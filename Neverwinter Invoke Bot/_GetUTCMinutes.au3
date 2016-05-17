@@ -23,8 +23,8 @@ Func _GetUTCMinutes($UTCHour = 0, $UTCMinute = 0, $Until = False)
                 $r = 24 * 60 - $r
             EndIf
         EndIf
+        TCPCloseSocket($s)
     EndIf
-    TCPCloseSocket($s)
     TCPShutdown()
     Return $r
 EndFunc
