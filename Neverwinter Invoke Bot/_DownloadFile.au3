@@ -13,6 +13,7 @@ Func _DownloadFile($DownloadURL, $DownloadTitle = "Downloading", $DownloadMsg = 
     If Number($DownloadSize) > 0 Then
         Local $Download = InetGet($DownloadURL, $DownloadFilePath, $INET_FORCERELOAD, $INET_DOWNLOADBACKGROUND)
         If @error Then
+            InetClose($Download)
             FileDelete($DownloadFilePath)
             Return 0
         EndIf
