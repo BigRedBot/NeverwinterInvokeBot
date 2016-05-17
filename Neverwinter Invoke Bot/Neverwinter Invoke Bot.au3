@@ -4,6 +4,7 @@ Global $LoadPrivateSettings = 1
 #include "..\variables.au3"
 #include "Shared.au3"
 #include "_DownloadFile.au3"
+#include "_GetUTCMinutes.au3"
 #include "_AddCommaToNumber.au3"
 #include "ImageSearch.au3"
 #include <Crypt.au3>
@@ -772,6 +773,7 @@ Func HoursAndMinutes($n)
     Return $Hours & $Minutes & " minute(s)"
 EndFunc
 
+Local $FirstRun = 1
 Func Start()
     While 1
         Local $strNumber = InputBox($Title, @CRLF & "Starting loop: ( 1 - " & $LoopDelayMinutes[0] & "+ )", $CurrentLoop, "", "", 140)
@@ -839,6 +841,15 @@ Func Start()
         EndIf
         MsgBox($MB_ICONWARNING, $Title, "You did not enter a valid number!")
     WEnd
+    If $FirstRun Or $MinutesToStart Then
+        $FirstRun = 0
+        If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, "Get minutes until server reset?") = $IDYES Then
+            Local $m = _GetUTCMinutes(10, 1, True)
+            If $m >= 0 Then
+                $MinutesToStart = $m
+            EndIf
+        EndIf
+    EndIf
     While 1
         Local $strNumber = InputBox($Title, @CRLF & "To start invoking, click the OK button" & @CRLF & "while at the character selection screen." & @CRLF & @CRLF & "Minutes to wait before starting: ( 0 to start now )", $MinutesToStart, "", 300, 180)
         If @error <> 0 Then

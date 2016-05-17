@@ -1,5 +1,8 @@
 
 
+Version: 5.4
+    Added ability to get the minutes until server resets by synchronizing to a time server.
+
 Version: 5.3
     Added auto-updater.
 
