@@ -68,4 +68,3 @@ Func _DownloadFileAddCommaToNumber($v)
     EndIf
     Return $s
 EndFunc
-
