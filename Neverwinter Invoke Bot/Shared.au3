@@ -46,7 +46,7 @@ If FileExists(@ScriptDir & "\PrivateSettings.ini") Then
     FileDelete(@ScriptDir & "\PrivateSettings.ini")
 EndIf
 If Not FileExists($SettingsDir & "\Settings.ini") Then
-    FileCopy(@ScriptDir & "\dependencies\Template.ini", $SettingsDir & "\Settings.ini", $FC_OVERWRITE + $FC_CREATEPATH)
+    FileCopy(@ScriptDir & "\Template.ini", $SettingsDir & "\Settings.ini", $FC_OVERWRITE + $FC_CREATEPATH)
 EndIf
 LoadSettings($SettingsDir & "\Settings.ini")
 LoadSettings($SettingsDir & "\PrivateSettings.ini")

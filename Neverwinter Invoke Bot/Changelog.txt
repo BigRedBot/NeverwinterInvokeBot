@@ -1,5 +1,8 @@
 
 
+Version: 5.3
+    Added auto-updater.
+
 Version: 5.2.1
     Added an additional arrow key press to get the selected character from the character selection screen aligned correctly for pixel detection.
 

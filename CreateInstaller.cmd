@@ -1,8 +1,13 @@
 @ECHO OFF
-SET VERSION=5.2.1
+SET VERSION=5.3
 SET NAME=Neverwinter Invoke Bot
 SET INSTALLER=NeverwinterInvokeBot
 SET EXE=%NAME%,Uninstall,ImageCapture,ScreenDetection
+
+(
+    ECHO [CurrentVersion]
+    ECHO CurrentVersion=%VERSION%
+) > CurrentVersion.ini
 
 (
     ECHO #include-once

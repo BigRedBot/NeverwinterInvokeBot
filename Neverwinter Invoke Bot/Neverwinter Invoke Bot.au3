@@ -3,7 +3,9 @@
 Global $LoadPrivateSettings = 1
 #include "..\variables.au3"
 #include "Shared.au3"
-#include "dependencies\ImageSearch.au3"
+#include "_DownloadFile.au3"
+#include "_AddCommaToNumber.au3"
+#include "ImageSearch.au3"
 #include <Crypt.au3>
 Global $KeyDelay = $KeyDelaySeconds * 1000
 Global $TimeOut = $TimeOutMinutes * 60000
@@ -875,27 +877,41 @@ Func Start()
     Loop()
 EndFunc
 
-Func AddCommaToNumber($v)
-    Local $s = String(Ceiling(Number($v)))
-    If StringLen($s) > 3 Then
-        $s = StringLeft($s, StringLen($s) - 3) & "," & StringRight($s,3)
-        Do
-           If Not StringInStr(StringLeft($s, 4), ",") Then
-              $s = StringLeft($s, StringInStr($s, ",") - 4) & "," & StringRight($s, StringLen($s) - StringInStr($s, ",") + 4)
-           EndIf
-        Until StringInStr(StringLeft($s, 4), ",")
+If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, "Check for update?") = $IDYES Then
+    Local $tmpverfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/CurrentVersion.ini", $Title, "Retrieving current version information...")
+    If $tmpverfile Then
+        Local $CurrentVersion = IniRead($tmpverfile, "CurrentVersion", "CurrentVersion", "")
+        FileDelete($tmpverfile)
+        If $CurrentVersion <> "" Then
+            If $CurrentVersion = $Version Then
+                MsgBox($MB_OK, $Title, "You are running the latest version.")
+            ElseIf MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, "Newer version " & '"' & $CurrentVersion & '"' & " has been found." & @CRLF & @CRLF & "Download and install latest version?") = $IDYES Then
+                Local $tmpinstallfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe", $Title, "Downloading Installer...")
+                If $tmpinstallfile Then
+                    FileCopy($tmpinstallfile, "Install.exe", $FC_OVERWRITE)
+                    FileDelete($tmpinstallfile)
+                    ShellExecute("Install.exe")
+                    Exit
+                Else
+                    MsgBox($MB_ICONWARNING, $Title, "Could not download the latest version!")
+                EndIf
+            EndIf
+        Else
+            MsgBox($MB_ICONWARNING, $Title, "Could not read the current version information!")
+        EndIf
+    Else
+        MsgBox($MB_ICONWARNING, $Title, "Could not download the current version information!")
     EndIf
-    Return $s
-EndFunc
+EndIf
 
 If ( Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", "")) - Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "DonationPrompts", "")) * 2000 ) >= 2000 Then
     IniWrite($SettingsDir & "\Settings.ini", "Statistics", "DonationPrompts", Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "DonationPrompts", "")) + 1)
-    Local $text = "You have Invoked a total of " & AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", "")) & " times!"
+    Local $text = "You have Invoked a total of " & _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", "")) & " times!"
     If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalCelestialCoffers", "")) Then
-        $text &= @CRLF & @CRLF & "Total Celestial Coffers collected: " & AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalCelestialCoffers", ""))
+        $text &= @CRLF & @CRLF & "Total Celestial Coffers collected: " & _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalCelestialCoffers", ""))
     EndIf
     If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", "")) Then
-        $text &= @CRLF & @CRLF & "Total Overflow XP Rewards collected: " & AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", ""))
+        $text &= @CRLF & @CRLF & "Total Overflow XP Rewards collected: " & _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", ""))
     EndIf
     If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $text & @CRLF & @CRLF & @CRLF & "Would you like to donate now?") = $IDYES Then
         ShellExecute(@ScriptDir & "\Donation.html")

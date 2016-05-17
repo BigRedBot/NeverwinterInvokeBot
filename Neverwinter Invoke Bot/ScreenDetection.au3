@@ -2,7 +2,7 @@ Global $Name = "Neverwinter Invoke Bot: Screen Detection"
 
 #AutoIt3Wrapper_UseX64=n
 #include "Shared.au3"
-#include "dependencies\ImageSearch.au3"
+#include "ImageSearch.au3"
 Global $Title = $Name
 
 If @AutoItX64 Then
