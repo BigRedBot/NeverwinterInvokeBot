@@ -888,9 +888,9 @@ If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, "Check for update?") = $IDYES Th
             ElseIf MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, "Newer version " & '"' & $CurrentVersion & '"' & " has been found." & @CRLF & @CRLF & "Download and install latest version?") = $IDYES Then
                 Local $tmpinstallfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe", $Title, "Downloading Installer...")
                 If $tmpinstallfile Then
-                    FileCopy($tmpinstallfile, "Install.exe", $FC_OVERWRITE)
+                    FileCopy($tmpinstallfile, @ScriptDir & "\Install.exe", $FC_OVERWRITE)
                     FileDelete($tmpinstallfile)
-                    ShellExecute("Install.exe")
+                    ShellExecute(@ScriptDir & "\Install.exe")
                     Exit
                 Else
                     MsgBox($MB_ICONWARNING, $Title, "Could not download the latest version!")
