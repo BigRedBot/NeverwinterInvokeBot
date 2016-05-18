@@ -1,5 +1,8 @@
 
 
+Version: 5.4.1
+    The mouse clicks will now randomly click within 5 pixels of the selected location.
+
 Version: 5.4
     Added ability to get the minutes until server resets by synchronizing to a time server.
 

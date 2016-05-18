@@ -517,7 +517,7 @@ Func ImageSearch($f1 = 0 , $f2 = 0)
     For $i = 1 To @NumParams
         local $f = Eval("f" & $i)
         If $f And FileExists("images\" & $f & ".png") Then
-            If _ImageSearchArea("images\" & $f & ".png", 1, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, $ImageSearchTolerance) Then
+            If _ImageSearchArea("images\" & $f & ".png", 5, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, $ImageSearchTolerance) Then
                 If $LogIn And $f = "InGameScreen" Then
                     $LogIn = 0
                 EndIf
@@ -889,9 +889,9 @@ Func Start()
 EndFunc
 
 If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, "Check for update?") = $IDYES Then
-    Local $tmpverfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/CurrentVersion.ini", $Title, "Retrieving current version information...")
+    Local $tmpverfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/version.ini", $Title, "Retrieving current version information...")
     If $tmpverfile Then
-        Local $CurrentVersion = IniRead($tmpverfile, "CurrentVersion", "CurrentVersion", "")
+        Local $CurrentVersion = IniRead($tmpverfile, "version", "version", "")
         FileDelete($tmpverfile)
         If $CurrentVersion <> "" Then
             If $CurrentVersion = $Version Then

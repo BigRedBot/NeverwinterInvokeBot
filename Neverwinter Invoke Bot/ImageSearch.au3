@@ -17,7 +17,7 @@
 ;                   $tolerance - 0 for no tolerance (0-255). Needed when colors of
 ;                                image differ from desktop. e.g GIF
 ;                   $resultPosition - Set where the returned x,y location of the image is.
-;                                     1 for centre of image, 0 for top left of image
+;                                     0 for centre of image, 1 or greater for random number of pixels away from center of image, -1 for top left of image
 ;                   $x $y - Return the x and y location of the image
 ;
 ; Return Value(s):  On Success - Returns 1
@@ -28,30 +28,34 @@
 ;
 ;===============================================================================
 Func _ImageSearch($findImage,$resultPosition, ByRef $x, ByRef $y,$tolerance,$width = @DesktopWidth, $height = @DesktopHeight)
-	If $width = 0 Then $width = @DesktopWidth
-	If $height = 0 Then $height = @DesktopHeight
-   return _ImageSearchArea($findImage,$resultPosition,0,0,$width,$height,$x,$y,$tolerance)
+    If $width = 0 Then $width = @DesktopWidth
+    If $height = 0 Then $height = @DesktopHeight
+    return _ImageSearchArea($findImage,$resultPosition,0,0,$width,$height,$x,$y,$tolerance)
 EndFunc
 
 Func _ImageSearchArea($findImage,$resultPosition,$x1,$y1,$right,$bottom,ByRef $x, ByRef $y, $tolerance)
-	;MsgBox(0,"asd","" & $x1 & " " & $y1 & " " & $right & " " & $bottom)
-	if $tolerance>0 then $findImage = "*" & $tolerance & " " & $findImage
-	$result = DllCall("ImageSearchDLL.dll","str","ImageSearch","int",$x1,"int",$y1,"int",$right,"int",$bottom,"str",$findImage)
+    ;MsgBox(0,"asd","" & $x1 & " " & $y1 & " " & $right & " " & $bottom)
+    if $tolerance>0 then $findImage = "*" & $tolerance & " " & $findImage
+    $result = DllCall("ImageSearchDLL.dll","str","ImageSearch","int",$x1,"int",$y1,"int",$right,"int",$bottom,"str",$findImage)
 
-	; If error exit
+    ; If error exit
     if not IsArray($result) or $result[0]="0" then return 0
 
-	; Otherwise get the x,y location of the match and the size of the image to
-	; compute the centre of search
-	$array = StringSplit($result[0],"|")
+    ; Otherwise get the x,y location of the match and the size of the image to
+    ; compute the centre of search
+    $array = StringSplit($result[0],"|")
 
-   $x=Int(Number($array[2]))
-   $y=Int(Number($array[3]))
-   if $resultPosition=1 then
-      $x=$x + Int(Number($array[4])/2)
-      $y=$y + Int(Number($array[5])/2)
-   endif
-   return 1
+    $x=Int(Number($array[2]))
+    $y=Int(Number($array[3]))
+    if $resultPosition>=0 then
+        $x+=Int(Number($array[4])/2)
+        $y+=Int(Number($array[5])/2)
+        if $resultPosition>0 then
+            $x+=Random(-$resultPosition, $resultPosition, 1)
+            $y+=Random(-$resultPosition, $resultPosition, 1)
+        endif
+    endif
+    return 1
 EndFunc
 
 ;===============================================================================
@@ -65,7 +69,7 @@ EndFunc
 ;                   $tolerance - 0 for no tolerance (0-255). Needed when colors of
 ;                                image differ from desktop. e.g GIF
 ;                   $resultPosition - Set where the returned x,y location of the image is.
-;                                     1 for centre of image, 0 for top left of image
+;                                     0 for centre of image, 1 or greater for random number of pixels away from center of image, -1 for top left of image
 ;                   $x $y - Return the x and y location of the image
 ;
 ; Return Value(s):  On Success - Returns 1
@@ -74,18 +78,18 @@ EndFunc
 ;
 ;===============================================================================
 Func _WaitForImageSearch($findImage,$waitSecs,$resultPosition,ByRef $x, ByRef $y,$tolerance,$width = @DesktopWidth, $height = @DesktopHeight)
-	If $width = 0 Then $width = @DesktopWidth
-	If $height = 0 Then $height = @DesktopHeight
-	$waitSecs = $waitSecs * 1000
-	$startTime=TimerInit()
-	While TimerDiff($startTime) < $waitSecs
-		;sleep(100)
-		$result=_ImageSearch($findImage,$resultPosition,$x, $y,$tolerance,$width,$height)
-		if $result > 0 Then
-			return 1
-		EndIf
-	WEnd
-	return 0
+    If $width = 0 Then $width = @DesktopWidth
+    If $height = 0 Then $height = @DesktopHeight
+    $waitSecs = $waitSecs * 1000
+    $startTime=TimerInit()
+    While TimerDiff($startTime) < $waitSecs
+        ;sleep(100)
+        $result=_ImageSearch($findImage,$resultPosition,$x, $y,$tolerance,$width,$height)
+        if $result > 0 Then
+            return 1
+        EndIf
+    WEnd
+    return 0
 EndFunc
 
 ;===============================================================================
@@ -102,7 +106,7 @@ EndFunc
 ;                   $tolerance - 0 for no tolerance (0-255). Needed when colors of
 ;                                image differ from desktop. e.g GIF
 ;                   $resultPosition - Set where the returned x,y location of the image is.
-;                                     1 for centre of image, 0 for top left of image
+;                                     0 for centre of image, 1 or greater for random number of pixels away from center of image, -1 for top left of image
 ;                   $x $y - Return the x and y location of the image
 ;
 ; Return Value(s):  On Success - Returns the index of the successful find
@@ -111,17 +115,17 @@ EndFunc
 ;
 ;===============================================================================
 Func _WaitForImagesSearch($findImage,$waitSecs,$resultPosition,ByRef $x, ByRef $y,$tolerance)
-	$waitSecs = $waitSecs * 1000
-	$startTime=TimerInit()
-	While TimerDiff($startTime) < $waitSecs
-		for $i = 1 to $findImage[0]
-		    sleep(100)
-		    $result=_ImageSearch($findImage[$i],$resultPosition,$x, $y,$tolerance)
-		    if $result > 0 Then
-			    return $i
-		    EndIf
-		Next
-	WEnd
-	return 0
+    $waitSecs = $waitSecs * 1000
+    $startTime=TimerInit()
+    While TimerDiff($startTime) < $waitSecs
+        for $i = 1 to $findImage[0]
+            sleep(100)
+            $result=_ImageSearch($findImage[$i],$resultPosition,$x, $y,$tolerance)
+            if $result > 0 Then
+                return $i
+            EndIf
+        Next
+    WEnd
+    return 0
 EndFunc
 
