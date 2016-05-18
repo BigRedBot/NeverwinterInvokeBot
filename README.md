@@ -1,6 +1,6 @@
 # Neverwinter Invoke Bot
 
-You can download the installer here:  
+**You can download the installer here:**  
 https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe
 
 Find the latest list of changes here:  
