@@ -12,6 +12,7 @@ Global $KeyDelay = $KeyDelaySeconds * 1000
 Global $TimeOut = $TimeOutMinutes * 60000
 AutoItSetOption("SendKeyDownDelay", $KeyDelay)
 Global $Title = $Name & " v" & $Version
+Global $MouseOffset = 5
 
 If @AutoItX64 Then
     MsgBox($MB_ICONWARNING, $Title, "Please run this script with the 32 bit version of AutoIt!")
@@ -149,9 +150,9 @@ Func Loop()
         Splash()
         Local $LoopTimer = TimerInit()
         Focus()
-        MouseMove($SelectCharacterMenuX + $OffsetX, $SelectCharacterMenuY + $OffsetY)
+        MouseMove($SelectCharacterMenuX + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), $SelectCharacterMenuY + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
         DoubleRightClick()
-        MouseMove($ClientWidthCenter, $ClientHeightCenter)
+        MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
         If $Current <= Ceiling($TotalSlots / 2) Then
             If $TopScrollBarX And $TopSelectedCharacterX Then
                 For $n = 1 To 2
@@ -198,7 +199,7 @@ Func Loop()
         Sleep(1000)
         Send("{ENTER}")
         If $SafeLogInX Then
-            MouseMove($SafeLogInX + $OffsetX, $SafeLogInY + $OffsetY)
+            MouseMove($SafeLogInX + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), $SafeLogInY + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
             DoubleClick()
         EndIf
         Splash("[ Waiting for In Game Screen ]")
@@ -372,7 +373,7 @@ Func ChangeCharacter()
     Send($GameMenuKey)
     Sleep(1500)
     If Exists("ChangeCharacterButton") And Not ImageSearch("ChangeCharacterButton") Then
-        MouseMove($ClientWidthCenter, $ClientTop + Round($ClientHeight * 0.60))
+        MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
         While Not ImageSearch("ChangeCharacterButton")
             TimeOut()
             FindLogInScreen()
@@ -380,7 +381,7 @@ Func ChangeCharacter()
             Sleep(500)
             Send("{ESC}")
             Sleep(1500)
-            MouseMove($ClientWidthCenter, $ClientTop + Round($ClientHeight * 0.60))
+            MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
             If ImageSearch("ChangeCharacterButton") Then
                 Send("{ESC}")
                 Sleep(500)
@@ -389,7 +390,7 @@ Func ChangeCharacter()
             Sleep(500)
             Send($GameMenuKey)
             Sleep(1500)
-            MouseMove($ClientWidthCenter, $ClientTop + Round($ClientHeight * 0.60))
+            MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
         WEnd
     EndIf
     If Exists("ChangeCharacterButton") Then
@@ -409,7 +410,7 @@ Func ChangeCharacter()
         Sleep(500)
         Send("{ESC}")
         Sleep(1500)
-        MouseMove($ClientWidthCenter, $ClientTop + Round($ClientHeight * 0.60))
+        MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
         If ImageSearch("ChangeCharacterButton") Then
             Send("{ESC}")
             Sleep(500)
@@ -426,7 +427,7 @@ Func ChangeCharacter()
         Sleep(500)
         Send("{ESC}")
         Sleep(1500)
-        MouseMove($ClientWidthCenter, $ClientTop + Round($ClientHeight * 0.60))
+        MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
         If ImageSearch("ChangeCharacterButton") Then
             Send("{ESC}")
             Sleep(500)
@@ -517,7 +518,7 @@ Func ImageSearch($f1 = 0 , $f2 = 0)
     For $i = 1 To @NumParams
         local $f = Eval("f" & $i)
         If $f And FileExists("images\" & $f & ".png") Then
-            If _ImageSearchArea("images\" & $f & ".png", 5, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, $ImageSearchTolerance) Then
+            If _ImageSearchArea("images\" & $f & ".png", $MouseOffset, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, $ImageSearchTolerance) Then
                 If $LogIn And $f = "InGameScreen" Then
                     $LogIn = 0
                 EndIf
@@ -606,9 +607,9 @@ Func LogIn()
         Else
             Focus()
             If $UsernameBoxY Then
-                MouseMove($UsernameBoxX + $OffsetX, $UsernameBoxY + $OffsetY)
+                MouseMove($UsernameBoxX + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), $UsernameBoxY + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
             Else
-                MouseMove($ClientWidthCenter, $ClientHeightCenter)
+                MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
             EndIf
             DoubleClick()
             Send("^a")
