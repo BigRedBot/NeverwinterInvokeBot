@@ -4,7 +4,7 @@ You can download the installer here:
 https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe
 
 Find the latest list of changes here:  
-https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/Neverwinter%20Invoke%20Bot/Changelog.txt
+https://github.com/BigRedBot/NeverwinterInvokeBot/blob/master/CHANGELOG.md
 
 Please post your questions or requests for this script here:  
 https://github.com/BigRedBot/NeverwinterInvokeBot/issues
