@@ -1,5 +1,9 @@
 # Neverwinter Invoke Bot
 
+Some anti-virus software may falsely detect this program as a virus.  
+It is a false positive. Please read here for more information about this:  
+https://github.com/BigRedBot/NeverwinterInvokeBot/issues/38
+
 **You can download the installer here:**  
 https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe
 
