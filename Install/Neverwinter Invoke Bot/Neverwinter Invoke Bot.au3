@@ -518,7 +518,7 @@ Func ImageSearch($f1 = 0 , $f2 = 0)
     For $i = 1 To @NumParams
         local $f = Eval("f" & $i)
         If $f And FileExists("images\" & $f & ".png") Then
-            If _ImageSearchArea("images\" & $f & ".png", $MouseOffset, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, $ImageSearchTolerance) Then
+            If _ImageSearchArea("images\" & $f & ".png", -2, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, $ImageSearchTolerance) Then
                 If $LogIn And $f = "InGameScreen" Then
                     $LogIn = 0
                 EndIf

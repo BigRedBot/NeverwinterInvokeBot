@@ -17,7 +17,7 @@
 ;                   $tolerance - 0 for no tolerance (0-255). Needed when colors of
 ;                                image differ from desktop. e.g GIF
 ;                   $resultPosition - Set where the returned x,y location of the image is.
-;                                     0 for centre of image, 1 or greater for random number of pixels away from center of image, -1 for top left of image
+;                                     0 for centre of image, 1 or greater for random number of pixels away from center of image, -1 for top left of image,  -2 for random location within image
 ;                   $x $y - Return the x and y location of the image
 ;
 ; Return Value(s):  On Success - Returns 1
@@ -54,6 +54,9 @@ Func _ImageSearchArea($findImage,$resultPosition,$x1,$y1,$right,$bottom,ByRef $x
             $x+=Random(-$resultPosition, $resultPosition, 1)
             $y+=Random(-$resultPosition, $resultPosition, 1)
         endif
+    elseif $resultPosition<-1 then
+        $x=Random($x, $x+Int(Number($array[4])), 1)
+        $y=Random($y, $y+Int(Number($array[5])), 1)
     endif
     return 1
 EndFunc
@@ -69,7 +72,7 @@ EndFunc
 ;                   $tolerance - 0 for no tolerance (0-255). Needed when colors of
 ;                                image differ from desktop. e.g GIF
 ;                   $resultPosition - Set where the returned x,y location of the image is.
-;                                     0 for centre of image, 1 or greater for random number of pixels away from center of image, -1 for top left of image
+;                                     0 for centre of image, 1 or greater for random number of pixels away from center of image, -1 for top left of image,  -2 for random location within image
 ;                   $x $y - Return the x and y location of the image
 ;
 ; Return Value(s):  On Success - Returns 1
@@ -106,7 +109,7 @@ EndFunc
 ;                   $tolerance - 0 for no tolerance (0-255). Needed when colors of
 ;                                image differ from desktop. e.g GIF
 ;                   $resultPosition - Set where the returned x,y location of the image is.
-;                                     0 for centre of image, 1 or greater for random number of pixels away from center of image, -1 for top left of image
+;                                     0 for centre of image, 1 or greater for random number of pixels away from center of image, -1 for top left of image,  -2 for random location within image
 ;                   $x $y - Return the x and y location of the image
 ;
 ; Return Value(s):  On Success - Returns the index of the successful find

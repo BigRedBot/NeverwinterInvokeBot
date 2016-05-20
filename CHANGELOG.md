@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+5.4.2
+- The mouse clicks after detecting an image will now randomly click a random location within the image.
+
 5.4.1
 - The mouse clicks will now randomly click within 5 pixels of the selected location.
 
