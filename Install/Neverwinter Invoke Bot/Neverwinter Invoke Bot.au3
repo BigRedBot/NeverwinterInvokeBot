@@ -55,7 +55,7 @@ Func Position($r = 0)
                 Sleep(500)
             WEnd
             BlockInput(1)
-            Splash("[ Waiting for Log In Screen ]")
+            Splash("[ " & $LOCALIZATION_WaitingForLogInScreen & " ]")
             FileChangeDir($GameClientInstallLocation & "\Neverwinter\Live")
             Run("GameClient.exe" & $LogInServerAddress, $GameClientInstallLocation & "\Neverwinter\Live")
             FileChangeDir(@ScriptDir)
@@ -88,7 +88,7 @@ Func Position($r = 0)
             HotKeySet("{F4}")
             SplashOff()
             $SplashWindow = 0
-            Error("Please un-maximize the Neverwinter window!")
+            Error($LOCALIZATION_UnMaximize)
             Return
         ElseIf $DeskTopWidth <= ($GameWidth + $PaddingLeft) Or $DeskTopHeight <= ($GameHeight + $PaddingTop) Or ( $DeskTopWidth <= ($GameWidth + $PaddingLeft + $SplashWidth) And $DeskTopHeight <= ($GameHeight + $PaddingTop + $SplashHeight) ) Then
             BlockInput(0)
@@ -96,7 +96,7 @@ Func Position($r = 0)
             HotKeySet("{F4}")
             SplashOff()
             $SplashWindow = 0
-            Error("Your screen resolution must be higher than " & ($GameWidth + $PaddingLeft) & "x" & ($GameHeight + $PaddingTop + $SplashHeight) & "!")
+            Error(StringReplace($LOCALIZATION_ResolutionHigherThan, "<RESOLUTION>", ($GameWidth + $PaddingLeft) & "x" & ($GameHeight + $PaddingTop + $SplashHeight)))
             Return
         EndIf
         If $ClientWidth <> $GameWidth Or $ClientHeight <> $GameHeight Then
@@ -116,9 +116,9 @@ Func Position($r = 0)
             EndIf
         EndIf
         If $ClientWidth <> $GameWidth Or $ClientHeight <> $GameHeight Then
-            Error("Neverwinter window was unable to be resized!")
+            Error($LOCALIZATION_UnableToResize)
         ElseIf $ClientLeft < 0 Or $ClientTop < 0 Or ( $ClientRight >= $SplashLeft And $ClientBottom >= $SplashTop ) Then
-            Error("Neverwinter window was unable to be moved!")
+            Error($LOCALIZATION_UnableToMove)
         EndIf
     EndIf
 EndFunc
@@ -138,7 +138,7 @@ Func Loop()
     If $CurrentLoop > $EndAtLoop Or ( $CurrentLoop > $LoopDelayMinutes[0] And $Invoked = ($TotalSlots * $LoopDelayMinutes[0]) ) Then
         End()
     EndIf
-    Splash("[ Waiting for Character Selection Screen ]")
+    Splash("[ " & $LOCALIZATION_WaitingForCharacterSelectionScreen & " ]")
     If Exists("SelectionScreen") Then
         $WaitingTimer = TimerInit()
         WaitForScreen("SelectionScreen")
@@ -206,7 +206,7 @@ Func Loop()
             MouseMove($SafeLogInX + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), $SafeLogInY + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
             DoubleClick()
         EndIf
-        Splash("[ Waiting for In Game Screen ]")
+        Splash("[ " & $LOCALIZATION_WaitingForInGameScreen & " ]")
         If Exists("InGameScreen") Then
             $WaitingTimer = TimerInit()
             WaitForScreen("InGameScreen")
@@ -242,7 +242,7 @@ Func Loop()
         EndIf
         Local $LogOutTimer = TimerInit()
         Local $RemainingCharacters = $EndAt - $Current
-        Splash("[ Waiting for Character Selection Screen ]")
+        Splash("[ " & $LOCALIZATION_WaitingForCharacterSelectionScreen & " ]")
         If Exists("SelectionScreen") Then
             $WaitingTimer = TimerInit()
             WaitForScreen("SelectionScreen")
@@ -272,7 +272,7 @@ Func Loop()
             Next
             Local $LastTime = TimerDiff($LoopTimer)
             Local $RemainingSeconds = ( $RemainingCharacters * $LastTime + $AdditionalKeyPressTime - TimerDiff($LogOutTimer) ) / 1000
-            $ETAText = "Last invoke took " & Round($LastTime / 1000, 2) & " seconds to complete" & @CRLF & "ETA for current loop: " & HoursAndMinutes($RemainingSeconds / 60)
+            $ETAText = StringReplace($LOCALIZATION_LastInvokeTook, "<SECONDS>", Round($LastTime / 1000, 2)) & @CRLF & StringReplace($LOCALIZATION_ETAForCurrentLoop, "<MINUTES>", HoursAndMinutes($RemainingSeconds / 60))
         EndIf
     Next
     End()
@@ -296,7 +296,7 @@ Func WaitToInvoke()
             BlockInput(0)
             WinSetOnTop($WinHandle, "", 0)
             While $Minutes > 0
-                Splash("[ Waiting for Invoke Delay: " & HoursAndMinutes($Minutes) & " ]", 0)
+                Splash("[ " & StringReplace($LOCALIZATION_WaitingForInvokeDelay, "<MINUTES>", HoursAndMinutes($Minutes)) & " ]", 0)
                 Sleep(1000)
                 $Minutes = $LoopDelayMinutes[$i] - TimerDiff($Time) / 60000
             WEnd
@@ -478,7 +478,7 @@ Func Splash($s = "", $ontop = 1)
         Local $setontop = $DLG_NOTITLE, $toplocation = $SplashTop, $leftlocation = $SplashLeft
         If $ontop Then
             $SplashWindowOnTop = 1
-            $SplashStartText = "To Stop: Press Ctrl+Alt+Del then" & @CRLF & "press Escape and then press F4." & @CRLF & @CRLF
+            $SplashStartText = $LOCALIZATION_ToStopPressCtrlAltDel & @CRLF & @CRLF
         Else
             $SplashWindowOnTop = 0
             $setontop = $DLG_NOTONTOP + $DLG_MOVEABLE
@@ -572,7 +572,7 @@ Func FindLogInScreen($r = 0)
         Splash()
         Sleep(1000)
         LogIn()
-        Splash("[ Waiting for Character Selection Screen ]")
+        Splash("[ " & $LOCALIZATION_WaitingForCharacterSelectionScreen & " ]")
         Sleep(1000)
         If Exists("SelectionScreen") Then
             While Not ImageSearch("SelectionScreen")
@@ -582,7 +582,7 @@ Func FindLogInScreen($r = 0)
                     Splash()
                     Sleep(1000)
                     ChangeCharacter()
-                    Splash("[ Waiting for Character Selection Screen ]")
+                    Splash("[ " & $LOCALIZATION_WaitingForCharacterSelectionScreen & " ]")
                     While Not ImageSearch("SelectionScreen")
                         TimeOut()
                         FindLogInScreen()
@@ -607,7 +607,7 @@ EndFunc
 Func LogIn()
     If $LogInUserName And $LogInPassword Then
         If $LogInTries >= $MaxLogInAttempts Then
-            Error("Maximum login attempts reached!")
+            Error($LOCALIZATION_MaxLoginAttempts)
         Else
             Focus()
             If $UsernameBoxY Then
@@ -624,7 +624,7 @@ Func LogIn()
             $LogInTries += 1
         EndIf
     Else
-        Error("Username and password not defined!")
+        Error($LOCALIZATION_UsernameAndPasswordNotDefined)
     EndIf
 EndFunc
 
@@ -639,7 +639,7 @@ Func TimeOut($r = 0)
             EndIf
         EndIf
         If Not $r And $RestartGameClient And $GameClientInstallLocation And $GameClientInstallLocation <> "" And $LogInServerAddress And $LogInServerAddress <> "" And $LogInUserName And $LogInPassword And Exists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
-            Splash("[ Restarting Neverwinter! ]")
+            Splash("[ " & $LOCALIZATION_RestartingNeverwinter & " ]")
             If ProcessExists("GameClient.exe") Then
                 ProcessClose("GameClient.exe")
             EndIf
@@ -651,18 +651,18 @@ Func TimeOut($r = 0)
             WEnd
             Position(1)
         Else
-            Error("The operation timed out!")
+            Error($LOCALIZATION_OperationTimedOut)
         EndIf
     EndIf
 EndFunc
 
 Func End()
-    Message("Completed invoking: " & $StartAt & " - " & $EndAt & " ( " & $StartAtLoop & " to " & $EndAtLoop & " Loops )" & @CRLF & @CRLF & "Invoking took " & HoursAndMinutes(TimerDiff($StartTimer) / 60000) & " to complete.")
+    Message(StringReplace(StringReplace(StringReplace(StringReplace($LOCALIZATION_CompletedInvoking, "<STARTAT>", $StartAt), "<ENDAT>", $EndAt), "<STARTATLOOP>", $StartAtLoop), "<ENDATLOOP>", $EndAtLoop) & @CRLF & @CRLF & StringReplace($LOCALIZATION_InvokingTook, "<MINUTES>", HoursAndMinutes(TimerDiff($StartTimer) / 60000)))
     Exit
 EndFunc
 
 Func Pause()
-    Message("Paused.")
+    Message($LOCALIZATION_Paused)
     Start()
 EndFunc
 
@@ -739,25 +739,25 @@ Func Message($s, $n = $MB_OK, $ontop = 0)
         $TimedOutCharacterText = " ( " & $TimedOutCharacterText & " )"
     EndIf
     If $Invoked Then
-        $text &= @CRLF & @CRLF & "Invoked " & $Invoked & " / " & ($TotalSlots * $LoopDelayMinutes[0]) & " times. ( " & Floor(($Invoked / ($TotalSlots * $LoopDelayMinutes[0])) * 100) & "% )"
+        $text &= @CRLF & @CRLF & StringReplace(StringReplace(StringReplace($LOCALIZATION_InvokedTimes, "<INVOKED>", $Invoked), "<INVOKETOTAL>", $TotalSlots * $LoopDelayMinutes[0]), "<PERCENT>", Floor(($Invoked / ($TotalSlots * $LoopDelayMinutes[0])) * 100))
     EndIf
     If $CofferCount Then
-        $text &= @CRLF & @CRLF & "Collected " & $CofferCount & " coffers."
+        $text &= @CRLF & @CRLF & StringReplace($LOCALIZATION_CofferCount, "<COUNT>", $CofferCount)
     EndIf
     If $OverflowXPRewardCount Then
-        $text &= @CRLF & @CRLF & "Collected " & $OverflowXPRewardCount & " overflow XP rewards."
+        $text &= @CRLF & @CRLF & StringReplace($LOCALIZATION_OverflowXPRewardCount, "<COUNT>", $OverflowXPRewardCount)
     EndIf
     If $ReLogged Then
-        $text &= @CRLF & @CRLF & "Re-logged " & $ReLogged & " times."
+        $text &= @CRLF & @CRLF & StringReplace($LOCALIZATION_ReLoggedCount, "<COUNT>", $ReLogged)
     EndIf
     If $Restarted Then
-        $text &= @CRLF & @CRLF & "Restarted the game " & $Restarted & " times."
+        $text &= @CRLF & @CRLF & StringReplace($LOCALIZATION_RestartedCount, "<COUNT>", $Restarted)
     EndIf
     If $IdleLogout Then
-        $text &= @CRLF & @CRLF & "Idle logout " & $IdleLogout & " times." & $IdleLogoutCharacterText
+        $text &= @CRLF & @CRLF & StringReplace($LOCALIZATION_IdleLogoutCount, "<COUNT>", $IdleLogout) & $IdleLogoutCharacterText
     EndIf
     If $TimedOut Then
-        $text &= @CRLF & @CRLF & "Timed out " & $TimedOut & " times." & $TimedOutCharacterText
+        $text &= @CRLF & @CRLF & StringReplace($LOCALIZATION_TimedOutCount, "<COUNT>", $TimedOut) & $TimedOutCharacterText
     EndIf
     If $ontop Then
         MsgBox($n, $Title, $text, "", WinGetHandle(AutoItWinGetTitle()) * WinSetOnTop(AutoItWinGetTitle(), "", 1))
@@ -771,17 +771,18 @@ Func HoursAndMinutes($n)
     Local $Hours = Floor($All / 60)
     Local $Minutes = $All - $Hours * 60
     If $Hours Then
-        $Hours &= " hour(s) "
-    Else
-        $Hours = ""
+        If $Minutes Then
+            Return StringReplace(StringReplace($LOCALIZATION_HoursMinutes, "<HOURS>", $Hours), "<MINUTES>", $Minutes)
+        EndIf
+        Return StringReplace($LOCALIZATION_Hours, "<HOURS>", $Hours)
     EndIf
-    Return $Hours & $Minutes & " minute(s)"
+    Return StringReplace($LOCALIZATION_Minutes, "<MINUTES>", $Minutes)
 EndFunc
 
 Local $FirstRun = 1
 Func Start()
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & "Starting loop: ( 1 - " & $LoopDelayMinutes[0] & "+ )", $CurrentLoop, "", "", 140)
+        Local $strNumber = InputBox($Title, @CRLF & StringReplace($LOCALIZATION_StartingLoop, "<MAXLOOPS>", $LoopDelayMinutes[0]), $CurrentLoop, "", "", 140)
         If @error <> 0 Then
             Exit
         EndIf
@@ -791,10 +792,10 @@ Func Start()
             $CurrentLoop = $StartAtLoop
             ExitLoop
         EndIf
-        MsgBox($MB_ICONWARNING, $Title, "You did not enter a valid number!")
+        MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_ValidNumber)
     WEnd
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & "Ending loop: ( " & $StartAtLoop & "+ )", $EndAtLoop, "", "", 140)
+        Local $strNumber = InputBox($Title, @CRLF & StringReplace($LOCALIZATION_EndingLoop, "<STARTATLOOP>", $StartAtLoop), $EndAtLoop, "", "", 140)
         If @error <> 0 Then
             Exit
         EndIf
@@ -803,10 +804,10 @@ Func Start()
             $EndAtLoop = $number
             ExitLoop
         EndIf
-        MsgBox($MB_ICONWARNING, $Title, "You did not enter a valid number!")
+        MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_ValidNumber)
     WEnd
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & "Start at for each loop: ( 1 - " & $TotalSlots & " )", $StartAt, "", "", 140)
+        Local $strNumber = InputBox($Title, @CRLF & StringReplace($LOCALIZATION_StartAtEachLoop, "<TOTALSLOTS>", $TotalSlots), $StartAt, "", "", 140)
         If @error <> 0 Then
             Exit
         EndIf
@@ -815,10 +816,10 @@ Func Start()
             $StartAt = $number
             ExitLoop
         EndIf
-        MsgBox($MB_ICONWARNING, $Title, "You did not enter a valid number!")
+        MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_ValidNumber)
     WEnd
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & "End at for each loop: ( " & $StartAt & " - " & $TotalSlots & " )", $EndAt, "", "", 140)
+        Local $strNumber = InputBox($Title, @CRLF & StringReplace(StringReplace($LOCALIZATION_EndAtEachLoop, "<STARTAT>", $StartAt), "<TOTALSLOTS>", $TotalSlots), $EndAt, "", "", 140)
         If @error <> 0 Then
             Exit
         EndIf
@@ -827,7 +828,7 @@ Func Start()
             $EndAt = $number
             ExitLoop
         EndIf
-        MsgBox($MB_ICONWARNING, $Title, "You did not enter a valid number!")
+        MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_ValidNumber)
     WEnd
     If $Current < $StartAt Then
         $Current = $StartAt
@@ -835,7 +836,7 @@ Func Start()
         $Current = $EndAt
     EndIf
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & "Start at for current loop: ( " & $StartAt & " - " & $EndAt & " )", $Current, "", "", 140)
+        Local $strNumber = InputBox($Title, @CRLF & StringReplace(StringReplace($LOCALIZATION_StartAtCurrentLoop, "<STARTAT>", $StartAt), "<ENDAT>", $EndAt), $Current, "", "", 140)
         If @error <> 0 Then
             Exit
         EndIf
@@ -844,11 +845,11 @@ Func Start()
             $Current = $number
             ExitLoop
         EndIf
-        MsgBox($MB_ICONWARNING, $Title, "You did not enter a valid number!")
+        MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_ValidNumber)
     WEnd
     If $FirstRun Or $MinutesToStart Then
         $FirstRun = 0
-        If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, "Get minutes until server reset?") = $IDYES Then
+        If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $LOCALIZATION_GetMinutesUntilServerReset) = $IDYES Then
             Local $m = _GetUTCMinutes(10, 1, True)
             If $m >= 0 Then
                 $MinutesToStart = $m
@@ -856,7 +857,7 @@ Func Start()
         EndIf
     EndIf
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & "To start invoking, click the OK button" & @CRLF & "while at the character selection screen." & @CRLF & @CRLF & "Minutes to wait before starting: ( 0 to start now )", $MinutesToStart, "", 300, 180)
+        Local $strNumber = InputBox($Title, @CRLF & $LOCALIZATION_ToStartInvoking, $MinutesToStart, "", 300, 180)
         If @error <> 0 Then
             Exit
         EndIf
@@ -865,7 +866,7 @@ Func Start()
             $MinutesToStart = $number
             ExitLoop
         EndIf
-        MsgBox($MB_ICONWARNING, $Title, "You did not enter a valid number!")
+        MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_ValidNumber)
     WEnd
     $StartTimer = 0
     $LogInTries = 0
@@ -878,7 +879,7 @@ Func Start()
         WinSetOnTop($WinHandle, "", 0)
         While $Minutes > 0
             $MinutesToStart = Ceiling($Minutes)
-            Splash("[ Waiting to Start: " & HoursAndMinutes($Minutes) & " ]", 0)
+            Splash("[ " & StringReplace($LOCALIZATION_WaitingToStart, "<MINUTES>", HoursAndMinutes($Minutes)) & " ]", 0)
             Sleep(1000)
             $Minutes = $StartingMinutes - TimerDiff($Time) / 60000
         WEnd
@@ -893,43 +894,43 @@ Func Start()
     Loop()
 EndFunc
 
-If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, "Check for update?") = $IDYES Then
+If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $LOCALIZATION_CheckForUpdate) = $IDYES Then
     Local $tmpverfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/version.ini", $Title, "Retrieving current version information...")
     If $tmpverfile Then
         Local $CurrentVersion = IniRead($tmpverfile, "version", "version", "")
         FileDelete($tmpverfile)
         If $CurrentVersion <> "" Then
             If $CurrentVersion = $Version Then
-                MsgBox($MB_OK, $Title, "You are running the latest version.")
-            ElseIf MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, "Newer version " & '"' & $CurrentVersion & '"' & " has been found." & @CRLF & @CRLF & "Download and install latest version?") = $IDYES Then
-                Local $tmpinstallfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe", $Title, "Downloading Installer...")
+                MsgBox($MB_OK, $Title, $LOCALIZATION_RunningLatestVersion)
+            ElseIf MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, StringReplace($LOCALIZATION_NewerVersionFound, "<VERSION>", $CurrentVersion)) = $IDYES Then
+                Local $tmpinstallfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe", $Title, $LOCALIZATION_DownloadingInstaller)
                 If $tmpinstallfile Then
                     FileCopy($tmpinstallfile, @ScriptDir & "\Install.exe", $FC_OVERWRITE)
                     FileDelete($tmpinstallfile)
                     ShellExecute(@ScriptDir & "\Install.exe")
                     Exit
                 Else
-                    MsgBox($MB_ICONWARNING, $Title, "Could not download the latest version!")
+                    MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_CouldNotDownloadLatestVersion)
                 EndIf
             EndIf
         Else
-            MsgBox($MB_ICONWARNING, $Title, "Could not read the current version information!")
+            MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_CouldNotReadCurrentVersionInfo)
         EndIf
     Else
-        MsgBox($MB_ICONWARNING, $Title, "Could not download the current version information!")
+        MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_CouldNotDownloadCurrentVersionInfo)
     EndIf
 EndIf
 
 If ( Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", "")) - Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "DonationPrompts", "")) * 2000 ) >= 2000 Then
     IniWrite($SettingsDir & "\Settings.ini", "Statistics", "DonationPrompts", Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "DonationPrompts", "")) + 1)
-    Local $text = "You have Invoked a total of " & _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", "")) & " times!"
+    Local $text = StringReplace($LOCALIZATION_InvokedTotalTimes, "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", "")))
     If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalCelestialCoffers", "")) Then
-        $text &= @CRLF & @CRLF & "Total Celestial Coffers collected: " & _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalCelestialCoffers", ""))
+        $text &= @CRLF & @CRLF & StringReplace($LOCALIZATION_TotalCelestialCoffersCollected, "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalCelestialCoffers", "")))
     EndIf
     If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", "")) Then
-        $text &= @CRLF & @CRLF & "Total Overflow XP Rewards collected: " & _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", ""))
+        $text &= @CRLF & @CRLF & StringReplace($LOCALIZATION_TotalOverflowXPRewardsCollected, "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", "")))
     EndIf
-    If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $text & @CRLF & @CRLF & @CRLF & "Would you like to donate now?") = $IDYES Then
+    If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $text & @CRLF & @CRLF & @CRLF & $LOCALIZATION_DonateNow) = $IDYES Then
         ShellExecute(@ScriptDir & "\Donation.html")
         Exit
     EndIf
@@ -940,7 +941,7 @@ If Exists("LogInScreen") Then
         $LogInUserName = ""
     EndIf
     While 1
-        Local $string = InputBox($Title, @CRLF & "Enter your username:", $LogInUserName, "", "", 140)
+        Local $string = InputBox($Title, @CRLF & $LOCALIZATION_EnterUsername, $LogInUserName, "", "", 140)
         If @error <> 0 Then
             Exit
         EndIf
@@ -948,15 +949,15 @@ If Exists("LogInScreen") Then
             $LogInUserName = $string
             ExitLoop
         EndIf
-        If IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInUserName", "") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, "Delete your username from the settings file?") = $IDYES Then
+        If IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInUserName", "") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $LOCALIZATION_DeleteUsername) = $IDYES Then
             $LogInUserName = ""
             IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInUserName", "")
         Else
-            MsgBox($MB_ICONWARNING, $Title, "You did not enter a valid username!")
+            MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_ValidUsername)
         EndIf
     WEnd
     If IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInUserName", "") <> $LogInUserName Then
-        If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, "Save your username to the settings file?") = $IDYES Then
+        If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $LOCALIZATION_SaveUsername) = $IDYES Then
             IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInUserName", $LogInUserName)
         Else
             IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInUserName", "")
@@ -967,7 +968,7 @@ If Exists("LogInScreen") Then
     EndIf
     _Crypt_Startup()
     While 1
-        Local $string = InputBox($Title, @CRLF & "Enter your password:", $LogInPassword, "*", "", 140)
+        Local $string = InputBox($Title, @CRLF & $LOCALIZATION_EnterPassword, $LogInPassword, "*", "", 140)
         If @error <> 0 Then
             Exit
         EndIf
@@ -981,22 +982,22 @@ If Exists("LogInScreen") Then
                     $LogInPassword = $string
                     ExitLoop
                 EndIf
-                MsgBox($MB_ICONWARNING, $Title, "Password was incorrect!")
+                MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_PasswordIncorrect)
             Else
-                Local $string2 = InputBox($Title, @CRLF & "Enter your password again:", "", "*", "", 140)
+                Local $string2 = InputBox($Title, @CRLF & $LOCALIZATION_EnterPasswordAgain, "", "*", "", 140)
                 If @error <> 0 Then
                     Exit
                 EndIf
                 If $string == $string2 Then
                     $LogInPassword = $string
-                    If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, "Save your password to the settings file?") = $IDYES Then
+                    If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $LOCALIZATION_SavePassword) = $IDYES Then
                         IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInPassword", $LogInPassword)
                         If IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", "") <> "" Then
                             IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", "")
                         EndIf
                     Else
                         IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInPassword", "")
-                        If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, "Save your password's SHA1 hash to the settings file?") = $IDYES Then
+                        If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $LOCALIZATION_SavePasswordHash) = $IDYES Then
                             $PasswordHash = Hex(_Crypt_HashData($LogInPassword, $CALG_SHA1))
                             IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", $PasswordHash)
                         ElseIf IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", "") <> "" Then
@@ -1005,17 +1006,17 @@ If Exists("LogInScreen") Then
                     EndIf
                     ExitLoop
                 EndIf
-                MsgBox($MB_ICONWARNING, $Title, "Password did not match!")
+                MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_PasswordNotMatch)
             EndIf
         Else
-            If IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInPassword", "") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, "Delete your password from the settings file?") = $IDYES Then
+            If IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInPassword", "") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $LOCALIZATION_DeletePassword) = $IDYES Then
                 $LogInPassword = ""
                 IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInPassword", "")
-            ElseIf IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", "") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, "Delete your password's SHA1 hash from the settings file?") = $IDYES Then
+            ElseIf IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", "") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $LOCALIZATION_DeletePasswordHash) = $IDYES Then
                 $PasswordHash = 0
                 IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", "")
             Else
-                MsgBox($MB_ICONWARNING, $Title, "You did not enter a valid password!")
+                MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_ValidPassword)
             EndIf
         EndIf
     WEnd
@@ -1023,7 +1024,7 @@ If Exists("LogInScreen") Then
 EndIf
 
 While 1
-    Local $strNumber = InputBox($Title, @CRLF & "Enter your total number of characters:", $TotalSlots, "", "", 140)
+    Local $strNumber = InputBox($Title, @CRLF & $LOCALIZATION_TotalCharacters, $TotalSlots, "", "", 140)
     If @error <> 0 Then
         Exit
     EndIf
@@ -1032,7 +1033,7 @@ While 1
         $TotalSlots = $number
         ExitLoop
     EndIf
-    MsgBox($MB_ICONWARNING, $Title, "You did not enter a valid number!")
+    MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_ValidNumber)
 WEnd
 If IniRead($SettingsDir & "\Settings.ini", "Settings", "TotalSlots", "") <> $TotalSlots Then
     IniWrite($SettingsDir & "\Settings.ini", "Settings", "TotalSlots", $TotalSlots)
