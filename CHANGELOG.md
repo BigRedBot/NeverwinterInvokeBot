@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+5.5
+- Added support for the Russian game client.
+
 5.4.2
 - The mouse clicks after detecting an image will now randomly click a random location within the image.
 

@@ -1,5 +1,5 @@
 @ECHO OFF
-SET VERSION=5.5a
+SET VERSION=5.5
 SET NAME=Neverwinter Invoke Bot
 SET INSTALLER=NeverwinterInvokeBot
 SET EXE=%NAME%,Uninstall,ImageCapture,ScreenDetection
