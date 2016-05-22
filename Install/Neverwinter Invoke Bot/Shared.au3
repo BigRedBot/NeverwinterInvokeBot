@@ -8,7 +8,7 @@
 #include <WinAPIProc.au3>
 #include <WinAPI.au3>
 
-Global $SettingsDir = @AppDataCommonDir & "\" & $Name
+Global $SettingsDir = @AppDataCommonDir & "\Neverwinter Invoke Bot"
 
 DirCreate($SettingsDir)
 
