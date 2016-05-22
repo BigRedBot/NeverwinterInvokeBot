@@ -2,18 +2,80 @@
 #include <FileConstants.au3>
 #include <MsgBoxConstants.au3>
 #include <AutoItConstants.au3>
-If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
-    MsgBox($MB_ICONWARNING, $Name, $Name & " is already running!")
-    Exit
-EndIf
+#include <GUIConstants.au3>
+#include <GUIConstantsEx.au3>
+#include <WinAPIFiles.au3>
 #include <WinAPIProc.au3>
 #include <WinAPI.au3>
+
+Global $SettingsDir = @AppDataCommonDir & "\" & $Name
+
+DirCreate($SettingsDir)
+
+Global $Language = IniRead($SettingsDir & "\Settings.ini", "Settings", "Language", "")
+
+Local $LocalizationFile = @ScriptDir & "\Localization.ini"
+
+Func SetLanguage($default = "English")
+    Local $langlist = $default
+    Local $sections = IniReadSectionNames($LocalizationFile)
+    If @error = 0 Then
+        For $i = 1 To $sections[0]
+            If $sections[$i] <> $default Then
+                $langlist &= "|" & $sections[$i]
+            EndIf
+        Next
+    EndIf
+    Local $hGUI = GUICreate("Language", 200, 85)
+    Local $hCombo = GUICtrlCreateCombo("", 25, 15, 150, -1)
+    GUICtrlSetData(-1, $langlist, $default)
+    Local $hButton = GUICtrlCreateButton("OK", 58, 50, 84, -1, $BS_DEFPUSHBUTTON)
+    GUISetState()
+    While 1
+        Switch GUIGetMsg()
+            Case $GUI_EVENT_CLOSE
+                Exit
+            Case $hButton
+                Local $sCurrCombo = GUICtrlRead($hCombo)
+                For $i = 1 To $sections[0]
+                    If $sections[$i] == $sCurrCombo Then
+                        GUIDelete()
+                        $Language = $sCurrCombo
+                        IniWrite($SettingsDir & "\Settings.ini", "Settings", "Language", $Language)
+                        Return
+                    EndIf
+                Next
+        EndSwitch
+    WEnd
+EndFunc
+
+If $Language = "" Then
+    SetLanguage()
+EndIf
 
 Func SetDefault($name, $default = 0)
     If Not IsDeclared($name) Then
         Assign($name, $default, 2)
     EndIf
 EndFunc
+
+Func LoadLocalizations($file, $lang)
+    Local $values = IniReadSection($file, $lang)
+    If @error = 0 Then
+        For $i = 1 To $values[0][0]
+            Local $v = $values[$i][1]
+            If $v = "" Then
+                $v = IniRead($file, "English", $values[$i][0], "")
+            EndIf
+            SetDefault("Localization_" & $values[$i][0], StringReplace($v, "<BR>", @CRLF))
+        Next
+    EndIf
+    If $lang <> "English" Then
+        LoadLocalizations($file, "English")
+    EndIf
+EndFunc
+
+LoadLocalizations($LocalizationFile, $Language)
 
 SetDefault("LoadPrivateSettings")
 Func LoadSettings($file)
@@ -36,18 +98,6 @@ Func LoadSettings($file)
     EndIf
 EndFunc
 
-Global $SettingsDir = @AppDataCommonDir & "\" & $Name
-If FileExists(@ScriptDir & "\Settings.ini") Then
-    FileCopy(@ScriptDir & "\Settings.ini", $SettingsDir & "\Settings.ini", $FC_OVERWRITE + $FC_CREATEPATH)
-    FileDelete(@ScriptDir & "\Settings.ini")
-EndIf
-If FileExists(@ScriptDir & "\PrivateSettings.ini") Then
-    FileCopy(@ScriptDir & "\PrivateSettings.ini", $SettingsDir & "\PrivateSettings.ini", $FC_OVERWRITE + $FC_CREATEPATH)
-    FileDelete(@ScriptDir & "\PrivateSettings.ini")
-EndIf
-If Not FileExists($SettingsDir & "\Settings.ini") Then
-    FileCopy(@ScriptDir & "\Template.ini", $SettingsDir & "\Settings.ini", $FC_OVERWRITE + $FC_CREATEPATH)
-EndIf
 LoadSettings($SettingsDir & "\Settings.ini")
 LoadSettings($SettingsDir & "\PrivateSettings.ini")
 

@@ -1,6 +1,10 @@
 Global $Name = "Neverwinter Client Image Capture"
 
 #include "Shared.au3"
+If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
+    MsgBox($MB_ICONWARNING, $Name, $Localization_ImageCaptureAlreadyRunning)
+    Exit
+EndIf
 #include <ScreenCapture.au3>
 #include <Clipboard.au3>
 Global $Title = $Name
@@ -8,30 +12,30 @@ Global $Title = $Name
 Func Position()
     Focus()
     If Not $WinFound Or Not GetPosition() Then
-        MsgBox($MB_ICONWARNING, $Title, "Neverwinter window not found!")
+        MsgBox($MB_ICONWARNING, $Title, $Localization_NeverwinterNotFound)
         Capture()
     EndIf
     If $GameWidth And $GameHeight Then
         If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight Then
-            MsgBox($MB_ICONWARNING, $Title, "Please un-maximize the Neverwinter window!")
+            MsgBox($MB_ICONWARNING, $Title, $Localization_UnMaximize)
             Exit
         ElseIf $DeskTopWidth <= ($GameWidth + $PaddingLeft) Or $DeskTopHeight <= ($GameHeight + $PaddingTop) Then
-            MsgBox($MB_ICONWARNING, $Title, "Your screen resolution must be higher than " & ($GameWidth + $PaddingLeft) & "x" & ($GameHeight + $PaddingTop) & "!")
+            MsgBox($MB_ICONWARNING, $Title, StringReplace($Localization_ResolutionHigherThan, "<RESOLUTION>", ($GameWidth + $PaddingLeft) & "x" & ($GameHeight + $PaddingTop)))
             Exit
         ElseIf $ClientWidth <> $GameWidth Or $ClientHeight <> $GameHeight Then
             WinMove($WinHandle, "", $WinLeft, $WinTop, $GameWidth + $PaddingWidth, $GameHeight + $PaddingHeight)
-            MsgBox($MB_ICONWARNING, $Title, "Neverwinter window resized!")
+            MsgBox($MB_ICONWARNING, $Title, $Localization_NeverwinterResized)
             Capture()
         ElseIf $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
             WinMove($WinHandle, "", 0, 0)
-            MsgBox($MB_ICONWARNING, $Title, "Neverwinter window moved!")
+            MsgBox($MB_ICONWARNING, $Title, $Localization_NeverwinterMoved)
             Capture()
         EndIf
     EndIf
 EndFunc
 
 Func Capture()
-    If MsgBox($MB_OKCANCEL, $Title, "Click OK to capture Neverwinter client screen now.") <> $IDOK Then
+    If MsgBox($MB_OKCANCEL, $Title, $Localization_ClickOKToCapture) <> $IDOK Then
         Exit
     EndIf
     Position()
@@ -42,23 +46,23 @@ Func Capture()
     WinSetOnTop($WinHandle, "", 0)
     If Not _ClipBoard_Open(0) Then
         $err = @error
-        $err_txt = "_ClipBoard_Open failed!"
+        $err_txt = "_ClipBoard_Open"
     EndIf
     If Not _ClipBoard_Empty() Then
         $err = @error
-        $err_txt = "_ClipBoard_Empty failed!"
+        $err_txt = "_ClipBoard_Empty"
     EndIf
     If Not _ClipBoard_SetDataEx($hHBITMAP, $CF_BITMAP) Then
         $err = @error
-        $err_txt = "_ClipBoard_SetDataEx failed!"
+        $err_txt = "_ClipBoard_SetDataEx"
     EndIf
     _ClipBoard_Close()
     _WinAPI_DeleteObject($hHBITMAP)
     If $err Then
-        MsgBox($MB_ICONWARNING, "Error", "An error has occured: " & $err_txt, 10)
+        MsgBox($MB_ICONWARNING, $Title, StringReplace($Localization_ErrorOccuredWith, "<ERROR>", $err_txt), 10)
         Exit
     EndIf
-    MsgBox($MB_OK, $Title, "Neverwinter client screen captured." & @CRLF & @CRLF & "You may now paste the image into an image editor.")
+    MsgBox($MB_OK, $Title, $Localization_NeverwinterCaptured)
     Exit
 EndFunc
 

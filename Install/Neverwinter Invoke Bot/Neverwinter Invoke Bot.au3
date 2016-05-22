@@ -3,6 +3,10 @@
 Global $LoadPrivateSettings = 1
 #include "..\variables.au3"
 #include "Shared.au3"
+If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
+    MsgBox($MB_ICONWARNING, $Name, $Localization_AlreadyRunning)
+    Exit
+EndIf
 #include "_DownloadFile.au3"
 #include "_GetUTCMinutes.au3"
 #include "_AddCommaToNumber.au3"
@@ -517,8 +521,8 @@ Func ImageSearch($f1 = 0 , $f2 = 0)
     #forceref $f1, $f2
     For $i = 1 To @NumParams
         local $f = Eval("f" & $i)
-        If $f And FileExists("images\" & $f & ".png") Then
-            If _ImageSearchArea("images\" & $f & ".png", -2, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, $ImageSearchTolerance) Then
+        If $f And FileExists("images\" & $Language & "\" & $f & ".png") Then
+            If _ImageSearchArea("images\" & $Language & "\" & $f & ".png", -2, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, $ImageSearchTolerance) Then
                 If $LogIn And $f = "InGameScreen" Then
                     $LogIn = 0
                 EndIf
@@ -535,7 +539,7 @@ Func Exists($f1 = 0, $f2 = 0)
     #forceref $f1, $f2
     For $i = 1 To @NumParams
         local $f = Eval("f" & $i)
-        If $f And FileExists("images\" & $f & ".png") Then
+        If $f And FileExists("images\" & $Language & "\" & $f & ".png") Then
             Return 1
         EndIf
     Next

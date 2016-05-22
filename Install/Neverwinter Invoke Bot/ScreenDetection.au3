@@ -2,6 +2,10 @@ Global $Name = "Neverwinter Invoke Bot: Screen Detection"
 
 #AutoIt3Wrapper_UseX64=n
 #include "Shared.au3"
+If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
+    MsgBox($MB_ICONWARNING, $Name, $Localization_ScreenDetectionAlreadyRunning)
+    Exit
+EndIf
 #include "ImageSearch.au3"
 Global $Title = $Name
 
@@ -48,7 +52,7 @@ Func ImageSearch($f1 = 0 , $f2 = 0)
     #forceref $f1, $f2
     For $i = 1 To @NumParams
         local $f = Eval("f" & $i)
-        If $f And FileExists("images\" & $f & ".png") And _ImageSearchArea("images\" & $f & ".png", 1, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, $ImageSearchTolerance) Then
+        If $f And FileExists("images\" & $Language & "\" & $f & ".png") And _ImageSearchArea("images\" & $Language & "\" & $f & ".png", 1, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, $ImageSearchTolerance) Then
             Return 1
         EndIf
     Next
