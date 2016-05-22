@@ -4,7 +4,7 @@ Global $LoadPrivateSettings = 1
 #include "..\variables.au3"
 #include "Shared.au3"
 If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
-    MsgBox($MB_ICONWARNING, $Name, $Localization_AlreadyRunning)
+    MsgBox($MB_ICONWARNING, $Name, $LOCALIZATION_AlreadyRunning)
     Exit
 EndIf
 #include "_DownloadFile.au3"
@@ -19,7 +19,7 @@ Global $Title = $Name & " v" & $Version
 Global $MouseOffset = 5
 
 If @AutoItX64 Then
-    MsgBox($MB_ICONWARNING, $Title, "Please run this script with the 32 bit version of AutoIt!")
+    MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_Use32bit)
     Exit
 EndIf
 
@@ -47,7 +47,7 @@ Func Position($r = 0)
     Focus()
     If Not $WinFound Or Not GetPosition() Then
         If $RestartGameClient And $GameClientInstallLocation And $GameClientInstallLocation <> "" And $LogInServerAddress And $LogInServerAddress <> "" And $LogInUserName And $LogInPassword And Exists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
-            Splash("[ Neverwinter window not found! ]")
+            Splash("[ " & $LOCALIZATION_NeverwinterNotFound & " ]")
             $WaitingTimer = TimerInit()
             While ProcessExists("GameClient.exe")
                 TimeOut($r)
@@ -79,7 +79,7 @@ Func Position($r = 0)
             WEnd
             Return
         EndIf
-        Error("Neverwinter window not found!")
+        Error($LOCALIZATION_NeverwinterNotFound)
     EndIf
     If $GameWidth And $GameHeight Then
         If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight Then
@@ -482,7 +482,7 @@ Func Splash($s = "", $ontop = 1)
         Else
             $SplashWindowOnTop = 0
             $setontop = $DLG_NOTONTOP + $DLG_MOVEABLE
-            $SplashStartText = "To Stop: Press F4." & @CRLF & @CRLF & @CRLF
+            $SplashStartText = $LOCALIZATION_ToStopPressF4 & @CRLF & @CRLF & @CRLF
             $toplocation = 30
             $leftlocation = $SplashLeft - 30
         EndIf

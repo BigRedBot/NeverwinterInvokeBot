@@ -67,7 +67,7 @@ Func LoadLocalizations($file, $lang)
             If $v = "" Then
                 $v = IniRead($file, "English", $values[$i][0], "")
             EndIf
-            SetDefault("Localization_" & $values[$i][0], StringReplace($v, "<BR>", @CRLF))
+            SetDefault("LOCALIZATION_" & $values[$i][0], StringReplace($v, "<BR>", @CRLF))
         Next
     EndIf
     If $lang <> "English" Then

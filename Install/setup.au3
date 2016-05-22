@@ -67,7 +67,7 @@ Func LoadLocalizations($file, $lang)
             If $v = "" Then
                 $v = IniRead($file, "English", $values[$i][0], "")
             EndIf
-            SetDefault("Localization_" & $values[$i][0], StringReplace($v, "<BR>", @CRLF))
+            SetDefault("LOCALIZATION_" & $values[$i][0], StringReplace($v, "<BR>", @CRLF))
         Next
     EndIf
     If $lang <> "English" Then
@@ -79,28 +79,28 @@ LoadLocalizations($LocalizationFile, $Language)
 
 
 If _Singleton($Name & " Installer" & "Jp4g9QRntjYP", 1) = 0 Then
-    MsgBox($MB_ICONWARNING, $Title, $Localization_InstallerAlreadyRunning)
+    MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_InstallerAlreadyRunning)
     Exit
 ElseIf _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
-    MsgBox($MB_ICONWARNING, $Title, $Localization_CloseBeforeInstall)
+    MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_CloseBeforeInstall)
     Exit
 EndIf
 If Not DirCopy($Name, @ProgramFilesDir & "\" & $Name, 1) Then
-    MsgBox($MB_ICONWARNING, $Title, $Localization_ErrorCopyingFilesToProgramsFolder)
+    MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_ErrorCopyingFilesToProgramsFolder)
     Exit
 EndIf
 If Not RegWrite("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & $Name, "DisplayName", "REG_SZ", $Name & " v" & $Version) Or Not RegWrite("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & $Name, "UninstallString", "REG_SZ", '"' & @ProgramFilesDir & "\" & $Name & '\Uninstall.exe"') Then
-    MsgBox($MB_ICONWARNING, $Title, $Localization_ErrorCreatingUninstallerRegistry)
+    MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_ErrorCreatingUninstallerRegistry)
     Exit
 EndIf
 FileDelete(@DesktopDir & "\" & $Name & ".lnk")
 If Not FileCreateShortcut(@ProgramFilesDir & "\" & $Name & "\" & $Name & ".exe", @DesktopCommonDir & "\" & $Name & ".lnk", @ProgramFilesDir & "\" & $Name) Then
-    MsgBox($MB_ICONWARNING, $Title, $Localization_ErrorCreatingShortcut)
+    MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_ErrorCreatingShortcut)
     Exit
 EndIf
 FileDelete(@DesktopDir & "\" & $Name & " Donation.lnk")
 If Not FileCreateShortcut(@ProgramFilesDir & "\" & $Name & "\Donation.html", @DesktopCommonDir & "\" & $Name & " Donation.lnk", @ProgramFilesDir & "\" & $Name) Then
-    MsgBox($MB_ICONWARNING, $Title, $Localization_ErrorCreatingShortcut)
+    MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_ErrorCreatingShortcut)
     Exit
 EndIf
-MsgBox($MB_OK, $Title, StringReplace($Localization_SuccessfullyInstalled, "<VERSION>", $Version))
+MsgBox($MB_OK, $Title, StringReplace($LOCALIZATION_SuccessfullyInstalled, "<VERSION>", $Version))
