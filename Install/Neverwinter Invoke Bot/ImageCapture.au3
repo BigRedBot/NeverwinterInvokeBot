@@ -1,6 +1,5 @@
 #RequireAdmin
 Global $Name = "Neverwinter Client Image Capture"
-
 #include "Shared.au3"
 If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
     MsgBox($MB_ICONWARNING, $Name, $LOCALIZATION_ImageCaptureAlreadyRunning)
