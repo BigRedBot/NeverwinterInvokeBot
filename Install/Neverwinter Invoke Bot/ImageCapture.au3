@@ -1,3 +1,4 @@
+#RequireAdmin
 Global $Name = "Neverwinter Client Image Capture"
 
 #include "Shared.au3"
