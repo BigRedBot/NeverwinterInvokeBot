@@ -31,8 +31,9 @@ DEL %INSTALLER%.exe
 
 COPY /b 7zS.sfx + config.txt + Installer.7z %INSTALLER%.exe
 
-PAUSE
 DEL Installer.7z
 DEL config.txt
 DEL .\Install\setup.exe
 FOR %%i IN ("%EXE:,=" "%") DO DEL ".\Install\%NAME%\%%~i.exe"
+
+PAUSE

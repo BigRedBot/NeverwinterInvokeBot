@@ -24,10 +24,18 @@ Func Position()
             Exit
         ElseIf $ClientWidth <> $GameWidth Or $ClientHeight <> $GameHeight Then
             WinMove($WinHandle, "", $WinLeft, $WinTop, $GameWidth + $PaddingWidth, $GameHeight + $PaddingHeight)
+            If $ClientWidth <> $GameWidth Or $ClientHeight <> $GameHeight Then
+                MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_UnableToResize)
+                Exit
+            EndIf
             MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_NeverwinterResized)
             Capture()
         ElseIf $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
             WinMove($WinHandle, "", 0, 0)
+            If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
+                MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_UnableToMove)
+                Exit
+            EndIf
             MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_NeverwinterMoved)
             Capture()
         EndIf
