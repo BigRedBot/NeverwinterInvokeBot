@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+5.4.4
+- Improved ability to get minutes until server resets.
+
 5.4.3
 - Added option for language. Will not yet work with the Russian game client.
 

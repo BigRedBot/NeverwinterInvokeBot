@@ -849,12 +849,26 @@ Func Start()
     WEnd
     If $FirstRun Or $MinutesToStart Then
         $FirstRun = 0
-        If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $LOCALIZATION_GetMinutesUntilServerReset) = $IDYES Then
-            Local $m = _GetUTCMinutes(10, 1, True)
-            If $m >= 0 Then
-                $MinutesToStart = $m
+        Local $Time = 0
+        While 1
+            If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $LOCALIZATION_GetMinutesUntilServerReset) = $IDYES Then
+                If $Time Then
+                    $Time = TimerDiff($Time)
+                    If $Time < 5000 Then
+                        Sleep(5000 - $Time)
+                    EndIf
+                EndIf
+                Local $m = _GetUTCMinutes(10, 1, True)
+                If $m >= 0 Then
+                    $MinutesToStart = $m
+                    ExitLoop
+                EndIf
+            Else
+                ExitLoop
             EndIf
-        EndIf
+            $Time = TimerInit()
+            MsgBox($MB_ICONWARNING, $Title, $LOCALIZATION_FailedToGetMinutes)
+        WEnd
     EndIf
     While 1
         Local $strNumber = InputBox($Title, @CRLF & $LOCALIZATION_ToStartInvoking, $MinutesToStart, "", 300, 180)
