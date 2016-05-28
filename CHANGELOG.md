@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+5.4.7
+- Added Localize function.
+
 5.4.6
 - Added Russian translation for Invoking. Will not yet work with the Russian game client.
 
