@@ -63,9 +63,9 @@ Func LoadLocalizations($file, $lang)
     Local $values = IniReadSection($file, $lang)
     If @error = 0 Then
         For $i = 1 To $values[0][0]
-            Local $v = $values[$i][1]
+            Local $v = BinaryToString(StringToBinary($values[$i][1]), 4)
             If $v = "" Then
-                $v = IniRead($file, "English", $values[$i][0], "")
+                $v = BinaryToString(StringToBinary(IniRead($file, "English", $values[$i][0], "")), 4)
             EndIf
             SetDefault("LOCALIZATION_" & $values[$i][0], StringReplace($v, "<BR>", @CRLF))
         Next

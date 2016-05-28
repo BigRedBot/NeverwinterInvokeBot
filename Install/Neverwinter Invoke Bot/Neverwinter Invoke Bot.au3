@@ -468,7 +468,7 @@ EndFunc
 Global $SplashWindow, $SplashWindowOnTop = 1, $LastSplashText = "", $SplashStartText = "", $ETAText = "", $SplashWidth = 380, $SplashHeight = 165, $SplashLeft = @DesktopWidth - $SplashWidth - 1, $SplashTop = @DesktopHeight - $SplashHeight - 1
 
 Func Splash($s = "", $ontop = 1)
-    Local $Message = "Invoking: " & $Current & " of " & $EndAt & " ( Loop " & $CurrentLoop & " of " & $EndAtLoop & " )" & @CRLF & $s & @CRLF & $ETAText
+    Local $Message = StringReplace(StringReplace(StringReplace(StringReplace($LOCALIZATION_Invoking, "<CURRENT>", $Current), "<ENDAT>", $EndAt), "<CURRENTLOOP>", $CurrentLoop), "<ENDATLOOP>", $EndAtLoop) & @CRLF & $s & @CRLF & $ETAText
     If $SplashWindow And $ontop = $SplashWindowOnTop Then
         If Not ($LastSplashText == $Message) Then
             ControlSetText($SplashWindow, "", "Static1", $SplashStartText & $Message)
