@@ -626,10 +626,12 @@ Func LogIn()
                 MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
             EndIf
             DoubleClick()
-            Send("^a")
-            Send(MultiStringReplace($LogInUserName, "!", "{!}", "#", "{#}", "+", "{+}", "^", "{^}", "{", "{{}", "}", "{}}"))
+            AutoItSetOption("SendKeyDownDelay", 10)
+            Send("{RIGHT 254}{BS 254}")
+            AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+            Send(MultiStringReplace(BinaryToString($LogInUserName, 4), "!", "{!}", "#", "{#}", "+", "{+}", "^", "{^}", "{", "{{}", "}", "{}}"))
             Send("{TAB}")
-            Send(MultiStringReplace($LogInPassword, "!", "{!}", "#", "{#}", "+", "{+}", "^", "{^}", "{", "{{}", "}", "{}}"))
+            Send(MultiStringReplace(BinaryToString($LogInPassword, 4), "!", "{!}", "#", "{#}", "+", "{+}", "^", "{^}", "{", "{{}", "}", "{}}"))
             Send("{ENTER}")
             $LogInTries += 1
         EndIf
@@ -705,6 +707,7 @@ Func Message($s, $n = $MB_OK, $ontop = 0)
     BlockInput(0)
     WinSetOnTop($WinHandle, "", 0)
     HotKeySet("{F4}")
+    AutoItSetOption("SendKeyDownDelay", $KeyDelay)
     SplashOff()
     $SplashWindow = 0
     $ETAText = ""
@@ -965,10 +968,11 @@ If Exists("LogInScreen") Then
         $LogInUserName = ""
     EndIf
     While 1
-        Local $string = InputBox($Title, @CRLF & Localize("EnterUsername"), $LogInUserName, "", "", 140)
+        Local $string = InputBox($Title, @CRLF & Localize("EnterUsername"), BinaryToString($LogInUserName, 4), "", "", 140)
         If @error <> 0 Then
             Exit
         EndIf
+        $string = String(StringToBinary($string, 4))
         If $string And $string <> "" Then
             $LogInUserName = $string
             ExitLoop
@@ -980,7 +984,7 @@ If Exists("LogInScreen") Then
             MsgBox($MB_ICONWARNING, $Title, Localize("ValidUsername"))
         EndIf
     WEnd
-    If IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInUserName", "") <> $LogInUserName Then
+    If BinaryToString(IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInUserName", ""), 4) <> BinaryToString($LogInUserName, 4) Then
         If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SaveUsername")) = $IDYES Then
             IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInUserName", $LogInUserName)
         Else
@@ -992,16 +996,17 @@ If Exists("LogInScreen") Then
     EndIf
     _Crypt_Startup()
     While 1
-        Local $string = InputBox($Title, @CRLF & Localize("EnterPassword"), $LogInPassword, "*", "", 140)
+        Local $string = InputBox($Title, @CRLF & Localize("EnterPassword"), BinaryToString($LogInPassword, 4), "*", "", 140)
         If @error <> 0 Then
             Exit
         EndIf
+        $string = String(StringToBinary($string, 4))
         If $string And $string <> "" Then
-            If IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInPassword", "") == $string Then
+            If BinaryToString(IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInPassword", ""), 4) == BinaryToString($string, 4) Then
                 $LogInPassword = $string
                 ExitLoop
             ElseIf $PasswordHash Then
-                Local $Hash = Hex(_Crypt_HashData($string, $CALG_SHA1))
+                Local $Hash = Hex(_Crypt_HashData(BinaryToString($string, 4), $CALG_SHA1))
                 If $Hash = $PasswordHash Then
                     $LogInPassword = $string
                     ExitLoop
@@ -1012,7 +1017,7 @@ If Exists("LogInScreen") Then
                 If @error <> 0 Then
                     Exit
                 EndIf
-                If $string == $string2 Then
+                If $string == String(StringToBinary($string2, 4)) Then
                     $LogInPassword = $string
                     If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SavePassword")) = $IDYES Then
                         IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInPassword", $LogInPassword)
@@ -1022,7 +1027,7 @@ If Exists("LogInScreen") Then
                     Else
                         IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInPassword", "")
                         If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SavePasswordHash")) = $IDYES Then
-                            $PasswordHash = Hex(_Crypt_HashData($LogInPassword, $CALG_SHA1))
+                            $PasswordHash = Hex(_Crypt_HashData(BinaryToString($LogInPassword, 4), $CALG_SHA1))
                             IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", $PasswordHash)
                         ElseIf IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", "") <> "" Then
                             IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", "")

@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+5.4.8
+- User name and password now saved in a binary unicode format.
+- Now using right arrow keys and backspace keys instead of ctrl+a to clear user name text field.
+
 5.4.7
 - Added Localize function.
 
