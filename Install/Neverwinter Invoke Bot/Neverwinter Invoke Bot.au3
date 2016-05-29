@@ -34,15 +34,19 @@ If @error <> 0 Then
 EndIf
 
 Func GetLogInServerAddressString()
-    Local $a = Array($LogInServerAddress)
-    $LogInServerAddress = ""
+    Local $r = "", $a = Array($LogInServerAddress)
     If $a[1] And IsString($a[1]) And $a[1] <> "" Then
+        TCPStartup()
         For $i = 1 to $a[0]
-            $LogInServerAddress &= " -server " & $a[$i]
+            Local $ip = TCPNameToIP($a[$i])
+            If $ip And $ip <> "" Then
+                $r &= " -server " & $ip
+            EndIf
         Next
+        TCPShutdown()
     EndIf
+    Return $r
 EndFunc
-GetLogInServerAddressString()
 
 Func Position($r = 0)
     Focus()
@@ -58,7 +62,8 @@ Func Position($r = 0)
             BlockInput(1)
             Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
             FileChangeDir($GameClientInstallLocation & "\Neverwinter\Live")
-            Run("GameClient.exe" & $LogInServerAddress, $GameClientInstallLocation & "\Neverwinter\Live")
+            
+            Run("GameClient.exe" & GetLogInServerAddressString(), $GameClientInstallLocation & "\Neverwinter\Live")
             FileChangeDir(@ScriptDir)
             Sleep(1000)
             Focus()
