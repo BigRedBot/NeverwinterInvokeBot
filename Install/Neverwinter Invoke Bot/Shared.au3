@@ -111,15 +111,22 @@ EndFunc
 LoadSettings($SettingsDir & "\Settings.ini")
 LoadSettings($SettingsDir & "\PrivateSettings.ini")
 
+If $Language = "Russian" Then
+    SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
+    SetDefault("JumpKey", "{SPACE}")
+    SetDefault("GameMenuKey", "{ESC}")
+    SetDefault("CursorModeKey", "{F2}")
+Else
+    SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
+    SetDefault("JumpKey", "{SPACE}")
+    SetDefault("GameMenuKey", "{ESC}")
+    SetDefault("CursorModeKey", "{ALT}")
+EndIf
 SetDefault("TotalSlots")
 SetDefault("StartAtLoop", 1)
 SetDefault("EndAtLoop", 8)
 SetDefault("StartAt", 1)
 SetDefault("EndAt")
-SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
-SetDefault("JumpKey", "{SPACE}")
-SetDefault("GameMenuKey", "{ESC}")
-SetDefault("CursorModeKey", "{ALT}")
 SetDefault("TimeOutMinutes", 5)
 SetDefault("KeyDelaySeconds", 0.15)
 SetDefault("MaxLogInAttempts", 3)

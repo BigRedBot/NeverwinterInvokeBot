@@ -11,6 +11,7 @@ EndIf
 #include "_GetUTCMinutes.au3"
 #include "_AddCommaToNumber.au3"
 #include "ImageSearch.au3"
+#include "_SendUnicode.au3"
 #include <Crypt.au3>
 Global $KeyDelay = $KeyDelaySeconds * 1000
 Global $TimeOut = $TimeOutMinutes * 60000
@@ -31,16 +32,6 @@ Global $GameClientInstallLocation = RegRead("HKEY_CURRENT_USER\SOFTWARE\Cryptic\
 If @error <> 0 Then
     $GameClientInstallLocation = 0
 EndIf
-
-Func MultiStringReplace($s, $f1=0, $r1=0, $f2=0, $r2=0, $f3=0, $r3=0, $f4=0, $r4=0, $f5=0, $r5=0, $f6=0, $r6=0, $f7=0, $r7=0, $f8=0, $r8=0, $f9=0, $r9=0, $f10=0, $r10=0)
-    #forceref $f1, $f2, $f3, $f4, $f5, $f6, $f7, $f8, $f9, $f10
-    #forceref $r1, $r2, $r3, $r4, $r5, $r6, $r7, $r8, $r9, $r10
-    Local $v = $s
-    For $i = 1 To Int((@NumParams - 1) / 2)
-        $v = StringReplace($v, Eval("f" & $i), Eval("r" & $i))
-    Next
-    Return $v
-EndFunc
 
 Func GetLogInServerAddressString()
     Local $a = Array($LogInServerAddress)
@@ -626,12 +617,18 @@ Func LogIn()
                 MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
             EndIf
             DoubleClick()
-            AutoItSetOption("SendKeyDownDelay", 10)
+            AutoItSetOption("SendKeyDownDelay", 5)
             Send("{RIGHT 254}{BS 254}")
+            Sleep(500)
+            AutoItSetOption("SendKeyDownDelay", 15)
+            Send(_SendUnicodeReturn(BinaryToString($LogInUserName, 4)))
+            Sleep(500)
             AutoItSetOption("SendKeyDownDelay", $KeyDelay)
-            Send(MultiStringReplace(BinaryToString($LogInUserName, 4), "!", "{!}", "#", "{#}", "+", "{+}", "^", "{^}", "{", "{{}", "}", "{}}"))
             Send("{TAB}")
-            Send(MultiStringReplace(BinaryToString($LogInPassword, 4), "!", "{!}", "#", "{#}", "+", "{+}", "^", "{^}", "{", "{{}", "}", "{}}"))
+            AutoItSetOption("SendKeyDownDelay", 15)
+            Send(_SendUnicodeReturn(BinaryToString($LogInPassword, 4)))
+            Sleep(500)
+            AutoItSetOption("SendKeyDownDelay", $KeyDelay)
             Send("{ENTER}")
             $LogInTries += 1
         EndIf

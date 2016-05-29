@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+5.5
+- Added Russian client support. ( Thanks to mef-t for all the translations and screen shots that made this possible. )
+
 5.4.8
 - User name and password now saved in a binary unicode format.
 - Now using right arrow keys and backspace keys instead of ctrl+a to clear user name text field.
