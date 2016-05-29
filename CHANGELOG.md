@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+5.5.1
+- Allowed the ability to use login server domain addresses.
+
 5.5
 - Added Russian client support. ( Thanks to mef-t for all the translations and screen shots that made this possible. )
 
