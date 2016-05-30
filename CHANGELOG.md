@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+5.5.2
+- Added Russian uninstall translations.
+
 5.5.1
 - Allowed the ability to use login server domain addresses.
 
