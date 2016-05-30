@@ -26,7 +26,7 @@ Func Position()
     Return 1
 EndFunc
 
-Global $SplashWindow, $LastSplashText = "", $SplashWidth = 380, $SplashHeight = 210, $SplashLeft = @DesktopWidth - $SplashWidth - 6, $SplashTop = @DesktopHeight - $SplashHeight - 25
+Global $SplashWindow, $LastSplashText = "", $SplashLeft = @DesktopWidth - $ScreenDetectionSplashWidth - 6, $SplashTop = @DesktopHeight - $ScreenDetectionSplashHeight - 25
 
 Func Splash($s = "")
     If $SplashWindow Then
@@ -35,7 +35,7 @@ Func Splash($s = "")
             $LastSplashText = $s
         EndIf
     Else
-        $SplashWindow = SplashTextOn($Title, $s, $SplashWidth, $SplashHeight, $SplashLeft, $SplashTop, 16, "", 0)
+        $SplashWindow = SplashTextOn($Title, $s, $ScreenDetectionSplashWidth, $ScreenDetectionSplashHeight, $SplashLeft, $SplashTop, 16, "", 0)
         $LastSplashText = $s
     EndIf
 EndFunc
