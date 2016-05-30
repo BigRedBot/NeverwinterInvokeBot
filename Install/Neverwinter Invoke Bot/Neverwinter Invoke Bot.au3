@@ -471,7 +471,7 @@ Func SingleRightClick()
     MouseUp("right")
 EndFunc
 
-Global $SplashWindow, $SplashWindowOnTop = 1, $LastSplashText = "", $SplashStartText = "", $ETAText = "", $SplashWidth = 380, $SplashHeight = 165, $SplashLeft = @DesktopWidth - $SplashWidth - 1, $SplashTop = @DesktopHeight - $SplashHeight - 1
+Global $SplashWindow, $SplashWindowOnTop = 1, $LastSplashText = "", $SplashStartText = "", $ETAText = "", $SplashLeft = @DesktopWidth - $SplashWidth - 1, $SplashTop = @DesktopHeight - $SplashHeight - 1
 
 Func Splash($s = "", $ontop = 1)
     Local $Message = Localize("Invoking", "<CURRENT>", $Current, "<ENDAT>", $EndAt, "<CURRENTLOOP>", $CurrentLoop, "<ENDATLOOP>", $EndAtLoop) & @CRLF & $s & @CRLF & $ETAText
@@ -797,7 +797,7 @@ EndFunc
 Local $FirstRun = 1
 Func Start()
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $LoopDelayMinutes[0]), $CurrentLoop, "", "", 140)
+        Local $strNumber = InputBox($Title, @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $LoopDelayMinutes[0]), $CurrentLoop, "", $InputBoxWidth, $InputBoxHeight)
         If @error <> 0 Then
             Exit
         EndIf
@@ -810,7 +810,7 @@ Func Start()
         MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
     WEnd
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & Localize("EndingLoop", "<STARTATLOOP>", $StartAtLoop), $EndAtLoop, "", "", 140)
+        Local $strNumber = InputBox($Title, @CRLF & Localize("EndingLoop", "<STARTATLOOP>", $StartAtLoop), $EndAtLoop, "", $InputBoxWidth, $InputBoxHeight)
         If @error <> 0 Then
             Exit
         EndIf
@@ -822,7 +822,7 @@ Func Start()
         MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
     WEnd
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & Localize("StartAtEachLoop", "<TOTALSLOTS>", $TotalSlots), $StartAt, "", "", 140)
+        Local $strNumber = InputBox($Title, @CRLF & Localize("StartAtEachLoop", "<TOTALSLOTS>", $TotalSlots), $StartAt, "", $InputBoxWidth, $InputBoxHeight)
         If @error <> 0 Then
             Exit
         EndIf
@@ -834,7 +834,7 @@ Func Start()
         MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
     WEnd
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & Localize("EndAtEachLoop", "<STARTAT>", $StartAt, "<TOTALSLOTS>", $TotalSlots), $EndAt, "", "", 140)
+        Local $strNumber = InputBox($Title, @CRLF & Localize("EndAtEachLoop", "<STARTAT>", $StartAt, "<TOTALSLOTS>", $TotalSlots), $EndAt, "", $InputBoxWidth, $InputBoxHeight)
         If @error <> 0 Then
             Exit
         EndIf
@@ -851,7 +851,7 @@ Func Start()
         $Current = $EndAt
     EndIf
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & Localize("StartAtCurrentLoop", "<STARTAT>", $StartAt, "<ENDAT>", $EndAt), $Current, "", "", 140)
+        Local $strNumber = InputBox($Title, @CRLF & Localize("StartAtCurrentLoop", "<STARTAT>", $StartAt, "<ENDAT>", $EndAt), $Current, "", $InputBoxWidth, $InputBoxHeight)
         If @error <> 0 Then
             Exit
         EndIf
@@ -886,7 +886,7 @@ Func Start()
         WEnd
     EndIf
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & Localize("ToStartInvoking"), $MinutesToStart, "", 300, 180)
+        Local $strNumber = InputBox($Title, @CRLF & Localize("ToStartInvoking"), $MinutesToStart, "", $StartInputBoxWidth, $StartInputBoxHeight)
         If @error <> 0 Then
             Exit
         EndIf
@@ -970,7 +970,7 @@ If Exists("LogInScreen") Then
         $LogInUserName = ""
     EndIf
     While 1
-        Local $string = InputBox($Title, @CRLF & Localize("EnterUsername"), BinaryToString($LogInUserName, 4), "", "", 140)
+        Local $string = InputBox($Title, @CRLF & Localize("EnterUsername"), BinaryToString($LogInUserName, 4), "", $InputBoxWidth, $InputBoxHeight)
         If @error <> 0 Then
             Exit
         EndIf
@@ -998,7 +998,7 @@ If Exists("LogInScreen") Then
     EndIf
     _Crypt_Startup()
     While 1
-        Local $string = InputBox($Title, @CRLF & Localize("EnterPassword"), BinaryToString($LogInPassword, 4), "*", "", 140)
+        Local $string = InputBox($Title, @CRLF & Localize("EnterPassword"), BinaryToString($LogInPassword, 4), "*", $InputBoxWidth, $InputBoxHeight)
         If @error <> 0 Then
             Exit
         EndIf
@@ -1015,7 +1015,7 @@ If Exists("LogInScreen") Then
                 EndIf
                 MsgBox($MB_ICONWARNING, $Title, Localize("PasswordIncorrect"))
             Else
-                Local $string2 = InputBox($Title, @CRLF & Localize("EnterPasswordAgain"), "", "*", "", 140)
+                Local $string2 = InputBox($Title, @CRLF & Localize("EnterPasswordAgain"), "", "*", $InputBoxWidth, $InputBoxHeight)
                 If @error <> 0 Then
                     Exit
                 EndIf
@@ -1055,7 +1055,7 @@ If Exists("LogInScreen") Then
 EndIf
 
 While 1
-    Local $strNumber = InputBox($Title, @CRLF & Localize("TotalCharacters"), $TotalSlots, "", "", 140)
+    Local $strNumber = InputBox($Title, @CRLF & Localize("TotalCharacters"), $TotalSlots, "", $InputBoxWidth, $InputBoxHeight)
     If @error <> 0 Then
         Exit
     EndIf
