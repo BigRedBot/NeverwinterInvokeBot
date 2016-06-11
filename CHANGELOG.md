@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+5.6
+- Removed UPX compression. (May have been causing some anti-virus false positives.)
+- Added icon image.
+
 5.5.2
 - Added Russian uninstall translations.
 
