@@ -131,7 +131,7 @@ EndFunc
 
 Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $Restarted = 0, $IdleLogout = 0, $TimedOut = 0, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $StartTimer, $WaitingTimer, $LoggingIn
 
-Func Loop()
+Func SyncValues()
     If GetValue("FinishedLoop") Then
         SetAccountValue("CurrentLoop", GetValue("CurrentLoop") + GetValue("FinishedLoop"))
         SetAccountValue("FinishedLoop")
@@ -141,6 +141,9 @@ Func Loop()
     EndIf
     SetAccountValue("Current", GetValue("Current") + GetValue("FinishedInvoke"))
     SetAccountValue("FinishedInvoke")
+EndFunc
+
+Func Loop()
     If CompletedAccount() Then
         End()
         Exit
@@ -291,6 +294,7 @@ Func Loop()
 EndFunc
 
 Func CompletedAccount()
+    SyncValues()
     If GetValue("CompletedAccount") Or ( (GetValue("CurrentLoop") + GetValue("FinishedLoop")) > $LoopDelayMinutes[0] And GetValue("Invoked") = (GetValue("TotalSlots") * $LoopDelayMinutes[0]) ) Then
         Return 1
     EndIf
@@ -298,6 +302,7 @@ Func CompletedAccount()
 EndFunc
 
 Func CheckAccounts()
+    SyncValues()
     Local $old = $CurrentAccount, $oldtime = GetTimeToInvoke(), $new = $old, $newtime = $oldtime, $allcomplete = 1
     If $oldtime <= 1 And Not CompletedAccount() Then
         Return $CurrentAccount
@@ -328,7 +333,7 @@ Func GetTimeToInvoke()
             $Time = $StartTimer
         EndIf
         Local $i = GetValue("CurrentLoop")
-        If GetValue("CurrentLoop") > $LoopDelayMinutes[0] Then
+        If $i > $LoopDelayMinutes[0] Then
             $i = $LoopDelayMinutes[0]
         EndIf
         Local $Minutes = $LoopDelayMinutes[$i] - TimerDiff($Time) / 60000
@@ -384,6 +389,10 @@ Func WaitToInvoke()
         Position()
         BlockInput(0)
         WinSetOnTop($WinHandle, "", 0)
+        Local $i = GetValue("CurrentLoop")
+        If $i > $LoopDelayMinutes[0] Then
+            $i = $LoopDelayMinutes[0]
+        EndIf
         While $Minutes > 0
             Splash("[ " & Localize("WaitingForInvokeDelay", "<MINUTES>", HoursAndMinutes($Minutes)) & " ]", 0)
             Sleep(1000)
@@ -399,7 +408,7 @@ EndFunc
 
 Func Invoke()
     If Exists("CongratulationsWindow") Then
-        For $n = 1 To 10
+        For $n = 1 To 5
             FindLogInScreen()
             Send(GetValue("InvokeKey"))
             Sleep(500)
@@ -756,15 +765,6 @@ Func TimeOut($r = 0)
 EndFunc
 
 Func End()
-    If GetValue("FinishedLoop") Then
-        SetAccountValue("CurrentLoop", GetValue("CurrentLoop") + GetValue("FinishedLoop"))
-        SetAccountValue("FinishedLoop")
-        SetAccountValue("Current", GetValue("StartAt"))
-        SetAccountValue("FinishedInvoke")
-        $ETAText = ""
-    EndIf
-    SetAccountValue("Current", GetValue("Current") + GetValue("FinishedInvoke"))
-    SetAccountValue("FinishedInvoke")
     If Exists("SelectionScreen") And Exists("LogInScreen") Then
         Local $check = CheckAccounts()
         If $check > 0 Then
@@ -808,15 +808,6 @@ Func End()
     Local $old = $CurrentAccount
     For $n = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $n
-        If GetValue("FinishedLoop") Then
-            SetAccountValue("CurrentLoop", GetValue("CurrentLoop") + GetValue("FinishedLoop"))
-            SetAccountValue("FinishedLoop")
-            SetAccountValue("Current", GetValue("StartAt"))
-            SetAccountValue("FinishedInvoke")
-            $ETAText = ""
-        EndIf
-        SetAccountValue("Current", GetValue("Current") + GetValue("FinishedInvoke"))
-        SetAccountValue("FinishedInvoke")
         If CompletedAccount() Then
             If GetValue("CurrentLoop") <= GetValue("EndAtLoop") Then
                 If GetValue("Current") = GetValue("StartAt") Then
@@ -854,15 +845,6 @@ EndFunc
 
 
 Func Message($s, $n = $MB_OK, $ontop = 0)
-    If GetValue("FinishedLoop") Then
-        SetAccountValue("CurrentLoop", GetValue("CurrentLoop") + GetValue("FinishedLoop"))
-        SetAccountValue("FinishedLoop")
-        SetAccountValue("Current", GetValue("StartAt"))
-        SetAccountValue("FinishedInvoke")
-        $ETAText = ""
-    EndIf
-    SetAccountValue("Current", GetValue("Current") + GetValue("FinishedInvoke"))
-    SetAccountValue("FinishedInvoke")
     If Not CheckAccounts() Then
         End()
         Exit
