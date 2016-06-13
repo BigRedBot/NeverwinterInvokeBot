@@ -13,8 +13,8 @@ EndIf
 #include "ImageSearch.au3"
 #include "_SendUnicode.au3"
 #include <Crypt.au3>
-Global $KeyDelay = $KeyDelaySeconds * 1000
-Global $TimeOut = $TimeOutMinutes * 60000
+Global $KeyDelay = GetValue("KeyDelaySeconds") * 1000
+Global $TimeOut = GetValue("TimeOutMinutes") * 60000
 AutoItSetOption("SendKeyDownDelay", $KeyDelay)
 Global $Title = $Name & " v" & $Version
 Global $MouseOffset = 5
@@ -34,7 +34,7 @@ If @error <> 0 Then
 EndIf
 
 Func GetLogInServerAddressString()
-    Local $r = "", $a = Array($LogInServerAddress)
+    Local $r = "", $a = Array(GetValue("LogInServerAddress"))
     If $a[1] And IsString($a[1]) And $a[1] <> "" Then
         TCPStartup()
         For $i = 1 to $a[0]
@@ -51,7 +51,7 @@ EndFunc
 Func Position($r = 0)
     Focus()
     If Not $WinFound Or Not GetPosition() Then
-        If $RestartGameClient And $GameClientInstallLocation And $GameClientInstallLocation <> "" And $LogInServerAddress And $LogInServerAddress <> "" And $LogInUserName And $LogInPassword And Exists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
+        If GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And Exists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
             Splash("[ " & Localize("NeverwinterNotFound") & " ]")
             $WaitingTimer = TimerInit()
             While ProcessExists("GameClient.exe")
@@ -87,7 +87,7 @@ Func Position($r = 0)
         EndIf
         Error(Localize("NeverwinterNotFound"))
     EndIf
-    If $GameWidth And $GameHeight Then
+    If GetValue("GameWidth") And GetValue("GameHeight") Then
         If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight Then
             BlockInput(0)
             WinSetOnTop($WinHandle, "", 0)
@@ -96,17 +96,17 @@ Func Position($r = 0)
             $SplashWindow = 0
             Error(Localize("UnMaximize"))
             Return
-        ElseIf $DeskTopWidth <= ($GameWidth + $PaddingLeft) Or $DeskTopHeight <= ($GameHeight + $PaddingTop) Or ( $DeskTopWidth <= ($GameWidth + $PaddingLeft + $SplashWidth) And $DeskTopHeight <= ($GameHeight + $PaddingTop + $SplashHeight) ) Then
+        ElseIf $DeskTopWidth <= (GetValue("GameWidth") + $PaddingLeft) Or $DeskTopHeight <= (GetValue("GameHeight") + $PaddingTop) Or ( $DeskTopWidth <= (GetValue("GameWidth") + $PaddingLeft + GetValue("SplashWidth")) And $DeskTopHeight <= (GetValue("GameHeight") + $PaddingTop + GetValue("SplashHeight")) ) Then
             BlockInput(0)
             WinSetOnTop($WinHandle, "", 0)
             HotKeySet("{F4}")
             SplashOff()
             $SplashWindow = 0
-            Error(Localize("ResolutionHigherThan", "<RESOLUTION>", ($GameWidth + $PaddingLeft) & "x" & ($GameHeight + $PaddingTop + $SplashHeight)))
+            Error(Localize("ResolutionHigherThan", "<RESOLUTION>", (GetValue("GameWidth") + $PaddingLeft) & "x" & (GetValue("GameHeight") + $PaddingTop + GetValue("SplashHeight"))))
             Return
         EndIf
-        If $ClientWidth <> $GameWidth Or $ClientHeight <> $GameHeight Then
-            WinMove($WinHandle, "", $WinLeft, $WinTop, $GameWidth + $PaddingWidth, $GameHeight + $PaddingHeight)
+        If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
+            WinMove($WinHandle, "", $WinLeft, $WinTop, GetValue("GameWidth") + $PaddingWidth, GetValue("GameHeight") + $PaddingHeight)
             Focus()
             If Not $WinFound Or Not GetPosition() Then
                 Position($r)
@@ -121,7 +121,7 @@ Func Position($r = 0)
                 Return
             EndIf
         EndIf
-        If $ClientWidth <> $GameWidth Or $ClientHeight <> $GameHeight Then
+        If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
             Error(Localize("UnableToResize"))
         ElseIf $ClientLeft < 0 Or $ClientTop < 0 Or ( $ClientRight >= $SplashLeft And $ClientBottom >= $SplashTop ) Then
             Error(Localize("UnableToMove"))
@@ -129,20 +129,21 @@ Func Position($r = 0)
     EndIf
 EndFunc
 
-Global $Current = $StartAt, $MinutesToStart = 0, $FinishedInvoke = 0, $FinishedLoop = 0, $Invoked = 0, $ReLogged = 0, $LogInTries = 0, $Restarted = 0, $IdleLogout = 0, $TimedOut = 0, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $CurrentLoop = $StartAtLoop, $StartTimer, $WaitingTimer, $LoggingIn
+Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $Restarted = 0, $IdleLogout = 0, $TimedOut = 0, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $StartTimer, $WaitingTimer, $LoggingIn
 
 Func Loop()
-    If $FinishedLoop Then
-        $CurrentLoop += $FinishedLoop
-        $FinishedLoop = 0
-        $Current = $StartAt
-        $FinishedInvoke = 0
+    If GetValue("FinishedLoop") Then
+        SetAccountValue("CurrentLoop", GetValue("CurrentLoop") + GetValue("FinishedLoop"))
+        SetAccountValue("FinishedLoop")
+        SetAccountValue("Current", GetValue("StartAt"))
+        SetAccountValue("FinishedInvoke")
         $ETAText = ""
     EndIf
-    $Current += $FinishedInvoke
-    $FinishedInvoke = 0
-    If $CurrentLoop > $EndAtLoop Or ( $CurrentLoop > $LoopDelayMinutes[0] And $Invoked = ($TotalSlots * $LoopDelayMinutes[0]) ) Then
+    SetAccountValue("Current", GetValue("Current") + GetValue("FinishedInvoke"))
+    SetAccountValue("FinishedInvoke")
+    If CompletedAccount() Then
         End()
+        Exit
     EndIf
     Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
     If Exists("SelectionScreen") Then
@@ -152,64 +153,64 @@ Func Loop()
         $LogInTries = 0
     EndIf
     Position()
-    Local $Start = $Current
-    For $i = $Start To $EndAt
-        $Current = $i
-        $FinishedInvoke = 0
+    Local $Start = GetValue("Current")
+    For $i = $Start To GetValue("EndAt")
+        SetAccountValue("Current", $i)
+        SetAccountValue("FinishedInvoke")
         WaitToInvoke()
         Splash()
         Local $LoopTimer = TimerInit()
         Focus()
-        MouseMove($SelectCharacterMenuX + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), $SelectCharacterMenuY + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+        MouseMove(GetValue("SelectCharacterMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SelectCharacterMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
         DoubleRightClick()
         MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
-        If $Current <= Ceiling($TotalSlots / 2) Then
-            If $TopScrollBarX And $TopSelectedCharacterX Then
+        If GetValue("Current") <= Ceiling(GetValue("TotalSlots") / 2) Then
+            If GetValue("TopScrollBarX") And GetValue("TopSelectedCharacterX") Then
                 For $n = 1 To 2
                     Send("{DOWN}")
                 Next
-                For $n = 1 To $TotalSlots
+                For $n = 1 To GetValue("TotalSlots")
                     Send("{UP}")
-                    If FindPixels($TopScrollBarX, $TopScrollBarY, $TopScrollBarC) And FindPixels($TopSelectedCharacterX, $TopSelectedCharacterY, $TopSelectedCharacterC) Then
+                    If FindPixels(GetValue("TopScrollBarX"), GetValue("TopScrollBarY"), GetValue("TopScrollBarC")) And FindPixels(GetValue("TopSelectedCharacterX"), GetValue("TopSelectedCharacterY"), GetValue("TopSelectedCharacterC")) Then
                         ExitLoop
                     EndIf
                 Next
             Else
-                For $n = 1 To $TotalSlots
+                For $n = 1 To GetValue("TotalSlots")
                     Send("{UP}")
                 Next
             EndIf
             Sleep($KeyDelay)
-            For $n = 2 To $Current
+            For $n = 2 To GetValue("Current")
                 Send("{DOWN}")
                 Sleep(50)
             Next
         Else
-            If $BottomScrollBarX And $BottomSelectedCharacterX Then
+            If GetValue("BottomScrollBarX") And GetValue("BottomSelectedCharacterX") Then
                 For $n = 1 To 2
                     Send("{UP}")
                 Next
-                For $n = 1 To $TotalSlots
+                For $n = 1 To GetValue("TotalSlots")
                     Send("{DOWN}")
-                    If FindPixels($BottomScrollBarX, $BottomScrollBarY, $BottomScrollBarC) And FindPixels($BottomSelectedCharacterX, $BottomSelectedCharacterY, $BottomSelectedCharacterC) Then
+                    If FindPixels(GetValue("BottomScrollBarX"), GetValue("BottomScrollBarY"), GetValue("BottomScrollBarC")) And FindPixels(GetValue("BottomSelectedCharacterX"), GetValue("BottomSelectedCharacterY"), GetValue("BottomSelectedCharacterC")) Then
                         ExitLoop
                     EndIf
                 Next
             Else
-                For $n = 1 To $TotalSlots
+                For $n = 1 To GetValue("TotalSlots")
                     Send("{DOWN}")
                 Next
             EndIf
             Sleep($KeyDelay)
-            For $n = 1 To ($TotalSlots - $Current)
+            For $n = 1 To (GetValue("TotalSlots") - GetValue("Current"))
                 Send("{UP}")
                 Sleep(50)
             Next
         EndIf
         Sleep(1000)
         Send("{ENTER}")
-        If $SafeLogInX Then
-            MouseMove($SafeLogInX + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), $SafeLogInY + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+        If GetValue("SafeLogInX") Then
+            MouseMove(GetValue("SafeLogInX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SafeLogInY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
             DoubleClick()
         EndIf
         Splash("[ " & Localize("WaitingForInGameScreen") & " ]")
@@ -217,61 +218,65 @@ Func Loop()
             $WaitingTimer = TimerInit()
             WaitForScreen("InGameScreen")
             Splash()
-            Sleep($LogInDelaySeconds * 1000)
+            Sleep(GetValue("LogInDelaySeconds") * 1000)
         Else
-            Sleep($LogInSeconds * 1000)
+            Sleep(GetValue("LogInSeconds") * 1000)
             Splash()
         EndIf
         Sleep(500)
         If ImageSearch("OverflowXPReward") Then
-            Send($CursorModeKey)
+            Send(GetValue("CursorModeKey"))
             Sleep(500)
             MouseMove($X, $Y)
             SingleClick()
-            $CollectedOverflowXPRewards[$Current] = 1
+            SetAccountInfo("TotalOverflowXPRewards", 1)
+            CountItems("TotalOverflowXPRewards")
             Sleep(1000)
-            Send($JumpKey)
+            Send(GetValue("JumpKey"))
             Sleep(500)
         EndIf
         $WaitingTimer = TimerInit()
         Invoke()
-        $InvokeTime[$Current] = TimerInit()
-        $InvokeLoop[$Current] = $CurrentLoop
-        $FinishedInvoke = 1
-        If $EndAt = $Current Then
-            $FinishedLoop = 1
+        SetAccountInfo("InvokeTime", TimerInit())
+        SetAccountInfo("InvokeLoop", GetValue("CurrentLoop"))
+        SetAccountValue("FinishedInvoke", 1)
+        If GetValue("EndAt") = GetValue("Current") Then
+            SetAccountValue("FinishedLoop", 1)
+            If GetValue("CurrentLoop") >= GetValue("EndAtLoop") Then
+                SetAccountValue("CompletedAccount", 1)
+            EndIf
         EndIf
         $WaitingTimer = TimerInit()
         ChangeCharacter()
-        If $EndAt = $Current And $EndAtLoop = $CurrentLoop Then
-            ExitLoop
-        EndIf
         Local $LogOutTimer = TimerInit()
-        Local $RemainingCharacters = $EndAt - $Current
+        Local $RemainingCharacters = GetValue("EndAt") - GetValue("Current")
         Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
         If Exists("SelectionScreen") Then
             $WaitingTimer = TimerInit()
             WaitForScreen("SelectionScreen")
             Splash()
         Else
-            Sleep($LogOutSeconds * 1000)
+            Sleep(GetValue("LogOutSeconds") * 1000)
             Splash()
         EndIf
-        If $FinishedLoop Then
-            Loop()
+        If GetValue("FinishedLoop") Then
+            If Not GetValue("CompletedAccount") Then
+                Loop()
+                Exit
+            EndIf
         Else
             Local $AdditionalKeyPressTime = 0, $AddKeyPressTime = 0, $RemoveKeyPressTime = 0
-            If $TopScrollBarX And $TopSelectedCharacterX Then
+            If GetValue("TopScrollBarX") And GetValue("TopSelectedCharacterX") Then
                 $AddKeyPressTime = $KeyDelay
             EndIf
-            If $BottomScrollBarX And $BottomSelectedCharacterX Then
+            If GetValue("BottomScrollBarX") And GetValue("BottomSelectedCharacterX") Then
                 $RemoveKeyPressTime = $KeyDelay
             EndIf
             For $n = 1 To $RemainingCharacters
-                If $Current + $n <= Ceiling($TotalSlots / 2) Then
+                If GetValue("Current") + $n <= Ceiling(GetValue("TotalSlots") / 2) Then
                     $AdditionalKeyPressTime += $n * ($KeyDelay + 50) + $AddKeyPressTime
-                ElseIf $Current <= Floor($TotalSlots / 2) + 1 Then
-                    $AdditionalKeyPressTime -= ($Current + $n - Floor($TotalSlots / 2) + 1) * ($KeyDelay + 50)
+                ElseIf GetValue("Current") <= Floor(GetValue("TotalSlots") / 2) + 1 Then
+                    $AdditionalKeyPressTime -= (GetValue("Current") + $n - Floor(GetValue("TotalSlots") / 2) + 1) * ($KeyDelay + 50)
                 Else
                     $AdditionalKeyPressTime -= $n * ($KeyDelay + 50) + $RemoveKeyPressTime
                 EndIf
@@ -282,35 +287,113 @@ Func Loop()
         EndIf
     Next
     End()
+    Exit
 EndFunc
 
-Func WaitToInvoke()
-    Local $LastLoop = $InvokeLoop[$Current]
-    If ( $LastLoop And $CurrentLoop > $LastLoop ) Or ( Not $LastLoop And $CurrentLoop > $StartAtLoop ) Then
-        Local $Time = $InvokeTime[$Current]
+Func CompletedAccount()
+    If GetValue("CompletedAccount") Or ( (GetValue("CurrentLoop") + GetValue("FinishedLoop")) > $LoopDelayMinutes[0] And GetValue("Invoked") = (GetValue("TotalSlots") * $LoopDelayMinutes[0]) ) Then
+        Return 1
+    EndIf
+    Return 0
+EndFunc
+
+Func CheckAccounts()
+    Local $old = $CurrentAccount, $oldtime = GetTimeToInvoke(), $new = $old, $newtime = $oldtime, $allcomplete = 1
+    If $oldtime <= 1 And Not CompletedAccount() Then
+        Return $CurrentAccount
+    EndIf
+    For $n = 1 To GetValue("TotalAccounts")
+        $CurrentAccount = $n
+        If Not CompletedAccount() Then
+            $allcomplete = 0
+            Local $t = GetTimeToInvoke()
+            If ($t + 1) < $oldtime And $t < $newtime Then
+                $new = $n
+                $newtime = $t
+            EndIf
+        EndIf
+    Next
+    $CurrentAccount = $old
+    If $allcomplete Then
+        Return 0
+    EndIf
+    Return $new
+EndFunc
+
+Func GetTimeToInvoke()
+    Local $LastLoop = GetAccountInfo("InvokeLoop")
+    If ( $LastLoop And GetValue("CurrentLoop") > $LastLoop ) Or ( Not $LastLoop And GetValue("CurrentLoop") > GetValue("StartAtLoop") ) Then
+        Local $Time = GetAccountInfo("InvokeTime")
         If Not $Time Then
             $Time = $StartTimer
         EndIf
-        Local $i = $CurrentLoop
-        If $CurrentLoop > $LoopDelayMinutes[0] Then
+        Local $i = GetValue("CurrentLoop")
+        If GetValue("CurrentLoop") > $LoopDelayMinutes[0] Then
             $i = $LoopDelayMinutes[0]
         EndIf
         Local $Minutes = $LoopDelayMinutes[$i] - TimerDiff($Time) / 60000
         If $Minutes > 0 Then
-            $ETAText = ""
-            Position()
-            BlockInput(0)
-            WinSetOnTop($WinHandle, "", 0)
-            While $Minutes > 0
-                Splash("[ " & Localize("WaitingForInvokeDelay", "<MINUTES>", HoursAndMinutes($Minutes)) & " ]", 0)
-                Sleep(1000)
-                $Minutes = $LoopDelayMinutes[$i] - TimerDiff($Time) / 60000
-            WEnd
-            Position()
-            BlockInput(1)
-            WinSetOnTop($WinHandle, "", 1)
-            Loop()
+            Return $Minutes
         EndIf
+    EndIf
+    Return 0
+EndFunc
+
+Func WaitToInvoke()
+    Local $Minutes = GetTimeToInvoke()
+    If $Minutes > 1 And Exists("SelectionScreen") And Exists("LogInScreen") Then
+        Local $check = CheckAccounts()
+        If $check > 0 Then
+            If $check <> $CurrentAccount Then
+                $CurrentAccount = $check
+                $ETAText = ""
+                Position()
+                BlockInput(1)
+                WinSetOnTop($WinHandle, "", 1)
+                Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
+                $WaitingTimer = TimerInit()
+                WaitForScreen("SelectionScreen")
+                If ImageSearch("SelectionScreen") Then
+                    MouseMove($X, $Y)
+                    SingleClick()
+                    Sleep(1000)
+                EndIf
+                Position()
+                WinSetOnTop($WinHandle, "", 1)
+                $WaitingTimer = TimerInit()
+                While Not ImageSearch("LogInScreen")
+                    Sleep(500)
+                    TimeOut(1)
+                    Position(1)
+                WEnd
+                FindLogInScreen(1)
+                Loop()
+                Exit
+            EndIf
+        Else
+            End()
+            Exit
+        EndIf
+    EndIf
+    If $Minutes > 0 Then
+        Local $Time = GetAccountInfo("InvokeTime")
+        If Not $Time Then
+            $Time = $StartTimer
+        EndIf
+        $ETAText = ""
+        Position()
+        BlockInput(0)
+        WinSetOnTop($WinHandle, "", 0)
+        While $Minutes > 0
+            Splash("[ " & Localize("WaitingForInvokeDelay", "<MINUTES>", HoursAndMinutes($Minutes)) & " ]", 0)
+            Sleep(1000)
+            $Minutes = $LoopDelayMinutes[$i] - TimerDiff($Time) / 60000
+        WEnd
+        Position()
+        BlockInput(1)
+        WinSetOnTop($WinHandle, "", 1)
+        Loop()
+        Exit
     EndIf
 EndFunc
 
@@ -318,7 +401,7 @@ Func Invoke()
     If Exists("CongratulationsWindow") Then
         For $n = 1 To 10
             FindLogInScreen()
-            Send($InvokeKey)
+            Send(GetValue("InvokeKey"))
             Sleep(500)
             If ImageSearch("Invoked") Then
                 Return
@@ -330,7 +413,7 @@ Func Invoke()
                 ElseIf ImageSearch("CongratulationsWindow") Then
                     Sleep(500)
                     If ImageSearch("CongratulationsWindow") Then
-                        $Invoked += 1
+                        SetAccountValue("Invoked", GetValue("Invoked") + 1)
                         IniWrite($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", "")) + 1)
                         Return
                     EndIf
@@ -341,7 +424,7 @@ Func Invoke()
         Next
     Else
         For $n = 1 To 3
-            Send($InvokeKey)
+            Send(GetValue("InvokeKey"))
             Sleep(5000)
         Next
         If ImageSearch("VaultOfPietyButton") Then
@@ -359,7 +442,7 @@ Func GetCoffer()
         DoubleClick()
         Sleep(1000)
     EndIf
-    If ImageSearch($Coffer) Then
+    If ImageSearch(GetValue("Coffer")) Then
         MouseMove($X, $Y)
         DoubleClick()
         Sleep(1000)
@@ -367,10 +450,11 @@ Func GetCoffer()
             Send("{ENTER}")
             Sleep(500)
         Next
-        $CollectedCoffers[$Current] = 1
+        SetAccountInfo("TotalCelestialCoffers", 1)
+        CountItems("TotalCelestialCoffers")
     EndIf
     Sleep(1000)
-    Send($JumpKey)
+    Send(GetValue("JumpKey"))
     Sleep(500)
     Invoke()
 EndFunc
@@ -378,9 +462,9 @@ EndFunc
 Func ChangeCharacter()
     TimeOut()
     FindLogInScreen()
-    Send($JumpKey)
+    Send(GetValue("JumpKey"))
     Sleep(500)
-    Send($GameMenuKey)
+    Send(GetValue("GameMenuKey"))
     Sleep(1500)
     If Exists("ChangeCharacterButton") And Not ImageSearch("ChangeCharacterButton") Then
         MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
@@ -396,9 +480,9 @@ Func ChangeCharacter()
                 Send("{ESC}")
                 Sleep(500)
             EndIf
-            Send($JumpKey)
+            Send(GetValue("JumpKey"))
             Sleep(500)
-            Send($GameMenuKey)
+            Send(GetValue("GameMenuKey"))
             Sleep(1500)
             MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
         WEnd
@@ -471,10 +555,10 @@ Func SingleRightClick()
     MouseUp("right")
 EndFunc
 
-Global $SplashWindow, $SplashWindowOnTop = 1, $LastSplashText = "", $SplashStartText = "", $ETAText = "", $SplashLeft = @DesktopWidth - $SplashWidth - 1, $SplashTop = @DesktopHeight - $SplashHeight - 1
+Global $SplashWindow, $SplashWindowOnTop = 1, $LastSplashText = "", $SplashStartText = "", $ETAText = "", $SplashLeft = @DesktopWidth - GetValue("SplashWidth") - 1, $SplashTop = @DesktopHeight - GetValue("SplashHeight") - 1
 
 Func Splash($s = "", $ontop = 1)
-    Local $Message = Localize("Invoking", "<CURRENT>", $Current, "<ENDAT>", $EndAt, "<CURRENTLOOP>", $CurrentLoop, "<ENDATLOOP>", $EndAtLoop) & @CRLF & $s & @CRLF & $ETAText
+    Local $Message = Localize("Invoking", "<CURRENT>", GetValue("Current"), "<ENDAT>", GetValue("EndAt"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & $s & @CRLF & $ETAText
     If $SplashWindow And $ontop = $SplashWindowOnTop Then
         If Not ($LastSplashText == $Message) Then
             ControlSetText($SplashWindow, "", "Static1", $SplashStartText & $Message)
@@ -493,7 +577,7 @@ Func Splash($s = "", $ontop = 1)
             $leftlocation = $SplashLeft - 30
         EndIf
         HotKeySet("{F4}", "Pause")
-        $SplashWindow = SplashTextOn("", $SplashStartText & $Message, $SplashWidth, $SplashHeight, $leftlocation, $toplocation, $setontop, "", 0)
+        $SplashWindow = SplashTextOn("", $SplashStartText & $Message, GetValue("SplashWidth"), GetValue("SplashHeight"), $leftlocation, $toplocation, $setontop, "", 0)
         $LastSplashText = $Message
     EndIf
 EndFunc
@@ -527,14 +611,14 @@ Func ImageSearch($f1 = 0 , $f2 = 0)
     #forceref $f1, $f2
     For $i = 1 To @NumParams
         local $f = Eval("f" & $i)
-        If $f And FileExists("images\" & $Language & "\" & $f & ".png") Then
-            If _ImageSearchArea("images\" & $Language & "\" & $f & ".png", -2, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, $ImageSearchTolerance) Then
+        If $f And FileExists("images\" & GetValue("Language") & "\" & $f & ".png") Then
+            If _ImageSearchArea("images\" & GetValue("Language") & "\" & $f & ".png", -2, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, GetValue("ImageSearchTolerance")) Then
                 If $LogIn And $f = "InGameScreen" Then
                     $LogIn = 0
                 EndIf
                 Return 1
             ElseIf $LogIn And $f = "InGameScreen" Then
-                Send($JumpKey)
+                Send(GetValue("JumpKey"))
             EndIf
         EndIf
     Next
@@ -545,7 +629,7 @@ Func Exists($f1 = 0, $f2 = 0)
     #forceref $f1, $f2
     For $i = 1 To @NumParams
         local $f = Eval("f" & $i)
-        If $f And FileExists("images\" & $Language & "\" & $f & ".png") Then
+        If $f And FileExists("images\" & GetValue("Language") & "\" & $f & ".png") Then
             Return 1
         EndIf
     Next
@@ -555,12 +639,12 @@ EndFunc
 Func FindLogInScreen($r = 0)
     If ImageSearch("Idle") Then
         $IdleLogout += 1
-        If $IdleLogoutCharacter[$Current] Then
-            $IdleLogoutCharacter[$Current] += 1
+        If GetAccountInfo("IdleLogoutCharacter") Then
+            SetAccountInfo("IdleLogoutCharacter", GetAccountInfo("IdleLogoutCharacter") + 1)
         Else
-            $IdleLogoutCharacter[$Current] = 1
+            SetAccountInfo("IdleLogoutCharacter", 1)
         EndIf
-        $FinishedInvoke = 1
+        SetAccountValue("FinishedInvoke", 1)
         Splash()
         MouseMove($X, $Y)
         DoubleClick()
@@ -606,18 +690,19 @@ Func FindLogInScreen($r = 0)
         If Not $r Then
             $ReLogged += 1
             Loop()
+            Exit
         EndIf
     EndIf
 EndFunc
 
 Func LogIn()
-    If $LogInUserName And $LogInPassword Then
-        If $LogInTries >= $MaxLogInAttempts Then
+    If GetValue("LogInUserName") And GetValue("LogInPassword") Then
+        If $LogInTries >= GetValue("MaxLogInAttempts") Then
             Error(Localize("MaxLoginAttempts"))
         Else
             Focus()
-            If $UsernameBoxY Then
-                MouseMove($UsernameBoxX + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), $UsernameBoxY + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+            If GetValue("UsernameBoxY") Then
+                MouseMove(GetValue("UsernameBoxX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("UsernameBoxY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
             Else
                 MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
             EndIf
@@ -626,12 +711,12 @@ Func LogIn()
             Send("{RIGHT 254}{BS 254}")
             Sleep(500)
             AutoItSetOption("SendKeyDownDelay", 15)
-            Send(_SendUnicodeReturn(BinaryToString($LogInUserName, 4)))
+            Send(_SendUnicodeReturn(BinaryToString(GetValue("LogInUserName"), 4)))
             Sleep(500)
             AutoItSetOption("SendKeyDownDelay", $KeyDelay)
             Send("{TAB}")
             AutoItSetOption("SendKeyDownDelay", 15)
-            Send(_SendUnicodeReturn(BinaryToString($LogInPassword, 4)))
+            Send(_SendUnicodeReturn(BinaryToString(GetValue("LogInPassword"), 4)))
             Sleep(500)
             AutoItSetOption("SendKeyDownDelay", $KeyDelay)
             Send("{ENTER}")
@@ -646,13 +731,13 @@ Func TimeOut($r = 0)
     If TimerDiff($WaitingTimer) >= $TimeOut Then
         $TimedOut += 1
         If Not $LoggingIn Then
-            If $TimedOutCharacter[$Current] Then
-                $TimedOutCharacter[$Current] += 1
+            If GetAccountInfo("TimedOutCharacter") Then
+                SetAccountInfo("TimedOutCharacter", GetAccountInfo("TimedOutCharacter") + 1)
             Else
-                $TimedOutCharacter[$Current] = 1
+                SetAccountInfo("TimedOutCharacter", 1)
             EndIf
         EndIf
-        If Not $r And $RestartGameClient And $GameClientInstallLocation And $GameClientInstallLocation <> "" And $LogInServerAddress And $LogInServerAddress <> "" And $LogInUserName And $LogInPassword And Exists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
+        If Not $r And GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And Exists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
             Splash("[ " & Localize("RestartingNeverwinter") & " ]")
             If ProcessExists("GameClient.exe") Then
                 ProcessClose("GameClient.exe")
@@ -671,41 +756,140 @@ Func TimeOut($r = 0)
 EndFunc
 
 Func End()
-    Message(Localize("CompletedInvoking", "<STARTAT>", $StartAt, "<ENDAT>", $EndAt, "<STARTATLOOP>", $StartAtLoop, "<ENDATLOOP>", $EndAtLoop) & @CRLF & @CRLF & Localize("InvokingTook", "<MINUTES>", HoursAndMinutes(TimerDiff($StartTimer) / 60000)))
+    If GetValue("FinishedLoop") Then
+        SetAccountValue("CurrentLoop", GetValue("CurrentLoop") + GetValue("FinishedLoop"))
+        SetAccountValue("FinishedLoop")
+        SetAccountValue("Current", GetValue("StartAt"))
+        SetAccountValue("FinishedInvoke")
+        $ETAText = ""
+    EndIf
+    SetAccountValue("Current", GetValue("Current") + GetValue("FinishedInvoke"))
+    SetAccountValue("FinishedInvoke")
+    If Exists("SelectionScreen") And Exists("LogInScreen") Then
+        Local $check = CheckAccounts()
+        If $check > 0 Then
+            $CurrentAccount = $check
+            $ETAText = ""
+            Position()
+            BlockInput(1)
+            WinSetOnTop($WinHandle, "", 1)
+            Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
+            $WaitingTimer = TimerInit()
+            WaitForScreen("SelectionScreen")
+            Position()
+            WinSetOnTop($WinHandle, "", 1)
+            If ImageSearch("SelectionScreen") Then
+                MouseMove($X, $Y)
+                SingleClick()
+                Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
+                Sleep(1000)
+            EndIf
+            Position()
+            WinSetOnTop($WinHandle, "", 1)
+            $WaitingTimer = TimerInit()
+            While Not ImageSearch("LogInScreen")
+                Sleep(500)
+                TimeOut(1)
+                Position(1)
+            WEnd
+            FindLogInScreen(1)
+            Loop()
+            Exit
+        EndIf
+    EndIf
+    Splash()
+    Position()
+    WinSetOnTop($WinHandle, "", 1)
+    If ImageSearch("SelectionScreen") Then
+        MouseMove($X, $Y)
+        SingleClick()
+        Sleep(1000)
+    EndIf
+    Local $old = $CurrentAccount
+    For $n = 1 To GetValue("TotalAccounts")
+        $CurrentAccount = $n
+        If GetValue("FinishedLoop") Then
+            SetAccountValue("CurrentLoop", GetValue("CurrentLoop") + GetValue("FinishedLoop"))
+            SetAccountValue("FinishedLoop")
+            SetAccountValue("Current", GetValue("StartAt"))
+            SetAccountValue("FinishedInvoke")
+            $ETAText = ""
+        EndIf
+        SetAccountValue("Current", GetValue("Current") + GetValue("FinishedInvoke"))
+        SetAccountValue("FinishedInvoke")
+        If CompletedAccount() Then
+            If GetValue("CurrentLoop") <= GetValue("EndAtLoop") Then
+                If GetValue("Current") = GetValue("StartAt") Then
+                    SetAccountValue("EndAtLoop", GetValue("CurrentLoop") - 1)
+                Else
+                    SetAccountValue("EndAtLoop", GetValue("CurrentLoop"))
+                EndIf
+            EndIf
+        EndIf
+        SendMessage(Localize("CompletedInvoking", "<STARTAT>", GetValue("StartAt"), "<ENDAT>", GetValue("EndAt"), "<STARTATLOOP>", GetValue("StartAtLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & @CRLF & Localize("InvokingTook", "<MINUTES>", HoursAndMinutes(TimerDiff($StartTimer) / 60000)))
+    Next
+    $CurrentAccount = $old
     Exit
 EndFunc
 
 Func Pause()
-    Message(Localize("Paused"))
+    Local $old = $CurrentAccount
+    For $n = 1 To GetValue("TotalAccounts")
+        $CurrentAccount = $n
+        Message(Localize("Paused"))
+    Next
+    $CurrentAccount = $old
     Start()
 EndFunc
 
 Func Error($s)
-    Message($s, $MB_ICONWARNING, 1)
+    Local $old = $CurrentAccount
+    For $n = 1 To GetValue("TotalAccounts")
+        $CurrentAccount = $n
+        Message($s, $MB_ICONWARNING, 1)
+    Next
+    $CurrentAccount = $old
     Start()
 EndFunc
 
+
 Func Message($s, $n = $MB_OK, $ontop = 0)
-    If $FinishedLoop Then
-        $CurrentLoop += $FinishedLoop
-        $FinishedLoop = 0
-        $Current = $StartAt
-        $FinishedInvoke = 0
+    If GetValue("FinishedLoop") Then
+        SetAccountValue("CurrentLoop", GetValue("CurrentLoop") + GetValue("FinishedLoop"))
+        SetAccountValue("FinishedLoop")
+        SetAccountValue("Current", GetValue("StartAt"))
+        SetAccountValue("FinishedInvoke")
         $ETAText = ""
     EndIf
-    $Current += $FinishedInvoke
-    $FinishedInvoke = 0
-    If $CurrentLoop > $EndAtLoop Or ( $CurrentLoop > $LoopDelayMinutes[0] And $Invoked = ($TotalSlots * $LoopDelayMinutes[0]) ) Then
-        If $CurrentLoop <= $EndAtLoop Then
-            If $Current = $StartAt Then
-                $EndAtLoop = $CurrentLoop - 1
-            Else
-                $EndAtLoop = $CurrentLoop
-            EndIf
-        EndIf
-        $CurrentLoop = 0
+    SetAccountValue("Current", GetValue("Current") + GetValue("FinishedInvoke"))
+    SetAccountValue("FinishedInvoke")
+    If Not CheckAccounts() Then
         End()
+        Exit
     EndIf
+    SendMessage($s, $n, $ontop)
+EndFunc
+
+Local $ItemStart = -1
+Func CountItems($item)
+    If $ItemStart < 0 Then
+        $ItemStart = Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", $item, ""))
+    EndIf
+    Local $ItemCount = 0
+    For $a = 1 To GetValue("TotalAccounts")
+        For $c = 1 To GetValue("TotalSlots", $a)
+            If GetAccountInfo($item, $c, $a) Then
+                $ItemCount += 1
+            EndIf
+        Next
+    Next
+    $ItemCount = $ItemStart + $ItemCount
+    If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", $item, "")) < $ItemCount Then
+        IniWrite($SettingsDir & "\Settings.ini", "Statistics", $item, $ItemCount)
+    EndIf
+EndFunc
+
+Func SendMessage($s, $n = $MB_OK, $ontop = 0)
     BlockInput(0)
     WinSetOnTop($WinHandle, "", 0)
     HotKeySet("{F4}")
@@ -713,21 +897,19 @@ Func Message($s, $n = $MB_OK, $ontop = 0)
     SplashOff()
     $SplashWindow = 0
     $ETAText = ""
-    Local $text = $s
+    Local $text = "Account #" & $CurrentAccount & @CRLF & @CRLF & $s
     Local $CofferCount = 0, $OverflowXPRewardCount = 0, $TimedOutCharacterText = "", $IdleLogoutCharacterText = ""
-    For $i = 1 To $TotalSlots
-        If $CollectedCoffers[$i] Then
+    For $i = 1 To GetValue("TotalSlots")
+        If GetAccountInfo("TotalCelestialCoffers", $i) Then
             $CofferCount += 1
-            IniWrite($SettingsDir & "\Settings.ini", "Statistics", "TotalCelestialCoffers", Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalCelestialCoffers", "")) + 1)
         EndIf
-        If $CollectedOverflowXPRewards[$i] Then
+        If GetAccountInfo("TotalOverflowXPRewards", $i) Then
             $OverflowXPRewardCount += 1
-            IniWrite($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", "")) + 1)
         EndIf
-        If $IdleLogoutCharacter[$i] Then
+        If GetAccountInfo("IdleLogoutCharacter", $i) Then
             Local $times = ""
-            If $IdleLogoutCharacter[$i] > 1 Then
-                $times = $IdleLogoutCharacter[$i] & "x"
+            If GetAccountInfo("IdleLogoutCharacter", $i) > 1 Then
+                $times = GetAccountInfo("IdleLogoutCharacter", $i) & "x"
             EndIf
             If $IdleLogoutCharacterText <> "" Then
                 $IdleLogoutCharacterText &= ", " & $times & "#" & $i
@@ -735,10 +917,10 @@ Func Message($s, $n = $MB_OK, $ontop = 0)
                 $IdleLogoutCharacterText = $times & "#" & $i
             EndIf
         EndIf
-        If $TimedOutCharacter[$i] Then
+        If GetAccountInfo("TimedOutCharacter", $i) Then
             Local $times = ""
-            If $TimedOutCharacter[$i] > 1 Then
-                $times = $TimedOutCharacter[$i] & "x"
+            If GetAccountInfo("TimedOutCharacter", $i) > 1 Then
+                $times = GetAccountInfo("TimedOutCharacter", $i) & "x"
             EndIf
             If $TimedOutCharacterText <> "" Then
                 $TimedOutCharacterText &= ", " & $times & "#" & $i
@@ -753,8 +935,8 @@ Func Message($s, $n = $MB_OK, $ontop = 0)
     If $TimedOutCharacterText <> "" Then
         $TimedOutCharacterText = " ( " & $TimedOutCharacterText & " )"
     EndIf
-    If $Invoked Then
-        $text &= @CRLF & @CRLF & Localize("InvokedTimes", "<INVOKED>", $Invoked, "<INVOKETOTAL>", $TotalSlots * $LoopDelayMinutes[0], "<PERCENT>", Floor(($Invoked / ($TotalSlots * $LoopDelayMinutes[0])) * 100))
+    If GetValue("Invoked") Then
+        $text &= @CRLF & @CRLF & Localize("InvokedTimes", "<INVOKED>", GetValue("Invoked"), "<INVOKETOTAL>", GetValue("TotalSlots") * $LoopDelayMinutes[0], "<PERCENT>", Floor((GetValue("Invoked") / (GetValue("TotalSlots") * $LoopDelayMinutes[0])) * 100))
     EndIf
     If $CofferCount Then
         $text &= @CRLF & @CRLF & Localize("CofferCount", "<COUNT>", $CofferCount)
@@ -794,74 +976,86 @@ Func HoursAndMinutes($n)
     Return Localize("Minutes", "<MINUTES>", $Minutes)
 EndFunc
 
-Local $FirstRun = 1
-Func Start()
+Func Begin()
+    If CompletedAccount() Then
+        Return
+    EndIf
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $LoopDelayMinutes[0]), $CurrentLoop, "", $InputBoxWidth, $InputBoxHeight)
+        Local $strNumber = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $LoopDelayMinutes[0]), GetValue("CurrentLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then
             Exit
         EndIf
         Local $number = Floor(Number($strNumber))
         If $number >= 1 Then
-            $StartAtLoop = $number
-            $CurrentLoop = $StartAtLoop
+            SetAccountValue("StartAtLoop", $number)
+            SetAccountValue("CurrentLoop", GetValue("StartAtLoop"))
             ExitLoop
         EndIf
         MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
     WEnd
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & Localize("EndingLoop", "<STARTATLOOP>", $StartAtLoop), $EndAtLoop, "", $InputBoxWidth, $InputBoxHeight)
+        Local $strNumber = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("EndingLoop", "<STARTATLOOP>", GetValue("StartAtLoop")), GetValue("EndAtLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then
             Exit
         EndIf
         Local $number = Floor(Number($strNumber))
-        If $number >= $StartAtLoop Then
-            $EndAtLoop = $number
+        If $number >= GetValue("StartAtLoop") Then
+            SetAccountValue("EndAtLoop", $number)
             ExitLoop
         EndIf
         MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
     WEnd
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & Localize("StartAtEachLoop", "<TOTALSLOTS>", $TotalSlots), $StartAt, "", $InputBoxWidth, $InputBoxHeight)
+        Local $strNumber = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("StartAtEachLoop", "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("StartAt"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then
             Exit
         EndIf
         Local $number = Floor(Number($strNumber))
-        If $number >= 1 And $number <= $TotalSlots Then
-            $StartAt = $number
+        If $number >= 1 And $number <= GetValue("TotalSlots") Then
+            SetAccountValue("StartAt", $number)
             ExitLoop
         EndIf
         MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
     WEnd
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & Localize("EndAtEachLoop", "<STARTAT>", $StartAt, "<TOTALSLOTS>", $TotalSlots), $EndAt, "", $InputBoxWidth, $InputBoxHeight)
+        Local $strNumber = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("EndAtEachLoop", "<STARTAT>", GetValue("StartAt"), "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("EndAt"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then
             Exit
         EndIf
         Local $number = Floor(Number($strNumber))
-        If $number >= $StartAt And $number <= $TotalSlots Then
-            $EndAt = $number
+        If $number >= GetValue("StartAt") And $number <= GetValue("TotalSlots") Then
+            SetAccountValue("EndAt", $number)
             ExitLoop
         EndIf
         MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
     WEnd
-    If $Current < $StartAt Then
-        $Current = $StartAt
-    ElseIf $Current > $EndAt Then
-        $Current = $EndAt
+    If GetValue("Current") < GetValue("StartAt") Then
+        SetAccountValue("Current", GetValue("StartAt"))
+    ElseIf GetValue("Current") > GetValue("EndAt") Then
+        SetAccountValue("Current", GetValue("EndAt"))
     EndIf
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & Localize("StartAtCurrentLoop", "<STARTAT>", $StartAt, "<ENDAT>", $EndAt), $Current, "", $InputBoxWidth, $InputBoxHeight)
+        Local $strNumber = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("StartAtCurrentLoop", "<STARTAT>", GetValue("StartAt"), "<ENDAT>", GetValue("EndAt")), GetValue("Current"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then
             Exit
         EndIf
         Local $number = Floor(Number($strNumber))
-        If $number >= $StartAt And $number <= $EndAt Then
-            $Current = $number
+        If $number >= GetValue("StartAt") And $number <= GetValue("EndAt") Then
+            SetAccountValue("Current", $number)
             ExitLoop
         EndIf
         MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
     WEnd
+EndFunc
+
+Local $FirstRun = 1
+Func Start()
+    Local $old = $CurrentAccount
+    For $n = 1 To GetValue("TotalAccounts")
+        $CurrentAccount = $n
+        Begin()
+    Next
+    $CurrentAccount = $old
     If $FirstRun Or $MinutesToStart Then
         $FirstRun = 0
         Local $Time = 0
@@ -886,7 +1080,7 @@ Func Start()
         WEnd
     EndIf
     While 1
-        Local $strNumber = InputBox($Title, @CRLF & Localize("ToStartInvoking"), $MinutesToStart, "", $StartInputBoxWidth, $StartInputBoxHeight)
+        Local $strNumber = InputBox($Title, @CRLF & Localize("ToStartInvoking"), $MinutesToStart, "", GetValue("StartInputBoxWidth"), GetValue("StartInputBoxHeight"))
         If @error <> 0 Then
             Exit
         EndIf
@@ -921,6 +1115,7 @@ Func Start()
     FindLogInScreen(1)
     $StartTimer = TimerInit()
     Loop()
+    Exit
 EndFunc
 
 If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("CheckForUpdate")) = $IDYES Then
@@ -965,115 +1160,142 @@ If ( Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked"
     EndIf
 EndIf
 
-If Exists("LogInScreen") Then
-    If Not $LogInUserName Then
-        $LogInUserName = ""
+Func Initialize()
+    SetAccountValue("Current", GetValue("StartAt"))
+    SetAccountValue("FinishedInvoke")
+    SetAccountValue("FinishedLoop")
+    SetAccountValue("Invoked")
+    SetAccountValue("CurrentLoop", GetValue("StartAtLoop"))
+    If Exists("LogInScreen") Then
+        If Not GetValue("LogInUserName") Then
+            SetAccountValue("LogInUserName", "")
+        EndIf
+        While 1
+            Local $string = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("EnterUsername"), BinaryToString(GetValue("LogInUserName"), 4), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+            If @error <> 0 Then
+                Exit
+            EndIf
+            $string = String(StringToBinary($string, 4))
+            If $string And $string <> "" Then
+                SetAccountValue("LogInUserName", $string)
+                ExitLoop
+            EndIf
+            If GetIniPrivate("LogInUserName") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DeleteUsername")) = $IDYES Then
+                SetAccountValue("LogInUserName", "")
+                SaveIniPrivate("LogInUserName")
+            Else
+                MsgBox($MB_ICONWARNING, $Title, Localize("ValidUsername"))
+            EndIf
+        WEnd
+        If BinaryToString(GetIniPrivate("LogInUserName"), 4) <> BinaryToString(GetValue("LogInUserName"), 4) Then
+            If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SaveUsername")) = $IDYES Then
+                SaveIniPrivate("LogInUserName", GetValue("LogInUserName"))
+            Else
+                SaveIniPrivate("LogInUserName")
+            EndIf
+        EndIf
+        If Not GetValue("LogInPassword") Then
+            SetAccountValue("LogInPassword", "")
+        EndIf
+        _Crypt_Startup()
+        While 1
+            Local $string = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("EnterPassword"), BinaryToString(GetValue("LogInPassword"), 4), "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+            If @error <> 0 Then
+                Exit
+            EndIf
+            $string = String(StringToBinary($string, 4))
+            If $string And $string <> "" Then
+                If BinaryToString(GetIniPrivate("LogInPassword"), 4) == BinaryToString($string, 4) Then
+                    SetAccountValue("LogInPassword", $string)
+                    ExitLoop
+                ElseIf GetValue("PasswordHash") Then
+                    Local $Hash = Hex(_Crypt_HashData(BinaryToString($string, 4), $CALG_SHA1))
+                    If $Hash = GetValue("PasswordHash") Then
+                        SetAccountValue("LogInPassword", $string)
+                        ExitLoop
+                    EndIf
+                    MsgBox($MB_ICONWARNING, $Title, Localize("PasswordIncorrect"))
+                Else
+                    Local $string2 = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("EnterPasswordAgain"), "", "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+                    If @error <> 0 Then
+                        Exit
+                    EndIf
+                    If $string == String(StringToBinary($string2, 4)) Then
+                        SetAccountValue("LogInPassword", $string)
+                        If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SavePassword")) = $IDYES Then
+                            SaveIniPrivate("LogInPassword", GetValue("LogInPassword"))
+                            If GetIniPrivate("PasswordHash") <> "" Then
+                                SaveIniPrivate("PasswordHash")
+                            EndIf
+                        Else
+                            SaveIniPrivate("LogInPassword")
+                            If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SavePasswordHash")) = $IDYES Then
+                                SetAccountValue("PasswordHash", Hex(_Crypt_HashData(BinaryToString(GetValue("LogInPassword"), 4), $CALG_SHA1)))
+                                SaveIniPrivate("PasswordHash", GetValue("PasswordHash"))
+                            ElseIf GetIniPrivate("PasswordHash") <> "" Then
+                                SaveIniPrivate("PasswordHash")
+                            EndIf
+                        EndIf
+                        ExitLoop
+                    EndIf
+                    MsgBox($MB_ICONWARNING, $Title, Localize("PasswordNotMatch"))
+                EndIf
+            Else
+                If GetIniPrivate("LogInPassword") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DeletePassword")) = $IDYES Then
+                    SetAccountValue("LogInPassword", "")
+                    SaveIniPrivate("LogInPassword")
+                ElseIf GetIniPrivate("PasswordHash") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DeletePasswordHash")) = $IDYES Then
+                    SetAccountValue("PasswordHash")
+                    SaveIniPrivate("PasswordHash")
+                Else
+                    MsgBox($MB_ICONWARNING, $Title, Localize("ValidPassword"))
+                EndIf
+            EndIf
+        WEnd
+        _Crypt_Shutdown()
     EndIf
+
     While 1
-        Local $string = InputBox($Title, @CRLF & Localize("EnterUsername"), BinaryToString($LogInUserName, 4), "", $InputBoxWidth, $InputBoxHeight)
+        Local $strNumber = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("TotalCharacters"), GetValue("TotalSlots"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then
             Exit
         EndIf
-        $string = String(StringToBinary($string, 4))
-        If $string And $string <> "" Then
-            $LogInUserName = $string
+        Local $number = Floor(Number($strNumber))
+        If $number > 0 Then
+            SetAccountValue("TotalSlots", $number)
             ExitLoop
         EndIf
-        If IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInUserName", "") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DeleteUsername")) = $IDYES Then
-            $LogInUserName = ""
-            IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInUserName", "")
-        Else
-            MsgBox($MB_ICONWARNING, $Title, Localize("ValidUsername"))
-        EndIf
+        MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
     WEnd
-    If BinaryToString(IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInUserName", ""), 4) <> BinaryToString($LogInUserName, 4) Then
-        If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SaveUsername")) = $IDYES Then
-            IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInUserName", $LogInUserName)
-        Else
-            IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInUserName", "")
-        EndIf
+    If GetIniAccount("TotalSlots") <> GetValue("TotalSlots") Then
+        SaveIniAccount("TotalSlots", GetValue("TotalSlots"))
     EndIf
-    If Not $LogInPassword Then
-        $LogInPassword = ""
-    EndIf
-    _Crypt_Startup()
-    While 1
-        Local $string = InputBox($Title, @CRLF & Localize("EnterPassword"), BinaryToString($LogInPassword, 4), "*", $InputBoxWidth, $InputBoxHeight)
-        If @error <> 0 Then
-            Exit
-        EndIf
-        $string = String(StringToBinary($string, 4))
-        If $string And $string <> "" Then
-            If BinaryToString(IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInPassword", ""), 4) == BinaryToString($string, 4) Then
-                $LogInPassword = $string
-                ExitLoop
-            ElseIf $PasswordHash Then
-                Local $Hash = Hex(_Crypt_HashData(BinaryToString($string, 4), $CALG_SHA1))
-                If $Hash = $PasswordHash Then
-                    $LogInPassword = $string
-                    ExitLoop
-                EndIf
-                MsgBox($MB_ICONWARNING, $Title, Localize("PasswordIncorrect"))
-            Else
-                Local $string2 = InputBox($Title, @CRLF & Localize("EnterPasswordAgain"), "", "*", $InputBoxWidth, $InputBoxHeight)
-                If @error <> 0 Then
-                    Exit
-                EndIf
-                If $string == String(StringToBinary($string2, 4)) Then
-                    $LogInPassword = $string
-                    If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SavePassword")) = $IDYES Then
-                        IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInPassword", $LogInPassword)
-                        If IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", "") <> "" Then
-                            IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", "")
-                        EndIf
-                    Else
-                        IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInPassword", "")
-                        If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SavePasswordHash")) = $IDYES Then
-                            $PasswordHash = Hex(_Crypt_HashData(BinaryToString($LogInPassword, 4), $CALG_SHA1))
-                            IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", $PasswordHash)
-                        ElseIf IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", "") <> "" Then
-                            IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", "")
-                        EndIf
-                    EndIf
-                    ExitLoop
-                EndIf
-                MsgBox($MB_ICONWARNING, $Title, Localize("PasswordNotMatch"))
-            EndIf
-        Else
-            If IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInPassword", "") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DeletePassword")) = $IDYES Then
-                $LogInPassword = ""
-                IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "LogInPassword", "")
-            ElseIf IniRead($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", "") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DeletePasswordHash")) = $IDYES Then
-                $PasswordHash = 0
-                IniWrite($SettingsDir & "\PrivateSettings.ini", "PrivateSettings", "PasswordHash", "")
-            Else
-                MsgBox($MB_ICONWARNING, $Title, Localize("ValidPassword"))
-            EndIf
-        EndIf
-    WEnd
-    _Crypt_Shutdown()
-EndIf
 
-While 1
-    Local $strNumber = InputBox($Title, @CRLF & Localize("TotalCharacters"), $TotalSlots, "", $InputBoxWidth, $InputBoxHeight)
-    If @error <> 0 Then
-        Exit
+    If Not GetValue("EndAt") Then
+        SetAccountValue("EndAt", GetValue("TotalSlots"))
     EndIf
-    Local $number = Floor(Number($strNumber))
-    If $number > 0 Then
-        $TotalSlots = $number
-        ExitLoop
+EndFunc
+
+Func SetAccountInfo($name, $value = 0, $character = GetValue("Current"), $account = $CurrentAccount)
+    If IsDeclared("ACCOUNT" & $account & "SETTINGS" & $character & "_" & $name) Then
+        Return Assign("ACCOUNT" & $account & "SETTINGS" & $character & "_" & $name, $value)
     EndIf
-    MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
-WEnd
-If IniRead($SettingsDir & "\Settings.ini", "Settings", "TotalSlots", "") <> $TotalSlots Then
-    IniWrite($SettingsDir & "\Settings.ini", "Settings", "TotalSlots", $TotalSlots)
-EndIf
+    Return Assign("ACCOUNT" & $account & "SETTINGS" & $character & "_" & $name, $value, 2)
+EndFunc
 
-If Not $EndAt Then
-    $EndAt = $TotalSlots
-EndIf
+Func GetAccountInfo($name, $character = GetValue("Current"), $account = $CurrentAccount)
+    If IsDeclared("ACCOUNT" & $account & "SETTINGS" & $character & "_" & $name) Then
+        Return Eval("ACCOUNT" & $account & "SETTINGS" & $character & "_" & $name)
+    EndIf
+    Return 0
+EndFunc
 
-Global $InvokeTime[$TotalSlots + 2], $InvokeLoop[$TotalSlots + 2], $CollectedCoffers[$TotalSlots + 2], $CollectedOverflowXPRewards[$TotalSlots + 2], $TimedOutCharacter[$TotalSlots + 2], $IdleLogoutCharacter[$TotalSlots + 2]
+
+
+For $n = 1 To GetValue("TotalAccounts")
+    $CurrentAccount = $n
+    Initialize()
+Next
+$CurrentAccount = 1
 
 Start()

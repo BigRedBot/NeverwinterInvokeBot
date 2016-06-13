@@ -10,7 +10,7 @@ Global $Title = $Name & " v" & $Version & " Uninstaller"
 
 Global $SettingsDir = @AppDataCommonDir & "\" & $Name
 
-Global $Language = IniRead($SettingsDir & "\Settings.ini", "Settings", "Language", "")
+Global $Language = IniRead($SettingsDir & "\Settings.ini", "AllAccounts", "Language", "")
 
 Local $LocalizationFile = @ScriptDir & "\Localization.ini"
 
@@ -50,12 +50,6 @@ If $Language = "" Then
     SetLanguage()
 EndIf
 
-Func SetDefault($name, $default = 0)
-    If Not IsDeclared($name) Then
-        Assign($name, $default, 2)
-    EndIf
-EndFunc
-
 Func LoadLocalizations($file, $lang)
     Local $values = IniReadSection($file, $lang)
     If @error = 0 Then
@@ -64,7 +58,9 @@ Func LoadLocalizations($file, $lang)
             If $v = "" Then
                 $v = BinaryToString(StringToBinary(IniRead($file, "English", $values[$i][0], "")), 4)
             EndIf
-            SetDefault("LOCALIZATION_" & $values[$i][0], StringReplace($v, "<BR>", @CRLF))
+            If Not IsDeclared("LOCALIZATION_" & $values[$i][0]) Then
+                Assign("LOCALIZATION_" & $values[$i][0], StringReplace($v, "<BR>", @CRLF), 2)
+            EndIf
         Next
     EndIf
     If $lang <> "English" Then

@@ -15,16 +15,16 @@ Func Position()
         MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
         Capture()
     EndIf
-    If $GameWidth And $GameHeight Then
+    If GetValue("GameWidth") And GetValue("GameHeight") Then
         If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight Then
             MsgBox($MB_ICONWARNING, $Title, Localize("UnMaximize"))
             Exit
-        ElseIf $DeskTopWidth <= ($GameWidth + $PaddingLeft) Or $DeskTopHeight <= ($GameHeight + $PaddingTop) Then
-            MsgBox($MB_ICONWARNING, $Title, Localize("ResolutionHigherThan", "<RESOLUTION>", ($GameWidth + $PaddingLeft) & "x" & ($GameHeight + $PaddingTop)))
+        ElseIf $DeskTopWidth <= (GetValue("GameWidth") + $PaddingLeft) Or $DeskTopHeight <= (GetValue("GameHeight") + $PaddingTop) Then
+            MsgBox($MB_ICONWARNING, $Title, Localize("ResolutionHigherThan", "<RESOLUTION>", (GetValue("GameWidth") + $PaddingLeft) & "x" & (GetValue("GameHeight") + $PaddingTop)))
             Exit
-        ElseIf $ClientWidth <> $GameWidth Or $ClientHeight <> $GameHeight Then
-            WinMove($WinHandle, "", $WinLeft, $WinTop, $GameWidth + $PaddingWidth, $GameHeight + $PaddingHeight)
-            If $ClientWidth <> $GameWidth Or $ClientHeight <> $GameHeight Then
+        ElseIf $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
+            WinMove($WinHandle, "", $WinLeft, $WinTop, GetValue("GameWidth") + $PaddingWidth, GetValue("GameHeight") + $PaddingHeight)
+            If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
                 MsgBox($MB_ICONWARNING, $Title, Localize("UnableToResize"))
                 Exit
             EndIf

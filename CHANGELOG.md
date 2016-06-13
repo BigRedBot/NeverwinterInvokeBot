@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.0
+- Added multi-account support.
+
 5.6
 - Removed UPX compression. (May have been causing some anti-virus false positives.)
 - Added icon image.

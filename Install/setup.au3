@@ -10,7 +10,7 @@ Global $SettingsDir = @AppDataCommonDir & "\" & $Name
 
 DirCreate($SettingsDir)
 
-Global $Language = IniRead($SettingsDir & "\Settings.ini", "Settings", "Language", "")
+Global $Language = IniRead($SettingsDir & "\Settings.ini", "AllAccounts", "Language", "")
 
 Local $LocalizationFile = @ScriptDir & "\" & $Name & "\Localization.ini"
 
@@ -39,7 +39,7 @@ Func SetLanguage($default = "English")
                     If $sections[$i] == $sCurrCombo Then
                         GUIDelete()
                         $Language = $sCurrCombo
-                        IniWrite($SettingsDir & "\Settings.ini", "Settings", "Language", $Language)
+                        IniWrite($SettingsDir & "\Settings.ini", "AllAccounts", "Language", $Language)
                         Return
                     EndIf
                 Next
@@ -53,12 +53,6 @@ Else
     SetLanguage($Language)
 EndIf
 
-Func SetDefault($name, $default = 0)
-    If Not IsDeclared($name) Then
-        Assign($name, $default, 2)
-    EndIf
-EndFunc
-
 Func LoadLocalizations($file, $lang)
     Local $values = IniReadSection($file, $lang)
     If @error = 0 Then
@@ -67,7 +61,9 @@ Func LoadLocalizations($file, $lang)
             If $v = "" Then
                 $v = BinaryToString(StringToBinary(IniRead($file, "English", $values[$i][0], "")), 4)
             EndIf
-            SetDefault("LOCALIZATION_" & $values[$i][0], StringReplace($v, "<BR>", @CRLF))
+            If Not IsDeclared("LOCALIZATION_" & $values[$i][0]) Then
+                Assign("LOCALIZATION_" & $values[$i][0], StringReplace($v, "<BR>", @CRLF), 2)
+            EndIf
         Next
     EndIf
     If $lang <> "English" Then

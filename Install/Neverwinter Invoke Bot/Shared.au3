@@ -10,7 +10,7 @@
 AutoItSetOption("WinTitleMatchMode", 3)
 
 Func LoadDefaults()
-    If $Language = "Russian" Then
+    If GetValue("Language") = "Russian" Then
         SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
         SetDefault("JumpKey", "{SPACE}")
         SetDefault("GameMenuKey", "{ESC}")
@@ -39,6 +39,7 @@ Func LoadDefaults()
         SetDefault("ScreenDetectionSplashHeight", 400)
         SetDefault("LogInServerAddress", "208.95.186.167, 208.95.186.168, 208.95.186.96")
     EndIf
+    SetDefault("TotalAccounts", 1)
     SetDefault("TotalSlots")
     SetDefault("StartAtLoop", 1)
     SetDefault("EndAtLoop", 8)
@@ -79,11 +80,17 @@ Func LoadDefaults()
     SetDefault("PasswordHash")
 EndFunc
 
+Global $CurrentAccount = 1
+
 Global $SettingsDir = @AppDataCommonDir & "\Neverwinter Invoke Bot"
 
 DirCreate($SettingsDir)
 
-Global $Language = IniRead($SettingsDir & "\Settings.ini", "Settings", "Language", "")
+SetValue("Language", IniRead($SettingsDir & "\Settings.ini", "AllAccounts", "Language", ""))
+
+If Not IsDeclared("LoadPrivateSettings") Then
+    Assign("LoadPrivateSettings", 0, 2)
+EndIf
 
 Local $LocalizationFile = @ScriptDir & "\Localization.ini"
 
@@ -111,8 +118,8 @@ Func SetLanguage($default = "English")
                 For $i = 1 To $sections[0]
                     If $sections[$i] == $sCurrCombo Then
                         GUIDelete()
-                        $Language = $sCurrCombo
-                        IniWrite($SettingsDir & "\Settings.ini", "Settings", "Language", $Language)
+                        SetValue("Language", $sCurrCombo)
+                        IniWrite($SettingsDir & "\Settings.ini", "AllAccounts", "Language", GetValue("Language"))
                         Return
                     EndIf
                 Next
@@ -120,15 +127,77 @@ Func SetLanguage($default = "English")
     WEnd
 EndFunc
 
-If $Language = "" Then
+If GetValue("Language") = "" Then
     SetLanguage()
 EndIf
 
-Func SetDefault($name, $default = 0)
-    If Not IsDeclared($name) Then
-        Assign($name, $default, 2)
+Func SetDefault($name, $value = 0)
+    If Not IsDeclared("SETTINGS_Default" & $name) Then
+        Assign("SETTINGS_Default" & $name, $value, 2)
     EndIf
 EndFunc
+
+Func SetValue($name, $value = 0, $account = 0)
+    If $account Then
+        If IsDeclared("SETTINGS_Account" & $account & $name) Then
+            Return Assign("SETTINGS_Account" & $account & $name, $value)
+        EndIf
+        Return Assign("SETTINGS_Account" & $account & $name, $value, 2)
+    ElseIf IsDeclared("SETTINGS_Account" & $CurrentAccount & $name) Then
+        Return Assign("SETTINGS_Account" & $CurrentAccount & $name, $value)
+    ElseIf IsDeclared("SETTINGS_AllAccounts" & $name) Then
+        Return Assign("SETTINGS_AllAccounts" & $name, $value)
+    EndIf
+    Return Assign("SETTINGS_AllAccounts" & $name, $value, 2)
+EndFunc
+
+Func SetAccountValue($name, $value = 0)
+    Return SetValue($name, $value, $CurrentAccount)
+EndFunc
+
+Func GetValue($name, $account = $CurrentAccount)
+    If IsDeclared("SETTINGS_Account" & $account & $name) Then
+        Return Eval("SETTINGS_Account" & $account & $name)
+    ElseIf IsDeclared("SETTINGS_AllAccounts" & $name) Then
+        Return Eval("SETTINGS_AllAccounts" & $name)
+    ElseIf IsDeclared("SETTINGS_Default" & $name) Then
+        Return Eval("SETTINGS_Default" & $name)
+    EndIf
+    Return 0
+EndFunc
+
+Func SaveIniSetting($name, $value = "")
+    Return IniWrite($SettingsDir & "\Settings.ini", "AllAccounts", $name, $value)
+EndFunc
+
+Func GetIniSetting($name)
+    Return IniRead($SettingsDir & "\Settings.ini", "AllAccounts", $name, "")
+EndFunc
+
+Func SaveIniAccount($name, $value = "", $account = $CurrentAccount, $private = 0)
+    Local $file = "\Settings.ini"
+    If $private Then
+        $file = "\PrivateSettings.ini"
+    EndIf
+    Return IniWrite($SettingsDir & $file, "Account" & $account, $name, $value)
+EndFunc
+
+Func GetIniAccount($name, $account = $CurrentAccount, $private = 0)
+    Local $file = "\Settings.ini"
+    If $private Then
+        $file = "\PrivateSettings.ini"
+    EndIf
+    Return IniRead($SettingsDir & $file, "Account" & $account, $name, "")
+EndFunc
+
+Func SaveIniPrivate($name, $value = "", $account = $CurrentAccount)
+    Return SaveIniAccount($name, $value , $account, 1)
+EndFunc
+
+Func GetIniPrivate($name, $account = $CurrentAccount)
+    Return GetIniAccount($name, $account, 1)
+EndFunc
+
 
 Func LoadLocalizations($file, $lang)
     Local $values = IniReadSection($file, $lang)
@@ -138,7 +207,9 @@ Func LoadLocalizations($file, $lang)
             If $v = "" Then
                 $v = BinaryToString(StringToBinary(IniRead($file, "English", $values[$i][0], "")), 4)
             EndIf
-            SetDefault("LOCALIZATION_" & $values[$i][0], StringReplace($v, "<BR>", @CRLF))
+            If Not IsDeclared("LOCALIZATION_" & $values[$i][0]) Then
+                Assign("LOCALIZATION_" & $values[$i][0], StringReplace($v, "<BR>", @CRLF), 2)
+            EndIf
         Next
     EndIf
     If $lang <> "English" Then
@@ -146,7 +217,7 @@ Func LoadLocalizations($file, $lang)
     EndIf
 EndFunc
 
-LoadLocalizations($LocalizationFile, $Language)
+LoadLocalizations($LocalizationFile, GetValue("Language"))
 
 Func Localize($s, $f1=0, $r1=0, $f2=0, $r2=0, $f3=0, $r3=0, $f4=0, $r4=0, $f5=0, $r5=0, $f6=0, $r6=0, $f7=0, $r7=0, $f8=0, $r8=0, $f9=0, $r9=0, $f10=0, $r10=0)
     #forceref $f1, $f2, $f3, $f4, $f5, $f6, $f7, $f8, $f9, $f10
@@ -158,29 +229,30 @@ Func Localize($s, $f1=0, $r1=0, $f2=0, $r2=0, $f3=0, $r3=0, $f4=0, $r4=0, $f5=0,
     Return $v
 EndFunc
 
-SetDefault("LoadPrivateSettings")
 Func LoadSettings($file)
     Local $sections = IniReadSectionNames($file)
     If @error = 0 Then
         For $i = 1 To $sections[0]
-            If $sections[$i] = "Settings" Or ($LoadPrivateSettings And $sections[$i] = "PrivateSettings") Then
-                Local $values = IniReadSection($file, $sections[$i])
-                If @error = 0 Then
-                    For $i2 = 1 To $values[0][0]
-                        Local $v = $values[$i2][1]
-                        If String(Number($v)) = String($v) Or $v = "" Then
-                            $v = Number($v)
-                        EndIf
-                        SetDefault($values[$i2][0], $v)
-                    Next
-                EndIf
+            Local $values = IniReadSection($file, $sections[$i])
+            If @error = 0 Then
+                For $i2 = 1 To $values[0][0]
+                    Local $v = $values[$i2][1]
+                    If String(Number($v)) = String($v) Or $v = "" Then
+                        $v = Number($v)
+                    EndIf
+                    If Not IsDeclared("SETTINGS_" & $sections[$i] & $values[$i2][0]) Then
+                        Assign("SETTINGS_" & $sections[$i] & $values[$i2][0], $v, 2)
+                    EndIf
+                Next
             EndIf
         Next
     EndIf
 EndFunc
 
 LoadSettings($SettingsDir & "\Settings.ini")
-LoadSettings($SettingsDir & "\PrivateSettings.ini")
+If $LoadPrivateSettings Then
+    LoadSettings($SettingsDir & "\PrivateSettings.ini")
+EndIf
 LoadDefaults()
 
 Global $WinHandle, $WinFound
@@ -246,7 +318,7 @@ Func GetPosition()
     $PaddingBottom = $WinBottom + 1 - $ClientBottom
     $DeskTopWidth = @DeskTopWidth
     $DeskTopHeight = @DeskTopHeight
-    If $RelativePixelLocation Then
+    If GetValue("RelativePixelLocation") Then
         $OffsetX = $ClientLeft
         $OffsetY = $ClientTop
     EndIf

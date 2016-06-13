@@ -26,7 +26,7 @@ Func Position()
     Return 1
 EndFunc
 
-Global $SplashWindow, $LastSplashText = "", $SplashLeft = @DesktopWidth - $ScreenDetectionSplashWidth - 6, $SplashTop = @DesktopHeight - $ScreenDetectionSplashHeight - 25
+Global $SplashWindow, $LastSplashText = "", $SplashLeft = @DesktopWidth - GetValue("ScreenDetectionSplashWidth") - 6, $SplashTop = @DesktopHeight - GetValue("ScreenDetectionSplashHeight") - 25
 
 Func Splash($s = "")
     If $SplashWindow Then
@@ -35,7 +35,7 @@ Func Splash($s = "")
             $LastSplashText = $s
         EndIf
     Else
-        $SplashWindow = SplashTextOn($Title, $s, $ScreenDetectionSplashWidth, $ScreenDetectionSplashHeight, $SplashLeft, $SplashTop, 16, "", 0)
+        $SplashWindow = SplashTextOn($Title, $s, GetValue("ScreenDetectionSplashWidth"), GetValue("ScreenDetectionSplashHeight"), $SplashLeft, $SplashTop, 16, "", 0)
         $LastSplashText = $s
     EndIf
 EndFunc
@@ -52,7 +52,7 @@ Func ImageSearch($f1 = 0 , $f2 = 0)
     #forceref $f1, $f2
     For $i = 1 To @NumParams
         local $f = Eval("f" & $i)
-        If $f And FileExists("images\" & $Language & "\" & $f & ".png") And _ImageSearchArea("images\" & $Language & "\" & $f & ".png", 1, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, $ImageSearchTolerance) Then
+        If $f And FileExists("images\" & GetValue("Language") & "\" & $f & ".png") And _ImageSearchArea("images\" & GetValue("Language") & "\" & $f & ".png", 1, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, GetValue("ImageSearchTolerance")) Then
             Return 1
         EndIf
     Next
@@ -70,16 +70,16 @@ While 1
         If ImageSearch("SelectionScreen") Then
             $text &= @CRLF & @CRLF & Localize("CharacterSelectionScreenDetected")
         EndIf
-        If FindPixels($TopScrollBarX, $TopScrollBarY, $TopScrollBarC) Then
+        If FindPixels(GetValue("TopScrollBarX"), GetValue("TopScrollBarY"), GetValue("TopScrollBarC")) Then
             $text &= @CRLF & @CRLF & Localize("TopOfScrollBarDetected")
         EndIf
-        If FindPixels($TopSelectedCharacterX, $TopSelectedCharacterY, $TopSelectedCharacterC) Then
+        If FindPixels(GetValue("TopSelectedCharacterX"), GetValue("TopSelectedCharacterY"), GetValue("TopSelectedCharacterC")) Then
             $text &= @CRLF & @CRLF & Localize("TopSelectedCharacterDetected")
         EndIf
-        If FindPixels($BottomScrollBarX, $BottomScrollBarY, $BottomScrollBarC) Then
+        If FindPixels(GetValue("BottomScrollBarX"), GetValue("BottomScrollBarY"), GetValue("BottomScrollBarC")) Then
             $text &= @CRLF & @CRLF & Localize("BottomOfScrollBarDetected")
         EndIf
-        If FindPixels($BottomSelectedCharacterX, $BottomSelectedCharacterY, $BottomSelectedCharacterC) Then
+        If FindPixels(GetValue("BottomSelectedCharacterX"), GetValue("BottomSelectedCharacterY"), GetValue("BottomSelectedCharacterC")) Then
             $text &= @CRLF & @CRLF & Localize("BottomSelectedCharacterDetected")
         EndIf
         If ImageSearch("InGameScreen") Then
