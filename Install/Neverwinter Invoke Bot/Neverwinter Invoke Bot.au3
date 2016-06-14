@@ -829,6 +829,7 @@ Func End()
 EndFunc
 
 Func Pause()
+    $UnattendedStart = 0
     Local $old = $CurrentAccount
     For $n = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $n
@@ -878,6 +879,9 @@ Func CountItems($item)
 EndFunc
 
 Func SendMessage($s, $n = $MB_OK, $ontop = 0)
+    If $UnattendedStart Then
+        Exit
+    EndIf
     BlockInput(0)
     WinSetOnTop($WinHandle, "", 0)
     HotKeySet("{F4}")
@@ -1101,7 +1105,6 @@ Func Begin()
 EndFunc
 
 Func Go()
-    $UnattendedStart = 0
     $StartTimer = 0
     $LogInTries = 0
     $LoggingIn = 1
