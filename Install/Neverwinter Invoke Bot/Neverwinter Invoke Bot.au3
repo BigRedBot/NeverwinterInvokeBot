@@ -295,6 +295,7 @@ EndFunc
 Func CompletedAccount()
     SyncValues()
     If GetValue("CompletedAccount") Or ( (GetValue("CurrentLoop") + GetValue("FinishedLoop")) > $LoopDelayMinutes[0] And GetValue("Invoked") = (GetValue("TotalSlots") * $LoopDelayMinutes[0]) ) Then
+        SetAccountValue("CompletedAccount", 1)
         Return 1
     EndIf
     Return 0
