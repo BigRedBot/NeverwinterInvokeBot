@@ -151,8 +151,6 @@ Func Loop()
     If Exists("SelectionScreen") Then
         $WaitingTimer = TimerInit()
         WaitForScreen("SelectionScreen")
-        $LoggingIn = 0
-        $LogInTries = 0
     EndIf
     Position()
     Local $Start = GetValue("Current")
@@ -242,7 +240,7 @@ Func Loop()
         SetAccountInfo("InvokeTime", TimerInit())
         SetAccountInfo("InvokeLoop", GetValue("CurrentLoop"))
         SetAccountValue("FinishedInvoke", 1)
-        If GetValue("EndAt") = GetValue("Current") Then
+        If GetValue("Current") >= GetValue("EndAt") Then
             SetAccountValue("FinishedLoop", 1)
             If GetValue("CurrentLoop") >= GetValue("EndAtLoop") Then
                 SetAccountValue("CompletedAccount", 1)
@@ -261,7 +259,9 @@ Func Loop()
             Sleep(GetValue("LogOutSeconds") * 1000)
             Splash()
         EndIf
-        If GetValue("FinishedLoop") Then
+        If CompletedAccount() Then
+            ExitLoop
+        ElseIf GetValue("FinishedLoop") Then
             If Not GetValue("CompletedAccount") Then
                 Loop()
                 Exit
@@ -302,8 +302,8 @@ EndFunc
 
 Func CheckAccounts()
     SyncValues()
-    Local $old = $CurrentAccount, $oldtime = GetTimeToInvoke(), $new = $old, $newtime = $oldtime, $allcomplete = 1
-    If $oldtime <= 1 And Not CompletedAccount() Then
+    Local $old = $CurrentAccount, $oldtime = GetTimeToInvoke(), $new = $old, $newtime = $oldtime, $CurrentComplete = CompletedAccount(), $allcomplete = 1
+    If $oldtime <= 1 And Not $CurrentComplete Then
         Return $CurrentAccount
     EndIf
     For $n = 1 To GetValue("TotalAccounts")
@@ -311,7 +311,7 @@ Func CheckAccounts()
         If Not CompletedAccount() Then
             $allcomplete = 0
             Local $t = GetTimeToInvoke()
-            If ($t + 1) < $oldtime And $t < $newtime Then
+            If ( $CurrentComplete And ( $t < $newtime Or $new = $old ) ) Or ( ($t + 1) < $oldtime And $t < $newtime ) Then
                 $new = $n
                 $newtime = $t
             EndIf
@@ -627,8 +627,12 @@ Func ImageSearch($f1 = 0 , $f2 = 0)
         local $f = Eval("f" & $i)
         If $f And FileExists("images\" & GetValue("Language") & "\" & $f & ".png") Then
             If _ImageSearchArea("images\" & GetValue("Language") & "\" & $f & ".png", -2, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, GetValue("ImageSearchTolerance")) Then
-                If $LogIn And $f = "InGameScreen" Then
-                    $LogIn = 0
+                If $f <> "LogInScreen" Then
+                    $LoggingIn = 0
+                    $LogInTries = 0
+                    If $f = "InGameScreen" Then
+                        $LogIn = 0
+                    EndIf
                 EndIf
                 Return 1
             ElseIf $LogIn And $f = "InGameScreen" Then
@@ -681,8 +685,6 @@ Func FindLogInScreen($r = 0)
         If Exists("SelectionScreen") Then
             While Not ImageSearch("SelectionScreen")
                 If ImageSearch("InGameScreen") Then
-                    $LoggingIn = 0
-                    $LogInTries = 0
                     Splash()
                     Sleep(1000)
                     ChangeCharacter()
@@ -698,8 +700,6 @@ Func FindLogInScreen($r = 0)
                 FindLogInScreen()
                 Sleep(500)
             WEnd
-            $LoggingIn = 0
-            $LogInTries = 0
         EndIf
         If Not $r Then
             $ReLogged += 1
