@@ -62,7 +62,6 @@ Func Position($r = 0)
             BlockInput(1)
             Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
             FileChangeDir($GameClientInstallLocation & "\Neverwinter\Live")
-            
             Run("GameClient.exe" & GetLogInServerAddressString(), $GameClientInstallLocation & "\Neverwinter\Live")
             FileChangeDir(@ScriptDir)
             Sleep(1000)
@@ -569,12 +568,16 @@ Global $SplashWindow, $SplashWindowOnTop = 1, $LastSplashText = "", $SplashStart
 Func Splash($s = "", $ontop = 1)
     Local $Message = Localize("Invoking", "<CURRENT>", GetValue("Current"), "<ENDAT>", GetValue("EndAt"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & $s & @CRLF & $ETAText
     If $SplashWindow And $ontop = $SplashWindowOnTop Then
+        $Message = Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & $SplashStartText & $Message
         If Not ($LastSplashText == $Message) Then
-            ControlSetText($SplashWindow, "", "Static1", $SplashStartText & $Message)
+            ControlSetText($SplashWindow, "", "Static1", $Message)
             $LastSplashText = $Message
         EndIf
     Else
         Local $setontop = $DLG_NOTITLE, $toplocation = $SplashTop, $leftlocation = $SplashLeft
+        If $SplashWindow And $ontop <> $SplashWindowOnTop Then
+            SplashOff()
+        EndIf
         If $ontop Then
             $SplashWindowOnTop = 1
             $SplashStartText = Localize("ToStopPressCtrlAltDel") & @CRLF & @CRLF
@@ -586,7 +589,8 @@ Func Splash($s = "", $ontop = 1)
             $leftlocation = $SplashLeft - 30
         EndIf
         HotKeySet("{F4}", "Pause")
-        $SplashWindow = SplashTextOn("", $SplashStartText & $Message, GetValue("SplashWidth"), GetValue("SplashHeight"), $leftlocation, $toplocation, $setontop, "", 0)
+        $Message = Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & $SplashStartText & $Message
+        $SplashWindow = SplashTextOn("", $Message, GetValue("SplashWidth"), GetValue("SplashHeight"), $leftlocation, $toplocation, $setontop, "", 0)
         $LastSplashText = $Message
     EndIf
 EndFunc
@@ -616,6 +620,7 @@ Func FindPixels(ByRef $x, ByRef $y, ByRef $c)
 EndFunc
 
 Global $X = 0, $Y = 0, $LogIn = 1
+
 Func ImageSearch($f1 = 0 , $f2 = 0)
     #forceref $f1, $f2
     For $i = 1 To @NumParams
@@ -845,7 +850,7 @@ EndFunc
 
 
 Func Message($s, $n = $MB_OK, $ontop = 0)
-    If Not CheckAccounts() Then
+    If Not $FirstRun And Not CheckAccounts() Then
         End()
         Exit
     EndIf
@@ -853,6 +858,7 @@ Func Message($s, $n = $MB_OK, $ontop = 0)
 EndFunc
 
 Local $ItemStart = -1
+
 Func CountItems($item)
     If $ItemStart < 0 Then
         $ItemStart = Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", $item, ""))
@@ -879,7 +885,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
     SplashOff()
     $SplashWindow = 0
     $ETAText = ""
-    Local $text = "Account #" & $CurrentAccount & @CRLF & @CRLF & $s
+    Local $text = Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & $s
     Local $CofferCount = 0, $OverflowXPRewardCount = 0, $TimedOutCharacterText = "", $IdleLogoutCharacterText = ""
     For $i = 1 To GetValue("TotalSlots")
         If GetAccountInfo("TotalCelestialCoffers", $i) Then
@@ -958,12 +964,14 @@ Func HoursAndMinutes($n)
     Return Localize("Minutes", "<MINUTES>", $Minutes)
 EndFunc
 
-Func Begin()
+Func ConfigureAccount()
     If CompletedAccount() Then
+        Return
+    ElseIf MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAccountOptions", "<ACCOUNT>", $CurrentAccount)) = $IDYES Then
         Return
     EndIf
     While 1
-        Local $strNumber = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $LoopDelayMinutes[0]), GetValue("CurrentLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $LoopDelayMinutes[0]), GetValue("CurrentLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then
             Exit
         EndIf
@@ -976,7 +984,7 @@ Func Begin()
         MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
     WEnd
     While 1
-        Local $strNumber = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("EndingLoop", "<STARTATLOOP>", GetValue("StartAtLoop")), GetValue("EndAtLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EndingLoop", "<STARTATLOOP>", GetValue("StartAtLoop")), GetValue("EndAtLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then
             Exit
         EndIf
@@ -988,7 +996,7 @@ Func Begin()
         MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
     WEnd
     While 1
-        Local $strNumber = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("StartAtEachLoop", "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("StartAt"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartAtEachLoop", "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("StartAt"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then
             Exit
         EndIf
@@ -1000,7 +1008,7 @@ Func Begin()
         MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
     WEnd
     While 1
-        Local $strNumber = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("EndAtEachLoop", "<STARTAT>", GetValue("StartAt"), "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("EndAt"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EndAtEachLoop", "<STARTAT>", GetValue("StartAt"), "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("EndAt"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then
             Exit
         EndIf
@@ -1017,7 +1025,7 @@ Func Begin()
         SetAccountValue("Current", GetValue("EndAt"))
     EndIf
     While 1
-        Local $strNumber = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("StartAtCurrentLoop", "<STARTAT>", GetValue("StartAt"), "<ENDAT>", GetValue("EndAt")), GetValue("Current"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartAtCurrentLoop", "<STARTAT>", GetValue("StartAt"), "<ENDAT>", GetValue("EndAt")), GetValue("Current"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then
             Exit
         EndIf
@@ -1030,49 +1038,70 @@ Func Begin()
     WEnd
 EndFunc
 
-Local $FirstRun = 1
 Func Start()
-    Local $old = $CurrentAccount
-    For $n = 1 To GetValue("TotalAccounts")
-        $CurrentAccount = $n
-        Begin()
-    Next
-    $CurrentAccount = $old
-    If $FirstRun Or $MinutesToStart Then
-        $FirstRun = 0
-        Local $Time = 0
-        While 1
-            If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("GetMinutesUntilServerReset")) = $IDYES Then
-                If $Time Then
-                    $Time = TimerDiff($Time)
-                    If $Time < 5000 Then
-                        Sleep(5000 - $Time)
+    If Not $FirstRun And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAllConfigurations", "<NUMBER>", GetValue("TotalAccounts"))) = $IDYES Then
+        $SkipAllConfigurations = 1
+    EndIf
+    If Not $UnattendedStart And Not $SkipAllConfigurations Then
+        Local $old = $CurrentAccount
+        For $n = 1 To GetValue("TotalAccounts")
+            $CurrentAccount = $n
+            ConfigureAccount()
+            If GetValue("Current") < GetValue("StartAt") Then
+                SetAccountValue("Current", GetValue("StartAt"))
+            ElseIf GetValue("Current") > GetValue("EndAt") Then
+                SetAccountValue("Current", GetValue("EndAt"))
+            EndIf
+        Next
+        $CurrentAccount = $old
+    EndIf
+    Begin()
+EndFunc
+
+Func Begin()
+    $SkipAllConfigurations = 0
+    If Not $UnattendedStart Then
+        If $FirstRun Or $MinutesToStart Then
+            $FirstRun = 0
+            Local $Time = 0
+            While 1
+                If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("GetMinutesUntilServerReset")) = $IDYES Then
+                    If $Time Then
+                        $Time = TimerDiff($Time)
+                        If $Time < 5000 Then
+                            Sleep(5000 - $Time)
+                        EndIf
                     EndIf
-                EndIf
-                Local $m = _GetUTCMinutes(10, 1, True)
-                If $m >= 0 Then
-                    $MinutesToStart = $m
+                    Local $m = _GetUTCMinutes(10, 1, True)
+                    If $m >= 0 Then
+                        $MinutesToStart = $m
+                        ExitLoop
+                    EndIf
+                Else
                     ExitLoop
                 EndIf
-            Else
+                $Time = TimerInit()
+                MsgBox($MB_ICONWARNING, $Title, Localize("FailedToGetMinutes"))
+            WEnd
+        EndIf
+        While 1
+            Local $strNumber = InputBox($Title, @CRLF & Localize("ToStartInvoking"), $MinutesToStart, "", GetValue("StartInputBoxWidth"), GetValue("StartInputBoxHeight"))
+            If @error <> 0 Then
+                Exit
+            EndIf
+            Local $number = Floor(Number($strNumber))
+            If $number >= 0 Then
+                $MinutesToStart = $number
                 ExitLoop
             EndIf
-            $Time = TimerInit()
-            MsgBox($MB_ICONWARNING, $Title, Localize("FailedToGetMinutes"))
+            MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
         WEnd
     EndIf
-    While 1
-        Local $strNumber = InputBox($Title, @CRLF & Localize("ToStartInvoking"), $MinutesToStart, "", GetValue("StartInputBoxWidth"), GetValue("StartInputBoxHeight"))
-        If @error <> 0 Then
-            Exit
-        EndIf
-        Local $number = Floor(Number($strNumber))
-        If $number >= 0 Then
-            $MinutesToStart = $number
-            ExitLoop
-        EndIf
-        MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
-    WEnd
+    Go()
+EndFunc
+
+Func Go()
+    $UnattendedStart = 0
     $StartTimer = 0
     $LogInTries = 0
     $LoggingIn = 1
@@ -1090,9 +1119,25 @@ Func Start()
         WEnd
         $MinutesToStart = 0
     EndIf
-    BlockInput(1)
-    Position()
-    WinSetOnTop($WinHandle, "", 1)
+    Local $check = CheckAccounts()
+    If $check > 0 Then
+        Splash()
+        BlockInput(1)
+        Position()
+        WinSetOnTop($WinHandle, "", 1)
+        If $check <> $CurrentAccount Then
+            $CurrentAccount = $check
+            Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
+            If ImageSearch("SelectionScreen") Then
+                MouseMove($X, $Y)
+                SingleClick()
+                Sleep(1000)
+            EndIf
+        EndIf
+    Else
+        End()
+        Exit
+    EndIf
     $WaitingTimer = TimerInit()
     FindLogInScreen(1)
     $StartTimer = TimerInit()
@@ -1100,60 +1145,13 @@ Func Start()
     Exit
 EndFunc
 
-If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("CheckForUpdate")) = $IDYES Then
-    Local $tmpverfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/version.ini", $Title, "Retrieving current version information...")
-    If $tmpverfile Then
-        Local $CurrentVersion = IniRead($tmpverfile, "version", "version", "")
-        FileDelete($tmpverfile)
-        If $CurrentVersion <> "" Then
-            If $CurrentVersion = $Version Then
-                MsgBox($MB_OK, $Title, Localize("RunningLatestVersion"))
-            ElseIf MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("NewerVersionFound", "<VERSION>", $CurrentVersion)) = $IDYES Then
-                Local $tmpinstallfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe", $Title, Localize("DownloadingInstaller"))
-                If $tmpinstallfile Then
-                    FileCopy($tmpinstallfile, @ScriptDir & "\Install.exe", $FC_OVERWRITE)
-                    FileDelete($tmpinstallfile)
-                    ShellExecute(@ScriptDir & "\Install.exe")
-                    Exit
-                Else
-                    MsgBox($MB_ICONWARNING, $Title, Localize("CouldNotDownloadLatestVersion"))
-                EndIf
-            EndIf
-        Else
-            MsgBox($MB_ICONWARNING, $Title, Localize("CouldNotReadCurrentVersionInfo"))
-        EndIf
-    Else
-        MsgBox($MB_ICONWARNING, $Title, Localize("CouldNotDownloadCurrentVersionInfo"))
-    EndIf
-EndIf
-
-If ( Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", "")) - Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "DonationPrompts", "")) * 2352 ) >= 2352 Then
-    IniWrite($SettingsDir & "\Settings.ini", "Statistics", "DonationPrompts", Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "DonationPrompts", "")) + 1)
-    Local $text = Localize("InvokedTotalTimes", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", "")))
-    If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalCelestialCoffers", "")) Then
-        $text &= @CRLF & @CRLF & Localize("TotalCelestialCoffersCollected", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalCelestialCoffers", "")))
-    EndIf
-    If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", "")) Then
-        $text &= @CRLF & @CRLF & Localize("TotalOverflowXPRewardsCollected", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", "")))
-    EndIf
-    If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $text & @CRLF & @CRLF & @CRLF & Localize("DonateNow")) = $IDYES Then
-        ShellExecute(@ScriptDir & "\Donation.html")
-        Exit
-    EndIf
-EndIf
-
 Func Initialize()
-    SetAccountValue("Current", GetValue("StartAt"))
-    SetAccountValue("FinishedInvoke")
-    SetAccountValue("FinishedLoop")
-    SetAccountValue("Invoked")
-    SetAccountValue("CurrentLoop", GetValue("StartAtLoop"))
     If Exists("LogInScreen") Then
         If Not GetValue("LogInUserName") Then
             SetAccountValue("LogInUserName", "")
         EndIf
         While 1
-            Local $string = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("EnterUsername"), BinaryToString(GetValue("LogInUserName"), 4), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+            Local $string = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterUsername"), BinaryToString(GetValue("LogInUserName"), 4), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
             If @error <> 0 Then
                 Exit
             EndIf
@@ -1181,7 +1179,7 @@ Func Initialize()
         EndIf
         _Crypt_Startup()
         While 1
-            Local $string = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("EnterPassword"), BinaryToString(GetValue("LogInPassword"), 4), "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+            Local $string = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterPassword"), BinaryToString(GetValue("LogInPassword"), 4), "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
             If @error <> 0 Then
                 Exit
             EndIf
@@ -1198,7 +1196,7 @@ Func Initialize()
                     EndIf
                     MsgBox($MB_ICONWARNING, $Title, Localize("PasswordIncorrect"))
                 Else
-                    Local $string2 = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("EnterPasswordAgain"), "", "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+                    Local $string2 = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterPasswordAgain"), "", "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
                     If @error <> 0 Then
                         Exit
                     EndIf
@@ -1236,9 +1234,8 @@ Func Initialize()
         WEnd
         _Crypt_Shutdown()
     EndIf
-
     While 1
-        Local $strNumber = InputBox($Title, "Account #" & $CurrentAccount & @CRLF & @CRLF & Localize("TotalCharacters"), GetValue("TotalSlots"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("TotalCharacters"), GetValue("TotalSlots"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then
             Exit
         EndIf
@@ -1251,10 +1248,6 @@ Func Initialize()
     WEnd
     If GetIniAccount("TotalSlots") <> GetValue("TotalSlots") Then
         SaveIniAccount("TotalSlots", GetValue("TotalSlots"))
-    EndIf
-
-    If Not GetValue("EndAt") Then
-        SetAccountValue("EndAt", GetValue("TotalSlots"))
     EndIf
 EndFunc
 
@@ -1272,12 +1265,92 @@ Func GetAccountInfo($name, $character = GetValue("Current"), $account = $Current
     Return 0
 EndFunc
 
+Global $AllLoginInfoFound = 1, $SkipAllConfigurations = 0, $FirstRun = 1, $UnattendedStart = $CmdLine[0]
 
+Func RunScript()
+    For $n = 1 To GetValue("TotalAccounts")
+        $CurrentAccount = $n
+        If Not GetValue("LogInUserName") Or Not GetValue("LogInPassword") Or Not GetValue("TotalSlots") Then
+            $AllLoginInfoFound = 0
+            $UnattendedStart = 0
+        EndIf
+    Next
+    If Not $UnattendedStart And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("CheckForUpdate")) = $IDYES Then
+        Local $tmpverfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/version.ini", $Title, Localize("RetrievingVersion"))
+        If $tmpverfile Then
+            Local $CurrentVersion = IniRead($tmpverfile, "version", "version", "")
+            FileDelete($tmpverfile)
+            If $CurrentVersion <> "" Then
+                If $CurrentVersion = $Version Then
+                    MsgBox($MB_OK, $Title, Localize("RunningLatestVersion"))
+                ElseIf MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("NewerVersionFound", "<VERSION>", $CurrentVersion)) = $IDYES Then
+                    Local $tmpinstallfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe", $Title, Localize("DownloadingInstaller"))
+                    If $tmpinstallfile Then
+                        FileCopy($tmpinstallfile, @ScriptDir & "\Install.exe", $FC_OVERWRITE)
+                        FileDelete($tmpinstallfile)
+                        ShellExecute(@ScriptDir & "\Install.exe")
+                        Exit
+                    Else
+                        MsgBox($MB_ICONWARNING, $Title, Localize("CouldNotDownloadLatestVersion"))
+                    EndIf
+                EndIf
+            Else
+                MsgBox($MB_ICONWARNING, $Title, Localize("CouldNotReadCurrentVersionInfo"))
+            EndIf
+        Else
+            MsgBox($MB_ICONWARNING, $Title, Localize("CouldNotDownloadCurrentVersionInfo"))
+        EndIf
+    EndIf
+    If Not $UnattendedStart And ( Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", "")) - Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "DonationPrompts", "")) * 2352 ) >= 2352 Then
+        IniWrite($SettingsDir & "\Settings.ini", "Statistics", "DonationPrompts", Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "DonationPrompts", "")) + 1)
+        Local $text = Localize("InvokedTotalTimes", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", "")))
+        If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalCelestialCoffers", "")) Then
+            $text &= @CRLF & @CRLF & Localize("TotalCelestialCoffersCollected", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalCelestialCoffers", "")))
+        EndIf
+        If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", "")) Then
+            $text &= @CRLF & @CRLF & Localize("TotalOverflowXPRewardsCollected", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", "")))
+        EndIf
+        If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $text & @CRLF & @CRLF & @CRLF & Localize("DonateNow")) = $IDYES Then
+            ShellExecute(@ScriptDir & "\Donation.html")
+            Exit
+        EndIf
+    EndIf
+    If Not $UnattendedStart And $AllLoginInfoFound And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAllConfigurations", "<NUMBER>", GetValue("TotalAccounts"))) = $IDYES Then
+        $SkipAllConfigurations = 1
+    EndIf
+    If Not $UnattendedStart And Not $SkipAllConfigurations Then
+        While 1
+            Local $strNumber = InputBox($Title, @CRLF & Localize("TotalAccounts"), GetValue("TotalAccounts"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+            If @error <> 0 Then
+                Exit
+            EndIf
+            Local $number = Floor(Number($strNumber))
+            If $number > 0 Then
+                SetValue("TotalAccounts", $number)
+                ExitLoop
+            EndIf
+            MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
+        WEnd
+        If GetIniAllAccounts("TotalAccounts") <> GetValue("TotalAccounts") Then
+            SaveIniAllAccounts("TotalAccounts", GetValue("TotalAccounts"))
+        EndIf
+    EndIf
+    For $n = 1 To GetValue("TotalAccounts")
+        $CurrentAccount = $n
+        SetAccountValue("Current", GetValue("StartAt"))
+        SetAccountValue("FinishedInvoke")
+        SetAccountValue("FinishedLoop")
+        SetAccountValue("Invoked")
+        SetAccountValue("CurrentLoop", GetValue("StartAtLoop"))
+        If Not $UnattendedStart And Not $SkipAllConfigurations Then
+            Initialize()
+        EndIf
+        If Not GetValue("EndAt") Then
+            SetAccountValue("EndAt", GetValue("TotalSlots"))
+        EndIf
+    Next
+    $CurrentAccount = 1
+    Start()
+EndFunc
 
-For $n = 1 To GetValue("TotalAccounts")
-    $CurrentAccount = $n
-    Initialize()
-Next
-$CurrentAccount = 1
-
-Start()
+RunScript()

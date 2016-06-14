@@ -7,38 +7,11 @@
 #include <WinAPIFiles.au3>
 #include <WinAPIProc.au3>
 #include <WinAPI.au3>
+#include "Localization.au3"
 AutoItSetOption("WinTitleMatchMode", 3)
 
 Func LoadDefaults()
-    If GetValue("Language") = "Russian" Then
-        SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
-        SetDefault("JumpKey", "{SPACE}")
-        SetDefault("GameMenuKey", "{ESC}")
-        SetDefault("CursorModeKey", "{F2}")
-        SetDefault("InputBoxWidth", -1)
-        SetDefault("InputBoxHeight", -1)
-        SetDefault("StartInputBoxWidth", 300)
-        SetDefault("StartInputBoxHeight", -1)
-        SetDefault("SplashWidth", 380)
-        SetDefault("SplashHeight", 165)
-        SetDefault("ScreenDetectionSplashWidth", 380)
-        SetDefault("ScreenDetectionSplashHeight", 400)
-        SetDefault("LogInServerAddress", "208.95.186.167, 208.95.186.168, 208.95.186.96")
-    Else
-        SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
-        SetDefault("JumpKey", "{SPACE}")
-        SetDefault("GameMenuKey", "{ESC}")
-        SetDefault("CursorModeKey", "{ALT}")
-        SetDefault("InputBoxWidth", -1)
-        SetDefault("InputBoxHeight", 140)
-        SetDefault("StartInputBoxWidth", 300)
-        SetDefault("StartInputBoxHeight", -1)
-        SetDefault("SplashWidth", 380)
-        SetDefault("SplashHeight", 165)
-        SetDefault("ScreenDetectionSplashWidth", 380)
-        SetDefault("ScreenDetectionSplashHeight", 400)
-        SetDefault("LogInServerAddress", "208.95.186.167, 208.95.186.168, 208.95.186.96")
-    EndIf
+    LoadLocalizationDefaults()
     SetDefault("TotalAccounts", 1)
     SetDefault("TotalSlots")
     SetDefault("StartAtLoop", 1)
@@ -166,11 +139,11 @@ Func GetValue($name, $account = $CurrentAccount)
     Return 0
 EndFunc
 
-Func SaveIniSetting($name, $value = "")
+Func SaveIniAllAccounts($name, $value = "")
     Return IniWrite($SettingsDir & "\Settings.ini", "AllAccounts", $name, $value)
 EndFunc
 
-Func GetIniSetting($name)
+Func GetIniAllAccounts($name)
     Return IniRead($SettingsDir & "\Settings.ini", "AllAccounts", $name, "")
 EndFunc
 
