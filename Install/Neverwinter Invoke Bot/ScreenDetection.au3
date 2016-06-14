@@ -6,7 +6,7 @@ If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
     MsgBox($MB_ICONWARNING, $Name, Localize("ScreenDetectionAlreadyRunning"))
     Exit
 EndIf
-#include "ImageSearch.au3"
+#include "_ImageSearch.au3"
 Global $Title = $Name
 
 If @AutoItX64 Then

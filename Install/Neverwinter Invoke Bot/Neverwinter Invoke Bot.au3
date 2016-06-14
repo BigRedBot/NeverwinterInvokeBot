@@ -10,7 +10,7 @@ EndIf
 #include "_DownloadFile.au3"
 #include "_GetUTCMinutes.au3"
 #include "_AddCommaToNumber.au3"
-#include "ImageSearch.au3"
+#include "_ImageSearch.au3"
 #include "_SendUnicode.au3"
 #include <Crypt.au3>
 Global $KeyDelay = GetValue("KeyDelaySeconds") * 1000
