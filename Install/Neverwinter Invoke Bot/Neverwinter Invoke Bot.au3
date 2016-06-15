@@ -355,16 +355,15 @@ Func WaitToInvoke()
                 Position()
                 BlockInput(1)
                 WinSetOnTop($WinHandle, "", 1)
-                Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
+                Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
                 $WaitingTimer = TimerInit()
                 WaitForScreen("SelectionScreen")
+                Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
                 If ImageSearch("SelectionScreen") Then
                     MouseMove($X, $Y)
                     SingleClick()
                     Sleep(1000)
                 EndIf
-                Position()
-                WinSetOnTop($WinHandle, "", 1)
                 $WaitingTimer = TimerInit()
                 While Not ImageSearch("LogInScreen")
                     Sleep(500)
@@ -774,31 +773,26 @@ Func End()
     If Exists("SelectionScreen") And Exists("LogInScreen") Then
         Local $check = CheckAccounts()
         If $check > 0 Then
-            $CurrentAccount = $check
-            $ETAText = ""
-            Position()
-            BlockInput(1)
-            WinSetOnTop($WinHandle, "", 1)
-            Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
-            $WaitingTimer = TimerInit()
-            WaitForScreen("SelectionScreen")
-            Position()
-            WinSetOnTop($WinHandle, "", 1)
-            If ImageSearch("SelectionScreen") Then
-                MouseMove($X, $Y)
-                SingleClick()
+            If $check <> $CurrentAccount Then
+                $CurrentAccount = $check
+                $ETAText = ""
+                Position()
+                BlockInput(1)
+                WinSetOnTop($WinHandle, "", 1)
                 Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
-                Sleep(1000)
+                If ImageSearch("SelectionScreen") Then
+                    MouseMove($X, $Y)
+                    SingleClick()
+                    Sleep(1000)
+                EndIf
+                $WaitingTimer = TimerInit()
+                While Not ImageSearch("LogInScreen")
+                    Sleep(500)
+                    TimeOut(1)
+                    Position(1)
+                WEnd
+                FindLogInScreen(1)
             EndIf
-            Position()
-            WinSetOnTop($WinHandle, "", 1)
-            $WaitingTimer = TimerInit()
-            While Not ImageSearch("LogInScreen")
-                Sleep(500)
-                TimeOut(1)
-                Position(1)
-            WEnd
-            FindLogInScreen(1)
             Loop()
             Exit
         EndIf
@@ -1125,10 +1119,11 @@ Func Go()
     EndIf
     Local $check = CheckAccounts()
     If $check > 0 Then
-        Splash()
+        $ETAText = ""
         BlockInput(1)
         Position()
         WinSetOnTop($WinHandle, "", 1)
+        Splash()
         If $check <> $CurrentAccount Then
             $CurrentAccount = $check
             Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
@@ -1137,6 +1132,12 @@ Func Go()
                 SingleClick()
                 Sleep(1000)
             EndIf
+            $WaitingTimer = TimerInit()
+            While Not ImageSearch("LogInScreen")
+                Sleep(500)
+                TimeOut(1)
+                Position(1)
+            WEnd
         EndIf
     Else
         End()
