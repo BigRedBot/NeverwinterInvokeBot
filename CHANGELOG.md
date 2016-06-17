@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.1
+- Improved account switching logic.
+
 6.0
 - Added multi-account support.
 

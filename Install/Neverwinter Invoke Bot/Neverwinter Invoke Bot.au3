@@ -259,13 +259,8 @@ Func Loop()
             Sleep(GetValue("LogOutSeconds") * 1000)
             Splash()
         EndIf
-        If CompletedAccount() Then
+        If GetValue("FinishedLoop") Or CompletedAccount() Then
             ExitLoop
-        ElseIf GetValue("FinishedLoop") Then
-            If Not GetValue("CompletedAccount") Then
-                Loop()
-                Exit
-            EndIf
         Else
             Local $AdditionalKeyPressTime = 0, $AddKeyPressTime = 0, $RemoveKeyPressTime = 0
             If GetValue("TopScrollBarX") And GetValue("TopSelectedCharacterX") Then
@@ -294,7 +289,7 @@ EndFunc
 
 Func CompletedAccount()
     SyncValues()
-    If GetValue("CompletedAccount") Or ( (GetValue("CurrentLoop") + GetValue("FinishedLoop")) > $LoopDelayMinutes[0] And GetValue("Invoked") = (GetValue("TotalSlots") * $LoopDelayMinutes[0]) ) Then
+    If GetValue("CompletedAccount") Or ( GetValue("CurrentLoop") > $LoopDelayMinutes[0] And GetValue("Invoked") = (GetValue("TotalSlots") * $LoopDelayMinutes[0]) ) Then
         SetAccountValue("CompletedAccount", 1)
         Return 1
     EndIf
@@ -303,18 +298,17 @@ EndFunc
 
 Func CheckAccounts()
     SyncValues()
-    Local $old = $CurrentAccount, $oldtime = GetTimeToInvoke(), $new = $old, $newtime = $oldtime, $CurrentComplete = CompletedAccount(), $allcomplete = 1
-    If $oldtime <= 1 And Not $CurrentComplete Then
-        Return $CurrentAccount
-    EndIf
+    Local $old = $CurrentAccount, $oldtime = GetTimeToInvoke(), $oldloop = GetValue("CurrentLoop"), $new = $old, $newtime = $oldtime, $newloop = $oldloop, $CurrentComplete = CompletedAccount(), $allcomplete = 1
     For $n = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $n
+        SyncValues()
         If Not CompletedAccount() Then
             $allcomplete = 0
-            Local $t = GetTimeToInvoke()
-            If ( $CurrentComplete And ( $t < $newtime Or $new = $old ) ) Or ( ($t + 1) < $oldtime And $t < $newtime ) Then
+            Local $t = GetTimeToInvoke(), $l = GetValue("CurrentLoop")
+            If ( $l < $newloop And $t < 1 ) Or ( $CurrentComplete And ( $t < $newtime Or $new = $old ) ) Or ( $oldtime > 1 And ($t + 1) < $oldtime And $t < $newtime ) Then
                 $new = $n
                 $newtime = $t
+                $newloop = $l
             EndIf
         EndIf
     Next
