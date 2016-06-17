@@ -100,19 +100,19 @@ While 1
         If ImageSearch("CelestialSynergyTab") Then
             $text &= @CRLF & @CRLF & Localize("VaultOfPietyCelestialSynergyTabDetected")
         EndIf
-        If ImageSearch("Enchantments") Then
+        If ImageSearch("CofferOfCelestialEnchantments") Then
             $text &= @CRLF & @CRLF & Localize("CofferOfCelestialEnchantmentsDetected")
         EndIf
-        If ImageSearch("Artifacts") Then
+        If ImageSearch("CofferOfCelestialArtifacts") Then
             $text &= @CRLF & @CRLF & Localize("CofferOfCelestialArtifactsDetected")
         EndIf
-        If ImageSearch("ArtifactEquipment") Then
+        If ImageSearch("CofferOfCelestialArtifactEquipment") Then
             $text &= @CRLF & @CRLF & Localize("CofferOfCelestialArtifactEquipmentDetected")
         EndIf
         If ImageSearch("ElixirOfFate") Then
             $text &= @CRLF & @CRLF & Localize("ElixirOfFateDetected")
         EndIf
-        If ImageSearch("ProfessionsPack") Then
+        If ImageSearch("BlessedProfessionsElementalPack") Then
             $text &= @CRLF & @CRLF & Localize("BlessedProfessionsElementalPackDetected")
         EndIf
         If ImageSearch("ChangeCharacterButton") Then

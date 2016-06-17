@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.2
+- Added drop down list option to change the item to spend celestial coins on.
+
 6.1
 - Improved account switching logic.
 

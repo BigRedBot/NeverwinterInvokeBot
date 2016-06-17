@@ -128,17 +128,17 @@ Func Position($r = 0)
     EndIf
 EndFunc
 
-Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $Restarted = 0, $IdleLogout = 0, $TimedOut = 0, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $StartTimer, $WaitingTimer, $LoggingIn
+Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $Restarted = 0, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $StartTimer, $WaitingTimer, $LoggingIn
 
 Func SyncValues()
     If GetValue("FinishedLoop") Then
-        SetAccountValue("CurrentLoop", GetValue("CurrentLoop") + GetValue("FinishedLoop"))
+        AddAccountCountValue("CurrentLoop", GetValue("FinishedLoop"))
         SetAccountValue("FinishedLoop")
         SetAccountValue("Current", GetValue("StartAt"))
         SetAccountValue("FinishedInvoke")
         $ETAText = ""
     EndIf
-    SetAccountValue("Current", GetValue("Current") + GetValue("FinishedInvoke"))
+    AddAccountCountValue("Current", GetValue("FinishedInvoke"))
     SetAccountValue("FinishedInvoke")
 EndFunc
 
@@ -229,16 +229,16 @@ Func Loop()
             Sleep(500)
             MouseMove($X, $Y)
             SingleClick()
-            SetAccountInfo("TotalOverflowXPRewards", 1)
-            CountItems("TotalOverflowXPRewards")
+            SetCharacterInfo("TotalOverflowXPRewards", 1)
+            SaveItemCount("TotalOverflowXPRewards")
             Sleep(1000)
             Send(GetValue("JumpKey"))
             Sleep(500)
         EndIf
         $WaitingTimer = TimerInit()
         Invoke()
-        SetAccountInfo("InvokeTime", TimerInit())
-        SetAccountInfo("InvokeLoop", GetValue("CurrentLoop"))
+        SetCharacterInfo("InvokeTime", TimerInit())
+        SetCharacterInfo("InvokeLoop", GetValue("CurrentLoop"))
         SetAccountValue("FinishedInvoke", 1)
         If GetValue("Current") >= GetValue("EndAt") Then
             SetAccountValue("FinishedLoop", 1)
@@ -297,11 +297,9 @@ Func CompletedAccount()
 EndFunc
 
 Func CheckAccounts()
-    SyncValues()
-    Local $old = $CurrentAccount, $oldtime = GetTimeToInvoke(), $oldloop = GetValue("CurrentLoop"), $new = $old, $newtime = $oldtime, $newloop = $oldloop, $CurrentComplete = CompletedAccount(), $allcomplete = 1
+    Local $CurrentComplete = CompletedAccount(), $old = $CurrentAccount, $oldtime = GetTimeToInvoke(), $oldloop = GetValue("CurrentLoop"), $new = $old, $newtime = $oldtime, $newloop = $oldloop, $allcomplete = 1
     For $n = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $n
-        SyncValues()
         If Not CompletedAccount() Then
             $allcomplete = 0
             Local $t = GetTimeToInvoke(), $l = GetValue("CurrentLoop")
@@ -320,9 +318,9 @@ Func CheckAccounts()
 EndFunc
 
 Func GetTimeToInvoke()
-    Local $LastLoop = GetAccountInfo("InvokeLoop")
+    Local $LastLoop = GetCharacterInfo("InvokeLoop")
     If ( $LastLoop And GetValue("CurrentLoop") > $LastLoop ) Or ( Not $LastLoop And GetValue("CurrentLoop") > GetValue("StartAtLoop") ) Then
-        Local $Time = GetAccountInfo("InvokeTime")
+        Local $Time = GetCharacterInfo("InvokeTime")
         If Not $Time Then
             $Time = $StartTimer
         EndIf
@@ -374,7 +372,7 @@ Func WaitToInvoke()
         EndIf
     EndIf
     If $Minutes > 0 Then
-        Local $Time = GetAccountInfo("InvokeTime")
+        Local $Time = GetCharacterInfo("InvokeTime")
         If Not $Time Then
             $Time = $StartTimer
         EndIf
@@ -415,7 +413,7 @@ Func Invoke()
                 ElseIf ImageSearch("CongratulationsWindow") Then
                     Sleep(500)
                     If ImageSearch("CongratulationsWindow") Then
-                        SetAccountValue("Invoked", GetValue("Invoked") + 1)
+                        AddAccountCountValue("Invoked")
                         IniWrite($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", "")) + 1)
                         Return
                     EndIf
@@ -448,14 +446,45 @@ Func GetCoffer()
         MouseMove($X, $Y)
         DoubleClick()
         Sleep(1000)
-        For $n = 1 To 2
+        If GetValue("Coffer") = "ElixirOfFate" Then
+            If ImageSearch("OK") Then
+                Send("{BS 2}4")
+                Sleep(500)
+                If ImageSearch("OK") Then
+                    MouseMove($X, $Y)
+                    DoubleClick()
+                    SetCharacterInfo("TotalElixirsOfFate", 4)
+                    SaveItemCount("TotalElixirsOfFate")
+                EndIf
+            EndIf
+        ElseIf GetValue("Coffer") = "BlessedProfessionsElementalPack" Then
             Send("{ENTER}")
             Sleep(500)
-        Next
-        SetAccountInfo("TotalCelestialCoffers", 1)
-        CountItems("TotalCelestialCoffers")
+            Send("{ENTER}")
+            Sleep(500)
+            SetCharacterInfo("TotalProfessionPacks", 1)
+            Sleep(GetValue("ClaimCofferDelay") * 1000)
+            If ImageSearch(GetValue("Coffer")) Then
+                MouseMove($X, $Y)
+                DoubleClick()
+                Sleep(1000)
+                Send("{ENTER}")
+                Sleep(500)
+                Send("{ENTER}")
+                Sleep(500)
+            EndIf
+            SetCharacterInfo("TotalProfessionPacks", 2)
+            SaveItemCount("TotalProfessionPacks")
+        Else
+            Send("{ENTER}")
+            Sleep(500)
+            Send("{ENTER}")
+            Sleep(500)
+            SetCharacterInfo("TotalCelestialCoffers", 1)
+            SaveItemCount("TotalCelestialCoffers")
+        EndIf
     EndIf
-    Sleep(1000)
+    Sleep(GetValue("ClaimCofferDelay") * 1000)
     Send(GetValue("JumpKey"))
     Sleep(500)
     Invoke()
@@ -650,12 +679,8 @@ EndFunc
 
 Func FindLogInScreen($r = 0)
     If ImageSearch("Idle") Then
-        $IdleLogout += 1
-        If GetAccountInfo("IdleLogoutCharacter") Then
-            SetAccountInfo("IdleLogoutCharacter", GetAccountInfo("IdleLogoutCharacter") + 1)
-        Else
-            SetAccountInfo("IdleLogoutCharacter", 1)
-        EndIf
+        AddAccountCountValue("IdleLogout")
+        AddCharacterCountInfo("IdleLogoutCharacter")
         SetAccountValue("FinishedInvoke", 1)
         Splash()
         MouseMove($X, $Y)
@@ -737,13 +762,9 @@ EndFunc
 
 Func TimeOut($r = 0)
     If TimerDiff($WaitingTimer) >= $TimeOut Then
-        $TimedOut += 1
+        AddAccountCountValue("TimedOut")
         If Not $LoggingIn Then
-            If GetAccountInfo("TimedOutCharacter") Then
-                SetAccountInfo("TimedOutCharacter", GetAccountInfo("TimedOutCharacter") + 1)
-            Else
-                SetAccountInfo("TimedOutCharacter", 1)
-            EndIf
+            AddCharacterCountInfo("TimedOutCharacter")
         EndIf
         If Not $r And GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And Exists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
             Splash("[ " & Localize("RestartingNeverwinter") & " ]")
@@ -799,6 +820,7 @@ Func End()
         SingleClick()
         Sleep(1000)
     EndIf
+    Local $EndTime = HoursAndMinutes(TimerDiff($StartTimer) / 60000)
     Local $old = $CurrentAccount
     For $n = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $n
@@ -811,7 +833,7 @@ Func End()
                 EndIf
             EndIf
         EndIf
-        SendMessage(Localize("CompletedInvoking", "<STARTAT>", GetValue("StartAt"), "<ENDAT>", GetValue("EndAt"), "<STARTATLOOP>", GetValue("StartAtLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & @CRLF & Localize("InvokingTook", "<MINUTES>", HoursAndMinutes(TimerDiff($StartTimer) / 60000)))
+        SendMessage(Localize("CompletedInvoking", "<STARTAT>", GetValue("StartAt"), "<ENDAT>", GetValue("EndAt"), "<STARTATLOOP>", GetValue("StartAtLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & @CRLF & Localize("InvokingTook", "<MINUTES>", $EndTime))
     Next
     $CurrentAccount = $old
     Exit
@@ -849,16 +871,14 @@ EndFunc
 
 Local $ItemStart = -1
 
-Func CountItems($item)
+Func SaveItemCount($item)
     If $ItemStart < 0 Then
         $ItemStart = Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", $item, ""))
     EndIf
     Local $ItemCount = 0
     For $a = 1 To GetValue("TotalAccounts")
         For $c = 1 To GetValue("TotalSlots", $a)
-            If GetAccountInfo($item, $c, $a) Then
-                $ItemCount += 1
-            EndIf
+            $ItemCount += GetCharacterInfo($item, $c, $a)
         Next
     Next
     $ItemCount = $ItemStart + $ItemCount
@@ -879,18 +899,16 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
     $SplashWindow = 0
     $ETAText = ""
     Local $text = Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & $s
-    Local $CofferCount = 0, $OverflowXPRewardCount = 0, $TimedOutCharacterText = "", $IdleLogoutCharacterText = ""
+    Local $CofferCount = 0, $ProfessionPackCount = 0, $ElixirOfFateCount = 0, $OverflowXPRewardCount = 0, $TimedOutCharacterText = "", $IdleLogoutCharacterText = ""
     For $i = 1 To GetValue("TotalSlots")
-        If GetAccountInfo("TotalCelestialCoffers", $i) Then
-            $CofferCount += 1
-        EndIf
-        If GetAccountInfo("TotalOverflowXPRewards", $i) Then
-            $OverflowXPRewardCount += 1
-        EndIf
-        If GetAccountInfo("IdleLogoutCharacter", $i) Then
+        $CofferCount += GetCharacterInfo("TotalCelestialCoffers", $i)
+        $ProfessionPackCount += GetCharacterInfo("TotalProfessionPacks", $i)
+        $ElixirOfFateCount += GetCharacterInfo("TotalElixirsOfFate", $i)
+        $OverflowXPRewardCount += GetCharacterInfo("TotalOverflowXPRewards", $i)
+        If GetCharacterInfo("IdleLogoutCharacter", $i) Then
             Local $times = ""
-            If GetAccountInfo("IdleLogoutCharacter", $i) > 1 Then
-                $times = GetAccountInfo("IdleLogoutCharacter", $i) & "x"
+            If GetCharacterInfo("IdleLogoutCharacter", $i) > 1 Then
+                $times = GetCharacterInfo("IdleLogoutCharacter", $i) & "x"
             EndIf
             If $IdleLogoutCharacterText <> "" Then
                 $IdleLogoutCharacterText &= ", " & $times & "#" & $i
@@ -898,10 +916,10 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
                 $IdleLogoutCharacterText = $times & "#" & $i
             EndIf
         EndIf
-        If GetAccountInfo("TimedOutCharacter", $i) Then
+        If GetCharacterInfo("TimedOutCharacter", $i) Then
             Local $times = ""
-            If GetAccountInfo("TimedOutCharacter", $i) > 1 Then
-                $times = GetAccountInfo("TimedOutCharacter", $i) & "x"
+            If GetCharacterInfo("TimedOutCharacter", $i) > 1 Then
+                $times = GetCharacterInfo("TimedOutCharacter", $i) & "x"
             EndIf
             If $TimedOutCharacterText <> "" Then
                 $TimedOutCharacterText &= ", " & $times & "#" & $i
@@ -922,20 +940,26 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
     If $CofferCount Then
         $text &= @CRLF & @CRLF & Localize("CofferCount", "<COUNT>", $CofferCount)
     EndIf
+    If $ProfessionPackCount Then
+        $text &= @CRLF & @CRLF & Localize("ProfessionPackCount", "<COUNT>", $ProfessionPackCount)
+    EndIf
+    If $ElixirOfFateCount Then
+        $text &= @CRLF & @CRLF & Localize("ElixirOfFateCount", "<COUNT>", $ElixirOfFateCount)
+    EndIf
     If $OverflowXPRewardCount Then
         $text &= @CRLF & @CRLF & Localize("OverflowXPRewardCount", "<COUNT>", $OverflowXPRewardCount)
+    EndIf
+    If GetValue("IdleLogout") Then
+        $text &= @CRLF & @CRLF & Localize("IdleLogoutCount", "<COUNT>", GetValue("IdleLogout")) & $IdleLogoutCharacterText
+    EndIf
+    If GetValue("TimedOut") Then
+        $text &= @CRLF & @CRLF & Localize("TimedOutCount", "<COUNT>", GetValue("TimedOut")) & $TimedOutCharacterText
     EndIf
     If $ReLogged Then
         $text &= @CRLF & @CRLF & Localize("ReLoggedCount", "<COUNT>", $ReLogged)
     EndIf
     If $Restarted Then
         $text &= @CRLF & @CRLF & Localize("RestartedCount", "<COUNT>", $Restarted)
-    EndIf
-    If $IdleLogout Then
-        $text &= @CRLF & @CRLF & Localize("IdleLogoutCount", "<COUNT>", $IdleLogout) & $IdleLogoutCharacterText
-    EndIf
-    If $TimedOut Then
-        $text &= @CRLF & @CRLF & Localize("TimedOutCount", "<COUNT>", $TimedOut) & $TimedOutCharacterText
     EndIf
     If $ontop Then
         MsgBox($n, $Title, $text, "", WinGetHandle(AutoItWinGetTitle()) * WinSetOnTop(AutoItWinGetTitle(), "", 1))
@@ -1250,18 +1274,58 @@ Func Initialize()
     EndIf
 EndFunc
 
-Func SetAccountInfo($name, $value = 0, $character = GetValue("Current"), $account = $CurrentAccount)
-    If IsDeclared("ACCOUNT" & $account & "SETTINGS" & $character & "_" & $name) Then
-        Return Assign("ACCOUNT" & $account & "SETTINGS" & $character & "_" & $name, $value)
+Func SetCharacterInfo($name, $value = 0, $character = GetValue("Current"), $account = $CurrentAccount)
+    If IsDeclared("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name) Then
+        Return Assign("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name, $value)
     EndIf
-    Return Assign("ACCOUNT" & $account & "SETTINGS" & $character & "_" & $name, $value, 2)
+    Return Assign("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name, $value, 2)
 EndFunc
 
-Func GetAccountInfo($name, $character = GetValue("Current"), $account = $CurrentAccount)
-    If IsDeclared("ACCOUNT" & $account & "SETTINGS" & $character & "_" & $name) Then
-        Return Eval("ACCOUNT" & $account & "SETTINGS" & $character & "_" & $name)
+Func GetCharacterInfo($name, $character = GetValue("Current"), $account = $CurrentAccount)
+    If IsDeclared("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name) Then
+        Return Eval("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name)
     EndIf
     Return 0
+EndFunc
+
+Func AddCharacterCountInfo($name, $value = 1, $character = GetValue("Current"), $account = $CurrentAccount)
+    If IsDeclared("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name) Then
+        Return Assign("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name, GetCharacterInfo($name, $character, $account) + $value)
+    EndIf
+    Return Assign("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name, GetCharacterInfo($name, $character, $account) + $value, 2)
+EndFunc
+
+Func ChooseCoffer()
+    Local $default = GetValue("Coffer"), $list = Localize($default), $coffers = Array("CofferOfCelestialEnchantments, CofferOfCelestialArtifacts, CofferOfCelestialArtifactEquipment, BlessedProfessionsElementalPack, ElixirOfFate")
+    For $i = 1 To $coffers[0]
+        If Not ($coffers[$i] == $default) Then
+            $list &= "|" & Localize($coffers[$i])
+        EndIf
+    Next
+    Local $hGUI = GUICreate($Title, 320, 120)
+    GUICtrlCreateLabel(Localize("ChooseCoffer"), 25, 20, 270)
+    Local $hCombo = GUICtrlCreateCombo("", 25, 50, 270, -1)
+    GUICtrlSetData(-1, $list, Localize($default))
+    Local $hButton = GUICtrlCreateButton("OK", 118, 85, 84, -1, $BS_DEFPUSHBUTTON)
+    GUISetState()
+    While 1
+        Switch GUIGetMsg()
+            Case $GUI_EVENT_CLOSE
+                Exit
+            Case $hButton
+                Local $sCurrCombo = GUICtrlRead($hCombo)
+                For $i = 1 To $coffers[0]
+                    If Localize($coffers[$i]) == $sCurrCombo Then
+                        GUIDelete()
+                        If Not ($default == $coffers[$i]) Then
+                            SetValue("Coffer", $coffers[$i])
+                            SaveIniAllAccounts("Coffer", GetValue("Coffer"))
+                        EndIf
+                        Return
+                    EndIf
+                Next
+        EndSwitch
+    WEnd
 EndFunc
 
 Global $AllLoginInfoFound = 1, $SkipAllConfigurations = 0, $FirstRun = 1
@@ -1309,6 +1373,12 @@ Func RunScript()
         If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalCelestialCoffers", "")) Then
             $text &= @CRLF & @CRLF & Localize("TotalCelestialCoffersCollected", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalCelestialCoffers", "")))
         EndIf
+        If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalProfessionPacks", "")) Then
+            $text &= @CRLF & @CRLF & Localize("TotalProfessionPacksCollected", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalProfessionPacks", "")))
+        EndIf
+        If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalElixirsOfFate", "")) Then
+            $text &= @CRLF & @CRLF & Localize("TotalElixirsOfFateCollected", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalElixirsOfFate", "")))
+        EndIf
         If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", "")) Then
             $text &= @CRLF & @CRLF & Localize("TotalOverflowXPRewardsCollected", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", "")))
         EndIf
@@ -1336,6 +1406,7 @@ Func RunScript()
         If GetIniAllAccounts("TotalAccounts") <> GetValue("TotalAccounts") Then
             SaveIniAllAccounts("TotalAccounts", GetValue("TotalAccounts"))
         EndIf
+        ChooseCoffer()
     EndIf
     For $n = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $n

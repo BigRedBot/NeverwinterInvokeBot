@@ -21,6 +21,7 @@ Func LoadDefaults()
     SetDefault("TimeOutMinutes", 5)
     SetDefault("KeyDelaySeconds", 0.15)
     SetDefault("MaxLogInAttempts", 3)
+    SetDefault("ClaimCofferDelay", 1)
     SetDefault("LogInSeconds", 16)
     SetDefault("LogOutSeconds", 9)
     SetDefault("LogInDelaySeconds", 2)
@@ -28,7 +29,7 @@ Func LoadDefaults()
     SetDefault("GameWidth", 752)
     SetDefault("GameHeight", 522)
     SetDefault("ImageSearchTolerance", 50)
-    SetDefault("Coffer", "ArtifactEquipment")
+    SetDefault("Coffer", "CofferOfCelestialArtifactEquipment")
     SetDefault("RelativePixelLocation", 1)
     SetDefault("SafeLogInX", 471)
     SetDefault("SafeLogInY", 305)
@@ -72,7 +73,7 @@ Func SetLanguage($default = "English")
     Local $sections = IniReadSectionNames($LocalizationFile)
     If @error = 0 Then
         For $i = 1 To $sections[0]
-            If $sections[$i] <> $default Then
+            If Not ($sections[$i] == $default) Then
                 $langlist &= "|" & $sections[$i]
             EndIf
         Next
@@ -92,7 +93,7 @@ Func SetLanguage($default = "English")
                     If $sections[$i] == $sCurrCombo Then
                         GUIDelete()
                         SetValue("Language", $sCurrCombo)
-                        IniWrite($SettingsDir & "\Settings.ini", "AllAccounts", "Language", GetValue("Language"))
+                        SaveIniAllAccounts("Language", GetValue("Language"))
                         Return
                     EndIf
                 Next
@@ -124,13 +125,25 @@ Func SetValue($name, $value = 0, $account = 0)
     Return Assign("SETTINGS_AllAccounts" & $name, $value, 2)
 EndFunc
 
-Func SetAccountValue($name, $value = 0)
-    Return SetValue($name, $value, $CurrentAccount)
+Func SetAccountValue($name, $value = 0, $account = $CurrentAccount)
+    Return SetValue($name, $value, $account)
+EndFunc
+
+Func AddCountValue($name, $value = 1, $account = 0)
+    Return SetValue($name, GetValue($name, $account) + $value, $account)
+EndFunc
+
+Func AddAccountCountValue($name, $value = 1, $account = $CurrentAccount)
+    Return SetValue($name, GetValue($name, $account) + $value, $account)
 EndFunc
 
 Func GetValue($name, $account = $CurrentAccount)
-    If IsDeclared("SETTINGS_Account" & $account & $name) Then
-        Return Eval("SETTINGS_Account" & $account & $name)
+    If $account And @NumParams = 2 Then
+        If IsDeclared("SETTINGS_Account" & $account & $name) Then
+            Return Eval("SETTINGS_Account" & $account & $name)
+        EndIf
+    ElseIf IsDeclared("SETTINGS_Account" & $CurrentAccount & $name) Then
+        Return Eval("SETTINGS_Account" & $CurrentAccount & $name)
     ElseIf IsDeclared("SETTINGS_AllAccounts" & $name) Then
         Return Eval("SETTINGS_AllAccounts" & $name)
     ElseIf IsDeclared("SETTINGS_Default" & $name) Then
