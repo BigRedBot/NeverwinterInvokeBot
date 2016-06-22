@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.3
+- Will now claim the account bound VIP reward.
+
 6.2
 - Added drop down list option to change the item to spend celestial coins on.
 

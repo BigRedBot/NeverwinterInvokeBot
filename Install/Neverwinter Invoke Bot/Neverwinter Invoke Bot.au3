@@ -51,7 +51,7 @@ EndFunc
 Func Position($r = 0)
     Focus()
     If Not $WinFound Or Not GetPosition() Then
-        If GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And Exists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
+        If GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And ImageExists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
             Splash("[ " & Localize("NeverwinterNotFound") & " ]")
             $WaitingTimer = TimerInit()
             While ProcessExists("GameClient.exe")
@@ -148,7 +148,7 @@ Func Loop()
         Exit
     EndIf
     Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
-    If Exists("SelectionScreen") Then
+    If ImageExists("SelectionScreen") Then
         $WaitingTimer = TimerInit()
         WaitForScreen("SelectionScreen")
     EndIf
@@ -214,16 +214,20 @@ Func Loop()
             DoubleClick()
         EndIf
         Splash("[ " & Localize("WaitingForInGameScreen") & " ]")
-        If Exists("InGameScreen") Then
+        If ImageExists("InGameScreen") Then
             $WaitingTimer = TimerInit()
             WaitForScreen("InGameScreen")
             Splash()
             Sleep(GetValue("LogInDelaySeconds") * 1000)
+            Sleep(500)
+            If Not ImageSearch("InGameScreen") Then
+                Send(GetValue("JumpKey"))
+                Sleep(500)
+            EndIf
         Else
             Sleep(GetValue("LogInSeconds") * 1000)
             Splash()
         EndIf
-        Sleep(500)
         If ImageSearch("OverflowXPReward") Then
             Send(GetValue("CursorModeKey"))
             Sleep(500)
@@ -234,6 +238,22 @@ Func Loop()
             Sleep(1000)
             Send(GetValue("JumpKey"))
             Sleep(500)
+        EndIf
+        If Not GetValue("SkipVIPAccountReward") And ImageExists("VIPAccountReward") Then
+            Send(GetValue("InventoryKey"))
+            Sleep(2000)
+            If ImageSearch("VIPAccountReward", -1) And ImageSearch("VIPAccountRewardBorder", -1, $X, $Y-10) Then
+                $X = Random($X + GetValue("VIPAccountRewardButtonTopLeftOffsetX"), $X + GetValue("VIPAccountRewardButtonBottomRightOffsetX"), 1)
+                $Y = Random($Y + GetValue("VIPAccountRewardButtonTopLeftOffsetY"), $Y + GetValue("VIPAccountRewardButtonBottomRightOffsetY"), 1)
+                MouseMove($X, $Y)
+                SingleClick()
+                SetCharacterInfo("TotalVIPAccountRewards", 1)
+                SaveItemCount("TotalVIPAccountRewards")
+                Sleep(2000)
+            EndIf
+            Send(GetValue("JumpKey"))
+            Sleep(500)
+            SetAccountValue("SkipVIPAccountReward", 1)
         EndIf
         $WaitingTimer = TimerInit()
         Invoke()
@@ -251,7 +271,7 @@ Func Loop()
         Local $LogOutTimer = TimerInit()
         Local $RemainingCharacters = GetValue("EndAt") - GetValue("Current")
         Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
-        If Exists("SelectionScreen") Then
+        If ImageExists("SelectionScreen") Then
             $WaitingTimer = TimerInit()
             WaitForScreen("SelectionScreen")
             Splash()
@@ -338,7 +358,7 @@ EndFunc
 
 Func WaitToInvoke()
     Local $Minutes = GetTimeToInvoke()
-    If $Minutes > 1 And Exists("SelectionScreen") And Exists("LogInScreen") Then
+    If $Minutes > 1 And ImageExists("SelectionScreen") And ImageExists("LogInScreen") Then
         Local $check = CheckAccounts()
         If $check > 0 Then
             If $check <> $CurrentAccount Then
@@ -398,7 +418,7 @@ Func WaitToInvoke()
 EndFunc
 
 Func Invoke()
-    If Exists("CongratulationsWindow") Then
+    If ImageExists("CongratulationsWindow") Then
         For $n = 1 To 5
             FindLogInScreen()
             Send(GetValue("InvokeKey"))
@@ -497,7 +517,7 @@ Func ChangeCharacter()
     Sleep(500)
     Send(GetValue("GameMenuKey"))
     Sleep(1500)
-    If Exists("ChangeCharacterButton") And Not ImageSearch("ChangeCharacterButton") Then
+    If ImageExists("ChangeCharacterButton") And Not ImageSearch("ChangeCharacterButton") Then
         MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
         While Not ImageSearch("ChangeCharacterButton")
             TimeOut()
@@ -518,7 +538,7 @@ Func ChangeCharacter()
             MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
         WEnd
     EndIf
-    If Exists("ChangeCharacterButton") Then
+    If ImageExists("ChangeCharacterButton") Then
         MouseMove($X, $Y)
         DoubleClick()
     Else
@@ -530,7 +550,7 @@ Func ChangeCharacter()
         Send("{ENTER}")
     EndIf
     Sleep(500)
-    If Exists("ChangeCharacterConfirmation") And Not ImageSearch("ChangeCharacterConfirmation") Then
+    If ImageExists("ChangeCharacterConfirmation") And Not ImageSearch("ChangeCharacterConfirmation") Then
         Send("{ESC}")
         Sleep(500)
         Send("{ESC}")
@@ -618,16 +638,12 @@ Func Splash($s = "", $ontop = 1)
     EndIf
 EndFunc
 
-Func WaitForScreen($f1 = 0, $f2 = 0)
-    #forceref $f1, $f2
-    Local $p = @NumParams
+Func WaitForScreen($image, $resultPosition = -2, $x1 = $ClientLeft, $y1 = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom)
     While 1
         Position()
-        For $i = 1 To $p
-            If ImageSearch(Eval("f" & $i)) Then
-                Return
-            EndIf
-        Next
+        If ImageSearch($image, $resultPosition, $x1, $y1, $right, $bottom) Then
+            Return
+        EndIf
         FindLogInScreen()
         Sleep(500)
         TimeOut()
@@ -644,37 +660,26 @@ EndFunc
 
 Global $X = 0, $Y = 0, $LogIn = 1
 
-Func ImageSearch($f1 = 0 , $f2 = 0)
-    #forceref $f1, $f2
-    For $i = 1 To @NumParams
-        local $f = Eval("f" & $i)
-        If $f And FileExists("images\" & GetValue("Language") & "\" & $f & ".png") Then
-            If _ImageSearchArea("images\" & GetValue("Language") & "\" & $f & ".png", -2, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, GetValue("ImageSearchTolerance")) Then
-                If $f <> "LogInScreen" Then
-                    $LoggingIn = 0
-                    $LogInTries = 0
-                    If $f = "InGameScreen" Then
-                        $LogIn = 0
-                    EndIf
+Func ImageSearch($image, $resultPosition = -2, $x1 = $ClientLeft, $y1 = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom)
+    If ImageExists($image) Then
+        If _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $x1, $y1, $right, $bottom, $X, $Y, GetValue("ImageSearchTolerance")) Then
+            If $image <> "LogInScreen" Then
+                $LoggingIn = 0
+                $LogInTries = 0
+                If $image = "InGameScreen" Then
+                    $LogIn = 0
                 EndIf
-                Return 1
-            ElseIf $LogIn And $f = "InGameScreen" Then
-                Send(GetValue("JumpKey"))
             EndIf
+            Return 1
+        ElseIf $LogIn And $image = "InGameScreen" Then
+            Send(GetValue("JumpKey"))
         EndIf
-    Next
+    EndIf
     Return 0
 EndFunc
 
-Func Exists($f1 = 0, $f2 = 0)
-    #forceref $f1, $f2
-    For $i = 1 To @NumParams
-        local $f = Eval("f" & $i)
-        If $f And FileExists("images\" & GetValue("Language") & "\" & $f & ".png") Then
-            Return 1
-        EndIf
-    Next
-    Return 0
+Func ImageExists($image)
+    Return FileExists("images\" & GetValue("Language") & "\" & $image & ".png")
 EndFunc
 
 Func FindLogInScreen($r = 0)
@@ -701,7 +706,7 @@ Func FindLogInScreen($r = 0)
         LogIn()
         Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
         Sleep(1000)
-        If Exists("SelectionScreen") Then
+        If ImageExists("SelectionScreen") Then
             While Not ImageSearch("SelectionScreen")
                 If ImageSearch("InGameScreen") Then
                     Splash()
@@ -766,7 +771,7 @@ Func TimeOut($r = 0)
         If Not $LoggingIn Then
             AddCharacterCountInfo("TimedOutCharacter")
         EndIf
-        If Not $r And GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And Exists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
+        If Not $r And GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And ImageExists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
             Splash("[ " & Localize("RestartingNeverwinter") & " ]")
             If ProcessExists("GameClient.exe") Then
                 ProcessClose("GameClient.exe")
@@ -785,7 +790,7 @@ Func TimeOut($r = 0)
 EndFunc
 
 Func End()
-    If Exists("SelectionScreen") And Exists("LogInScreen") Then
+    If ImageExists("SelectionScreen") And ImageExists("LogInScreen") Then
         Local $check = CheckAccounts()
         If $check > 0 Then
             If $check <> $CurrentAccount Then
@@ -899,12 +904,13 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
     $SplashWindow = 0
     $ETAText = ""
     Local $text = Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & $s
-    Local $CofferCount = 0, $ProfessionPackCount = 0, $ElixirOfFateCount = 0, $OverflowXPRewardCount = 0, $TimedOutCharacterText = "", $IdleLogoutCharacterText = ""
+    Local $CofferCount = 0, $ProfessionPackCount = 0, $ElixirOfFateCount = 0, $OverflowXPRewardCount = 0, $VIPAccountRewardCount = 0, $TimedOutCharacterText = "", $IdleLogoutCharacterText = ""
     For $i = 1 To GetValue("TotalSlots")
         $CofferCount += GetCharacterInfo("TotalCelestialCoffers", $i)
         $ProfessionPackCount += GetCharacterInfo("TotalProfessionPacks", $i)
         $ElixirOfFateCount += GetCharacterInfo("TotalElixirsOfFate", $i)
         $OverflowXPRewardCount += GetCharacterInfo("TotalOverflowXPRewards", $i)
+        $VIPAccountRewardCount += GetCharacterInfo("TotalVIPAccountRewards", $i)
         If GetCharacterInfo("IdleLogoutCharacter", $i) Then
             Local $times = ""
             If GetCharacterInfo("IdleLogoutCharacter", $i) > 1 Then
@@ -948,6 +954,9 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
     EndIf
     If $OverflowXPRewardCount Then
         $text &= @CRLF & @CRLF & Localize("OverflowXPRewardCount", "<COUNT>", $OverflowXPRewardCount)
+    EndIf
+    If $VIPAccountRewardCount Then
+        $text &= @CRLF & @CRLF & Localize("VIPAccountRewardCount", "<COUNT>", $VIPAccountRewardCount)
     EndIf
     If GetValue("IdleLogout") Then
         $text &= @CRLF & @CRLF & Localize("IdleLogoutCount", "<COUNT>", GetValue("IdleLogout")) & $IdleLogoutCharacterText
@@ -1169,7 +1178,7 @@ Func Go()
 EndFunc
 
 Func Initialize()
-    If Exists("LogInScreen") Then
+    If ImageExists("LogInScreen") Then
         If Not GetValue("LogInUserName") Then
             SetAccountValue("LogInUserName", "")
         EndIf
@@ -1355,6 +1364,9 @@ Func RunScript()
         EndIf
         If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", "")) Then
             $text &= @CRLF & @CRLF & Localize("TotalOverflowXPRewardsCollected", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", "")))
+        EndIf
+        If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalVIPAccountRewards", "")) Then
+            $text &= @CRLF & @CRLF & Localize("TotalVIPAccountRewardsCollected", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalVIPAccountRewards", "")))
         EndIf
         If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $text & @CRLF & @CRLF & @CRLF & Localize("DonateNow")) = $IDYES Then
             ShellExecute(@ScriptDir & "\Donation.html")

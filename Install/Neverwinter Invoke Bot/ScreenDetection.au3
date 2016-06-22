@@ -48,15 +48,15 @@ Func FindPixels(ByRef $x, ByRef $y, ByRef $c)
 EndFunc
 
 Global $X = 0, $Y = 0
-Func ImageSearch($f1 = 0 , $f2 = 0)
-    #forceref $f1, $f2
-    For $i = 1 To @NumParams
-        local $f = Eval("f" & $i)
-        If $f And FileExists("images\" & GetValue("Language") & "\" & $f & ".png") And _ImageSearchArea("images\" & GetValue("Language") & "\" & $f & ".png", 1, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $X, $Y, GetValue("ImageSearchTolerance")) Then
-            Return 1
-        EndIf
-    Next
+Func ImageSearch($image, $resultPosition = -1, $x1 = $ClientLeft, $y1 = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom)
+    If ImageExists($image) And _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $x1, $y1, $right, $bottom, $X, $Y, GetValue("ImageSearchTolerance")) Then
+        Return 1
+    EndIf
     Return 0
+EndFunc
+
+Func ImageExists($image)
+    Return FileExists("images\" & GetValue("Language") & "\" & $image & ".png")
 EndFunc
 
 Func End()
@@ -68,64 +68,70 @@ Splash()
 While 1
     If Position() Then
         If ImageSearch("SelectionScreen") Then
-            $text &= @CRLF & @CRLF & Localize("CharacterSelectionScreenDetected")
+            $text &= @CRLF & @CRLF & Localize("CharacterSelectionScreenDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
         EndIf
         If FindPixels(GetValue("TopScrollBarX"), GetValue("TopScrollBarY"), GetValue("TopScrollBarC")) Then
-            $text &= @CRLF & @CRLF & Localize("TopOfScrollBarDetected")
+            $text &= @CRLF & @CRLF & Localize("TopOfScrollBarDetected") & " @ " & GetValue("TopScrollBarX") & ", " & GetValue("TopScrollBarY")
         EndIf
         If FindPixels(GetValue("TopSelectedCharacterX"), GetValue("TopSelectedCharacterY"), GetValue("TopSelectedCharacterC")) Then
-            $text &= @CRLF & @CRLF & Localize("TopSelectedCharacterDetected")
+            $text &= @CRLF & @CRLF & Localize("TopSelectedCharacterDetected") & " @ " & GetValue("TopSelectedCharacterX") & ", " & GetValue("TopSelectedCharacterY")
         EndIf
         If FindPixels(GetValue("BottomScrollBarX"), GetValue("BottomScrollBarY"), GetValue("BottomScrollBarC")) Then
-            $text &= @CRLF & @CRLF & Localize("BottomOfScrollBarDetected")
+            $text &= @CRLF & @CRLF & Localize("BottomOfScrollBarDetected") & " @ " & GetValue("BottomScrollBarX") & ", " & GetValue("BottomScrollBarY")
         EndIf
         If FindPixels(GetValue("BottomSelectedCharacterX"), GetValue("BottomSelectedCharacterY"), GetValue("BottomSelectedCharacterC")) Then
-            $text &= @CRLF & @CRLF & Localize("BottomSelectedCharacterDetected")
+            $text &= @CRLF & @CRLF & Localize("BottomSelectedCharacterDetected") & " @ " & GetValue("BottomSelectedCharacterX") & ", " & GetValue("BottomSelectedCharacterY")
         EndIf
         If ImageSearch("InGameScreen") Then
-            $text &= @CRLF & @CRLF & Localize("InGameScreenDetected")
+            $text &= @CRLF & @CRLF & Localize("InGameScreenDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
         EndIf
         If ImageSearch("Invoked") Then
-            $text &= @CRLF & @CRLF & Localize("AlreadyInvokedDetected")
+            $text &= @CRLF & @CRLF & Localize("AlreadyInvokedDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
         EndIf
         If ImageSearch("CongratulationsWindow") Then
-            $text &= @CRLF & @CRLF & Localize("InvokeCongratulationsWindowDetected")
+            $text &= @CRLF & @CRLF & Localize("InvokeCongratulationsWindowDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
         EndIf
         If ImageSearch("OverflowXPReward") Then
-            $text &= @CRLF & @CRLF & Localize("OverflowExperiencePointRewardDetected")
+            $text &= @CRLF & @CRLF & Localize("OverflowExperiencePointRewardDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
         EndIf
         If ImageSearch("VaultOfPietyButton") Then
-            $text &= @CRLF & @CRLF & Localize("VaultOfPietyButtonDetected")
+            $text &= @CRLF & @CRLF & Localize("VaultOfPietyButtonDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
         EndIf
         If ImageSearch("CelestialSynergyTab") Then
-            $text &= @CRLF & @CRLF & Localize("VaultOfPietyCelestialSynergyTabDetected")
+            $text &= @CRLF & @CRLF & Localize("VaultOfPietyCelestialSynergyTabDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
         EndIf
         If ImageSearch("CofferOfCelestialEnchantments") Then
-            $text &= @CRLF & @CRLF & Localize("CofferOfCelestialEnchantmentsDetected")
+            $text &= @CRLF & @CRLF & Localize("CofferOfCelestialEnchantmentsDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
         EndIf
         If ImageSearch("CofferOfCelestialArtifacts") Then
-            $text &= @CRLF & @CRLF & Localize("CofferOfCelestialArtifactsDetected")
+            $text &= @CRLF & @CRLF & Localize("CofferOfCelestialArtifactsDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
         EndIf
         If ImageSearch("CofferOfCelestialArtifactEquipment") Then
-            $text &= @CRLF & @CRLF & Localize("CofferOfCelestialArtifactEquipmentDetected")
+            $text &= @CRLF & @CRLF & Localize("CofferOfCelestialArtifactEquipmentDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
         EndIf
         If ImageSearch("ElixirOfFate") Then
-            $text &= @CRLF & @CRLF & Localize("ElixirOfFateDetected")
+            $text &= @CRLF & @CRLF & Localize("ElixirOfFateDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
         EndIf
         If ImageSearch("BlessedProfessionsElementalPack") Then
-            $text &= @CRLF & @CRLF & Localize("BlessedProfessionsElementalPackDetected")
+            $text &= @CRLF & @CRLF & Localize("BlessedProfessionsElementalPackDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
         EndIf
         If ImageSearch("ChangeCharacterButton") Then
-            $text &= @CRLF & @CRLF & Localize("GameMenuDetected")
+            $text &= @CRLF & @CRLF & Localize("GameMenuDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
         EndIf
         If ImageSearch("ChangeCharacterConfirmation") Then
-            $text &= @CRLF & @CRLF & Localize("ChangeCharacterConfirmationDetected")
+            $text &= @CRLF & @CRLF & Localize("ChangeCharacterConfirmationDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
         EndIf
         If ImageSearch("LogInScreen") Then
-            $text &= @CRLF & @CRLF & Localize("LogInScreenDetected")
+            $text &= @CRLF & @CRLF & Localize("LogInScreenDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
         EndIf
         If ImageSearch("Idle") Then
-            $text &= @CRLF & @CRLF & Localize("IdleLogOutMessageBoxDetected")
+            $text &= @CRLF & @CRLF & Localize("IdleLogOutMessageBoxDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
+        EndIf
+        If ImageSearch("VIPAccountReward") Then
+            $text &= @CRLF & @CRLF & Localize("VIPAccountRewardDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
+            If ImageSearch("VIPAccountRewardBorder", -1, $X, $Y-10) Then
+                $text &= @CRLF & @CRLF & Localize("VIPAccountRewardBorderDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
+            EndIf
         EndIf
     EndIf
     Splash($text)
