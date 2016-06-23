@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.3.1
+- Changed default coffer to Coffer of Celestial Enchantments.
+
 6.3
 - Will now claim the account bound VIP reward.
 
