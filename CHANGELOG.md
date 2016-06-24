@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.3.2
+- Installer now allows the choice of the install location.
+
 6.3.1
 - Changed default coffer to Coffer of Celestial Enchantments.
 

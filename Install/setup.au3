@@ -1,9 +1,14 @@
 #include "variables.au3"
 #include <Misc.au3>
+#include <WinAPIFiles.au3>
 #include <MsgBoxConstants.au3>
 #include <GUIConstants.au3>
 #include <GUIConstantsEx.au3>
-#include <WinAPIFiles.au3>
+#include <ButtonConstants.au3>
+#include <EditConstants.au3>
+#include <StaticConstants.au3>
+#include <WindowsConstants.au3>
+#include <StringConstants.au3>
 Global $Title = $Name & " v" & $Version & " Installer"
 
 Global $SettingsDir = @AppDataCommonDir & "\" & $Name
@@ -83,6 +88,50 @@ Func Localize($s, $f1=0, $r1=0, $f2=0, $r2=0, $f3=0, $r3=0, $f4=0, $r4=0, $f5=0,
     Return $v
 EndFunc
 
+Global $InstallDir = @ProgramFilesDir & "\" & $Name, $RegLocation = "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & $Name, $InstallLocation = RegRead($RegLocation, "InstallLocation")
+If $InstallLocation <> "" And FileExists($InstallLocation) Then
+    $InstallDir = $InstallLocation
+EndIf
+
+Func GetInstallLocation($dir = $InstallDir)
+    Local $GUI = GUICreate($Title, 434, 142)
+    Local $Input = GUICtrlCreateInput($dir, 16, 56, 329, 21)
+    Local $ButtonChange = GUICtrlCreateButton("Change", 352, 54, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("OK", 168, 104, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 264, 104, 75, 25)
+    Local $Label = GUICtrlCreateLabel(Localize("SelectInstallLocation"), 16, 24, 332, 25)
+    GUISetState()
+    While 1
+        Switch GUIGetMsg()
+            Case $GUI_EVENT_CLOSE
+                Exit
+            Case $ButtonChange
+                Local $sFileSelectFolder = FileSelectFolder(Localize("SelectInstallLocation"), StringRegExpReplace(StringRegExpReplace(GUICtrlRead($Input), "\\+$", ""), "\\" & $Name & "$", ""), 0, "", $GUI)
+                If @error = 0 Then
+                    GUICtrlSetData($Input, StringRegExpReplace($sFileSelectFolder, "\\+$", "") & "\" & $Name)
+                EndIf
+            Case $ButtonOK
+                Local $sCurrInput = StringRegExpReplace(GUICtrlRead($Input), "\\+$", "")
+                If StringRegExp($sCurrInput, "\\" & $Name & "$") And FileExists(StringRegExpReplace($sCurrInput, "\\" & $Name & "$", "")) Then
+                    GUIDelete()
+                    $InstallLocation = RegRead($RegLocation, "InstallLocation")
+                    If $InstallLocation <> $sCurrInput And $InstallLocation <> "" And FileExists($InstallLocation) Then
+                        MsgBox($MB_ICONWARNING, $Title, Localize("UninstallPreviousInstallation"))
+                        RunWait(RegRead($RegLocation, "UninstallString"), $InstallLocation)
+                        $InstallLocation = RegRead($RegLocation, "InstallLocation")
+                        If $InstallLocation <> "" Then
+                            Return GetInstallLocation($InstallLocation)
+                        EndIf
+                        Return GetInstallLocation($sCurrInput)
+                    EndIf
+                    Return $sCurrInput
+                EndIf
+            Case $ButtonCancel
+                Exit
+        EndSwitch
+    WEnd
+EndFunc
+
 If _Singleton($Name & " Installer" & "Jp4g9QRntjYP", 1) = 0 Then
     MsgBox($MB_ICONWARNING, $Title, Localize("InstallerAlreadyRunning"))
     Exit
@@ -90,21 +139,22 @@ ElseIf _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
     MsgBox($MB_ICONWARNING, $Title, Localize("CloseBeforeInstall"))
     Exit
 EndIf
-If Not DirCopy($Name, @ProgramFilesDir & "\" & $Name, 1) Then
+$InstallDir = GetInstallLocation()
+If Not DirCopy($Name, $InstallDir, 1) Then
     MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCopyingFilesToProgramsFolder"))
     Exit
 EndIf
-If Not RegWrite("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & $Name, "DisplayName", "REG_SZ", $Name & " v" & $Version) Or Not RegWrite("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & $Name, "DisplayIcon", "REG_SZ", '"' & @ProgramFilesDir & "\" & $Name & "\" & $Name & '.exe"') Or Not RegWrite("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & $Name, "UninstallString", "REG_SZ", '"' & @ProgramFilesDir & "\" & $Name & '\Uninstall.exe"') Then
+If Not RegWrite($RegLocation, "DisplayName", "REG_SZ", $Name) Or Not RegWrite($RegLocation, "DisplayVersion", "REG_SZ", $Version) Or Not RegWrite($RegLocation, "Publisher", "REG_SZ", "BigRedBot") Or Not RegWrite($RegLocation, "DisplayIcon", "REG_SZ", $InstallDir & "\" & $Name & ".exe") Or Not RegWrite($RegLocation, "UninstallString", "REG_SZ", '"' & $InstallDir & '\Uninstall.exe"') Or Not RegWrite($RegLocation, "InstallLocation", "REG_SZ", $InstallDir) Then
     MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingUninstallerRegistry"))
     Exit
 EndIf
 FileDelete(@DesktopDir & "\" & $Name & ".lnk")
-If Not FileCreateShortcut(@ProgramFilesDir & "\" & $Name & "\" & $Name & ".exe", @DesktopCommonDir & "\" & $Name & ".lnk", @ProgramFilesDir & "\" & $Name) Then
+If Not FileCreateShortcut($InstallDir & "\" & $Name & ".exe", @DesktopCommonDir & "\" & $Name & ".lnk", $InstallDir) Then
     MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingShortcut"))
     Exit
 EndIf
 FileDelete(@DesktopDir & "\" & $Name & " Donation.lnk")
-If Not FileCreateShortcut(@ProgramFilesDir & "\" & $Name & "\Donation.html", @DesktopCommonDir & "\" & $Name & " Donation.lnk", @ProgramFilesDir & "\" & $Name) Then
+If Not FileCreateShortcut($InstallDir & "\Donation.html", @DesktopCommonDir & "\" & $Name & " Donation.lnk", $InstallDir) Then
     MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingShortcut"))
     Exit
 EndIf

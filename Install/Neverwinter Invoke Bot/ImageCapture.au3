@@ -1,13 +1,13 @@
 #RequireAdmin
 Global $Name = "Neverwinter Client Image Capture"
+Global $Title = $Name
 #include "Shared.au3"
 If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
-    MsgBox($MB_ICONWARNING, $Name, Localize("ImageCaptureAlreadyRunning"))
+    MsgBox($MB_ICONWARNING, $Title, Localize("ImageCaptureAlreadyRunning"))
     Exit
 EndIf
 #include <ScreenCapture.au3>
 #include <Clipboard.au3>
-Global $Title = $Name
 
 Func Position()
     Focus()

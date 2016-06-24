@@ -3,6 +3,10 @@ Global $Title = $Name & " v" & $Version & " Uninstaller"
 #RequireAdmin
 #include <Misc.au3>
 #include <MsgBoxConstants.au3>
+If _Singleton($Name & " Uninstaller" & "Jp4g9QRntjYP", 1) = 0 Then
+    MsgBox($MB_ICONWARNING, $Title, Localize("UninstallerAlreadyRunning"))
+    Exit
+EndIf
 #include <GUIConstants.au3>
 #include <GUIConstantsEx.au3>
 #include <WinAPIFiles.au3>
@@ -94,7 +98,9 @@ For $i = 1 To $delete[0]
     EndIf
 Next
 
-If ( RegRead("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & $Name, "DisplayName") <> "" Or RegRead("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & $Name, "UninstallString") <> "" ) And Not RegDelete("HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & $Name) Then
+Local $RegLocation = "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & $Name
+
+If ( RegRead($RegLocation, "DisplayName") <> "" Or RegRead($RegLocation, "DisplayVersion") <> "" Or RegRead($RegLocation, "Publisher") <> "" Or RegRead($RegLocation, "DisplayIcon") <> "" Or RegRead($RegLocation, "UninstallString") <> "" Or RegRead($RegLocation, "InstallLocation") <> "" ) And Not RegDelete($RegLocation) Then
     MsgBox($MB_ICONWARNING, $Title, Localize("FailedToDeleteRegistry"))
     Exit
 EndIf

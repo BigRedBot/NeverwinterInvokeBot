@@ -1,5 +1,5 @@
 @ECHO OFF
-SET VERSION=6.3.1
+SET VERSION=6.3.2
 SET NAME=Neverwinter Invoke Bot
 SET INSTALLER=NeverwinterInvokeBot
 SET EXE=Uninstall,ImageCapture,ScreenDetection
@@ -20,7 +20,7 @@ FOR %%i IN ("%EXE:,=" "%") DO "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" 
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in .\Install\setup.au3 /out .\Install\setup.exe /comp 0 /nopack /x86
 
 DEL %INSTALLER%.exe
-"%ProgramFiles%\7-Zip\7z.exe" a Installer.7z .\Install\* -r -x!Thumbs.db -x!ehthumbs.db -x!Desktop.ini -x!*.au3
+"%ProgramFiles%\7-Zip\7z.exe" a Installer.7z .\Install\* -r -x!Thumbs.db -x!ehthumbs.db -x!Desktop.ini -x!*.au3 -x!*.kxf
 
 (
     ECHO ^;^!@Install@!UTF-8^!
