@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.3.4
+- Rearranged coffer selection to show before account total selection.
+
 6.3.3
 - Now looks at all processes for the game window.
 

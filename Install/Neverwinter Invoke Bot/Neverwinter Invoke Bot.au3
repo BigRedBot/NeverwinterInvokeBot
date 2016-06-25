@@ -1412,6 +1412,7 @@ Func RunScript()
         $SkipAllConfigurations = 1
     EndIf
     If Not GetValue("UnattendedMode") And Not $SkipAllConfigurations Then
+        ChooseCoffer()
         While 1
             Local $strNumber = InputBox($Title, @CRLF & Localize("TotalAccounts"), GetValue("TotalAccounts"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
             If @error <> 0 Then
@@ -1427,7 +1428,6 @@ Func RunScript()
         If GetIniAllAccounts("TotalAccounts") <> GetValue("TotalAccounts") Then
             SaveIniAllAccounts("TotalAccounts", GetValue("TotalAccounts"))
         EndIf
-        ChooseCoffer()
     EndIf
     For $n = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $n
