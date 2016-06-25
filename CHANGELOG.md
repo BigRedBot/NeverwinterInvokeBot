@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.3.3
+- Now looks at all processes for the game window.
+
 6.3.2
 - Installer now allows the choice of the install location.
 

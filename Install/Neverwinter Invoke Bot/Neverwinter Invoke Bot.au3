@@ -48,17 +48,27 @@ Func GetLogInServerAddressString()
     Return $r
 EndFunc
 
+Func CloseGameClient($r = 0)
+    Local $list = ProcessList("GameClient.exe")
+    If @error = 0 Then
+        For $i = 1 To $list[0][0]
+            Local $PID = $list[$i][1]
+            While ProcessExists($PID)
+                TimeOut($r)
+                ProcessWaitClose($PID, 60)
+                Sleep(500)
+            WEnd
+        Next
+    EndIf
+EndFunc
+
 Func Position($r = 0)
     Focus()
     If Not $WinFound Or Not GetPosition() Then
         If GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And ImageExists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
             Splash("[ " & Localize("NeverwinterNotFound") & " ]")
             $WaitingTimer = TimerInit()
-            While ProcessExists("GameClient.exe")
-                TimeOut($r)
-                ProcessWaitClose("GameClient.exe", 60)
-                Sleep(500)
-            WEnd
+            CloseGameClient($r)
             BlockInput(1)
             Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
             FileChangeDir($GameClientInstallLocation & "\Neverwinter\Live")
@@ -777,11 +787,7 @@ Func TimeOut($r = 0)
                 ProcessClose("GameClient.exe")
             EndIf
             $WaitingTimer = TimerInit()
-            While ProcessExists("GameClient.exe")
-                TimeOut(1)
-                ProcessWaitClose("GameClient.exe", 60)
-                Sleep(500)
-            WEnd
+            CloseGameClient(1)
             Position(1)
         Else
             Error(Localize("OperationTimedOut"))
@@ -1316,6 +1322,7 @@ Func ChooseCoffer()
     Local $hCombo = GUICtrlCreateCombo("", 25, 50, 270, -1)
     GUICtrlSetData(-1, $list, Localize($default))
     Local $hButton = GUICtrlCreateButton("OK", 118, 85, 84, -1, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 85, 75, 25)
     GUISetState()
     While 1
         Switch GUIGetMsg()
@@ -1333,6 +1340,8 @@ Func ChooseCoffer()
                         Return
                     EndIf
                 Next
+            Case $ButtonCancel
+                Exit
         EndSwitch
     WEnd
 EndFunc
