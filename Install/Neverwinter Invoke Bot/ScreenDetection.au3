@@ -127,6 +127,9 @@ While 1
         If ImageSearch("Idle") Then
             $text &= @CRLF & @CRLF & Localize("IdleLogOutMessageBoxDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
         EndIf
+        If ImageSearch("OK") Then
+            $text &= @CRLF & @CRLF & Localize("OKButtonDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
+        EndIf
         If ImageSearch("VIPAccountReward") Then
             $text &= @CRLF & @CRLF & Localize("VIPAccountRewardDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
             If ImageSearch("VIPAccountRewardBorder", -1, $X, $Y-10) Then

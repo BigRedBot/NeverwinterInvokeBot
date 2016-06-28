@@ -88,10 +88,7 @@ Func Localize($s, $f1=0, $r1=0, $f2=0, $r2=0, $f3=0, $r3=0, $f4=0, $r4=0, $f5=0,
     Return $v
 EndFunc
 
-Global $InstallDir = @ProgramFilesDir & "\" & $Name, $RegLocation = "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & $Name, $InstallLocation = RegRead($RegLocation, "InstallLocation")
-If $InstallLocation <> "" And FileExists($InstallLocation) Then
-    $InstallDir = $InstallLocation
-EndIf
+Global $InstallDir = @ProgramFilesDir & "\" & $Name, $RegLocation = "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & $Name, $InstallLocation = StringRegExpReplace(RegRead($RegLocation, "InstallLocation"), "\\+$", "")
 
 Func GetInstallLocation($dir = $InstallDir)
     Local $GUI = GUICreate($Title, 434, 142)
@@ -115,14 +112,17 @@ Func GetInstallLocation($dir = $InstallDir)
                 If StringRegExp($sCurrInput, "\\" & $Name & "$") And FileExists(StringRegExpReplace($sCurrInput, "\\" & $Name & "$", "")) Then
                     GUIDelete()
                     $InstallLocation = RegRead($RegLocation, "InstallLocation")
-                    If $InstallLocation <> $sCurrInput And $InstallLocation <> "" And FileExists($InstallLocation) Then
-                        MsgBox($MB_ICONWARNING, $Title, Localize("UninstallPreviousInstallation"))
-                        RunWait(RegRead($RegLocation, "UninstallString"), $InstallLocation)
-                        $InstallLocation = RegRead($RegLocation, "InstallLocation")
-                        If $InstallLocation <> "" Then
-                            Return GetInstallLocation($InstallLocation)
+                    If $InstallLocation <> $sCurrInput And $InstallLocation <> "" Then
+                        Local $UninstallString = StringReplace(RegRead($RegLocation, "UninstallString"), '"', "")
+                        If StringInStr($UninstallString, $InstallLocation) And FileExists($UninstallString) Then
+                            MsgBox($MB_ICONWARNING, $Title, Localize("UninstallPreviousInstallation"))
+                            RunWait($UninstallString, $InstallLocation)
+                            $InstallLocation = RegRead($RegLocation, "InstallLocation")
+                            If $InstallLocation <> "" Then
+                                Return GetInstallLocation($InstallLocation)
+                            EndIf
+                            Return GetInstallLocation($sCurrInput)
                         EndIf
-                        Return GetInstallLocation($sCurrInput)
                     EndIf
                     Return $sCurrInput
                 EndIf
@@ -139,7 +139,11 @@ ElseIf _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
     MsgBox($MB_ICONWARNING, $Title, Localize("CloseBeforeInstall"))
     Exit
 EndIf
-$InstallDir = GetInstallLocation()
+If $InstallLocation <> "" And StringRegExp($InstallLocation, "\\" & $Name & "$") And FileExists($InstallLocation) Then
+    $InstallDir = $InstallLocation
+Else
+    $InstallDir = GetInstallLocation()
+EndIf
 If Not DirCopy($Name, $InstallDir, 1) Then
     MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCopyingFilesToProgramsFolder"))
     Exit
@@ -158,4 +162,4 @@ If Not FileCreateShortcut($InstallDir & "\Donation.html", @DesktopCommonDir & "\
     MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingShortcut"))
     Exit
 EndIf
-MsgBox($MB_OK, $Title, Localize("SuccessfullyInstalled", "<VERSION>", $Version))
+MsgBox($MB_OK, $Title, Localize("SuccessfullyInstalled", "<VERSION>", $Version) & @CRLF & @CRLF & $InstallDir)

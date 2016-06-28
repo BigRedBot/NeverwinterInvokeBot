@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.3.5
+- Will now count failed invoke attempts.
+
 6.3.4
 - Rearranged coffer selection to show before account total selection.
 
