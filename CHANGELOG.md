@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.4.1
+- Fixed ImageCapture game client resizing.
+
 6.4
 - Fixed bug with game client window detection.
 

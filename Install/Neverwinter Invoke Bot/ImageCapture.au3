@@ -24,6 +24,11 @@ Func Position()
             Exit
         ElseIf $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
             WinMove($WinHandle, "", $WinLeft, $WinTop, GetValue("GameWidth") + $PaddingWidth, GetValue("GameHeight") + $PaddingHeight)
+            Focus()
+            If Not $WinFound Or Not GetPosition() Then
+                MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
+                Capture()
+            EndIf
             If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
                 MsgBox($MB_ICONWARNING, $Title, Localize("UnableToResize"))
                 Exit
@@ -32,6 +37,11 @@ Func Position()
             Capture()
         ElseIf $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
             WinMove($WinHandle, "", 0, 0)
+            Focus()
+            If Not $WinFound Or Not GetPosition() Then
+                MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
+                Capture()
+            EndIf
             If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
                 MsgBox($MB_ICONWARNING, $Title, Localize("UnableToMove"))
                 Exit
