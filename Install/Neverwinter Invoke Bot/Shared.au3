@@ -249,11 +249,15 @@ Func FindWindow()
     Local $list = ProcessList("GameClient.exe")
     If @error = 0 Then
         For $i = 1 To $list[0][0]
-            Local $Data = _WinAPI_EnumProcessWindows($list[$i][1])
-            If @error = 0 And $Data[1][1] == "CrypticWindowClass" And WinExists($Data[1][0]) Then
-                $WinHandle = $Data[1][0]
-                $WinFound = 1
-                Return
+            Local $Data = _WinAPI_EnumProcessWindows($list[$i][1], False)
+            If @error = 0 Then
+                For $i2 = 1 To $Data[0][0]
+                    If $Data[$i2][1] == "CrypticWindowClass" And WinExists($Data[$i2][0]) Then
+                        $WinHandle = $Data[$i2][0]
+                        $WinFound = 1
+                        Return
+                    EndIf
+                Next
             EndIf
         Next
     EndIf

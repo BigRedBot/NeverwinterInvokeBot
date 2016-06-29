@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.4
+- Fixed bug with game client window detection.
+
 6.3.5
 - Will now count failed invoke attempts.
 
