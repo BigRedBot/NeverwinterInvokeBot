@@ -26,7 +26,11 @@ If @error = 0 Then
         EndIf
     Next
     $text = StringRegExpReplace(StringRegExpReplace($text, @CRLF & "$", ""), @CRLF & "$", "")
-    FileDelete(@ScriptDir & "\ListPID.txt")
-    FileWrite(@ScriptDir & "\ListPID.txt", $text)
-    MsgBox(0, "", "Saved to:" & @CRLF & @ScriptDir & "\ListPID.txt" & @CRLF & @CRLF & $text)
+    If $text = "" Then
+        MsgBox(0, "", "No processes found.")
+    Else
+        FileDelete(@ScriptDir & "\ListPID.txt")
+        FileWrite(@ScriptDir & "\ListPID.txt", $text)
+        MsgBox(0, "", "Saved to:" & @CRLF & @ScriptDir & "\ListPID.txt" & @CRLF & @CRLF & $text)
+    EndIf
 EndIf

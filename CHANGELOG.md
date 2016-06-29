@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.4.2
+- ListPID will no longer write to text file if no processes are found.
+
 6.4.1
 - Fixed ImageCapture game client resizing.
 
