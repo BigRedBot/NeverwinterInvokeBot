@@ -446,6 +446,8 @@ Func Invoke()
             EndIf
             For $k = 1 To 10
                 If ImageSearch("VaultOfPietyButton") Then
+                    MouseMove($X, $Y)
+                    SingleClick()
                     GetCoffer()
                     Return
                 ElseIf ImageSearch("CongratulationsWindow") Then
@@ -467,24 +469,24 @@ Func Invoke()
             Sleep(5000)
         Next
         If ImageSearch("VaultOfPietyButton") Then
+            MouseMove($X, $Y)
+            SingleClick()
             GetCoffer()
         EndIf
     EndIf
 EndFunc
 
 Func GetCoffer()
-    MouseMove($X, $Y)
-    SingleClick()
-    Sleep(1000)
+    Sleep(GetValue("ClaimCofferDelay") * 1000)
     If ImageSearch("CelestialSynergyTab") Then
         MouseMove($X, $Y)
         DoubleClick()
-        Sleep(1000)
+        Sleep(GetValue("ClaimCofferDelay") * 1000)
     EndIf
     If ImageSearch(GetValue("Coffer")) Then
         MouseMove($X, $Y)
         DoubleClick()
-        Sleep(1000)
+        Sleep(GetValue("ClaimCofferDelay") * 1000)
         If GetValue("Coffer") = "ElixirOfFate" Then
             If ImageSearch("OK") Then
                 Send("{BS 2}4")
@@ -506,7 +508,7 @@ Func GetCoffer()
             If ImageSearch(GetValue("Coffer")) Then
                 MouseMove($X, $Y)
                 DoubleClick()
-                Sleep(1000)
+                Sleep(GetValue("ClaimCofferDelay") * 1000)
                 Send("{ENTER}")
                 Sleep(500)
                 Send("{ENTER}")

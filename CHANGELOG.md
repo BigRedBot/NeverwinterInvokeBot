@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.4.3
+- The ClaimCofferDelay option in Settings.ini has been added between more steps when trying to claim a coffer.
+
 6.4.2
 - ListPID will no longer write to text file if no processes are found.
 

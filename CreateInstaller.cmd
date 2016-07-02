@@ -1,5 +1,5 @@
 @ECHO OFF
-SET VERSION=6.4.2
+SET VERSION=6.4.3
 SET NAME=Neverwinter Invoke Bot
 SET INSTALLER=NeverwinterInvokeBot
 SET EXE=Uninstall,ImageCapture,ScreenDetection,ListPID
@@ -15,9 +15,9 @@ SET EXE=Uninstall,ImageCapture,ScreenDetection,ListPID
     ECHO Global $Version = "%VERSION%"
 ) > .\Install\variables.au3
 
-FOR %%i IN ("%EXE:,=" "%") DO "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\%%~i.au3" /out ".\Install\%NAME%\%%~i.exe" /comp 0 /nopack /x86
-"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\%NAME%.au3" /out ".\Install\%NAME%\%NAME%.exe" /icon icon.ico /comp 0 /nopack /x86
-"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in .\Install\setup.au3 /out .\Install\setup.exe /comp 0 /nopack /x86
+FOR %%i IN ("%EXE:,=" "%") DO "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\%%~i.au3" /out ".\Install\%NAME%\%%~i.exe" /nopack /x86
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\%NAME%.au3" /out ".\Install\%NAME%\%NAME%.exe" /icon icon.ico /nopack /x86
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in .\Install\setup.au3 /out .\Install\setup.exe /nopack /x86
 
 DEL %INSTALLER%.exe
 "%ProgramFiles%\7-Zip\7z.exe" a Installer.7z .\Install\* -r -x!Thumbs.db -x!ehthumbs.db -x!Desktop.ini -x!*.au3 -x!*.kxf
