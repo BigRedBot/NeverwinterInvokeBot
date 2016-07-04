@@ -243,28 +243,12 @@ Func Loop()
             Sleep(500)
             MouseMove($X, $Y)
             SingleClick()
-            SetCharacterInfo("TotalOverflowXPRewards", 1)
-            SaveItemCount("TotalOverflowXPRewards")
+            SaveItemCount("TotalOverflowXPRewards", 1)
             Sleep(1000)
             Send(GetValue("JumpKey"))
             Sleep(500)
         EndIf
-        If Not GetValue("SkipVIPAccountReward") And ImageExists("VIPAccountReward") Then
-            Send(GetValue("InventoryKey"))
-            Sleep(2000)
-            If ImageSearch("VIPAccountReward", -1) And ImageSearch("VIPAccountRewardBorder", -1, $X, $Y-10) Then
-                $X = Random($X + GetValue("VIPAccountRewardButtonTopLeftOffsetX"), $X + GetValue("VIPAccountRewardButtonBottomRightOffsetX"), 1)
-                $Y = Random($Y + GetValue("VIPAccountRewardButtonTopLeftOffsetY"), $Y + GetValue("VIPAccountRewardButtonBottomRightOffsetY"), 1)
-                MouseMove($X, $Y)
-                SingleClick()
-                SetCharacterInfo("TotalVIPAccountRewards", 1)
-                SaveItemCount("TotalVIPAccountRewards")
-                Sleep(2000)
-            EndIf
-            Send(GetValue("JumpKey"))
-            Sleep(500)
-            SetAccountValue("SkipVIPAccountReward", 1)
-        EndIf
+        GetVIPAccountReward()
         $WaitingTimer = TimerInit()
         $FailedInvoke = 1
         Invoke()
@@ -454,7 +438,8 @@ Func Invoke()
                     Sleep(500)
                     If ImageSearch("CongratulationsWindow") Then
                         AddAccountCountValue("Invoked")
-                        IniWrite($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", "")) + 1)
+                        Statistics_SaveIniAllAccounts("TotalInvoked", Number(Statistics_GetIniAllAccounts("TotalInvoked")) + 1)
+                        Statistics_SaveIniAccount("TotalInvoked", Number(Statistics_GetIniAccount("TotalInvoked")) + 1)
                         $FailedInvoke = 0
                         Return
                     EndIf
@@ -472,6 +457,42 @@ Func Invoke()
             MouseMove($X, $Y)
             SingleClick()
             GetCoffer()
+        EndIf
+    EndIf
+EndFunc
+
+Func GetVIPAccountReward()
+    If Not GetValue("SkipVIPAccountReward") And GetValue("VIPAccountRewardTries") >= 0 And GetValue("VIPAccountRewardTries") < 3 And ImageExists("VIPAccountReward") Then
+        AddAccountCountValue("VIPAccountRewardTries")
+        Send(GetValue("InventoryKey"))
+        Sleep(2000)
+        If ImageSearch("VIPAccountReward", -1) Then
+            If ImageSearch("VIPAccountRewardBorder", -1, $X, $Y-10) Then
+                $X = Random($X + GetValue("VIPAccountRewardButtonTopLeftOffsetX"), $X + GetValue("VIPAccountRewardButtonBottomRightOffsetX"), 1)
+                $Y = Random($Y + GetValue("VIPAccountRewardButtonTopLeftOffsetY"), $Y + GetValue("VIPAccountRewardButtonBottomRightOffsetY"), 1)
+                MouseMove($X, $Y)
+                SingleClick()
+                Sleep(2000)
+                If Not ImageSearch("VIPAccountReward", -1) Then
+                    SaveItemCount("TotalVIPAccountRewards", 1)
+                ElseIf ImageSearch("VIPAccountRewardBorder", -1, $X, $Y-10) Then
+                    $X = Random($X + GetValue("VIPAccountRewardButtonTopLeftOffsetX"), $X + GetValue("VIPAccountRewardButtonBottomRightOffsetX"), 1)
+                    $Y = Random($Y + GetValue("VIPAccountRewardButtonTopLeftOffsetY"), $Y + GetValue("VIPAccountRewardButtonBottomRightOffsetY"), 1)
+                    MouseMove($X, $Y)
+                    SingleClick()
+                    Sleep(2000)
+                    If Not ImageSearch("VIPAccountReward", -1) Then
+                        SaveItemCount("TotalVIPAccountRewards", 1)
+                    EndIf
+                EndIf
+            EndIf
+        Else
+            GetVIPAccountReward()
+        EndIf
+        If GetValue("VIPAccountRewardTries") >= 0 Then
+            SetAccountValue("VIPAccountRewardTries", -1)
+            Send(GetValue("JumpKey"))
+            Sleep(500)
         EndIf
     EndIf
 EndFunc
@@ -494,8 +515,7 @@ Func GetCoffer()
                 If ImageSearch("OK") Then
                     MouseMove($X, $Y)
                     DoubleClick()
-                    SetCharacterInfo("TotalElixirsOfFate", 4)
-                    SaveItemCount("TotalElixirsOfFate")
+                    SaveItemCount("TotalElixirsOfFate", 4)
                 EndIf
             EndIf
         ElseIf GetValue("Coffer") = "BlessedProfessionsElementalPack" Then
@@ -503,7 +523,6 @@ Func GetCoffer()
             Sleep(500)
             Send("{ENTER}")
             Sleep(500)
-            SetCharacterInfo("TotalProfessionPacks", 1)
             Sleep(GetValue("ClaimCofferDelay") * 1000)
             If ImageSearch(GetValue("Coffer")) Then
                 MouseMove($X, $Y)
@@ -513,16 +532,16 @@ Func GetCoffer()
                 Sleep(500)
                 Send("{ENTER}")
                 Sleep(500)
+                SaveItemCount("TotalProfessionPacks", 2)
+            Else
+                SaveItemCount("TotalProfessionPacks", 1)
             EndIf
-            SetCharacterInfo("TotalProfessionPacks", 2)
-            SaveItemCount("TotalProfessionPacks")
         Else
             Send("{ENTER}")
             Sleep(500)
             Send("{ENTER}")
             Sleep(500)
-            SetCharacterInfo("TotalCelestialCoffers", 1)
-            SaveItemCount("TotalCelestialCoffers")
+            SaveItemCount("TotalCelestialCoffers", 1)
         EndIf
     EndIf
     Sleep(GetValue("ClaimCofferDelay") * 1000)
@@ -877,7 +896,6 @@ Func Error($s)
     Start()
 EndFunc
 
-
 Func Message($s, $n = $MB_OK, $ontop = 0)
     If Not $FirstRun And Not CheckAccounts() Then
         End()
@@ -886,21 +904,29 @@ Func Message($s, $n = $MB_OK, $ontop = 0)
     SendMessage($s, $n, $ontop)
 EndFunc
 
-Local $ItemStart = -1
-
-Func SaveItemCount($item)
-    If $ItemStart < 0 Then
-        $ItemStart = Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", $item, ""))
+Func SaveItemCount($item, $value = 0)
+    If $value then
+        SetCharacterInfo($item, $value)
     EndIf
     Local $ItemCount = 0
+    Local $ItemStart = Statistics_GetAllAccountsStartValue($item)
     For $a = 1 To GetValue("TotalAccounts")
-        For $c = 1 To GetValue("TotalSlots", $a)
+        For $c = 1 To GetAccountValue("TotalSlots", $a)
             $ItemCount += GetCharacterInfo($item, $c, $a)
         Next
     Next
     $ItemCount = $ItemStart + $ItemCount
-    If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", $item, "")) < $ItemCount Then
-        IniWrite($SettingsDir & "\Settings.ini", "Statistics", $item, $ItemCount)
+    If Number(Statistics_GetIniAllAccounts($item)) < $ItemCount Then
+        Statistics_SaveIniAllAccounts($item, $ItemCount)
+    EndIf
+    $ItemCount = 0
+    $ItemStart = Statistics_GetAccountStartValue($item)
+    For $c = 1 To GetAccountValue("TotalSlots")
+        $ItemCount += GetCharacterInfo($item, $c)
+    Next
+    $ItemCount = $ItemStart + $ItemCount
+    If Number(Statistics_GetIniAccount($item)) < $ItemCount Then
+        Statistics_SaveIniAccount($item, $ItemCount)
     EndIf
 EndFunc
 
@@ -983,6 +1009,8 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
     EndIf
     If $VIPAccountRewardCount Then
         $text &= @CRLF & @CRLF & Localize("VIPAccountRewardCount", "<COUNT>", $VIPAccountRewardCount)
+    ElseIf Not GetValue("SkipVIPAccountReward") And GetValue("VIPAccountRewardTries") <> 0 Then
+        $text &= @CRLF & @CRLF & Localize("FailedVIPAccountReward")
     EndIf
     If GetValue("IdleLogout") Then
         $text &= @CRLF & @CRLF & Localize("IdleLogoutCount", "<COUNT>", GetValue("IdleLogout")) & $IdleLogoutText
@@ -1382,23 +1410,24 @@ Func RunScript()
             SetValue("UnattendedMode")
         EndIf
     Next
-    If Not GetValue("UnattendedMode") And ( Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", "")) - Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "DonationPrompts", "")) * 2352 ) >= 2352 Then
-        IniWrite($SettingsDir & "\Settings.ini", "Statistics", "DonationPrompts", Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "DonationPrompts", "")) + 1)
-        Local $text = Localize("InvokedTotalTimes", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalInvoked", "")))
-        If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalCelestialCoffers", "")) Then
-            $text &= @CRLF & @CRLF & Localize("TotalCelestialCoffersCollected", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalCelestialCoffers", "")))
+    Local $DonationPromptsInvokeInterval = 10000
+    If Not GetValue("UnattendedMode") And GetAllAccountsValue("DonationPrompts") >= 0 And ( Statistics_GetAllAccountsStartValue("TotalInvoked") - GetAllAccountsValue("DonationPrompts") * $DonationPromptsInvokeInterval ) >= $DonationPromptsInvokeInterval Then
+        SaveIniAllAccounts("DonationPrompts", Floor(Statistics_GetAllAccountsStartValue("TotalInvoked") / $DonationPromptsInvokeInterval))
+        Local $text = Localize("InvokedTotalTimes", "<COUNT>", _AddCommaToNumber(Statistics_GetAllAccountsStartValue("TotalInvoked")))
+        If Number(Statistics_GetAllAccountsStartValue("TotalCelestialCoffers")) Then
+            $text &= @CRLF & @CRLF & Localize("TotalCelestialCoffersCollected", "<COUNT>", _AddCommaToNumber(Statistics_GetAllAccountsStartValue("TotalCelestialCoffers")))
         EndIf
-        If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalProfessionPacks", "")) Then
-            $text &= @CRLF & @CRLF & Localize("TotalProfessionPacksCollected", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalProfessionPacks", "")))
+        If Number(Statistics_GetAllAccountsStartValue("TotalProfessionPacks")) Then
+            $text &= @CRLF & @CRLF & Localize("TotalProfessionPacksCollected", "<COUNT>", _AddCommaToNumber(Statistics_GetAllAccountsStartValue("TotalProfessionPacks")))
         EndIf
-        If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalElixirsOfFate", "")) Then
-            $text &= @CRLF & @CRLF & Localize("TotalElixirsOfFateCollected", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalElixirsOfFate", "")))
+        If Number(Statistics_GetAllAccountsStartValue("TotalElixirsOfFate")) Then
+            $text &= @CRLF & @CRLF & Localize("TotalElixirsOfFateCollected", "<COUNT>", _AddCommaToNumber(Statistics_GetAllAccountsStartValue("TotalElixirsOfFate")))
         EndIf
-        If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", "")) Then
-            $text &= @CRLF & @CRLF & Localize("TotalOverflowXPRewardsCollected", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalOverflowXPRewards", "")))
+        If Number(Statistics_GetAllAccountsStartValue("TotalOverflowXPRewards")) Then
+            $text &= @CRLF & @CRLF & Localize("TotalOverflowXPRewardsCollected", "<COUNT>", _AddCommaToNumber(Statistics_GetAllAccountsStartValue("TotalOverflowXPRewards")))
         EndIf
-        If Number(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalVIPAccountRewards", "")) Then
-            $text &= @CRLF & @CRLF & Localize("TotalVIPAccountRewardsCollected", "<COUNT>", _AddCommaToNumber(IniRead($SettingsDir & "\Settings.ini", "Statistics", "TotalVIPAccountRewards", "")))
+        If Number(Statistics_GetAllAccountsStartValue("TotalVIPAccountRewards")) Then
+            $text &= @CRLF & @CRLF & Localize("TotalVIPAccountRewardsCollected", "<COUNT>", _AddCommaToNumber(Statistics_GetAllAccountsStartValue("TotalVIPAccountRewards")))
         EndIf
         If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $text & @CRLF & @CRLF & @CRLF & Localize("DonateNow")) = $IDYES Then
             ShellExecute(@ScriptDir & "\Donation.html")

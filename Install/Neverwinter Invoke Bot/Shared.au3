@@ -107,23 +107,30 @@ If GetValue("Language") = "" Then
 EndIf
 
 Func SetDefault($name, $value = 0)
-    If Not IsDeclared("SETTINGS_Default" & $name) Then
-        Assign("SETTINGS_Default" & $name, $value, 2)
+    If Not IsDeclared("SETTINGS_Default_" & $name) Then
+        Assign("SETTINGS_Default_" & $name, $value, 2)
     EndIf
 EndFunc
 
 Func SetValue($name, $value = 0, $account = 0)
     If $account Then
-        If IsDeclared("SETTINGS_Account" & $account & $name) Then
-            Return Assign("SETTINGS_Account" & $account & $name, $value)
+        If IsDeclared("SETTINGS_Account" & $account & "_" & $name) Then
+            Return Assign("SETTINGS_Account" & $account & "_" & $name, $value)
         EndIf
-        Return Assign("SETTINGS_Account" & $account & $name, $value, 2)
-    ElseIf IsDeclared("SETTINGS_Account" & $CurrentAccount & $name) Then
-        Return Assign("SETTINGS_Account" & $CurrentAccount & $name, $value)
-    ElseIf IsDeclared("SETTINGS_AllAccounts" & $name) Then
-        Return Assign("SETTINGS_AllAccounts" & $name, $value)
+        Return Assign("SETTINGS_Account" & $account & "_" & $name, $value, 2)
+    ElseIf IsDeclared("SETTINGS_Account" & $CurrentAccount & "_" & $name) Then
+        Return Assign("SETTINGS_Account" & $CurrentAccount & "_" & $name, $value)
+    ElseIf IsDeclared("SETTINGS_AllAccounts_" & $name) Then
+        Return Assign("SETTINGS_AllAccounts_" & $name, $value)
     EndIf
-    Return Assign("SETTINGS_AllAccounts" & $name, $value, 2)
+    Return Assign("SETTINGS_AllAccounts_" & $name, $value, 2)
+EndFunc
+
+Func SetAllAccountsValue($name, $value = 0)
+    If IsDeclared("SETTINGS_AllAccounts_" & $name) Then
+        Return Assign("SETTINGS_AllAccounts_" & $name, $value)
+    EndIf
+    Return Assign("SETTINGS_AllAccounts_" & $name, $value, 2)
 EndFunc
 
 Func SetAccountValue($name, $value = 0, $account = $CurrentAccount)
@@ -140,15 +147,33 @@ EndFunc
 
 Func GetValue($name, $account = $CurrentAccount)
     If $account And @NumParams = 2 Then
-        If IsDeclared("SETTINGS_Account" & $account & $name) Then
-            Return Eval("SETTINGS_Account" & $account & $name)
+        If IsDeclared("SETTINGS_Account" & $account & "_" & $name) Then
+            Return Eval("SETTINGS_Account" & $account & "_" & $name)
         EndIf
-    ElseIf IsDeclared("SETTINGS_Account" & $CurrentAccount & $name) Then
-        Return Eval("SETTINGS_Account" & $CurrentAccount & $name)
-    ElseIf IsDeclared("SETTINGS_AllAccounts" & $name) Then
-        Return Eval("SETTINGS_AllAccounts" & $name)
-    ElseIf IsDeclared("SETTINGS_Default" & $name) Then
-        Return Eval("SETTINGS_Default" & $name)
+    ElseIf IsDeclared("SETTINGS_Account" & $CurrentAccount & "_" & $name) Then
+        Return Eval("SETTINGS_Account" & $CurrentAccount & "_" & $name)
+    ElseIf IsDeclared("SETTINGS_AllAccounts_" & $name) Then
+        Return Eval("SETTINGS_AllAccounts_" & $name)
+    ElseIf IsDeclared("SETTINGS_Default_" & $name) Then
+        Return Eval("SETTINGS_Default_" & $name)
+    EndIf
+    Return 0
+EndFunc
+
+Func GetAllAccountsValue($name)
+    If IsDeclared("SETTINGS_AllAccounts_" & $name) Then
+        Return Eval("SETTINGS_AllAccounts_" & $name)
+    ElseIf IsDeclared("SETTINGS_Default_" & $name) Then
+        Return Eval("SETTINGS_Default_" & $name)
+    EndIf
+    Return 0
+EndFunc
+
+Func GetAccountValue($name, $account = $CurrentAccount)
+    If IsDeclared("SETTINGS_Account" & $account & "_" & $name) Then
+        Return Eval("SETTINGS_Account" & $account & "_" & $name)
+    ElseIf IsDeclared("SETTINGS_Default_" & $name) Then
+        Return Eval("SETTINGS_Default_" & $name)
     EndIf
     Return 0
 EndFunc
@@ -185,6 +210,49 @@ Func GetIniPrivate($name, $account = $CurrentAccount)
     Return GetIniAccount($name, $account, 1)
 EndFunc
 
+Func Statistics_GetAllAccountsStartValue($name)
+    If IsDeclared("SETTINGS_Statistics_AllAccounts_" & $name) Then
+        Return Eval("SETTINGS_Statistics_AllAccounts_" & $name)
+    EndIf
+    Return 0
+EndFunc
+
+Func Statistics_GetAccountStartValue($name, $account = $CurrentAccount)
+    If IsDeclared("SETTINGS_Statistics_Account" & $account & "_" & $name) Then
+        Return Eval("SETTINGS_Statistics_Account" & $account & "_" & $name)
+    EndIf
+    Return 0
+EndFunc
+
+Func Statistics_SaveIniAllAccounts($name, $value = "")
+    If Not GetAllAccountsValue("DisableStatisticsStartDate") Then
+        If Not Statistics_GetAllAccountsStartValue("StartDate") Then
+            Local $Month[13] = [12, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+            IniWrite($SettingsDir & "\Settings.ini", "Statistics_AllAccounts", "StartDate", $Month[Number(@MON)] & " " & Number(@MDAY) & ", " & @YEAR)
+        EndIf
+        SetAllAccountsValue("DisableStatisticsStartDate", 1)
+    EndIf
+    Return IniWrite($SettingsDir & "\Settings.ini", "Statistics_AllAccounts", $name, $value)
+EndFunc
+
+Func Statistics_GetIniAllAccounts($name)
+    Return IniRead($SettingsDir & "\Settings.ini", "Statistics_AllAccounts", $name, "")
+EndFunc
+
+Func Statistics_SaveIniAccount($name, $value = "", $account = $CurrentAccount)
+    If Not GetAccountValue("DisableStatisticsStartDate", $account) Then
+        If Not Statistics_GetAccountStartValue("StartDate", $account) Then
+            Local $Month[13] = [12, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+            IniWrite($SettingsDir & "\Settings.ini", "Statistics_Account" & $account, "StartDate", $Month[Number(@MON)] & " " & Number(@MDAY) & ", " & @YEAR)
+        EndIf
+        SetAccountValue("DisableStatisticsStartDate", 1, $account)
+    EndIf
+    Return IniWrite($SettingsDir & "\Settings.ini", "Statistics_Account" & $account, $name, $value)
+EndFunc
+
+Func Statistics_GetIniAccount($name, $account = $CurrentAccount)
+    Return IniRead($SettingsDir & "\Settings.ini", "Statistics_Account" & $account, $name, "")
+EndFunc
 
 Func LoadLocalizations($file, $lang)
     Local $values = IniReadSection($file, $lang)
@@ -227,8 +295,8 @@ Func LoadSettings($file)
                     If String(Number($v)) = String($v) Or $v = "" Then
                         $v = Number($v)
                     EndIf
-                    If Not IsDeclared("SETTINGS_" & $sections[$i] & $values[$i2][0]) Then
-                        Assign("SETTINGS_" & $sections[$i] & $values[$i2][0], $v, 2)
+                    If Not IsDeclared("SETTINGS_" & $sections[$i] & "_" & $values[$i2][0]) Then
+                        Assign("SETTINGS_" & $sections[$i] & "_" & $values[$i2][0], $v, 2)
                     EndIf
                 Next
             EndIf

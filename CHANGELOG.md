@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.5
+- Fixed and replaced statistics collection.
+
 6.4.3
 - The delay from the ClaimCofferDelay option in Settings.ini has been added between more steps when trying to claim a coffer.
 
