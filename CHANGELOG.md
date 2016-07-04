@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.5.1
+- Fixed account bound VIP reward claiming detection.
+
 6.5
 - Fixed and replaced statistics collection.
 

@@ -27,6 +27,8 @@
 ;       a desktop region to search
 ;
 ;===============================================================================
+Global $_ImageSearchLeft = 0, $_ImageSearchTop = 0, $_ImageSearchRight = 0, $_ImageSearchBottom = 0
+
 Func _ImageSearch($findImage,$resultPosition, ByRef $x, ByRef $y,$tolerance,$width = @DesktopWidth, $height = @DesktopHeight)
     If $width = 0 Then $width = @DesktopWidth
     If $height = 0 Then $height = @DesktopHeight
@@ -45,18 +47,23 @@ Func _ImageSearchArea($findImage,$resultPosition,$x1,$y1,$right,$bottom,ByRef $x
     ; compute the centre of search
     $array = StringSplit($result[0],"|")
 
-    $x=Int(Number($array[2]))
-    $y=Int(Number($array[3]))
+    $_ImageSearchLeft=Int(Number($array[2]))
+    $_ImageSearchTop=Int(Number($array[3]))
+    $_ImageSearchRight=$_ImageSearchLeft+Int(Number($array[4]))
+    $_ImageSearchBottom=$_ImageSearchTop+Int(Number($array[5]))
+    $x=$_ImageSearchLeft
+    $y=$_ImageSearchTop
     if $resultPosition>=0 then
-        $x+=Int(Number($array[4])/2)
-        $y+=Int(Number($array[5])/2)
         if $resultPosition>0 then
             $x+=Random(-$resultPosition, $resultPosition, 1)
             $y+=Random(-$resultPosition, $resultPosition, 1)
+        else
+            $x+=Int(Number($array[4])/2)
+            $y+=Int(Number($array[5])/2)
         endif
     elseif $resultPosition<-1 then
-        $x=Random($x, $x+Int(Number($array[4])), 1)
-        $y=Random($y, $y+Int(Number($array[5])), 1)
+        $x=Random($_ImageSearchLeft, $_ImageSearchRight, 1)
+        $y=Random($_ImageSearchTop, $_ImageSearchBottom, 1)
     endif
     return 1
 EndFunc

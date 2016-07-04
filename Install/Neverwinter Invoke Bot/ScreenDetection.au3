@@ -48,8 +48,8 @@ Func FindPixels(ByRef $x, ByRef $y, ByRef $c)
 EndFunc
 
 Global $X = 0, $Y = 0
-Func ImageSearch($image, $resultPosition = -1, $x1 = $ClientLeft, $y1 = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom)
-    If ImageExists($image) And _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $x1, $y1, $right, $bottom, $X, $Y, GetValue("ImageSearchTolerance")) Then
+Func ImageSearch($image, $resultPosition = -1, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom)
+    If ImageExists($image) And _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $X, $Y, GetValue("ImageSearchTolerance")) Then
         Return 1
     EndIf
     Return 0

@@ -465,23 +465,24 @@ Func GetVIPAccountReward()
     If Not GetValue("SkipVIPAccountReward") And GetValue("VIPAccountRewardTries") >= 0 And GetValue("VIPAccountRewardTries") < 3 And ImageExists("VIPAccountReward") Then
         AddAccountCountValue("VIPAccountRewardTries")
         Send(GetValue("InventoryKey"))
-        Sleep(2000)
+        Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
         If ImageSearch("VIPAccountReward", -1) Then
+            Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom
             If ImageSearch("VIPAccountRewardBorder", -1, $X, $Y-10) Then
                 $X = Random($X + GetValue("VIPAccountRewardButtonTopLeftOffsetX"), $X + GetValue("VIPAccountRewardButtonBottomRightOffsetX"), 1)
                 $Y = Random($Y + GetValue("VIPAccountRewardButtonTopLeftOffsetY"), $Y + GetValue("VIPAccountRewardButtonBottomRightOffsetY"), 1)
                 MouseMove($X, $Y)
                 SingleClick()
-                Sleep(2000)
-                If Not ImageSearch("VIPAccountReward", -1) Then
+                Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
+                If Not ImageSearch("VIPAccountReward", -1, $left, $top, $right, $bottom) Then
                     SaveItemCount("TotalVIPAccountRewards", 1)
                 ElseIf ImageSearch("VIPAccountRewardBorder", -1, $X, $Y-10) Then
                     $X = Random($X + GetValue("VIPAccountRewardButtonTopLeftOffsetX"), $X + GetValue("VIPAccountRewardButtonBottomRightOffsetX"), 1)
                     $Y = Random($Y + GetValue("VIPAccountRewardButtonTopLeftOffsetY"), $Y + GetValue("VIPAccountRewardButtonBottomRightOffsetY"), 1)
                     MouseMove($X, $Y)
                     SingleClick()
-                    Sleep(2000)
-                    If Not ImageSearch("VIPAccountReward", -1) Then
+                    Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
+                    If Not ImageSearch("VIPAccountReward", -1, $left, $top, $right, $bottom) Then
                         SaveItemCount("TotalVIPAccountRewards", 1)
                     EndIf
                 EndIf
@@ -678,10 +679,10 @@ Func Splash($s = "", $ontop = 1)
     EndIf
 EndFunc
 
-Func WaitForScreen($image, $resultPosition = -2, $x1 = $ClientLeft, $y1 = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom)
+Func WaitForScreen($image, $resultPosition = -2, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom)
     While 1
         Position()
-        If ImageSearch($image, $resultPosition, $x1, $y1, $right, $bottom) Then
+        If ImageSearch($image, $resultPosition, $left, $top, $right, $bottom) Then
             Return
         EndIf
         FindLogInScreen()
@@ -700,9 +701,9 @@ EndFunc
 
 Global $X = 0, $Y = 0, $LogIn = 1
 
-Func ImageSearch($image, $resultPosition = -2, $x1 = $ClientLeft, $y1 = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom)
+Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom)
     If ImageExists($image) Then
-        If _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $x1, $y1, $right, $bottom, $X, $Y, GetValue("ImageSearchTolerance")) Then
+        If _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $X, $Y, GetValue("ImageSearchTolerance")) Then
             If $image <> "LogInScreen" Then
                 $LoggingIn = 0
                 $LogInTries = 0
@@ -1008,7 +1009,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
         $text &= @CRLF & @CRLF & Localize("OverflowXPRewardCount", "<COUNT>", $OverflowXPRewardCount)
     EndIf
     If $VIPAccountRewardCount Then
-        $text &= @CRLF & @CRLF & Localize("VIPAccountRewardCount", "<COUNT>", $VIPAccountRewardCount)
+        $text &= @CRLF & @CRLF & Localize("VIPAccountRewardCount")
     ElseIf Not GetValue("SkipVIPAccountReward") And GetValue("VIPAccountRewardTries") <> 0 Then
         $text &= @CRLF & @CRLF & Localize("FailedVIPAccountReward")
     EndIf
