@@ -910,7 +910,7 @@ Func SaveItemCount($item, $value = 0)
         SetCharacterInfo($item, $value)
     EndIf
     Local $ItemCount = 0
-    Local $ItemStart = Statistics_GetAllAccountsStartValue($item)
+    Local $ItemStart = GetAllAccountsValue($item)
     For $a = 1 To GetValue("TotalAccounts")
         For $c = 1 To GetAccountValue("TotalSlots", $a)
             $ItemCount += GetCharacterInfo($item, $c, $a)
@@ -921,7 +921,7 @@ Func SaveItemCount($item, $value = 0)
         Statistics_SaveIniAllAccounts($item, $ItemCount)
     EndIf
     $ItemCount = 0
-    $ItemStart = Statistics_GetAccountStartValue($item)
+    $ItemStart = GetAccountValue($item)
     For $c = 1 To GetAccountValue("TotalSlots")
         $ItemCount += GetCharacterInfo($item, $c)
     Next
@@ -1411,24 +1411,25 @@ Func RunScript()
             SetValue("UnattendedMode")
         EndIf
     Next
+    $CurrentAccount = 1
     Local $DonationPromptsInvokeInterval = 10000
-    If Not GetValue("UnattendedMode") And GetAllAccountsValue("DonationPrompts") >= 0 And ( Statistics_GetAllAccountsStartValue("TotalInvoked") - GetAllAccountsValue("DonationPrompts") * $DonationPromptsInvokeInterval ) >= $DonationPromptsInvokeInterval Then
-        SaveIniAllAccounts("DonationPrompts", Floor(Statistics_GetAllAccountsStartValue("TotalInvoked") / $DonationPromptsInvokeInterval))
-        Local $text = Localize("InvokedTotalTimes", "<COUNT>", _AddCommaToNumber(Statistics_GetAllAccountsStartValue("TotalInvoked")))
-        If Number(Statistics_GetAllAccountsStartValue("TotalCelestialCoffers")) Then
-            $text &= @CRLF & @CRLF & Localize("TotalCelestialCoffersCollected", "<COUNT>", _AddCommaToNumber(Statistics_GetAllAccountsStartValue("TotalCelestialCoffers")))
+    If Not GetValue("UnattendedMode") And Not GetValue("DisableDonationPrompts") And ( GetAllAccountsValue("TotalInvoked") - GetAllAccountsValue("DonationPrompts") * $DonationPromptsInvokeInterval ) >= $DonationPromptsInvokeInterval Then
+        Statistics_SaveIniAllAccounts("DonationPrompts", Floor(GetAllAccountsValue("TotalInvoked") / $DonationPromptsInvokeInterval))
+        Local $text = Localize("InvokedTotalTimes", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalInvoked")))
+        If GetAllAccountsValue("TotalCelestialCoffers") Then
+            $text &= @CRLF & @CRLF & Localize("TotalCelestialCoffersCollected", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalCelestialCoffers")))
         EndIf
-        If Number(Statistics_GetAllAccountsStartValue("TotalProfessionPacks")) Then
-            $text &= @CRLF & @CRLF & Localize("TotalProfessionPacksCollected", "<COUNT>", _AddCommaToNumber(Statistics_GetAllAccountsStartValue("TotalProfessionPacks")))
+        If GetAllAccountsValue("TotalProfessionPacks") Then
+            $text &= @CRLF & @CRLF & Localize("TotalProfessionPacksCollected", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalProfessionPacks")))
         EndIf
-        If Number(Statistics_GetAllAccountsStartValue("TotalElixirsOfFate")) Then
-            $text &= @CRLF & @CRLF & Localize("TotalElixirsOfFateCollected", "<COUNT>", _AddCommaToNumber(Statistics_GetAllAccountsStartValue("TotalElixirsOfFate")))
+        If GetAllAccountsValue("TotalElixirsOfFate") Then
+            $text &= @CRLF & @CRLF & Localize("TotalElixirsOfFateCollected", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalElixirsOfFate")))
         EndIf
-        If Number(Statistics_GetAllAccountsStartValue("TotalOverflowXPRewards")) Then
-            $text &= @CRLF & @CRLF & Localize("TotalOverflowXPRewardsCollected", "<COUNT>", _AddCommaToNumber(Statistics_GetAllAccountsStartValue("TotalOverflowXPRewards")))
+        If GetAllAccountsValue("TotalOverflowXPRewards") Then
+            $text &= @CRLF & @CRLF & Localize("TotalOverflowXPRewardsCollected", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalOverflowXPRewards")))
         EndIf
-        If Number(Statistics_GetAllAccountsStartValue("TotalVIPAccountRewards")) Then
-            $text &= @CRLF & @CRLF & Localize("TotalVIPAccountRewardsCollected", "<COUNT>", _AddCommaToNumber(Statistics_GetAllAccountsStartValue("TotalVIPAccountRewards")))
+        If GetAllAccountsValue("TotalVIPAccountRewards") Then
+            $text &= @CRLF & @CRLF & Localize("TotalVIPAccountRewardsCollected", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalVIPAccountRewards")))
         EndIf
         If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $text & @CRLF & @CRLF & @CRLF & Localize("DonateNow")) = $IDYES Then
             ShellExecute(@ScriptDir & "\Donation.html")

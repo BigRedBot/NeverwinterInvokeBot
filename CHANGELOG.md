@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.6
+- All statistics collection now saved in Statistics.ini instead of Settings.ini.
+
 6.5.1
 - Fixed account bound VIP reward claiming detection.
 

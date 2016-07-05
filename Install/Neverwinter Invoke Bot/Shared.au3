@@ -187,72 +187,46 @@ Func GetIniAllAccounts($name)
     Return IniRead($SettingsDir & "\Settings.ini", "AllAccounts", $name, "")
 EndFunc
 
-Func SaveIniAccount($name, $value = "", $account = $CurrentAccount, $private = 0)
-    Local $file = "\Settings.ini"
-    If $private Then
-        $file = "\PrivateSettings.ini"
-    EndIf
-    Return IniWrite($SettingsDir & $file, "Account" & $account, $name, $value)
+Func SaveIniAccount($name, $value = "", $account = $CurrentAccount)
+    Return IniWrite($SettingsDir & "\Settings.ini", "Account" & $account, $name, $value)
 EndFunc
 
-Func GetIniAccount($name, $account = $CurrentAccount, $private = 0)
-    Local $file = "\Settings.ini"
-    If $private Then
-        $file = "\PrivateSettings.ini"
-    EndIf
-    Return IniRead($SettingsDir & $file, "Account" & $account, $name, "")
+Func GetIniAccount($name, $account = $CurrentAccount)
+    Return IniRead($SettingsDir & "\Settings.ini", "Account" & $account, $name, "")
 EndFunc
 
 Func SaveIniPrivate($name, $value = "", $account = $CurrentAccount)
-    Return SaveIniAccount($name, $value , $account, 1)
+    Return IniWrite($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name, $value)
 EndFunc
 
 Func GetIniPrivate($name, $account = $CurrentAccount)
-    Return GetIniAccount($name, $account, 1)
-EndFunc
-
-Func Statistics_GetAllAccountsStartValue($name)
-    If IsDeclared("SETTINGS_Statistics_AllAccounts_" & $name) Then
-        Return Eval("SETTINGS_Statistics_AllAccounts_" & $name)
-    EndIf
-    Return 0
-EndFunc
-
-Func Statistics_GetAccountStartValue($name, $account = $CurrentAccount)
-    If IsDeclared("SETTINGS_Statistics_Account" & $account & "_" & $name) Then
-        Return Eval("SETTINGS_Statistics_Account" & $account & "_" & $name)
-    EndIf
-    Return 0
+    Return IniRead($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name, "")
 EndFunc
 
 Func Statistics_SaveIniAllAccounts($name, $value = "")
-    If Not GetAllAccountsValue("DisableStatisticsStartDate") Then
-        If Not Statistics_GetAllAccountsStartValue("StartDate") Then
-            Local $Month[13] = [12, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-            IniWrite($SettingsDir & "\Settings.ini", "Statistics_AllAccounts", "StartDate", $Month[Number(@MON)] & " " & Number(@MDAY) & ", " & @YEAR)
-        EndIf
-        SetAllAccountsValue("DisableStatisticsStartDate", 1)
+    If Not GetAllAccountsValue("StartDate") Then
+        Local $Month[13] = [12, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], $Date = $Month[Number(@MON)] & " " & Number(@MDAY) & ", " & @YEAR
+        IniWrite($SettingsDir & "\Statistics.ini", "AllAccounts", "StartDate", $Date)
+        SetAllAccountsValue("StartDate", $Date)
     EndIf
-    Return IniWrite($SettingsDir & "\Settings.ini", "Statistics_AllAccounts", $name, $value)
+    Return IniWrite($SettingsDir & "\Statistics.ini", "AllAccounts", $name, $value)
 EndFunc
 
 Func Statistics_GetIniAllAccounts($name)
-    Return IniRead($SettingsDir & "\Settings.ini", "Statistics_AllAccounts", $name, "")
+    Return IniRead($SettingsDir & "\Statistics.ini", "AllAccounts", $name, "")
 EndFunc
 
 Func Statistics_SaveIniAccount($name, $value = "", $account = $CurrentAccount)
-    If Not GetAccountValue("DisableStatisticsStartDate", $account) Then
-        If Not Statistics_GetAccountStartValue("StartDate", $account) Then
-            Local $Month[13] = [12, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-            IniWrite($SettingsDir & "\Settings.ini", "Statistics_Account" & $account, "StartDate", $Month[Number(@MON)] & " " & Number(@MDAY) & ", " & @YEAR)
-        EndIf
-        SetAccountValue("DisableStatisticsStartDate", 1, $account)
+    If Not GetAccountValue("StartDate", $account) Then
+        Local $Month[13] = [12, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], $Date = $Month[Number(@MON)] & " " & Number(@MDAY) & ", " & @YEAR
+        IniWrite($SettingsDir & "\Statistics.ini", "Account" & $account, "StartDate", $Date)
+        SetAccountValue("StartDate", $Date, $account)
     EndIf
-    Return IniWrite($SettingsDir & "\Settings.ini", "Statistics_Account" & $account, $name, $value)
+    Return IniWrite($SettingsDir & "\Statistics.ini", "Account" & $account, $name, $value)
 EndFunc
 
 Func Statistics_GetIniAccount($name, $account = $CurrentAccount)
-    Return IniRead($SettingsDir & "\Settings.ini", "Statistics_Account" & $account, $name, "")
+    Return IniRead($SettingsDir & "\Statistics.ini", "Account" & $account, $name, "")
 EndFunc
 
 Func LoadLocalizations($file, $lang)
@@ -305,6 +279,7 @@ Func LoadSettings($file)
     EndIf
 EndFunc
 
+LoadSettings($SettingsDir & "\Statistics.ini")
 LoadSettings($SettingsDir & "\Settings.ini")
 If $LoadPrivateSettings Then
     LoadSettings($SettingsDir & "\PrivateSettings.ini")
