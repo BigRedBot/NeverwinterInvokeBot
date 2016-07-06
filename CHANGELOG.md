@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.7.1
+- Will now only use a maximum of one log file per session.
+
 6.7
 - Added log files. ( One log file per day is created. By default, only the latest 30 of these files are kept. )
 

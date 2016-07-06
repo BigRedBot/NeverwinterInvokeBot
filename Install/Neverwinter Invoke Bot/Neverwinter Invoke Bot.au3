@@ -1024,19 +1024,20 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
     If $Restarted Then
         $text &= @CRLF & @CRLF & Localize("RestartedCount", "<COUNT>", $Restarted)
     EndIf
-    If Not FileExists($SettingsDir & "\Logs") Then
-        DirCreate($SettingsDir & "\Logs")
+    If $LogDate Then
+        If Not FileExists($SettingsDir & "\Logs") Then
+            DirCreate($SettingsDir & "\Logs")
+        EndIf
+        Local $LogStart = "", $LogEnd = @CRLF
+        If Not $LogTime Then
+            $LogTime = @HOUR & ":" & @MIN & ":" & @SEC
+            $LogStart = $LogTime & @CRLF
+        EndIf
+        If $CurrentAccount = GetValue("TotalAccounts") Then
+            $LogEnd = @CRLF & @CRLF
+        EndIf
+        FileWrite($SettingsDir & "\Logs\Log_" & $LogDate & ".txt", $LogStart & StringReplace($text, @CRLF & @CRLF, @CRLF) & $LogEnd)
     EndIf
-    Local $LogStart = "", $LogEnd = @CRLF
-    If Not $LogTime Then
-        $LogTime = @HOUR & ":" & @MIN & ":" & @SEC
-        $LogDate = @YEAR & "-" & @MON & "-" & @MDAY
-        $LogStart = $LogTime & @CRLF
-    EndIf
-    If $CurrentAccount = GetValue("TotalAccounts") Then
-        $LogEnd = @CRLF & @CRLF
-    EndIf
-    FileWrite($SettingsDir & "\Logs\Log_" & $LogDate & ".txt", $LogStart & StringReplace($text, @CRLF & @CRLF, @CRLF) & $LogEnd)
     If Not GetValue("UnattendedMode") Then
         If $ontop Then
             MsgBox($n, $Title, $text, "", WinGetHandle(AutoItWinGetTitle()) * WinSetOnTop(AutoItWinGetTitle(), "", 1))
@@ -1212,6 +1213,9 @@ Func Go()
             $Minutes = $StartingMinutes - TimerDiff($Time) / 60000
         WEnd
         $MinutesToStart = 0
+    EndIf
+    If Not $LogDate Then
+        $LogDate = @YEAR & "-" & @MON & "-" & @MDAY
     EndIf
     Local $check = CheckAccounts()
     If $check > 0 Then
