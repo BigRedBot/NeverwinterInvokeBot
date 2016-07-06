@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+6.7
+- Added log files. ( One log file per day is created. By default, only the latest 30 of these files are kept. )
+
 6.6
 - All statistics collection now saved in Statistics.ini instead of Settings.ini.
 

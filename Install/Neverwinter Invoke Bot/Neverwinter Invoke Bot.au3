@@ -138,7 +138,7 @@ Func Position($r = 0)
     EndIf
 EndFunc
 
-Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $Restarted = 0, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn
+Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $Restarted = 0, $LogTime = 0, $LogDate = 0, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn
 
 Func SyncValues()
     If GetValue("FinishedLoop") Then
@@ -317,13 +317,13 @@ EndFunc
 
 Func CheckAccounts()
     Local $CurrentComplete = CompletedAccount(), $old = $CurrentAccount, $oldtime = GetTimeToInvoke(), $oldloop = GetValue("CurrentLoop"), $new = $old, $newtime = $oldtime, $newloop = $oldloop, $allcomplete = 1
-    For $n = 1 To GetValue("TotalAccounts")
-        $CurrentAccount = $n
+    For $i = 1 To GetValue("TotalAccounts")
+        $CurrentAccount = $i
         If Not CompletedAccount() Then
             $allcomplete = 0
             Local $t = GetTimeToInvoke(), $l = GetValue("CurrentLoop")
             If ( $l < $newloop And $t < 1 ) Or ( $CurrentComplete And ( $t < $newtime Or $new = $old ) ) Or ( $oldtime > 1 And ($t + 1) < $oldtime And $t < $newtime ) Then
-                $new = $n
+                $new = $i
                 $newtime = $t
                 $newloop = $l
             EndIf
@@ -859,8 +859,8 @@ Func End()
     EndIf
     Local $EndTime = HoursAndMinutes(TimerDiff($StartTimer) / 60000)
     Local $old = $CurrentAccount
-    For $n = 1 To GetValue("TotalAccounts")
-        $CurrentAccount = $n
+    For $i = 1 To GetValue("TotalAccounts")
+        $CurrentAccount = $i
         If CompletedAccount() Then
             If GetValue("CurrentLoop") <= GetValue("EndAtLoop") Then
                 If GetValue("Current") = GetValue("StartAt") Then
@@ -873,28 +873,17 @@ Func End()
         SendMessage(Localize("CompletedInvoking", "<STARTAT>", GetValue("StartAt"), "<ENDAT>", GetValue("EndAt"), "<STARTATLOOP>", GetValue("StartAtLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & @CRLF & Localize("InvokingTook", "<MINUTES>", $EndTime))
     Next
     $CurrentAccount = $old
+    $LogTime = 0
     Exit
 EndFunc
 
 Func Pause()
     SetValue("UnattendedMode")
-    Local $old = $CurrentAccount
-    For $n = 1 To GetValue("TotalAccounts")
-        $CurrentAccount = $n
-        Message(Localize("Paused"))
-    Next
-    $CurrentAccount = $old
-    Start()
+    Message(Localize("Paused"))
 EndFunc
 
 Func Error($s)
-    Local $old = $CurrentAccount
-    For $n = 1 To GetValue("TotalAccounts")
-        $CurrentAccount = $n
-        Message($s, $MB_ICONWARNING, 1)
-    Next
-    $CurrentAccount = $old
-    Start()
+    Message($s, $MB_ICONWARNING, 1)
 EndFunc
 
 Func Message($s, $n = $MB_OK, $ontop = 0)
@@ -902,7 +891,17 @@ Func Message($s, $n = $MB_OK, $ontop = 0)
         End()
         Exit
     EndIf
-    SendMessage($s, $n, $ontop)
+    Local $old = $CurrentAccount
+    For $i = 1 To GetValue("TotalAccounts")
+        $CurrentAccount = $i
+        SendMessage($s, $n, $ontop)
+    Next
+    $CurrentAccount = $old
+    $LogTime = 0
+    If GetValue("UnattendedMode") Then
+        Exit
+    EndIf
+    Start()
 EndFunc
 
 Func SaveItemCount($item, $value = 0)
@@ -932,9 +931,6 @@ Func SaveItemCount($item, $value = 0)
 EndFunc
 
 Func SendMessage($s, $n = $MB_OK, $ontop = 0)
-    If GetValue("UnattendedMode") Then
-        Exit
-    EndIf
     BlockInput(0)
     WinSetOnTop($WinHandle, "", 0)
     HotKeySet("{F4}")
@@ -1028,10 +1024,25 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
     If $Restarted Then
         $text &= @CRLF & @CRLF & Localize("RestartedCount", "<COUNT>", $Restarted)
     EndIf
-    If $ontop Then
-        MsgBox($n, $Title, $text, "", WinGetHandle(AutoItWinGetTitle()) * WinSetOnTop(AutoItWinGetTitle(), "", 1))
-    Else
-        MsgBox($n, $Title, $text)
+    If Not FileExists($SettingsDir & "\Logs") Then
+        DirCreate($SettingsDir & "\Logs")
+    EndIf
+    Local $LogStart = "", $LogEnd = @CRLF
+    If Not $LogTime Then
+        $LogTime = @HOUR & ":" & @MIN & ":" & @SEC
+        $LogDate = @YEAR & "-" & @MON & "-" & @MDAY
+        $LogStart = $LogTime & @CRLF
+    EndIf
+    If $CurrentAccount = GetValue("TotalAccounts") Then
+        $LogEnd = @CRLF & @CRLF
+    EndIf
+    FileWrite($SettingsDir & "\Logs\Log_" & $LogDate & ".txt", $LogStart & StringReplace($text, @CRLF & @CRLF, @CRLF) & $LogEnd)
+    If Not GetValue("UnattendedMode") Then
+        If $ontop Then
+            MsgBox($n, $Title, $text, "", WinGetHandle(AutoItWinGetTitle()) * WinSetOnTop(AutoItWinGetTitle(), "", 1))
+        Else
+            MsgBox($n, $Title, $text)
+        EndIf
     EndIf
 EndFunc
 
@@ -1128,8 +1139,8 @@ Func Start()
     EndIf
     If Not GetValue("UnattendedMode") And Not $SkipAllConfigurations Then
         Local $old = $CurrentAccount
-        For $n = 1 To GetValue("TotalAccounts")
-            $CurrentAccount = $n
+        For $i = 1 To GetValue("TotalAccounts")
+            $CurrentAccount = $i
             ConfigureAccount()
             If GetValue("Current") < GetValue("StartAt") Then
                 SetAccountValue("Current", GetValue("StartAt"))
@@ -1404,8 +1415,8 @@ Func RunScript()
     If $CmdLine[0] Then
         SetValue("UnattendedMode", 1)
     EndIf
-    For $n = 1 To GetValue("TotalAccounts")
-        $CurrentAccount = $n
+    For $i = 1 To GetValue("TotalAccounts")
+        $CurrentAccount = $i
         If Not GetValue("LogInUserName") Or Not GetValue("LogInPassword") Or Not GetValue("TotalSlots") Then
             $AllLoginInfoFound = 0
             SetValue("UnattendedMode")
@@ -1483,8 +1494,8 @@ Func RunScript()
             SaveIniAllAccounts("TotalAccounts", GetValue("TotalAccounts"))
         EndIf
     EndIf
-    For $n = 1 To GetValue("TotalAccounts")
-        $CurrentAccount = $n
+    For $i = 1 To GetValue("TotalAccounts")
+        $CurrentAccount = $i
         SetAccountValue("Current", GetValue("StartAt"))
         SetAccountValue("FinishedInvoke")
         SetAccountValue("FinishedLoop")

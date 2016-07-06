@@ -7,6 +7,8 @@
 #include <WinAPIFiles.au3>
 #include <WinAPIProc.au3>
 #include <WinAPI.au3>
+#include <File.au3>
+#include <Array.au3>
 #include "Localization.au3"
 AutoItSetOption("WinTitleMatchMode", 3)
 
@@ -51,6 +53,7 @@ Func LoadDefaults()
     SetDefault("BottomSelectedCharacterX", 241)
     SetDefault("BottomSelectedCharacterY", 173)
     SetDefault("BottomSelectedCharacterC", "CCFFFF")
+    SetDefault("LogFilesToKeep", 30)
     SetDefault("LogInUserName")
     SetDefault("LogInPassword")
     SetDefault("PasswordHash")
@@ -279,12 +282,25 @@ Func LoadSettings($file)
     EndIf
 EndFunc
 
+Func PruneLogs()
+    If FileExists($SettingsDir & "\Logs") Then
+        Local $FileList = _FileListToArray($SettingsDir & "\Logs", "Log_????-??-??.txt", $FLTA_FILES)
+        If @error = 0 And $FileList[0] > GetValue("LogFilesToKeep") Then
+            _ArraySort($FileList)
+            For $i = 1 To $FileList[0] - GetValue("LogFilesToKeep")
+                FileDelete($SettingsDir & "\Logs" & "\" & $FileList[$i])
+            Next
+        EndIf
+    EndIf
+EndFunc
+
 LoadSettings($SettingsDir & "\Statistics.ini")
 LoadSettings($SettingsDir & "\Settings.ini")
 If $LoadPrivateSettings Then
     LoadSettings($SettingsDir & "\PrivateSettings.ini")
 EndIf
 LoadDefaults()
+PruneLogs()
 
 Global $WinHandle, $WinFound
 Func FindWindow()
