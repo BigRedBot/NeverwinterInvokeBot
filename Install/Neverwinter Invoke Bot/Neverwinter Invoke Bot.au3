@@ -878,7 +878,7 @@ Func End()
 EndFunc
 
 Func Pause()
-    SetValue("UnattendedMode")
+    $UnattendedMode = 0
     Message(Localize("Paused"))
 EndFunc
 
@@ -898,7 +898,7 @@ Func Message($s, $n = $MB_OK, $ontop = 0)
     Next
     $CurrentAccount = $old
     $LogTime = 0
-    If GetValue("UnattendedMode") Then
+    If $UnattendedMode Then
         Exit
     EndIf
     Start()
@@ -1038,7 +1038,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
         EndIf
         FileWrite($SettingsDir & "\Logs\Log_" & $LogDate & ".txt", $LogStart & StringReplace($text, @CRLF & @CRLF, @CRLF) & $LogEnd)
     EndIf
-    If Not GetValue("UnattendedMode") Then
+    If Not $UnattendedMode Then
         If $ontop Then
             MsgBox($n, $Title, $text, "", WinGetHandle(AutoItWinGetTitle()) * WinSetOnTop(AutoItWinGetTitle(), "", 1))
         Else
@@ -1138,7 +1138,7 @@ Func Start()
     If Not $FirstRun And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAllConfigurations", "<NUMBER>", GetValue("TotalAccounts"))) = $IDYES Then
         $SkipAllConfigurations = 1
     EndIf
-    If Not GetValue("UnattendedMode") And Not $SkipAllConfigurations Then
+    If Not $UnattendedMode And Not $SkipAllConfigurations Then
         Local $old = $CurrentAccount
         For $i = 1 To GetValue("TotalAccounts")
             $CurrentAccount = $i
@@ -1156,7 +1156,7 @@ EndFunc
 
 Func Begin()
     $SkipAllConfigurations = 0
-    If Not GetValue("UnattendedMode") Then
+    If Not $UnattendedMode Then
         If $FirstRun Or $MinutesToStart Then
             $FirstRun = 0
             Local $Time = 0
@@ -1197,6 +1197,7 @@ Func Begin()
 EndFunc
 
 Func Go()
+    $UnattendedMode = GetValue("UnattendedMode")
     $StartTimer = 0
     $LogInTries = 0
     $LoggingIn = 1
@@ -1251,6 +1252,22 @@ Func Go()
 EndFunc
 
 Func Initialize()
+    Local $old = $CurrentAccount
+    For $i = 1 To GetValue("TotalAccounts")
+        $CurrentAccount = $i
+        SetAccountValue("Current", GetValue("StartAt"))
+        SetAccountValue("CurrentLoop", GetValue("StartAtLoop"))
+        If Not $UnattendedMode And Not $SkipAllConfigurations Then
+            Load()
+        EndIf
+        If Not GetValue("EndAt") Then
+            SetAccountValue("EndAt", GetValue("TotalSlots"))
+        EndIf
+    Next
+    $CurrentAccount = $old
+EndFunc
+
+Func Load()
     If ImageExists("LogInScreen") Then
         If Not GetValue("LogInUserName") Then
             SetAccountValue("LogInUserName", "")
@@ -1413,22 +1430,26 @@ Func ChooseCoffer()
     WEnd
 EndFunc
 
-Global $AllLoginInfoFound = 1, $SkipAllConfigurations = 0, $FirstRun = 1
+Global $AllLoginInfoFound = 1, $SkipAllConfigurations = 0, $FirstRun = 1, $UnattendedMode = 0
 
 Func RunScript()
     If $CmdLine[0] Then
         SetValue("UnattendedMode", 1)
     EndIf
+    Local $old = $CurrentAccount
     For $i = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $i
         If Not GetValue("LogInUserName") Or Not GetValue("LogInPassword") Or Not GetValue("TotalSlots") Then
             $AllLoginInfoFound = 0
-            SetValue("UnattendedMode")
+            ExitLoop
         EndIf
     Next
-    $CurrentAccount = 1
+    $CurrentAccount = $old
+    If $AllLoginInfoFound Then
+        $UnattendedMode = GetValue("UnattendedMode")
+    EndIf
     Local $DonationPromptsInvokeInterval = 10000
-    If Not GetValue("UnattendedMode") And Not GetValue("DisableDonationPrompts") And ( GetAllAccountsValue("TotalInvoked") - GetAllAccountsValue("DonationPrompts") * $DonationPromptsInvokeInterval ) >= $DonationPromptsInvokeInterval Then
+    If Not $UnattendedMode And Not GetValue("DisableDonationPrompts") And ( GetAllAccountsValue("TotalInvoked") - GetAllAccountsValue("DonationPrompts") * $DonationPromptsInvokeInterval ) >= $DonationPromptsInvokeInterval Then
         Statistics_SaveIniAllAccounts("DonationPrompts", Floor(GetAllAccountsValue("TotalInvoked") / $DonationPromptsInvokeInterval))
         Local $text = Localize("InvokedTotalTimes", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalInvoked")))
         If GetAllAccountsValue("TotalCelestialCoffers") Then
@@ -1451,7 +1472,7 @@ Func RunScript()
             Exit
         EndIf
     EndIf
-    If Not GetValue("UnattendedMode") And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("CheckForUpdate")) = $IDYES Then
+    If Not $UnattendedMode And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("CheckForUpdate")) = $IDYES Then
         Local $tmpverfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/version.ini", $Title, Localize("RetrievingVersion"))
         If $tmpverfile Then
             Local $CurrentVersion = IniRead($tmpverfile, "version", "version", "")
@@ -1477,10 +1498,10 @@ Func RunScript()
             MsgBox($MB_ICONWARNING, $Title, Localize("CouldNotDownloadCurrentVersionInfo"))
         EndIf
     EndIf
-    If Not GetValue("UnattendedMode") And $AllLoginInfoFound And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAllConfigurations", "<NUMBER>", GetValue("TotalAccounts"))) = $IDYES Then
+    If Not $UnattendedMode And $AllLoginInfoFound And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAllConfigurations", "<NUMBER>", GetValue("TotalAccounts"))) = $IDYES Then
         $SkipAllConfigurations = 1
     EndIf
-    If Not GetValue("UnattendedMode") And Not $SkipAllConfigurations Then
+    If Not $UnattendedMode And Not $SkipAllConfigurations Then
         ChooseCoffer()
         While 1
             Local $strNumber = InputBox($Title, @CRLF & Localize("TotalAccounts"), GetValue("TotalAccounts"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
@@ -1498,21 +1519,7 @@ Func RunScript()
             SaveIniAllAccounts("TotalAccounts", GetValue("TotalAccounts"))
         EndIf
     EndIf
-    For $i = 1 To GetValue("TotalAccounts")
-        $CurrentAccount = $i
-        SetAccountValue("Current", GetValue("StartAt"))
-        SetAccountValue("FinishedInvoke")
-        SetAccountValue("FinishedLoop")
-        SetAccountValue("Invoked")
-        SetAccountValue("CurrentLoop", GetValue("StartAtLoop"))
-        If Not GetValue("UnattendedMode") And Not $SkipAllConfigurations Then
-            Initialize()
-        EndIf
-        If Not GetValue("EndAt") Then
-            SetAccountValue("EndAt", GetValue("TotalSlots"))
-        EndIf
-    Next
-    $CurrentAccount = 1
+    Initialize()
     Start()
 EndFunc
 

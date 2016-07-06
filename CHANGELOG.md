@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+6.7.2
+- Unattended mode will now resume after started again if paused.
+- Removed ListPID.
+
 6.7.1
 - Will now only use a maximum of one log file per session.
 
