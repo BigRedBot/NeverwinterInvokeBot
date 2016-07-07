@@ -1027,7 +1027,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
         EndIf
         Local $LogStart = "", $LogEnd = @CRLF
         If $LogSessionStart Then
-            $LogStart = Localize("SessionStart") & @CRLF & @CRLF
+            $LogStart = @CRLF & Localize("SessionStart") & @CRLF & @CRLF
             $LogSessionStart = 0
         EndIf
         If Not $LogTime Then
