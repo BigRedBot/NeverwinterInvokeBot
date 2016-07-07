@@ -1159,16 +1159,9 @@ Func Begin()
     If Not $UnattendedMode Then
         If $FirstRun Or $MinutesToStart Then
             $FirstRun = 0
-            Local $Time = 0
             While 1
                 If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("GetMinutesUntilServerReset")) = $IDYES Then
-                    If $Time Then
-                        $Time = TimerDiff($Time)
-                        If $Time < 5000 Then
-                            Sleep(5000 - $Time)
-                        EndIf
-                    EndIf
-                    Local $m = _GetUTCMinutes(10, 1, True)
+                    Local $m = _GetUTCMinutes(10, 1, True, True)
                     If $m >= 0 Then
                         $MinutesToStart = $m
                         ExitLoop
@@ -1176,7 +1169,6 @@ Func Begin()
                 Else
                     ExitLoop
                 EndIf
-                $Time = TimerInit()
                 MsgBox($MB_ICONWARNING, $Title, Localize("FailedToGetMinutes"))
             WEnd
         EndIf
