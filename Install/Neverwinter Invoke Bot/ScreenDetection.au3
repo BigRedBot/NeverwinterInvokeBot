@@ -1,5 +1,6 @@
-Global $Name = "Neverwinter Invoke Bot: Screen Detection"
 #AutoIt3Wrapper_UseX64=n
+AutoItSetOption("TrayAutoPause", 0)
+Global $Name = "Neverwinter Invoke Bot: Screen Detection"
 #include "Shared.au3"
 If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
     MsgBox($MB_ICONWARNING, $Name, Localize("ScreenDetectionAlreadyRunning"))

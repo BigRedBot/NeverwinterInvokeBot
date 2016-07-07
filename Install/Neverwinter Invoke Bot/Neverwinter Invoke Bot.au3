@@ -1,10 +1,16 @@
 #AutoIt3Wrapper_UseX64=n
 #RequireAdmin
+AutoItSetOption("TrayAutoPause", 0)
 Global $LoadPrivateSettings = 1
 #include "..\variables.au3"
 #include "Shared.au3"
+Global $Title = $Name & " v" & $Version
+TraySetToolTip($Title)
 If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
-    MsgBox($MB_ICONWARNING, $Name, Localize("AlreadyRunning"))
+    MsgBox($MB_ICONWARNING, $Title, Localize("AlreadyRunning"))
+    Exit
+ElseIf @AutoItX64 Then
+    MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
     Exit
 EndIf
 #include "_DownloadFile.au3"
@@ -16,13 +22,7 @@ EndIf
 Global $KeyDelay = GetValue("KeyDelaySeconds") * 1000
 Global $TimeOut = GetValue("TimeOutMinutes") * 60000
 AutoItSetOption("SendKeyDownDelay", $KeyDelay)
-Global $Title = $Name & " v" & $Version
 Global $MouseOffset = 5
-
-If @AutoItX64 Then
-    MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
-    Exit
-EndIf
 
 Func Array($x)
     Return StringSplit(StringRegExpReplace(StringRegExpReplace(StringStripWS($x, 8), "^,", ""), ",$", ""), ",")
@@ -1161,7 +1161,7 @@ Func Begin()
         If $FirstRun Or $MinutesToStart Then
             While 1
                 If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("GetMinutesUntilServerReset")) = $IDYES Then
-                    Local $m = _GetUTCMinutes(10, 1, True, True)
+                    Local $m = _GetUTCMinutes(10, 1, True, True, False, $Title)
                     If $m >= 0 Then
                         $MinutesToStart = $m
                         ExitLoop

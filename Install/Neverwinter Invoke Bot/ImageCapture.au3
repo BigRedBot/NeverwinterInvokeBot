@@ -1,4 +1,5 @@
 #RequireAdmin
+AutoItSetOption("TrayAutoPause", 0)
 Global $Name = "Neverwinter Client Image Capture"
 Global $Title = $Name
 #include "Shared.au3"

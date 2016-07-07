@@ -1,6 +1,7 @@
+#NoTrayIcon
+#RequireAdmin
 #include "..\variables.au3"
 Global $Title = $Name & " v" & $Version & " Uninstaller"
-#RequireAdmin
 #include <Misc.au3>
 #include <MsgBoxConstants.au3>
 If _Singleton($Name & " Uninstaller" & "Jp4g9QRntjYP", 1) = 0 Then

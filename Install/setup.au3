@@ -1,3 +1,4 @@
+#NoTrayIcon
 #include "variables.au3"
 #include <Misc.au3>
 #include <WinAPIFiles.au3>

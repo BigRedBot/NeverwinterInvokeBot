@@ -1,15 +1,18 @@
 #RequireAdmin
+AutoItSetOption("TrayAutoPause", 0)
+Local $Title = "Neverwinter Invoke Bot: Unattended Launcher"
+TraySetToolTip($Title)
 #include <Misc.au3>
 #include <MsgBoxConstants.au3>
 If _Singleton("Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then
-    MsgBox($MB_ICONWARNING, "Unattended Launcher", "Already running!")
+    MsgBox($MB_ICONWARNING, $Title, "Already running!")
     Exit
 EndIf
 #include "_GetUTCMinutes.au3"
 While 1
     Local $min = 0
     While 1
-        $min = _GetUTCMinutes(10, 1, True)
+        $min = _GetUTCMinutes(10, 1, True, False, True, $Title)
         If $min >= 0 Then
             ExitLoop
         EndIf
