@@ -8,15 +8,15 @@ Local $_GetUTCMinutes_TimeServers = "time.nist.gov, pool.ntp.org, 0.pool.ntp.org
 Local $_GetUTCMinutes_TimerDelaySet = TimerInit(), $_GetUTCMinutes_TimeServerArray = StringSplit(StringRegExpReplace(StringRegExpReplace(StringStripWS($_GetUTCMinutes_TimeServers, 8), "^,", ""), ",$", ""), ",")
 
 Func _GetUTCMinutes($Hour = 0, $Minute = 0, $Until = False, $Splash = False)
-    Local $r = -1, $data = "", $t = TimerDiff($_GetUTCMinutes_TimerDelaySet), $txt, $lasttxt, $w
+    Local $r = -1, $data = "", $wait = 5, $t = TimerDiff($_GetUTCMinutes_TimerDelaySet), $txt, $lasttxt, $win
     If $Splash Then
-        $w = SplashTextOn("", Ceiling(5-$t/1000) & "..." & @CRLF, 200, 100, -1, -1, $DLG_MOVEABLE + $DLG_TEXTVCENTER, "", 0)
+        $win = SplashTextOn("", Ceiling(5-$t/1000) & "..." & @CRLF, 200, 100, -1, -1, $DLG_MOVEABLE + $DLG_TEXTVCENTER)
     EndIf
-    While $t < 5000
+    While $t < $wait * 1000
         If $Splash Then
-            $txt = Ceiling(5-$t/1000) & "..." & @CRLF
+            $txt = Ceiling($wait-$t/1000) & "..." & @CRLF
             If Not ($txt == $lasttxt) Then
-                ControlSetText($w, "", "Static1", $txt)
+                ControlSetText($win, "", "Static1", $txt)
                 $lasttxt = $txt
             EndIf
         EndIf
@@ -28,11 +28,12 @@ Func _GetUTCMinutes($Hour = 0, $Minute = 0, $Until = False, $Splash = False)
     If @error = 0 Then
         UDPStartup()
         If @error = 0 Then
+            $wait = 10
             For $i = 1 to $_GetUTCMinutes_TimeServerArray[0]
                 If $Splash Then
                     $txt = $_GetUTCMinutes_TimeServerArray[$i] & @CRLF
                     If Not ($txt == $lasttxt) Then
-                        ControlSetText($w, "", "Static1", $txt)
+                        ControlSetText($win, "", "Static1", $txt)
                         $lasttxt = $txt
                     EndIf
                 EndIf
@@ -48,16 +49,19 @@ Func _GetUTCMinutes($Hour = 0, $Minute = 0, $Until = False, $Splash = False)
                         WEnd
                         UDPSend($socket, $p)
                         If @error = 0 Then
-                            Local $Time = TimerInit()
+                            Local $time = TimerInit()
                             While $data = ""
-                                $t = TimerDiff($Time)
-                                If $t >= 5000 Then
+                                $t = TimerDiff($time)
+                                If $t >= $wait * 1000 Then
                                     ExitLoop
                                 EndIf
                                 If $Splash Then
-                                    $txt = $_GetUTCMinutes_TimeServerArray[$i] & @CRLF & Ceiling(5-$t/1000) & "..."
+                                    $txt = $_GetUTCMinutes_TimeServerArray[$i] & @CRLF
+                                    If $t >= 1000 Then
+                                        $txt &= Ceiling($wait-$t/1000) & "..."
+                                    EndIf
                                     If Not ($txt == $lasttxt) Then
-                                        ControlSetText($w, "", "Static1", $txt)
+                                        ControlSetText($win, "", "Static1", $txt)
                                         $lasttxt = $txt
                                     EndIf
                                 EndIf

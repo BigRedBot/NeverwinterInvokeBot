@@ -674,7 +674,7 @@ Func Splash($s = "", $ontop = 1)
         EndIf
         HotKeySet("{F4}", "Pause")
         $Message = Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & $SplashStartText & $Message
-        $SplashWindow = SplashTextOn("", $Message, GetValue("SplashWidth"), GetValue("SplashHeight"), $leftlocation, $toplocation, $setontop, "", 0)
+        $SplashWindow = SplashTextOn("", $Message, GetValue("SplashWidth"), GetValue("SplashHeight"), $leftlocation, $toplocation, $setontop)
         $LastSplashText = $Message
     EndIf
 EndFunc
