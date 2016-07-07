@@ -1159,7 +1159,6 @@ Func Begin()
     $SkipAllConfigurations = 0
     If Not $UnattendedMode Then
         If $FirstRun Or $MinutesToStart Then
-            $FirstRun = 0
             While 1
                 If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("GetMinutesUntilServerReset")) = $IDYES Then
                     Local $m = _GetUTCMinutes(10, 1, True, True)
@@ -1186,6 +1185,7 @@ Func Begin()
             MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
         WEnd
     EndIf
+    $FirstRun = 0
     Go()
 EndFunc
 
