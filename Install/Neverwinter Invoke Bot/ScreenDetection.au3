@@ -1,5 +1,4 @@
 Global $Name = "Neverwinter Invoke Bot: Screen Detection"
-
 #AutoIt3Wrapper_UseX64=n
 #include "Shared.au3"
 If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then

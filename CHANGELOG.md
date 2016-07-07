@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+6.8
+- Repaired server reset time checking.
+- Added Unattended.exe that can continuously run the invoke bot once a day while it is running.
+
 6.7.2
 - Unattended mode will now resume after started again if paused.
 - Removed ListPID.

@@ -138,7 +138,7 @@ Func Position($r = 0)
     EndIf
 EndFunc
 
-Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $Restarted = 0, $LogTime = 0, $LogDate = 0, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn
+Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $Restarted = 0, $LogTime = 0, $LogDate = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn
 
 Func SyncValues()
     If GetValue("FinishedLoop") Then
@@ -878,7 +878,6 @@ Func End()
 EndFunc
 
 Func Pause()
-    $UnattendedMode = 0
     Message(Localize("Paused"))
 EndFunc
 
@@ -891,6 +890,7 @@ Func Message($s, $n = $MB_OK, $ontop = 0)
         End()
         Exit
     EndIf
+    $UnattendedMode = 0
     Local $old = $CurrentAccount
     For $i = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $i
@@ -898,9 +898,6 @@ Func Message($s, $n = $MB_OK, $ontop = 0)
     Next
     $CurrentAccount = $old
     $LogTime = 0
-    If $UnattendedMode Then
-        Exit
-    EndIf
     Start()
 EndFunc
 
@@ -1029,9 +1026,13 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
             DirCreate($SettingsDir & "\Logs")
         EndIf
         Local $LogStart = "", $LogEnd = @CRLF
+        If $LogSessionStart Then
+            $LogStart = Localize("SessionStart") & @CRLF & @CRLF
+            $LogSessionStart = 0
+        EndIf
         If Not $LogTime Then
             $LogTime = @HOUR & ":" & @MIN & ":" & @SEC
-            $LogStart = $LogTime & @CRLF
+            $LogStart &= @YEAR & "-" & @MON & "-" & @MDAY & " " & $LogTime & @CRLF
         EndIf
         If $CurrentAccount = GetValue("TotalAccounts") Then
             $LogEnd = @CRLF & @CRLF

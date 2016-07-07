@@ -1,8 +1,9 @@
 @ECHO OFF
-SET VERSION=6.7.2
+SET VERSION=6.8
 SET NAME=Neverwinter Invoke Bot
 SET INSTALLER=NeverwinterInvokeBot
 SET EXE=Uninstall,ImageCapture,ScreenDetection
+SET ICON_EXE=%NAME%,Unattended
 
 (
     ECHO [version]
@@ -16,7 +17,7 @@ SET EXE=Uninstall,ImageCapture,ScreenDetection
 ) > .\Install\variables.au3
 
 FOR %%i IN ("%EXE:,=" "%") DO "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\%%~i.au3" /out ".\Install\%NAME%\%%~i.exe" /nopack /x86
-"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\%NAME%.au3" /out ".\Install\%NAME%\%NAME%.exe" /icon icon.ico /nopack /x86
+FOR %%i IN ("%ICON_EXE:,=" "%") DO "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\%%~i.au3" /out ".\Install\%NAME%\%%~i.exe" /icon icon.ico /nopack /x86
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in .\Install\setup.au3 /out .\Install\setup.exe /nopack /x86
 
 DEL %INSTALLER%.exe
@@ -35,7 +36,7 @@ COPY /b 7zS.sfx + config.txt + Installer.7z %INSTALLER%.exe
 DEL Installer.7z
 DEL config.txt
 DEL .\Install\setup.exe
-DEL ".\Install\%NAME%\%NAME%.exe"
 FOR %%i IN ("%EXE:,=" "%") DO DEL ".\Install\%NAME%\%%~i.exe"
+FOR %%i IN ("%ICON_EXE:,=" "%") DO DEL ".\Install\%NAME%\%%~i.exe"
 
 PAUSE
