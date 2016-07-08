@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+6.9
+- Added tray icon tooltips, colored taskbar tray icons, flashing, and removed auto pausing on click.
+- Fixed ability to close game client.
+
 6.8
 - Repaired server reset time checking.
 - Added Unattended.exe that can continuously run the invoke bot once a day while it is running.
