@@ -1,6 +1,7 @@
 #AutoIt3Wrapper_UseX64=n
 #RequireAdmin
 AutoItSetOption("TrayAutoPause", 0)
+TraySetIcon(@ScriptDir & "\images\red.ico")
 Global $LoadPrivateSettings = 1
 #include "..\variables.au3"
 #include "Shared.au3"

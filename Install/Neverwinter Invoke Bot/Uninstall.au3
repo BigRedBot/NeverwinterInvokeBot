@@ -2,8 +2,11 @@
 #RequireAdmin
 #include "..\variables.au3"
 Global $Title = $Name & " v" & $Version & " Uninstaller"
-#include <Misc.au3>
 #include <MsgBoxConstants.au3>
+If Not @Compiled Then
+    Exit MsgBox($MB_ICONWARNING, $Title, "The script must be a compiled exe to work correctly!")
+EndIf
+#include <Misc.au3>
 If _Singleton($Name & " Uninstaller" & "Jp4g9QRntjYP", 1) = 0 Then
     MsgBox($MB_ICONWARNING, $Title, Localize("UninstallerAlreadyRunning"))
     Exit

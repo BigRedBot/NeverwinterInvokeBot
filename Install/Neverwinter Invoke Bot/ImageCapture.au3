@@ -1,5 +1,6 @@
 #RequireAdmin
 AutoItSetOption("TrayAutoPause", 0)
+TraySetIcon(@ScriptDir & "\images\purple.ico")
 Global $Name = "Neverwinter Client Image Capture"
 Global $Title = $Name
 #include "Shared.au3"

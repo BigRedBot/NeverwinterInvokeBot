@@ -2,8 +2,6 @@
 SET VERSION=6.8
 SET NAME=Neverwinter Invoke Bot
 SET INSTALLER=NeverwinterInvokeBot
-SET EXE=Uninstall,ImageCapture,ScreenDetection
-SET ICON_EXE=%NAME%,Unattended
 
 (
     ECHO [version]
@@ -16,8 +14,11 @@ SET ICON_EXE=%NAME%,Unattended
     ECHO Global $Version = "%VERSION%"
 ) > .\Install\variables.au3
 
-FOR %%i IN ("%EXE:,=" "%") DO "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\%%~i.au3" /out ".\Install\%NAME%\%%~i.exe" /nopack /x86
-FOR %%i IN ("%ICON_EXE:,=" "%") DO "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\%%~i.au3" /out ".\Install\%NAME%\%%~i.exe" /icon icon.ico /nopack /x86
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\%NAME%.au3" /out ".\Install\%NAME%\%NAME%.exe" /icon ".\Install\%NAME%\images\red.ico" /nopack /x86
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Unattended.au3" /out ".\Install\%NAME%\Unattended.exe" /icon ".\Install\%NAME%\images\blue.ico" /nopack /x86
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\ScreenDetection.au3" /out ".\Install\%NAME%\ScreenDetection.exe" /icon ".\Install\%NAME%\images\black.ico" /nopack /x86
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\ImageCapture.au3" /out ".\Install\%NAME%\ImageCapture.exe" /icon ".\Install\%NAME%\images\purple.ico" /nopack /x86
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Uninstall.au3" /out ".\Install\%NAME%\Uninstall.exe" /icon ".\Install\%NAME%\images\yellow.ico" /nopack /x86
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in .\Install\setup.au3 /out .\Install\setup.exe /nopack /x86
 
 DEL %INSTALLER%.exe
@@ -35,8 +36,7 @@ COPY /b 7zS.sfx + config.txt + Installer.7z %INSTALLER%.exe
 
 DEL Installer.7z
 DEL config.txt
-DEL .\Install\setup.exe
-FOR %%i IN ("%EXE:,=" "%") DO DEL ".\Install\%NAME%\%%~i.exe"
-FOR %%i IN ("%ICON_EXE:,=" "%") DO DEL ".\Install\%NAME%\%%~i.exe"
+DEL .\Install\*.exe
+DEL ".\Install\%NAME%\*.exe"
 
 PAUSE
