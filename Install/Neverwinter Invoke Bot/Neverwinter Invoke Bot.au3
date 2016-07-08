@@ -49,13 +49,14 @@ Func GetLogInServerAddressString()
 EndFunc
 
 Func CloseGameClient($r = 0)
+    $WaitingTimer = TimerInit()
     Local $list = ProcessList("GameClient.exe")
     If @error = 0 Then
         For $i = 1 To $list[0][0]
             Local $PID = $list[$i][1]
             While ProcessExists($PID)
                 TimeOut($r)
-                ProcessWaitClose($PID, 60)
+                ProcessClose($PID)
                 Sleep(500)
             WEnd
         Next
@@ -67,7 +68,6 @@ Func Position($r = 0)
     If Not $WinFound Or Not GetPosition() Then
         If GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And ImageExists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
             Splash("[ " & Localize("NeverwinterNotFound") & " ]")
-            $WaitingTimer = TimerInit()
             CloseGameClient($r)
             BlockInput(1)
             Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
@@ -100,17 +100,17 @@ Func Position($r = 0)
         If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight Then
             BlockInput(0)
             WinSetOnTop($WinHandle, "", 0)
-            HotKeySet("{F4}")
             SplashOff()
             $SplashWindow = 0
+            HotKeySet("{F4}")
             Error(Localize("UnMaximize"))
             Return
         ElseIf $DeskTopWidth <= (GetValue("GameWidth") + $PaddingLeft) Or $DeskTopHeight <= (GetValue("GameHeight") + $PaddingTop) Or ( $DeskTopWidth <= (GetValue("GameWidth") + $PaddingLeft + GetValue("SplashWidth")) And $DeskTopHeight <= (GetValue("GameHeight") + $PaddingTop + GetValue("SplashHeight")) ) Then
             BlockInput(0)
             WinSetOnTop($WinHandle, "", 0)
-            HotKeySet("{F4}")
             SplashOff()
             $SplashWindow = 0
+            HotKeySet("{F4}")
             Error(Localize("ResolutionHigherThan", "<RESOLUTION>", (GetValue("GameWidth") + $PaddingLeft) & "x" & (GetValue("GameHeight") + $PaddingTop + GetValue("SplashHeight"))))
             Return
         EndIf
@@ -809,10 +809,6 @@ Func TimeOut($r = 0)
         EndIf
         If Not $r And GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And ImageExists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
             Splash("[ " & Localize("RestartingNeverwinter") & " ]")
-            If ProcessExists("GameClient.exe") Then
-                ProcessClose("GameClient.exe")
-            EndIf
-            $WaitingTimer = TimerInit()
             CloseGameClient(1)
             Position(1)
         Else
@@ -858,6 +854,7 @@ Func End()
         Sleep(1000)
     EndIf
     Local $EndTime = HoursAndMinutes(TimerDiff($StartTimer) / 60000)
+    CloseGameClient()
     Local $old = $CurrentAccount
     For $i = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $i
@@ -930,10 +927,10 @@ EndFunc
 Func SendMessage($s, $n = $MB_OK, $ontop = 0)
     BlockInput(0)
     WinSetOnTop($WinHandle, "", 0)
-    HotKeySet("{F4}")
     AutoItSetOption("SendKeyDownDelay", $KeyDelay)
     SplashOff()
     $SplashWindow = 0
+    HotKeySet("{F4}")
     $ETAText = ""
     Local $text = Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & $s
     Local $CofferCount = 0, $ProfessionPackCount = 0, $ElixirOfFateCount = 0, $OverflowXPRewardCount = 0, $VIPAccountRewardCount = 0, $IdleLogoutText = "", $TimedOutText = "", $FailedInvokeText = ""
