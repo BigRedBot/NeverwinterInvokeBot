@@ -25,9 +25,17 @@ While 1
     TraySetIcon(@ScriptDir & "\images\blue.ico")
     Sleep($min * 60000)
     TraySetIcon(@ScriptDir & "\images\green.ico")
+    While ProcessExists("Neverwinter Invoke Bot.exe")
+        ProcessClose("Neverwinter Invoke Bot.exe")
+        Sleep(500)
+    WEnd
+    While ProcessExists("GameClient.exe")
+        ProcessClose("GameClient.exe")
+        Sleep(500)
+    WEnd
     If @Compiled Then
-        ShellexecuteWait(@ScriptDir & "\Neverwinter Invoke Bot.exe", 1, @ScriptDir)
+        ShellExecuteWait(@ScriptDir & "\Neverwinter Invoke Bot.exe", 1, @ScriptDir)
     Else
-        ShellexecuteWait(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Neverwinter Invoke Bot.au3" 1', @ScriptDir)
+        ShellExecuteWait(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Neverwinter Invoke Bot.au3" 1', @ScriptDir)
     EndIf
 WEnd
