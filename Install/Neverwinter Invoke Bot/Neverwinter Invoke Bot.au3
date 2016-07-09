@@ -33,6 +33,11 @@ If @error <> 0 Then
     $GameClientInstallLocation = 0
 EndIf
 
+Global $ArcLauncherLocation = RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Perfect World Entertainment\Arc", "launcher")
+If @error <> 0 Then
+    $ArcLauncherLocation = 0
+EndIf
+
 Func GetLogInServerAddressString()
     Local $r = "", $a = Array(GetValue("LogInServerAddress"))
     If $a[1] And IsString($a[1]) And $a[1] <> "" Then
@@ -888,8 +893,7 @@ EndFunc
 ; add restart loop after
 Func PatchClient()
     $PatchTried = 1
-    Local $key = RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Perfect World Entertainment\Arc", "launcher")
-    If FileExists($key) Then
+    If $GameClientInstallLocation And $ArcLauncherLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And FileExists($ArcLauncherLocation) Then
         CheckServer()
         $LogInTries = 0
         BlockInput(0)
@@ -899,10 +903,10 @@ Func PatchClient()
         If $RestartLoop Then Return 0
         CloseClient(0, "Neverwinter.exe")
         If $RestartLoop Then Return 0
-        If Not $auto Then
+        If Not Number($auto) Then
             RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 1)
         EndIf
-        ShellExecute($key, "gamecustom nw")
+        ShellExecute($ArcLauncherLocation, "gamecustom nw")
         While Not ProcessExists("Neverwinter.exe")
             Sleep(1000)
         WEnd
@@ -915,7 +919,7 @@ Func PatchClient()
             Sleep(1000)
         WEnd
         Sleep(1000)
-        If Not $auto Then
+        If Not Number($auto) Then
             RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
         EndIf
         CloseClient()
@@ -1609,11 +1613,15 @@ Func ChooseCoffer()
     WEnd
 EndFunc
 
-Global $AllLoginInfoFound = 1, $SkipAllConfigurations = 0, $FirstRun = 1, $UnattendedMode = 0
+Global $AllLoginInfoFound = 1, $SkipAllConfigurations = 0, $FirstRun = 1, $UnattendedMode = 0, $UnattendedModeCheckSettings = 0
 
 Func RunScript()
     If $CmdLine[0] Then
-        SetValue("UnattendedMode", 1)
+        If Number($CmdLine[1]) = 1 Then
+            SetValue("UnattendedMode", 1)
+        ElseIf Number($CmdLine[1]) = -1 Then
+            $UnattendedModeCheckSettings = 1
+        EndIf
     EndIf
     Local $old = $CurrentAccount
     For $i = 1 To GetValue("TotalAccounts")
@@ -1624,10 +1632,8 @@ Func RunScript()
         EndIf
     Next
     $CurrentAccount = $old
-    If $AllLoginInfoFound Then
-        $UnattendedMode = GetValue("UnattendedMode")
-    EndIf
-    If Not GetValue("DisableDonationPrompts") And ( GetAllAccountsValue("TotalInvoked") - GetAllAccountsValue("DonationPrompts") * 10000 ) >= 10000 Then
+    If $AllLoginInfoFound Then $UnattendedMode = GetValue("UnattendedMode")
+    If Not $UnattendedModeCheckSettings And Not GetValue("DisableDonationPrompts") And ( GetAllAccountsValue("TotalInvoked") - GetAllAccountsValue("DonationPrompts") * 10000 ) >= 10000 Then
         Statistics_SaveIniAllAccounts("DonationPrompts", Floor(GetAllAccountsValue("TotalInvoked") / 10000))
         CloseClient(0, "DonationPrompt.exe")
         If $RestartLoop Then Return 0
@@ -1643,33 +1649,33 @@ Func RunScript()
             ShellExecuteWait(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\DonationPrompt.au3"', @ScriptDir)
         EndIf
     EndIf
-    If Not $UnattendedMode And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("CheckForUpdate")) = $IDYES Then
+    If Not $UnattendedMode And @Compiled Then
         Local $tmpverfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/version.ini", $Title, Localize("RetrievingVersion"))
         If $tmpverfile Then
             Local $CurrentVersion = IniRead($tmpverfile, "version", "version", "")
             FileDelete($tmpverfile)
             If $CurrentVersion <> "" Then
-                If $CurrentVersion = $Version Then
-                    MsgBox($MB_OK, $Title, Localize("RunningLatestVersion"))
-                ElseIf MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("NewerVersionFound", "<VERSION>", $CurrentVersion)) = $IDYES Then
+                If $CurrentVersion <> $Version And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("NewerVersionFound", "<VERSION>", $CurrentVersion)) = $IDYES Then
                     Local $tmpinstallfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe", $Title, Localize("DownloadingInstaller"))
                     If $tmpinstallfile Then
-                        FileCopy($tmpinstallfile, @ScriptDir & "\Install.exe", $FC_OVERWRITE)
+                        If FileCopy($tmpinstallfile, @ScriptDir & "\Install.exe", $FC_OVERWRITE) Then
+                            FileDelete($tmpinstallfile)
+                            ShellExecute(@ScriptDir & "\Install.exe")
+                            Exit
+                        EndIf
                         FileDelete($tmpinstallfile)
-                        ShellExecute(@ScriptDir & "\Install.exe")
-                        Exit
-                    Else
-                        MsgBox($MB_ICONWARNING, $Title, Localize("CouldNotDownloadLatestVersion"))
                     EndIf
+                    MsgBox($MB_ICONWARNING, $Title, Localize("CouldNotDownloadLatestVersion"))
                 EndIf
-            Else
+            ElseIf Not $UnattendedModeCheckSettings Then
                 MsgBox($MB_ICONWARNING, $Title, Localize("CouldNotReadCurrentVersionInfo"))
             EndIf
-        Else
+        ElseIf Not $UnattendedModeCheckSettings Then
             MsgBox($MB_ICONWARNING, $Title, Localize("CouldNotDownloadCurrentVersionInfo"))
         EndIf
     EndIf
-    If Not $UnattendedMode And $AllLoginInfoFound And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAllConfigurations", "<NUMBER>", GetValue("TotalAccounts"))) = $IDYES Then
+    If $AllLoginInfoFound And $UnattendedModeCheckSettings Then Exit
+    If Not $UnattendedModeCheckSettings And Not $UnattendedMode And $AllLoginInfoFound And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAllConfigurations", "<NUMBER>", GetValue("TotalAccounts"))) = $IDYES Then
         $SkipAllConfigurations = 1
     EndIf
     If Not $UnattendedMode And Not $SkipAllConfigurations Then
@@ -1689,6 +1695,7 @@ Func RunScript()
         EndIf
     EndIf
     Initialize()
+    If $UnattendedModeCheckSettings Then Exit
     Start()
 EndFunc
 
