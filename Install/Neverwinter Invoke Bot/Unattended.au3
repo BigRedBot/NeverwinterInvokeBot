@@ -1,11 +1,12 @@
 #RequireAdmin
 AutoItSetOption("TrayAutoPause", 0)
-Local $Title = "Neverwinter Invoke Bot: Unattended Launcher"
+#include "..\variables.au3"
+Global $Title = $Name & ": Unattended Launcher"
 TraySetToolTip($Title)
 #include <Misc.au3>
 #include <MsgBoxConstants.au3>
 #include "Shared.au3"
-If _Singleton("Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then
+If _Singleton($Title & "Jp4g9QRntjYP", 1) = 0 Then
     MsgBox($MB_ICONWARNING, $Title, Localize("UnattendedAlreadyRunning"))
     Exit
 EndIf

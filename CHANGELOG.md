@@ -1,6 +1,12 @@
 RELEASE NOTES
 =============
 
+7.0
+- Will now try to patch the game client if you have the arc client.
+- Will now check the status of the game server before trying to log into the game.
+- Will now ask to run the unattended launcher on startup.
+- Added some fixes for recursion errors.
+
 6.9
 - Added tray icon tooltips, colored taskbar tray icons, flashing, and removed auto pausing on click.
 - Fixed ability to close game client.

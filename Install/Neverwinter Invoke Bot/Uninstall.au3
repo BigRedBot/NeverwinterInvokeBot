@@ -93,7 +93,7 @@ If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DoYouWantToUninstall",
     Exit
 EndIf
 
-Local $delete = StringSplit("Neverwinter Invoke Bot.exe,ImageCapture.exe,ScreenDetection.exe," & @DesktopCommonDir & "\Neverwinter Invoke Bot.lnk," & @DesktopCommonDir & "\Neverwinter Invoke Bot Donation.lnk", ",")
+Local $delete = StringSplit($Name & ".exe,ImageCapture.exe,ScreenDetection.exe,Unattended.exe,DonationPrompt.exe," & @DesktopCommonDir & "\" & $Name & ".lnk," & @DesktopCommonDir & "\" & $Name & " Donation.lnk," & @StartupCommonDir & "\" & $Name & " Unattended Launcher.lnk", ",")
 FileChangeDir(@ScriptDir)
 For $i = 1 To $delete[0]
     If FileExists($delete[$i]) And Not FileDelete($delete[$i]) Then

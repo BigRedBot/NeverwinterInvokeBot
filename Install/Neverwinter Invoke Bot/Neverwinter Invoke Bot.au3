@@ -16,7 +16,6 @@ ElseIf @AutoItX64 Then
 EndIf
 #include "_DownloadFile.au3"
 #include "_GetUTCMinutes.au3"
-#include "_AddCommaToNumber.au3"
 #include "_ImageSearch.au3"
 #include "_SendUnicode.au3"
 #include <Crypt.au3>
@@ -1260,9 +1259,7 @@ Func ConfigureAccount()
     EndIf
     While 1
         Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $MaxLoops), GetValue("CurrentLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
-        If @error <> 0 Then
-            Exit
-        EndIf
+        If @error <> 0 Then Exit
         Local $number = Floor(Number($strNumber))
         If $number >= 1 Then
             SetAccountValue("StartAtLoop", $number)
@@ -1273,9 +1270,7 @@ Func ConfigureAccount()
     WEnd
     While 1
         Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EndingLoop", "<STARTATLOOP>", GetValue("StartAtLoop")), GetValue("EndAtLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
-        If @error <> 0 Then
-            Exit
-        EndIf
+        If @error <> 0 Then Exit
         Local $number = Floor(Number($strNumber))
         If $number >= GetValue("StartAtLoop") Then
             SetAccountValue("EndAtLoop", $number)
@@ -1285,9 +1280,7 @@ Func ConfigureAccount()
     WEnd
     While 1
         Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartAtEachLoop", "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("StartAt"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
-        If @error <> 0 Then
-            Exit
-        EndIf
+        If @error <> 0 Then Exit
         Local $number = Floor(Number($strNumber))
         If $number >= 1 And $number <= GetValue("TotalSlots") Then
             SetAccountValue("StartAt", $number)
@@ -1297,9 +1290,7 @@ Func ConfigureAccount()
     WEnd
     While 1
         Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EndAtEachLoop", "<STARTAT>", GetValue("StartAt"), "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("EndAt"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
-        If @error <> 0 Then
-            Exit
-        EndIf
+        If @error <> 0 Then Exit
         Local $number = Floor(Number($strNumber))
         If $number >= GetValue("StartAt") And $number <= GetValue("TotalSlots") Then
             SetAccountValue("EndAt", $number)
@@ -1314,9 +1305,7 @@ Func ConfigureAccount()
     EndIf
     While 1
         Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartAtCurrentLoop", "<STARTAT>", GetValue("StartAt"), "<ENDAT>", GetValue("EndAt")), GetValue("Current"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
-        If @error <> 0 Then
-            Exit
-        EndIf
+        If @error <> 0 Then Exit
         Local $number = Floor(Number($strNumber))
         If $number >= GetValue("StartAt") And $number <= GetValue("EndAt") Then
             SetAccountValue("Current", $number)
@@ -1368,9 +1357,7 @@ Func Begin()
         EndIf
         While 1
             Local $strNumber = InputBox($Title, @CRLF & Localize("ToStartInvoking"), $MinutesToStart, "", GetValue("StartInputBoxWidth"), GetValue("StartInputBoxHeight"))
-            If @error <> 0 Then
-                Exit
-            EndIf
+            If @error <> 0 Then Exit
             Local $number = Floor(Number($strNumber))
             If $number >= 0 Then
                 $MinutesToStart = $number
@@ -1474,9 +1461,7 @@ Func Load()
         EndIf
         While 1
             Local $string = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterUsername"), BinaryToString(GetValue("LogInUserName"), 4), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
-            If @error <> 0 Then
-                Exit
-            EndIf
+            If @error <> 0 Then Exit
             $string = String(StringToBinary($string, 4))
             If $string And $string <> "" Then
                 SetAccountValue("LogInUserName", $string)
@@ -1502,9 +1487,7 @@ Func Load()
         _Crypt_Startup()
         While 1
             Local $string = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterPassword"), BinaryToString(GetValue("LogInPassword"), 4), "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
-            If @error <> 0 Then
-                Exit
-            EndIf
+            If @error <> 0 Then Exit
             $string = String(StringToBinary($string, 4))
             If $string And $string <> "" Then
                 If BinaryToString(GetIniPrivate("LogInPassword"), 4) == BinaryToString($string, 4) Then
@@ -1519,9 +1502,7 @@ Func Load()
                     MsgBox($MB_ICONWARNING, $Title, Localize("PasswordIncorrect"))
                 Else
                     Local $string2 = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterPasswordAgain"), "", "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
-                    If @error <> 0 Then
-                        Exit
-                    EndIf
+                    If @error <> 0 Then Exit
                     If $string == String(StringToBinary($string2, 4)) Then
                         SetAccountValue("LogInPassword", $string)
                         If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SavePassword")) = $IDYES Then
@@ -1558,9 +1539,7 @@ Func Load()
     EndIf
     While 1
         Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("TotalCharacters"), GetValue("TotalSlots"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
-        If @error <> 0 Then
-            Exit
-        EndIf
+        If @error <> 0 Then Exit
         Local $number = Floor(Number($strNumber))
         If $number > 0 Then
             SetAccountValue("TotalSlots", $number)
@@ -1648,28 +1627,20 @@ Func RunScript()
     If $AllLoginInfoFound Then
         $UnattendedMode = GetValue("UnattendedMode")
     EndIf
-    Local $DonationPromptsInvokeInterval = 10000
-    If Not $UnattendedMode And Not GetValue("DisableDonationPrompts") And ( GetAllAccountsValue("TotalInvoked") - GetAllAccountsValue("DonationPrompts") * $DonationPromptsInvokeInterval ) >= $DonationPromptsInvokeInterval Then
-        Statistics_SaveIniAllAccounts("DonationPrompts", Floor(GetAllAccountsValue("TotalInvoked") / $DonationPromptsInvokeInterval))
-        Local $text = Localize("InvokedTotalTimes", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalInvoked")))
-        If GetAllAccountsValue("TotalCelestialCoffers") Then
-            $text &= @CRLF & @CRLF & Localize("TotalCelestialCoffersCollected", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalCelestialCoffers")))
-        EndIf
-        If GetAllAccountsValue("TotalProfessionPacks") Then
-            $text &= @CRLF & @CRLF & Localize("TotalProfessionPacksCollected", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalProfessionPacks")))
-        EndIf
-        If GetAllAccountsValue("TotalElixirsOfFate") Then
-            $text &= @CRLF & @CRLF & Localize("TotalElixirsOfFateCollected", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalElixirsOfFate")))
-        EndIf
-        If GetAllAccountsValue("TotalOverflowXPRewards") Then
-            $text &= @CRLF & @CRLF & Localize("TotalOverflowXPRewardsCollected", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalOverflowXPRewards")))
-        EndIf
-        If GetAllAccountsValue("TotalVIPAccountRewards") Then
-            $text &= @CRLF & @CRLF & Localize("TotalVIPAccountRewardsCollected", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalVIPAccountRewards")))
-        EndIf
-        If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $text & @CRLF & @CRLF & @CRLF & Localize("DonateNow")) = $IDYES Then
-            ShellExecute(@ScriptDir & "\Donation.html")
-            Exit
+    If Not GetValue("DisableDonationPrompts") And ( GetAllAccountsValue("TotalInvoked") - GetAllAccountsValue("DonationPrompts") * 10000 ) >= 10000 Then
+        Statistics_SaveIniAllAccounts("DonationPrompts", Floor(GetAllAccountsValue("TotalInvoked") / 10000))
+        CloseClient(0, "DonationPrompt.exe")
+        If $RestartLoop Then Return 0
+        If $UnattendedMode Then
+            If @Compiled Then
+                ShellExecute(@ScriptDir & "\DonationPrompt.exe", "", @ScriptDir)
+            Else
+                ShellExecute(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\DonationPrompt.au3"', @ScriptDir)
+            EndIf
+        ElseIf @Compiled Then
+            ShellExecuteWait(@ScriptDir & "\DonationPrompt.exe", "", @ScriptDir)
+        Else
+            ShellExecuteWait(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\DonationPrompt.au3"', @ScriptDir)
         EndIf
     EndIf
     If Not $UnattendedMode And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("CheckForUpdate")) = $IDYES Then
@@ -1705,9 +1676,7 @@ Func RunScript()
         ChooseCoffer()
         While 1
             Local $strNumber = InputBox($Title, @CRLF & Localize("TotalAccounts"), GetValue("TotalAccounts"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
-            If @error <> 0 Then
-                Exit
-            EndIf
+            If @error <> 0 Then Exit
             Local $number = Floor(Number($strNumber))
             If $number > 0 Then
                 SetValue("TotalAccounts", $number)

@@ -1,8 +1,12 @@
 #NoTrayIcon
 #include "variables.au3"
+#include <MsgBoxConstants.au3>
+Global $Title = $Name & " v" & $Version & " Installer"
+If Not @Compiled Then
+    Exit MsgBox($MB_ICONWARNING, $Title, "The script must be a compiled exe to work correctly!")
+EndIf
 #include <Misc.au3>
 #include <WinAPIFiles.au3>
-#include <MsgBoxConstants.au3>
 #include <GUIConstants.au3>
 #include <GUIConstantsEx.au3>
 #include <ButtonConstants.au3>
@@ -10,7 +14,6 @@
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
 #include <StringConstants.au3>
-Global $Title = $Name & " v" & $Version & " Installer"
 
 Global $SettingsDir = @AppDataCommonDir & "\" & $Name
 
@@ -82,7 +85,10 @@ LoadLocalizations($LocalizationFile, $Language)
 Func Localize($s, $f1=0, $r1=0, $f2=0, $r2=0, $f3=0, $r3=0, $f4=0, $r4=0, $f5=0, $r5=0, $f6=0, $r6=0, $f7=0, $r7=0, $f8=0, $r8=0, $f9=0, $r9=0, $f10=0, $r10=0)
     #forceref $f1, $f2, $f3, $f4, $f5, $f6, $f7, $f8, $f9, $f10
     #forceref $r1, $r2, $r3, $r4, $r5, $r6, $r7, $r8, $r9, $r10
-    Local $v = Eval("LOCALIZATION_" & $s)
+    Local $v = $s
+    If IsDeclared("LOCALIZATION_" & $v) Then
+        $v = Eval("LOCALIZATION_" & $v)
+    EndIf
     For $i = 1 To Int((@NumParams - 1) / 2)
         $v = StringReplace($v, Eval("f" & $i), Eval("r" & $i))
     Next
@@ -139,6 +145,9 @@ If _Singleton($Name & " Installer" & "Jp4g9QRntjYP", 1) = 0 Then
 ElseIf _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
     MsgBox($MB_ICONWARNING, $Title, Localize("CloseBeforeInstall"))
     Exit
+ElseIf _Singleton($Name & ": Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then
+    MsgBox($MB_ICONWARNING, $Title, Localize("CloseUnattendedBeforeInstall"))
+    Exit
 EndIf
 If $InstallLocation <> "" And StringRegExp($InstallLocation, "\\" & $Name & "$") And FileExists($InstallLocation) Then
     $InstallDir = $InstallLocation
@@ -163,4 +172,18 @@ If Not FileCreateShortcut($InstallDir & "\Donation.html", @DesktopCommonDir & "\
     MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingShortcut"))
     Exit
 EndIf
+Local $RunUnattendedOnStartup
+If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("RunUnattendedOnStartup")) = $IDYES Then
+    If Not FileCreateShortcut($InstallDir & "\Unattended.exe", @StartupCommonDir & "\" & $Name & " Unattended Launcher.lnk", $InstallDir) Then
+        MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingShortcut"))
+        Exit
+    EndIf
+    $RunUnattendedOnStartup = 1
+ElseIf FileExists(@StartupCommonDir & "\" & $Name & " Unattended Launcher.lnk") And Not FileDelete(@StartupCommonDir & "\" & $Name & " Unattended Launcher.lnk") Then
+    MsgBox($MB_ICONWARNING, $Title, Localize("FailedToDeleteFile", "<FILE>", @StartupCommonDir & "\" & $Name & " Unattended Launcher.lnk"))
+    Exit
+EndIf
 MsgBox($MB_OK, $Title, Localize("SuccessfullyInstalled", "<VERSION>", $Version) & @CRLF & @CRLF & $InstallDir)
+If $RunUnattendedOnStartup And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("RunUnattendedNow")) = $IDYES Then
+    ShellExecute($InstallDir & "\Unattended.exe", "", $InstallDir)
+EndIf
