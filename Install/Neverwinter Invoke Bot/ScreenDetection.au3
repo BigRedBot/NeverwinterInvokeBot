@@ -1,4 +1,3 @@
-#AutoIt3Wrapper_UseX64=n
 AutoItSetOption("TrayAutoPause", 0)
 TraySetIcon(@ScriptDir & "\images\black.ico")
 Global $Name = "Neverwinter Invoke Bot: Screen Detection"

@@ -1,16 +1,19 @@
 #RequireAdmin
 AutoItSetOption("TrayAutoPause", 0)
 #include "..\variables.au3"
-Global $Title = $Name & ": Unattended Launcher"
-TraySetToolTip($Title)
 #include <Misc.au3>
 #include <MsgBoxConstants.au3>
 #include <TrayConstants.au3>
-#include "Shared.au3"
+#include "_GetUTCMinutes.au3"
+#include "Localization.au3"
+Global $Title = $Name & ": Unattended Launcher"
+TraySetToolTip($Title)
+LoadLocalizations()
 If _Singleton($Title & "Jp4g9QRntjYP", 1) = 0 Then
     MsgBox($MB_ICONWARNING, $Title, Localize("UnattendedAlreadyRunning"))
     Exit
 EndIf
+TraySetIcon(@ScriptDir & "\images\green.ico")
 TraySetState($TRAY_ICONSTATE_FLASH)
 If @Compiled Then
     Local $deleted = 1
@@ -21,7 +24,6 @@ Else
     ShellExecuteWait(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Neverwinter Invoke Bot.au3" -1', @ScriptDir)
 EndIf
 TraySetState($TRAY_ICONSTATE_STOPFLASH)
-#include "_GetUTCMinutes.au3"
 While 1
     TraySetIcon(@ScriptDir & "\images\teal.ico")
     Local $min = 0

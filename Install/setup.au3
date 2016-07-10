@@ -14,88 +14,10 @@ EndIf
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
 #include <StringConstants.au3>
+#include ".\Neverwinter Invoke Bot\Localization.au3"
+LoadLocalizations(1, @ScriptDir & "\" & $Name & "\Localization.ini")
 
-Global $SettingsDir = @AppDataCommonDir & "\" & $Name
-
-DirCreate($SettingsDir)
-
-Global $Language = IniRead($SettingsDir & "\Settings.ini", "AllAccounts", "Language", "")
-
-Local $LocalizationFile = @ScriptDir & "\" & $Name & "\Localization.ini"
-
-Func SetLanguage($default = "English")
-    Local $langlist = $default
-    Local $sections = IniReadSectionNames($LocalizationFile)
-    If @error = 0 Then
-        For $i = 1 To $sections[0]
-            If $sections[$i] <> $default Then
-                $langlist &= "|" & $sections[$i]
-            EndIf
-        Next
-    EndIf
-    Local $hGUI = GUICreate("Language", 200, 85)
-    Local $hCombo = GUICtrlCreateCombo("", 25, 15, 150, -1)
-    GUICtrlSetData(-1, $langlist, $default)
-    Local $hButton = GUICtrlCreateButton("OK", 58, 50, 84, -1, $BS_DEFPUSHBUTTON)
-    GUISetState()
-    While 1
-        Switch GUIGetMsg()
-            Case $GUI_EVENT_CLOSE
-                Exit
-            Case $hButton
-                Local $sCurrCombo = GUICtrlRead($hCombo)
-                For $i = 1 To $sections[0]
-                    If $sections[$i] == $sCurrCombo Then
-                        GUIDelete()
-                        $Language = $sCurrCombo
-                        IniWrite($SettingsDir & "\Settings.ini", "AllAccounts", "Language", $Language)
-                        Return
-                    EndIf
-                Next
-        EndSwitch
-    WEnd
-EndFunc
-
-If $Language = "" Then
-    SetLanguage()
-Else
-    SetLanguage($Language)
-EndIf
-
-Func LoadLocalizations($file, $lang)
-    Local $values = IniReadSection($file, $lang)
-    If @error = 0 Then
-        For $i = 1 To $values[0][0]
-            Local $v = BinaryToString(StringToBinary($values[$i][1]), 4)
-            If $v = "" Then
-                $v = BinaryToString(StringToBinary(IniRead($file, "English", $values[$i][0], "")), 4)
-            EndIf
-            If Not IsDeclared("LOCALIZATION_" & $values[$i][0]) Then
-                Assign("LOCALIZATION_" & $values[$i][0], StringReplace($v, "<BR>", @CRLF), 2)
-            EndIf
-        Next
-    EndIf
-    If $lang <> "English" Then
-        LoadLocalizations($file, "English")
-    EndIf
-EndFunc
-
-LoadLocalizations($LocalizationFile, $Language)
-
-Func Localize($s, $f1=0, $r1=0, $f2=0, $r2=0, $f3=0, $r3=0, $f4=0, $r4=0, $f5=0, $r5=0, $f6=0, $r6=0, $f7=0, $r7=0, $f8=0, $r8=0, $f9=0, $r9=0, $f10=0, $r10=0)
-    #forceref $f1, $f2, $f3, $f4, $f5, $f6, $f7, $f8, $f9, $f10
-    #forceref $r1, $r2, $r3, $r4, $r5, $r6, $r7, $r8, $r9, $r10
-    Local $v = $s
-    If IsDeclared("LOCALIZATION_" & $v) Then
-        $v = Eval("LOCALIZATION_" & $v)
-    EndIf
-    For $i = 1 To Int((@NumParams - 1) / 2)
-        $v = StringReplace($v, Eval("f" & $i), Eval("r" & $i))
-    Next
-    Return $v
-EndFunc
-
-Global $InstallDir = @ProgramFilesDir & "\" & $Name, $RegLocation = "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & $Name, $InstallLocation = StringRegExpReplace(RegRead($RegLocation, "InstallLocation"), "\\+$", "")
+Local $InstallDir = @ProgramFilesDir & "\" & $Name, $RegLocation = "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & $Name, $InstallLocation = StringRegExpReplace(RegRead($RegLocation, "InstallLocation"), "\\+$", "")
 
 Func GetInstallLocation($dir = $InstallDir)
     Local $GUI = GUICreate($Title, 434, 142)

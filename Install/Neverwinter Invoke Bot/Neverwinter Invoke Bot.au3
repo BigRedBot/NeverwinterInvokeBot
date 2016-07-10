@@ -1,4 +1,3 @@
-#AutoIt3Wrapper_UseX64=n
 #RequireAdmin
 AutoItSetOption("TrayAutoPause", 0)
 TraySetIcon(@ScriptDir & "\images\red.ico")
@@ -1655,7 +1654,7 @@ Func RunScript()
             Local $CurrentVersion = IniRead($tmpverfile, "version", "version", "")
             FileDelete($tmpverfile)
             If $CurrentVersion <> "" Then
-                If $CurrentVersion <> $Version And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("NewerVersionFound", "<VERSION>", $CurrentVersion)) = $IDYES Then
+                If $CurrentVersion <> $Version And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("NewerVersionFound", "<VERSION>", $CurrentVersion), 60) = $IDYES Then
                     Local $tmpinstallfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe", $Title, Localize("DownloadingInstaller"))
                     If $tmpinstallfile Then
                         If FileCopy($tmpinstallfile, @ScriptDir & "\Install.exe", $FC_OVERWRITE) Then

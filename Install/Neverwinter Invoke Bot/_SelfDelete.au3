@@ -1,6 +1,6 @@
 #include-once
+#include <File.au3>
 #include <FileConstants.au3>
-#include <StringConstants.au3>
 
 ; #FUNCTION# ====================================================================================================================
 ; Name ..........: _SelfDelete
@@ -22,12 +22,7 @@ Func _SelfDelete($iDelay = 5, $fUsePID = Default, $fRemoveDir = Default)
         Return SetError(1, 0, 0)
     EndIf
 
-    Local $sTempFileName = @ScriptName
-    $sTempFileName = StringLeft($sTempFileName, StringInStr($sTempFileName, '.', $STR_NOCASESENSEBASIC, -1) - 1)
-    While FileExists(@TempDir & '\' & $sTempFileName & '.bat')
-        $sTempFileName &= Chr(Random(65, 122, 1))
-    WEnd
-    $sTempFileName = @TempDir & '\' & $sTempFileName & '.bat'
+    Local $sTempFileName = _TempFile(@TempDir, "", ".bat")
 
     Local $sDelay = ''
     $iDelay = Int($iDelay)
