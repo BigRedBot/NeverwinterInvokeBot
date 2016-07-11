@@ -1237,7 +1237,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
         EndIf
         If Not $LogTime Then
             $LogTime = @HOUR & ":" & @MIN & ":" & @SEC
-            $LogStart = @YEAR & "-" & @MON & "-" & @MDAY & " " & $LogTime & @CRLF
+            $LogStart &= @YEAR & "-" & @MON & "-" & @MDAY & " " & $LogTime & @CRLF
         EndIf
         If $CurrentAccount = GetValue("TotalAccounts") Then
             $LogEnd = @CRLF & @CRLF

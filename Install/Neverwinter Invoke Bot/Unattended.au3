@@ -51,12 +51,12 @@ While 1
     TraySetIcon(@ScriptDir & "\images\teal.ico")
     Local $min = 0
     While 1
-        $min = _GetUTCMinutes(10, 1, True, False, True, $Title & @CRLF & Localize("SyncTime"))
+        $min = _GetUTCMinutes(10, 1, True, False, True, $Title & @CRLF & Localize("GettingTimeUntilServerReset"))
         If $min >= 0 Then ExitLoop
         $min = 10
         Local $time = TimerInit(), $left = $min, $txt = "", $last = "", $lastmin = 0, $leftover
         While $left > 0
-            $txt = $Title & @CRLF & Localize("WaitingToRetryTimeSync") & @CRLF & HoursAndMinutes($left)
+            $txt = $Title & @CRLF & Localize("WaitingToRetryGettingTimeUntilServerReset") & @CRLF & HoursAndMinutes($left)
             If Not ($last == $txt) Then
                 TraySetToolTip($txt)
                 $last = $txt

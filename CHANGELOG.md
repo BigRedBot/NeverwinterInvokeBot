@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.0.2
+- Put session start indicator back in the log files.
+
 7.0.1
 - Added time remaining to the Unattended Launcher tool-tip.
 - Added NoInputBlocking option that can be added to the Settings.ini file, to disable the blocking of your keyboard and mouse inputs when the script is running.
