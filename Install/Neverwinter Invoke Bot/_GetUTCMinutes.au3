@@ -12,18 +12,18 @@ Func _GetUTCMinutes($Hour = 0, $Minute = 0, $Until = False, $Splash = False, $Fl
     If $FlashTrayIcon Then
         TraySetState($TRAY_ICONSTATE_FLASH)
     EndIf
-    Local $r = -1, $data = "", $wait = 5, $t = TimerDiff($_GetUTCMinutes_TimerDelaySet), $txt = Ceiling(5-$t/1000) & "..." & @CRLF, $lasttxt = $txt, $win
+    Local $r = -1, $data = "", $wait = 5, $t = TimerDiff($_GetUTCMinutes_TimerDelaySet), $txt = Ceiling(5-$t/1000) & "...", $lasttxt = $txt, $win
     If $Splash Then
-        $win = SplashTextOn($title, $txt, 200, 100, -1, -1, $DLG_MOVEABLE + $DLG_TEXTVCENTER)
+        $win = SplashTextOn($title, $txt & @CRLF, 200, 100, -1, -1, $DLG_MOVEABLE + $DLG_TEXTVCENTER)
     EndIf
     If $title <> "" Then
         TraySetToolTip($title & @CRLF & $txt)
     EndIf
     While $t < $wait * 1000
-        $txt = Ceiling($wait-$t/1000) & "..." & @CRLF
+        $txt = Ceiling($wait-$t/1000) & "..."
         If Not ($txt == $lasttxt) Then
             If $Splash Then
-                ControlSetText($win, "", "Static1", $txt)
+                ControlSetText($win, "", "Static1", $txt & @CRLF)
             EndIf
             If $title <> "" Then
                 TraySetToolTip($title & @CRLF & $txt)
@@ -40,10 +40,10 @@ Func _GetUTCMinutes($Hour = 0, $Minute = 0, $Until = False, $Splash = False, $Fl
         If @error = 0 Then
             $wait = 10
             For $i = 1 to $_GetUTCMinutes_TimeServerArray[0]
-                $txt = $_GetUTCMinutes_TimeServerArray[$i] & @CRLF
+                $txt = $_GetUTCMinutes_TimeServerArray[$i]
                 If Not ($txt == $lasttxt) Then
                     If $Splash Then
-                        ControlSetText($win, "", "Static1", $txt)
+                        ControlSetText($win, "", "Static1", $txt & @CRLF)
                     EndIf
                     If $title <> "" Then
                         TraySetToolTip($title & @CRLF & $txt)
@@ -68,18 +68,19 @@ Func _GetUTCMinutes($Hour = 0, $Minute = 0, $Until = False, $Splash = False, $Fl
                                 If $t >= $wait * 1000 Then
                                     ExitLoop
                                 EndIf
-                                $txt = $_GetUTCMinutes_TimeServerArray[$i] & @CRLF
+                                $txt = $_GetUTCMinutes_TimeServerArray[$i]
+                                Local $n = ""
                                 If $t >= 1000 Then
-                                    $txt &= Ceiling($wait-$t/1000) & "..."
+                                    $n = Ceiling($wait-$t/1000) & "..."
                                 EndIf
-                                If Not ($txt == $lasttxt) Then
+                                If Not (($txt & $n) == $lasttxt) Then
                                     If $Splash Then
-                                        ControlSetText($win, "", "Static1", $txt)
+                                        ControlSetText($win, "", "Static1", $txt & @CRLF & $n)
                                     EndIf
                                     If $title <> "" Then
-                                        TraySetToolTip($title & @CRLF & $txt)
+                                        TraySetToolTip($title & @CRLF & $txt & "   " & $n)
                                     EndIf
-                                    $lasttxt = $txt
+                                    $lasttxt = $txt & $n
                                 EndIf
                                 Sleep(100)
                                 $data = UDPRecv($socket, 100)

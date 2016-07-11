@@ -24,18 +24,81 @@ Else
     ShellExecuteWait(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Neverwinter Invoke Bot.au3" -1', @ScriptDir)
 EndIf
 TraySetState($TRAY_ICONSTATE_STOPFLASH)
+
+Func HoursAndMinutes($n)
+    Local $All = Ceiling($n)
+    Local $Hours = Floor($All / 60)
+    Local $Minutes = $All - $Hours * 60
+    If $Hours Then
+        If $Hours = 1 Then
+            If $Minutes Then
+                If $Minutes = 1 Then Return Localize("HourMinute")
+                Return Localize("HourMinutes", "<MINUTES>", $Minutes)
+            EndIf
+            Return Localize("Hour")
+        ElseIf $Minutes Then
+            If $Minutes = 1 Then Return Localize("HoursMinute", "<HOURS>", $Hours)
+            Return Localize("HoursMinutes", "<HOURS>", $Hours, "<MINUTES>", $Minutes)
+        EndIf
+        Return Localize("Hours", "<HOURS>", $Hours)
+    ElseIf $Minutes = 1 Then
+        Return Localize("Minute")
+    EndIf
+    Return Localize("Minutes", "<MINUTES>", $Minutes)
+EndFunc
+
 While 1
     TraySetIcon(@ScriptDir & "\images\teal.ico")
     Local $min = 0
     While 1
-        $min = _GetUTCMinutes(10, 1, True, False, True, $Title)
+        $min = _GetUTCMinutes(10, 1, True, False, True, $Title & @CRLF & Localize("SyncTime"))
         If $min >= 0 Then ExitLoop
-        TraySetToolTip($Title & @CRLF & Localize("FailedToGetMinutes"))
-        Sleep(600000)
+        $min = 10
+        Local $time = TimerInit(), $left = $min, $txt = "", $last = "", $lastmin = 0, $leftover
+        While $left > 0
+            $txt = $Title & @CRLF & Localize("WaitingToRetryTimeSync") & @CRLF & HoursAndMinutes($left)
+            If Not ($last == $txt) Then
+                TraySetToolTip($txt)
+                $last = $txt
+            EndIf
+            If $left > 1 then
+                If $lastmin = Ceiling($left) Then
+                    $leftover = Ceiling(($lastmin - $left) * 60000)
+                    Sleep($leftover + 1)
+                Else
+                    $lastmin = Ceiling($left)
+                    Sleep(60000)
+                EndIf
+            Else
+                Sleep(Ceiling($left * 60000))
+                ExitLoop
+            EndIf
+            $left = $min - TimerDiff($time) / 60000
+        WEnd
     WEnd
-    TraySetToolTip($Title)
     TraySetIcon(@ScriptDir & "\images\blue.ico")
-    Sleep($min * 60000)
+    Local $time = TimerInit(), $left = $min, $txt = "", $last = "", $lastmin = 0, $leftover
+    While $left > 0
+        $txt = $Title & @CRLF & Localize("WaitingForServerReset") & @CRLF & HoursAndMinutes($left)
+        If Not ($last == $txt) Then
+            TraySetToolTip($txt)
+            $last = $txt
+        EndIf
+        If $left > 1 then
+            If $lastmin = Ceiling($left) Then
+                $leftover = Ceiling(($lastmin - $left) * 60000)
+                Sleep($leftover + 1)
+            Else
+                $lastmin = Ceiling($left)
+                Sleep(60000)
+            EndIf
+        Else
+            Sleep(Ceiling($left * 60000))
+            ExitLoop
+        EndIf
+        $left = $min - TimerDiff($time) / 60000
+    WEnd
+    TraySetToolTip($Title & @CRLF & Localize("UnattendedRunning"))
     TraySetIcon(@ScriptDir & "\images\green.ico")
     While ProcessExists("Neverwinter Invoke Bot.exe")
         ProcessClose("Neverwinter Invoke Bot.exe")

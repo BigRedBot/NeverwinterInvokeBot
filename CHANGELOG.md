@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+7.0.1
+- Added time remaining to the Unattended Launcher tool-tip.
+- Added NoInputBlocking option that can be added to the Settings.ini file, to disable the blocking of your keyboard and mouse inputs when the script is running.
+
 7.0
 - Will now try to patch the game client if you have the arc client.
 - Will now check the status of the game server before trying to log into the game.

@@ -77,7 +77,7 @@ Func Position($r = 0)
             Splash("[ " & Localize("NeverwinterNotFound") & " ]")
             CloseClient($r)
             If $RestartLoop Then Return 0
-            BlockInput(1)
+            If Not GetValue("NoInputBlocking") Then BlockInput(1)
             Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
             FileChangeDir($GameClientInstallLocation & "\Neverwinter\Live")
             Run("GameClient.exe" & GetLogInServerAddressString(), $GameClientInstallLocation & "\Neverwinter\Live")
@@ -405,7 +405,7 @@ Func WaitToInvoke()
                 $ETAText = ""
                 Position()
                 If $RestartLoop Then Return 0
-                BlockInput(1)
+                If Not GetValue("NoInputBlocking") Then BlockInput(1)
                 WinSetOnTop($WinHandle, "", 1)
                 Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
                 $WaitingTimer = TimerInit()
@@ -455,14 +455,26 @@ Func WaitToInvoke()
         If $i > $MaxLoops Then
             $i = $MaxLoops
         EndIf
-        While $Minutes > 0
-            Splash("[ " & Localize("WaitingForInvokeDelay", "<MINUTES>", HoursAndMinutes($Minutes)) & " ]", 0)
-            Sleep(1000)
-            $Minutes = $LoopDelayMinutes[$i] - TimerDiff($Time) / 60000
+        Local $left = $Minutes, $lastmin = 0, $leftover
+        While $left > 0
+            Splash("[ " & Localize("WaitingForInvokeDelay", "<MINUTES>", HoursAndMinutes($left)) & " ]", 0)
+            If $left > 1 then
+                If $lastmin = Ceiling($left) Then
+                    $leftover = Ceiling(($lastmin - $left) * 60000)
+                    Sleep($leftover + 1)
+                Else
+                    $lastmin = Ceiling($left)
+                    Sleep(60000)
+                EndIf
+            Else
+                Sleep(Ceiling($left * 60000))
+                ExitLoop
+            EndIf
+            $left = $LoopDelayMinutes[$i] - TimerDiff($Time) / 60000
         WEnd
         Position()
         If $RestartLoop Then Return 0
-        BlockInput(1)
+        If Not GetValue("NoInputBlocking") Then BlockInput(1)
         WinSetOnTop($WinHandle, "", 1)
         If $LoopStarted Then
             $RestartLoop = 1
@@ -941,7 +953,7 @@ Func LogIn()
         If $RestartLoop Then Return 0
         CheckServer()
         Splash()
-        BlockInput(1)
+        If Not GetValue("NoInputBlocking") Then BlockInput(1)
         Position()
         If $RestartLoop Then Return 0
         WinSetOnTop($WinHandle, "", 1)
@@ -1001,7 +1013,7 @@ Func End()
                 $ETAText = ""
                 Position()
                 If $RestartLoop Then Return 0
-                BlockInput(1)
+                If Not GetValue("NoInputBlocking") Then BlockInput(1)
                 WinSetOnTop($WinHandle, "", 1)
                 Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
                 If ImageSearch("SelectionScreen") Then
@@ -1246,10 +1258,19 @@ Func HoursAndMinutes($n)
     Local $Hours = Floor($All / 60)
     Local $Minutes = $All - $Hours * 60
     If $Hours Then
-        If $Minutes Then
+        If $Hours = 1 Then
+            If $Minutes Then
+                If $Minutes = 1 Then Return Localize("HourMinute")
+                Return Localize("HourMinutes", "<MINUTES>", $Minutes)
+            EndIf
+            Return Localize("Hour")
+        ElseIf $Minutes Then
+            If $Minutes = 1 Then Return Localize("HoursMinute", "<HOURS>", $Hours)
             Return Localize("HoursMinutes", "<HOURS>", $Hours, "<MINUTES>", $Minutes)
         EndIf
         Return Localize("Hours", "<HOURS>", $Hours)
+    ElseIf $Minutes = 1 Then
+        Return Localize("Minute")
     EndIf
     Return Localize("Minutes", "<MINUTES>", $Minutes)
 EndFunc
@@ -1382,16 +1403,27 @@ Func Go()
     $LoggingIn = 1
     $LogIn = 1
     If $MinutesToStart Then
-        Local $Time = TimerInit(), $StartingMinutes = $MinutesToStart, $Minutes = $StartingMinutes
+        Local $Time = TimerInit(), $StartingMinutes = $MinutesToStart, $left = $StartingMinutes, $lastmin = 0, $leftover
         Position()
         If $RestartLoop Then Return 0
         BlockInput(0)
         WinSetOnTop($WinHandle, "", 0)
-        While $Minutes > 0
-            $MinutesToStart = Ceiling($Minutes)
-            Splash("[ " & Localize("WaitingToStart", "<MINUTES>", HoursAndMinutes($Minutes)) & " ]", 0)
-            Sleep(1000)
-            $Minutes = $StartingMinutes - TimerDiff($Time) / 60000
+        While $left > 0
+            $MinutesToStart = Ceiling($left)
+            Splash("[ " & Localize("WaitingToStart", "<MINUTES>", HoursAndMinutes($left)) & " ]", 0)
+            If $left > 1 then
+                If $lastmin = Ceiling($left) Then
+                    $leftover = Ceiling(($lastmin - $left) * 60000)
+                    Sleep($leftover + 1)
+                Else
+                    $lastmin = Ceiling($left)
+                    Sleep(60000)
+                EndIf
+            Else
+                Sleep(Ceiling($left * 60000))
+                ExitLoop
+            EndIf
+            $left = $StartingMinutes - TimerDiff($Time) / 60000
         WEnd
         $MinutesToStart = 0
     EndIf
@@ -1401,7 +1433,7 @@ Func Go()
     Local $check = CheckAccounts()
     If $check > 0 Then
         $ETAText = ""
-        BlockInput(1)
+        If Not GetValue("NoInputBlocking") Then BlockInput(1)
         Position()
         If $RestartLoop Then Return 0
         WinSetOnTop($WinHandle, "", 1)

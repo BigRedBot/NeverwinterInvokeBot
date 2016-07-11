@@ -16,5 +16,5 @@ While 1
         EndIf
         MsgBox($MB_ICONWARNING, $Title, "Failed to get minutes until server reset!")
     WEnd
-    MsgBox($MB_OK, $Title, $_GetUTCMinutes_LastTimeServer & @CRLF & $min)
+    MsgBox($MB_OK, $Title, $_GetUTCMinutes_LastTimeServer & @CRLF & $min & " minutes left until server reset.")
 WEnd
