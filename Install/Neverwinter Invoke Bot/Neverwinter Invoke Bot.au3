@@ -1128,7 +1128,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
     $SplashWindow = 0
     HotKeySet("{F4}")
     $ETAText = ""
-    Local $text = Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & $s
+    Local $text = "    " & Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & $s
     Local $CofferCount = 0, $ProfessionPackCount = 0, $ElixirOfFateCount = 0, $OverflowXPRewardCount = 0, $VIPAccountRewardCount = 0, $IdleLogoutText = "", $TimedOutText = "", $FailedInvokeText = ""
     For $i = 1 To GetValue("TotalSlots")
         $CofferCount += GetCharacterInfo("TotalCelestialCoffers", $i)
@@ -1225,7 +1225,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
         EndIf
         If Not $LogTime Then
             $LogTime = @HOUR & ":" & @MIN & ":" & @SEC
-            $LogStart &= @YEAR & "-" & @MON & "-" & @MDAY & " " & $LogTime & @CRLF
+            $LogStart = @YEAR & "-" & @MON & "-" & @MDAY & " " & $LogTime & @CRLF
         EndIf
         If $CurrentAccount = GetValue("TotalAccounts") Then
             $LogEnd = @CRLF & @CRLF
