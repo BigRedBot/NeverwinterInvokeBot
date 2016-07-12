@@ -540,7 +540,7 @@ Func Invoke()
 EndFunc
 
 Func GetVIPAccountReward()
-    If Not GetValue("SkipVIPAccountReward") And GetValue("VIPAccountRewardTries") >= 0 And GetValue("VIPAccountRewardTries") < 3 And ImageExists("VIPAccountReward") Then
+    If Not GetValue("SkipVIPAccountReward") And GetValue("VIPAccountRewardTries") >= 0 And GetValue("VIPAccountRewardTries") < 3 And ( GetValue("VIPAccountRewardCharacter") < GetValue("StartAt") Or GetValue("VIPAccountRewardCharacter") > GetValue("EndAt") Or GetValue("VIPAccountRewardCharacter") = GetValue("Current") ) And ImageExists("VIPAccountReward") Then
         AddAccountCountValue("VIPAccountRewardTries")
         Send(GetValue("InventoryKey"))
         Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)

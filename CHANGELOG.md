@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.0.3
+- Added VIPAccountRewardCharacter option that can be added to the Settings.ini file, that may be set to the character number that you want to claim the VIP account reward on.
+
 7.0.2
 - Put session start indicator back in the log files.
 
