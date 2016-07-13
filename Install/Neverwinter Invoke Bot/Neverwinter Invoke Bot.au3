@@ -270,7 +270,7 @@ Func Loop()
                     Sleep(GetValue("LogInSeconds") * 1000)
                     Splash()
                 EndIf
-                If ImageSearch("OverflowXPReward") Then
+                If Not GetValue("DisableOverflowXPRewardCollection") And ImageSearch("OverflowXPReward") Then
                     Send(GetValue("CursorModeKey"))
                     Sleep(500)
                     MouseMove($X, $Y)
