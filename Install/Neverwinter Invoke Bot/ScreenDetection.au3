@@ -132,6 +132,12 @@ While 1
                 $text &= @CRLF & @CRLF & Localize("VIPAccountRewardBorderDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
             EndIf
         EndIf
+        If ScreenDetection_ImageSearch("Unavailable") Then
+            $text &= @CRLF & @CRLF & Localize("ServerUnavailableDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
+        EndIf
+        If ScreenDetection_ImageSearch("Mismatch") Then
+            $text &= @CRLF & @CRLF & Localize("VersionMismatchDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
+        EndIf
     EndIf
     ScreenDetection_Splash($text)
     Sleep(500)

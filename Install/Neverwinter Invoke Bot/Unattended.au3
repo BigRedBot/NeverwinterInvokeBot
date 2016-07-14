@@ -47,39 +47,10 @@ Func HoursAndMinutes($n)
     Return Localize("Minutes", "<MINUTES>", $Minutes)
 EndFunc
 
-While 1
-    TraySetIcon(@ScriptDir & "\images\teal.ico")
-    Local $min = 0
-    While 1
-        $min = _GetUTCMinutes(10, 1, True, False, True, $Title & @CRLF & Localize("GettingTimeUntilServerReset"))
-        If $min >= 0 Then ExitLoop
-        $min = 10
-        Local $time = TimerInit(), $left = $min, $txt = "", $last = "", $lastmin = 0, $leftover
-        While $left > 0
-            $txt = $Title & @CRLF & Localize("WaitingToRetryGettingTimeUntilServerReset") & @CRLF & HoursAndMinutes($left)
-            If Not ($last == $txt) Then
-                TraySetToolTip($txt)
-                $last = $txt
-            EndIf
-            If $left > 1 then
-                If $lastmin = Ceiling($left) Then
-                    $leftover = Ceiling(($lastmin - $left) * 60000)
-                    Sleep($leftover + 1)
-                Else
-                    $lastmin = Ceiling($left)
-                    Sleep(60000)
-                EndIf
-            Else
-                Sleep(Ceiling($left * 60000))
-                ExitLoop
-            EndIf
-            $left = $min - TimerDiff($time) / 60000
-        WEnd
-    WEnd
-    TraySetIcon(@ScriptDir & "\images\blue.ico")
-    Local $time = TimerInit(), $left = $min, $txt = "", $last = "", $lastmin = 0, $leftover
+Func WaitMinutes($time, $msg)
+    Local $t = TimerInit(), $left = $time, $txt = "", $last = "", $lastmin = 0, $leftover
     While $left > 0
-        $txt = $Title & @CRLF & Localize("WaitingForServerReset") & @CRLF & HoursAndMinutes($left)
+        $txt = $Title & @CRLF & Localize($msg) & @CRLF & HoursAndMinutes($left)
         If Not ($last == $txt) Then
             TraySetToolTip($txt)
             $last = $txt
@@ -96,8 +67,20 @@ While 1
             Sleep(Ceiling($left * 60000))
             ExitLoop
         EndIf
-        $left = $min - TimerDiff($time) / 60000
+        $left = $time - TimerDiff($t) / 60000
     WEnd
+EndFunc
+
+While 1
+    TraySetIcon(@ScriptDir & "\images\teal.ico")
+    Local $min = 0
+    While 1
+        $min = _GetUTCMinutes(10, 1, True, False, True, $Title & @CRLF & Localize("GettingTimeUntilServerReset"))
+        If $min >= 0 Then ExitLoop
+        WaitMinutes(10, "WaitingToRetryGettingTimeUntilServerReset")
+    WEnd
+    TraySetIcon(@ScriptDir & "\images\blue.ico")
+    WaitMinutes($min, "WaitingForServerReset")
     TraySetToolTip($Title & @CRLF & Localize("UnattendedRunning"))
     TraySetIcon(@ScriptDir & "\images\green.ico")
     While ProcessExists("Neverwinter Invoke Bot.exe")

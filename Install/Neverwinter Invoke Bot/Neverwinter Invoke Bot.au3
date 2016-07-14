@@ -74,6 +74,7 @@ Func Position($r = 0)
     Focus()
     If Not $WinFound Or Not GetPosition() Then
         If GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And ImageExists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
+            $LastLoginTry = 0
             Splash("[ " & Localize("NeverwinterNotFound") & " ]")
             CloseClient($r)
             If $RestartLoop Then Return 0
@@ -157,7 +158,7 @@ Func Position($r = 0)
     EndIf
 EndFunc
 
-Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $CofferTries = 0, $PatchTried = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogTime = 0, $LogDate = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn
+Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $RelogCount = 1, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogTime = 0, $LogDate = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn
 
 Func SyncValues()
     If GetValue("FinishedLoop") Then
@@ -181,6 +182,9 @@ Func Loop()
                 If $RestartLoop Then ExitLoop 1
                 Exit
             EndIf
+            $WaitingTimer = TimerInit()
+            FindLogInScreen()
+            If $RestartLoop Then ExitLoop 1
             Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
             If ImageExists("SelectionScreen") Then
                 $WaitingTimer = TimerInit()
@@ -425,8 +429,7 @@ Func WaitToInvoke()
                     Position(1)
                     If $RestartLoop Then Return 0
                 WEnd
-                FindLogInScreen(1)
-                If $RestartLoop Then Return 0
+                $RelogCount = 0
                 If $LoopStarted Then
                     $RestartLoop = 1
                     Return 0
@@ -442,36 +445,12 @@ Func WaitToInvoke()
         EndIf
     EndIf
     If $Minutes > 0 Then
-        Local $Time = GetCharacterInfo("InvokeTime")
-        If Not $Time Then
-            $Time = $StartTimer
-        EndIf
         $ETAText = ""
         Position()
         If $RestartLoop Then Return 0
         BlockInput(0)
         WinSetOnTop($WinHandle, "", 0)
-        Local $i = GetValue("CurrentLoop")
-        If $i > $MaxLoops Then
-            $i = $MaxLoops
-        EndIf
-        Local $left = $Minutes, $lastmin = 0, $leftover
-        While $left > 0
-            Splash("[ " & Localize("WaitingForInvokeDelay", "<MINUTES>", HoursAndMinutes($left)) & " ]", 0)
-            If $left > 1 then
-                If $lastmin = Ceiling($left) Then
-                    $leftover = Ceiling(($lastmin - $left) * 60000)
-                    Sleep($leftover + 1)
-                Else
-                    $lastmin = Ceiling($left)
-                    Sleep(60000)
-                EndIf
-            Else
-                Sleep(Ceiling($left * 60000))
-                ExitLoop
-            EndIf
-            $left = $LoopDelayMinutes[$i] - TimerDiff($Time) / 60000
-        WEnd
+        WaitMinutes($Minutes, "WaitingForInvokeDelay")
         Position()
         If $RestartLoop Then Return 0
         If Not GetValue("NoInputBlocking") Then BlockInput(1)
@@ -803,10 +782,11 @@ Global $X = 0, $Y = 0, $LogIn = 1
 Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom)
     If ImageExists($image) Then
         If _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $X, $Y, GetValue("ImageSearchTolerance")) Then
-            If $image <> "LogInScreen" Then
+            If $image <> "LogInScreen" And $image <> "Unavailable" And $image <> "Mismatch" Then
                 $LoggingIn = 0
                 $LogInTries = 0
-                $PatchTried = 0
+                $LastLoginTry = 0
+                $RelogCount = 1
                 If $image = "InGameScreen" Then
                     $LogIn = 0
                 EndIf
@@ -823,8 +803,28 @@ Func ImageExists($image)
     Return FileExists("images\" & GetValue("Language") & "\" & $image & ".png")
 EndFunc
 
+Func WaitMinutes($time, $msg)
+    Local $t = TimerInit(), $left = $time, $lastmin = 0, $leftover
+    While $left > 0
+        Splash("[ " & Localize($msg, "<MINUTES>", HoursAndMinutes($left)) & " ]", 0)
+        If $left > 1 then
+            If $lastmin = Ceiling($left) Then
+                $leftover = Ceiling(($lastmin - $left) * 60000)
+                Sleep($leftover + 1)
+            Else
+                $lastmin = Ceiling($left)
+                Sleep(60000)
+            EndIf
+        Else
+            Sleep(Ceiling($left * 60000))
+            ExitLoop
+        EndIf
+        $left = $time - TimerDiff($t) / 60000
+    WEnd
+EndFunc
+
 ; add restart loop after
-Func FindLogInScreen($r = 0)
+Func FindLogInScreen()
     If ImageSearch("Idle") And ImageSearch("OK") Then
         AddAccountCountValue("IdleLogout")
         AddCharacterCountInfo("IdleLogout")
@@ -838,45 +838,57 @@ Func FindLogInScreen($r = 0)
     If ImageSearch("LogInScreen") Then
         $LoggingIn = 1
         $LogIn = 1
-        Splash()
-        Sleep(1000)
-        LogIn()
-        If $RestartLoop Then Return 0
-        Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
-        Sleep(1000)
-        If ImageExists("SelectionScreen") Then
-            While Not ImageSearch("SelectionScreen")
-                If ImageSearch("InGameScreen") Then
-                    Splash()
-                    Sleep(1000)
-                    ChangeCharacter()
+        If $LastLoginTry And TimerDiff($LastLoginTry) / 1000 >= 60 Then
+            $LogInTries = 0
+            WaitMinutes(15, "WaitingToRetryLogin")
+        Else
+            Splash()
+            Sleep(1000)
+            LogIn()
+            If $RestartLoop Then Return 0
+            Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
+            Sleep(1000)
+            If ImageExists("SelectionScreen") Then
+                While Not ImageSearch("SelectionScreen")
+                    If ImageSearch("InGameScreen") Then
+                        Splash()
+                        Sleep(1000)
+                        ChangeCharacter()
+                        If $RestartLoop Then Return 0
+                        Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
+                        While Not ImageSearch("SelectionScreen")
+                            TimeOut()
+                            If $RestartLoop Then Return 0
+                            FindLogInScreen()
+                            If $RestartLoop Then Return 0
+                            Sleep(500)
+                        WEnd
+                        ExitLoop
+                    ElseIf ImageSearch("Unavailable") Then
+                        $LogInTries = 0
+                        WaitMinutes(15, "WaitingToRetryLogin")
+                        ExitLoop
+                    ElseIf ImageSearch("Mismatch") Then
+                        $LogInTries = 0
+                        PatchClient()
+                        If $RestartLoop Then Return 0
+                        ExitLoop
+                    EndIf
+                    TimeOut()
                     If $RestartLoop Then Return 0
-                    Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
-                    While Not ImageSearch("SelectionScreen")
-                        TimeOut()
-                        If $RestartLoop Then Return 0
-                        FindLogInScreen()
-                        If $RestartLoop Then Return 0
-                        Sleep(500)
-                    WEnd
-                    ExitLoop
-                EndIf
-                TimeOut()
-                If $RestartLoop Then Return 0
-                FindLogInScreen()
-                If $RestartLoop Then Return 0
-                Sleep(500)
-            WEnd
-        EndIf
-        If Not $r Then
-            $ReLogged += 1
-            If $LoopStarted Then
-                $RestartLoop = 1
-                Return 0
-            Else
-                Loop()
-                Exit
+                    FindLogInScreen()
+                    If $RestartLoop Then Return 0
+                    Sleep(500)
+                WEnd
             EndIf
+        EndIf
+        If $RelogCount Then $ReLogged += 1
+        If $LoopStarted Then
+            $RestartLoop = 1
+            Return 0
+        Else
+            Loop()
+            Exit
         EndIf
     EndIf
 EndFunc
@@ -897,13 +909,13 @@ Func CheckServer()
                 WinSetOnTop($WinHandle, "", 0)
                 Splash("[ " & Localize("WaitingForGameServer") & " ]", 0)
             EndIf
+            Sleep(10000)
         WEnd
     EndIf
 EndFunc
 
 ; add restart loop after
 Func PatchClient()
-    $PatchTried = 1
     If $GameClientInstallLocation And $ArcLauncherLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And FileExists($ArcLauncherLocation) Then
         CheckServer()
         $LogInTries = 0
@@ -945,8 +957,7 @@ EndFunc
 ; add restart loop after
 Func LogIn()
     If GetValue("LogInUserName") And GetValue("LogInPassword") Then
-        If $LogInTries >= GetValue("MaxLogInAttempts") And ( $PatchTried Or Not PatchClient() ) Then
-            If $RestartLoop Then Return 0
+        If $LogInTries >= GetValue("MaxLogInAttempts") Then
             Error(Localize("MaxLoginAttempts"))
             If $RestartLoop Then Return 0
         EndIf
@@ -977,6 +988,7 @@ Func LogIn()
         AutoItSetOption("SendKeyDownDelay", $KeyDelay)
         Send("{ENTER}")
         $LogInTries += 1
+        $LastLoginTry = TimerInit()
     Else
         Error(Localize("UsernameAndPasswordNotDefined"))
         If $RestartLoop Then Return 0
@@ -1029,8 +1041,6 @@ Func End()
                     Position(1)
                     If $RestartLoop Then Return 0
                 WEnd
-                FindLogInScreen(1)
-                If $RestartLoop Then Return 0
             EndIf
             If $LoopStarted Then
                 $RestartLoop = 1
@@ -1403,7 +1413,7 @@ Func Go()
     $LoggingIn = 1
     $LogIn = 1
     If $MinutesToStart Then
-        Local $Time = TimerInit(), $StartingMinutes = $MinutesToStart, $left = $StartingMinutes, $lastmin = 0, $leftover
+        Local $t = TimerInit(), $time = $MinutesToStart, $left = $time, $lastmin = 0, $leftover
         Position()
         If $RestartLoop Then Return 0
         BlockInput(0)
@@ -1423,7 +1433,7 @@ Func Go()
                 Sleep(Ceiling($left * 60000))
                 ExitLoop
             EndIf
-            $left = $StartingMinutes - TimerDiff($Time) / 60000
+            $left = $time - TimerDiff($t) / 60000
         WEnd
         $MinutesToStart = 0
     EndIf
@@ -1460,10 +1470,8 @@ Func Go()
         If $RestartLoop Then Return 0
         Exit
     EndIf
-    $WaitingTimer = TimerInit()
-    FindLogInScreen(1)
-    If $RestartLoop Then Return 0
     $StartTimer = TimerInit()
+    $RelogCount = 0
     If $LoopStarted Then
         $RestartLoop = 1
         Return 0
