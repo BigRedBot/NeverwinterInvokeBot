@@ -1621,32 +1621,39 @@ Func AddCharacterCountInfo($name, $value = 1, $character = GetValue("Current"), 
     Return Assign("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name, GetCharacterInfo($name, $character, $account) + $value, 2)
 EndFunc
 
-Func ChooseCoffer()
-    Local $default = GetValue("Coffer"), $list = Localize($default), $coffers = Array("CofferOfCelestialEnchantments, CofferOfCelestialArtifacts, CofferOfCelestialArtifactEquipment, BlessedProfessionsElementalPack, ElixirOfFate")
+Func ChooseOptions()
+    Local $overflowxpdefault = GetValue("DisableOverflowXPRewardCollection"), $cofferdefault = GetValue("Coffer"), $list = Localize($cofferdefault), $coffers = Array("CofferOfCelestialEnchantments, CofferOfCelestialArtifacts, CofferOfCelestialArtifactEquipment, BlessedProfessionsElementalPack, ElixirOfFate")
     For $i = 1 To $coffers[0]
-        If Not ($coffers[$i] == $default) Then
+        If Not ($coffers[$i] == $cofferdefault) Then
             $list &= "|" & Localize($coffers[$i])
         EndIf
     Next
-    Local $hGUI = GUICreate($Title, 320, 120)
+    Local $hGUI = GUICreate($Title, 320, 165)
     GUICtrlCreateLabel(Localize("ChooseCoffer"), 25, 20, 270)
-    Local $hCombo = GUICtrlCreateCombo("", 25, 50, 270, -1)
-    GUICtrlSetData(-1, $list, Localize($default))
-    Local $hButton = GUICtrlCreateButton("OK", 118, 85, 84, -1, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 85, 75, 25)
+    Local $hCombo = GUICtrlCreateCombo("", 25, 50, 270)
+    GUICtrlSetData(-1, $list, Localize($cofferdefault))
+    Local $Checkbox = GUICtrlCreateCheckbox(Localize("CollectOverflowXPRewards"), 25, 95, 270)
+    If Not GetValue("DisableOverflowXPRewardCollection") Then GUICtrlSetState(-1, $GUI_CHECKED)
+    Local $hButton = GUICtrlCreateButton("OK", 118, 130, 84, -1, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 130, 75, 25)
     GUISetState()
     While 1
         Switch GUIGetMsg()
             Case $GUI_EVENT_CLOSE
                 Exit
             Case $hButton
-                Local $sCurrCombo = GUICtrlRead($hCombo)
+                Local $CurrCombo = GUICtrlRead($hCombo), $overflowxpdisabled = 1
+                If GUICtrlRead($Checkbox) = $GUI_CHECKED Then $overflowxpdisabled = 0
                 For $i = 1 To $coffers[0]
-                    If Localize($coffers[$i]) == $sCurrCombo Then
+                    If Localize($coffers[$i]) == $CurrCombo Then
                         GUIDelete()
-                        If Not ($default == $coffers[$i]) Then
+                        If Not ($cofferdefault == $coffers[$i]) Then
                             SetValue("Coffer", $coffers[$i])
                             SaveIniAllAccounts("Coffer", GetValue("Coffer"))
+                        EndIf
+                        If $overflowxpdefault <> $overflowxpdisabled Then
+                            SetValue("DisableOverflowXPRewardCollection", $overflowxpdisabled)
+                            SaveIniAllAccounts("DisableOverflowXPRewardCollection", GetValue("DisableOverflowXPRewardCollection"))
                         EndIf
                         Return
                     EndIf
@@ -1723,7 +1730,7 @@ Func RunScript()
         $SkipAllConfigurations = 1
     EndIf
     If Not $UnattendedMode And Not $SkipAllConfigurations Then
-        ChooseCoffer()
+        ChooseOptions()
         While 1
             Local $strNumber = InputBox($Title, @CRLF & Localize("TotalAccounts"), GetValue("TotalAccounts"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
             If @error <> 0 Then Exit
