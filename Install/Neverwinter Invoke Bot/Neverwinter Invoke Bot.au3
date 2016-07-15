@@ -420,7 +420,6 @@ Func WaitToInvoke()
         Local $check = CheckAccounts()
         If $check > 0 Then
             If $check <> $CurrentAccount Then
-                $CurrentAccount = $check
                 $ETAText = ""
                 Position()
                 If $RestartLoop Then Return 0
@@ -437,6 +436,7 @@ Func WaitToInvoke()
                     Sleep(1000)
                     $DisableRelogCount = 1
                 EndIf
+                $CurrentAccount = $check
                 $WaitingTimer = TimerInit()
                 While Not ImageSearch("LogInScreen")
                     Sleep(500)
@@ -1027,7 +1027,6 @@ Func End()
         Local $check = CheckAccounts()
         If $check > 0 Then
             If $check <> $CurrentAccount Then
-                $CurrentAccount = $check
                 $ETAText = ""
                 Position()
                 If $RestartLoop Then Return 0
@@ -1040,6 +1039,7 @@ Func End()
                     Sleep(1000)
                     $DisableRelogCount = 1
                 EndIf
+                $CurrentAccount = $check
                 $WaitingTimer = TimerInit()
                 While Not ImageSearch("LogInScreen")
                     Sleep(500)
@@ -1458,7 +1458,6 @@ Func Go()
         WinSetOnTop($WinHandle, "", 1)
         Splash()
         If $check <> $CurrentAccount Then
-            $CurrentAccount = $check
             Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
             If ImageSearch("SelectionScreen") Then
                 MouseMove($X, $Y)
@@ -1466,6 +1465,7 @@ Func Go()
                 Sleep(1000)
                 $DisableRelogCount = 1
             EndIf
+            $CurrentAccount = $check
             $WaitingTimer = TimerInit()
             While Not ImageSearch("LogInScreen")
                 Sleep(500)
