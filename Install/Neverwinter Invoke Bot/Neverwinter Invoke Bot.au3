@@ -159,7 +159,7 @@ Func Position($r = 0)
     EndIf
 EndFunc
 
-Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DisableRelogCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogTime = 0, $LogDate = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn
+Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DoRelogCount = 0, $DisableRelogCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogTime = 0, $LogDate = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn
 
 Func SyncValues()
     If GetValue("FinishedLoop") Then
