@@ -158,7 +158,7 @@ Func Position($r = 0)
     EndIf
 EndFunc
 
-Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DisableRelogCount = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogTime = 0, $LogDate = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn
+Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DisableRelogCount = 1, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogTime = 0, $LogDate = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn
 
 Func SyncValues()
     If GetValue("FinishedLoop") Then
@@ -184,8 +184,8 @@ Func Loop()
             EndIf
             $WaitingTimer = TimerInit()
             FindLogInScreen()
-            $DisableRelogCount = 0
             If $RestartLoop Then ExitLoop 1
+            $DisableRelogCount = 0
             Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
             If ImageExists("SelectionScreen") Then
                 $WaitingTimer = TimerInit()
@@ -421,6 +421,7 @@ Func WaitToInvoke()
                     MouseMove($X, $Y)
                     SingleClick()
                     Sleep(1000)
+                    $DisableRelogCount = 1
                 EndIf
                 $WaitingTimer = TimerInit()
                 While Not ImageSearch("LogInScreen")
@@ -430,7 +431,6 @@ Func WaitToInvoke()
                     Position(1)
                     If $RestartLoop Then Return 0
                 WEnd
-                $DisableRelogCount = 1
                 If $LoopStarted Then
                     $RestartLoop = 1
                     Return 0
@@ -1042,6 +1042,7 @@ Func End()
                     MouseMove($X, $Y)
                     SingleClick()
                     Sleep(1000)
+                    $DisableRelogCount = 1
                 EndIf
                 $WaitingTimer = TimerInit()
                 While Not ImageSearch("LogInScreen")
@@ -1052,7 +1053,6 @@ Func End()
                     If $RestartLoop Then Return 0
                 WEnd
             EndIf
-            $DisableRelogCount = 1
             If $LoopStarted Then
                 $RestartLoop = 1
                 Return 0
@@ -1070,6 +1070,7 @@ Func End()
         MouseMove($X, $Y)
         SingleClick()
         Sleep(1000)
+        $DisableRelogCount = 1
     EndIf
     Local $EndTime = HoursAndMinutes(TimerDiff($StartTimer) / 60000)
     CloseClient()
@@ -1423,6 +1424,7 @@ Func Go()
     $LogInTries = 0
     $LoggingIn = 1
     $LogIn = 1
+    $DisableRelogCount = 1
     If $MinutesToStart Then
         Local $t = TimerInit(), $time = $MinutesToStart, $left = $time, $lastmin = 0, $leftover
         Position()
@@ -1466,6 +1468,7 @@ Func Go()
                 MouseMove($X, $Y)
                 SingleClick()
                 Sleep(1000)
+                $DisableRelogCount = 1
             EndIf
             $WaitingTimer = TimerInit()
             While Not ImageSearch("LogInScreen")
