@@ -8,9 +8,7 @@ While 1
     While 1
         If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, "Get minutes until server reset?") = $IDYES Then
             $min = _GetUTCMinutes(10, 1, True, True, True, $Title)
-            If $min >= 0 Then
-                ExitLoop
-            EndIf
+            If $min >= 0 Then ExitLoop
         Else
             Exit
         EndIf

@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.2
+- Added Run Now option to the Unattended Launcher's tray icon menu.
+
 7.1
 - Will now detect if the login server is unavailable and wait 15 minutes to retry login.
 - Will now detect if there is a version mismatch and try to patch the server if detected.

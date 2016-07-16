@@ -1,18 +1,13 @@
+#NoTrayIcon
 AutoItSetOption("TrayAutoPause", 0)
-TraySetIcon(@ScriptDir & "\images\black.ico")
 Global $Name = "Neverwinter Invoke Bot: Screen Detection"
 #include "Shared.au3"
-If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
-    MsgBox($MB_ICONWARNING, $Name, Localize("ScreenDetectionAlreadyRunning"))
-    Exit
-EndIf
+TraySetIcon(@ScriptDir & "\images\black.ico")
+If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Name, Localize("ScreenDetectionAlreadyRunning"))
 #include "_ImageSearch.au3"
 Global $Title = $Name
 
-If @AutoItX64 Then
-    MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
-    Exit
-EndIf
+If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
 
 Local $text
 
@@ -41,17 +36,13 @@ Func ScreenDetection_Splash($s = "")
 EndFunc
 
 Func ScreenDetection_FindPixels(ByRef $x, ByRef $y, ByRef $c)
-    If $x And Hex(PixelGetColor($x + $OffsetX, $y + $OffsetY), 6) = String($c) Then
-        Return 1
-    EndIf
+    If $x And Hex(PixelGetColor($x + $OffsetX, $y + $OffsetY), 6) = String($c) Then Return 1
     Return 0
 EndFunc
 
 Local $X = 0, $Y = 0
 Func ScreenDetection_ImageSearch($image, $resultPosition = -1, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom)
-    If FileExists("images\" & GetValue("Language") & "\" & $image & ".png") And _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $X, $Y, GetValue("ImageSearchTolerance")) Then
-        Return 1
-    EndIf
+    If FileExists("images\" & GetValue("Language") & "\" & $image & ".png") And _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $X, $Y, GetValue("ImageSearchTolerance")) Then Return 1
     Return 0
 EndFunc
 

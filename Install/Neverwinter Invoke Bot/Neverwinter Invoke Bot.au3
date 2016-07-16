@@ -1,18 +1,14 @@
+#NoTrayIcon
 #RequireAdmin
 AutoItSetOption("TrayAutoPause", 0)
-TraySetIcon(@ScriptDir & "\images\red.ico")
 Global $LoadPrivateSettings = 1
 #include "..\variables.au3"
 #include "Shared.au3"
+TraySetIcon(@ScriptDir & "\images\red.ico")
 Global $Title = $Name & " v" & $Version
 TraySetToolTip($Title)
-If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
-    MsgBox($MB_ICONWARNING, $Title, Localize("AlreadyRunning"))
-    Exit
-ElseIf @AutoItX64 Then
-    MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
-    Exit
-EndIf
+If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("AlreadyRunning"))
+If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
 #include "_DownloadFile.au3"
 #include "_GetUTCMinutes.au3"
 #include "_ImageSearch.au3"
@@ -28,14 +24,10 @@ Func Array($x)
 EndFunc
 
 Global $GameClientInstallLocation = RegRead("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "InstallLocation")
-If @error <> 0 Then
-    $GameClientInstallLocation = 0
-EndIf
+If @error <> 0 Then $GameClientInstallLocation = 0
 
 Global $ArcLauncherLocation = RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Perfect World Entertainment\Arc", "launcher")
-If @error <> 0 Then
-    $ArcLauncherLocation = 0
-EndIf
+If @error <> 0 Then $ArcLauncherLocation = 0
 
 Func GetLogInServerAddressString()
     Local $r = "", $a = Array(GetValue("LogInServerAddress"))
@@ -56,17 +48,16 @@ EndFunc
 Func CloseClient($r = 0, $p = "GameClient.exe")
     $WaitingTimer = TimerInit()
     Local $list = ProcessList($p)
-    If @error = 0 Then
-        For $i = 1 To $list[0][0]
-            Local $PID = $list[$i][1]
-            While ProcessExists($PID)
-                TimeOut($r)
-                If $RestartLoop Then Return 0
-                ProcessClose($PID)
-                Sleep(500)
-            WEnd
-        Next
-    EndIf
+    If @error <> 0 Then Return
+    For $i = 1 To $list[0][0]
+        Local $PID = $list[$i][1]
+        While ProcessExists($PID)
+            TimeOut($r)
+            If $RestartLoop Then Return 0
+            ProcessClose($PID)
+            Sleep(500)
+        WEnd
+    Next
 EndFunc
 
 ; add after: If $RestartLoop Then Return 0
@@ -304,9 +295,7 @@ Func Loop()
                 EndIf
                 If GetValue("Current") >= GetValue("EndAt") Then
                     SetAccountValue("FinishedLoop", 1)
-                    If GetValue("CurrentLoop") >= GetValue("EndAtLoop") Then
-                        SetAccountValue("CompletedAccount", 1)
-                    EndIf
+                    If GetValue("CurrentLoop") >= GetValue("EndAtLoop") Then SetAccountValue("CompletedAccount", 1)
                 EndIf
                 $WaitingTimer = TimerInit()
                 ChangeCharacter()
@@ -389,9 +378,7 @@ Func CheckAccounts()
         EndIf
     Next
     $CurrentAccount = $old
-    If $allcomplete Then
-        Return 0
-    EndIf
+    If $allcomplete Then Return 0
     Return $new
 EndFunc
 
@@ -399,17 +386,11 @@ Func GetTimeToInvoke()
     Local $LastLoop = GetCharacterInfo("InvokeLoop")
     If ( $LastLoop And GetValue("CurrentLoop") > $LastLoop ) Or ( Not $LastLoop And GetValue("CurrentLoop") > GetValue("StartAtLoop") ) Then
         Local $Time = GetCharacterInfo("InvokeTime")
-        If Not $Time Then
-            $Time = $StartTimer
-        EndIf
+        If Not $Time Then $Time = $StartTimer
         Local $i = GetValue("CurrentLoop")
-        If $i > $MaxLoops Then
-            $i = $MaxLoops
-        EndIf
+        If $i > $MaxLoops Then $i = $MaxLoops
         Local $Minutes = $LoopDelayMinutes[$i] - TimerDiff($Time) / 60000
-        If $Minutes > 0 Then
-            Return $Minutes
-        EndIf
+        If $Minutes > 0 Then Return $Minutes
     EndIf
     Return 0
 EndFunc
@@ -473,9 +454,7 @@ EndFunc
 
 ; add after: If $RestartLoop Then Return 0
 Func Invoke()
-    If $CofferTries >= 5 Then
-        Return
-    EndIf
+    If $CofferTries >= 5 Then Return
     If ImageExists("CongratulationsWindow") Then
         For $n = 1 To 5
             FindLogInScreen()
@@ -563,9 +542,7 @@ EndFunc
 
 ; add after: If $RestartLoop Then Return 0
 Func GetCoffer()
-    If $CofferTries >= 5 Then
-        Return
-    EndIf
+    If $CofferTries >= 5 Then Return
     Sleep(GetValue("ClaimCofferDelay") * 1000)
     If ImageSearch("CelestialSynergyTab") Then
         MouseMove($X, $Y)
@@ -735,9 +712,7 @@ Func Splash($s = "", $ontop = 1)
         EndIf
     Else
         Local $setontop = $DLG_NOTITLE, $toplocation = $SplashTop, $leftlocation = $SplashLeft
-        If $SplashWindow And $ontop <> $SplashWindowOnTop Then
-            SplashOff()
-        EndIf
+        If $SplashWindow And $ontop <> $SplashWindowOnTop Then SplashOff()
         If $ontop Then
             $SplashWindowOnTop = 1
             $SplashStartText = Localize("ToStopPressCtrlAltDel") & @CRLF & @CRLF
@@ -761,9 +736,7 @@ Func WaitForScreen($image, $resultPosition = -2, $left = $ClientLeft, $top = $Cl
     While 1
         Position()
         If $RestartLoop Then Return 0
-        If ImageSearch($image, $resultPosition, $left, $top, $right, $bottom) Then
-            Return
-        EndIf
+        If ImageSearch($image, $resultPosition, $left, $top, $right, $bottom) Then Return
         FindLogInScreen()
         If $RestartLoop Then Return 0
         Sleep(500)
@@ -777,9 +750,7 @@ Func FindPixels(ByRef $x, ByRef $y, ByRef $c)
     If $RestartLoop Then Return 0
     Position()
     If $RestartLoop Then Return 0
-    If $x And Hex(PixelGetColor($x + $OffsetX, $y + $OffsetY), 6) = String($c) Then
-        Return 1
-    EndIf
+    If $x And Hex(PixelGetColor($x + $OffsetX, $y + $OffsetY), 6) = String($c) Then Return 1
     Return 0
 EndFunc
 
@@ -792,9 +763,7 @@ Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $Clie
                 $LoggingIn = 0
                 $LogInTries = 0
                 $LastLoginTry = 0
-                If $image = "InGameScreen" Then
-                    $LogIn = 0
-                EndIf
+                If $image = "InGameScreen" Then $LogIn = 0
             EndIf
             Return 1
         ElseIf $LogIn And $image = "InGameScreen" Then
@@ -918,9 +887,7 @@ Func CheckServer()
         While 1
             For $i = 1 to $ip[0]
                 Ping($ip[$i])
-                If @error = 0 Then
-                    Return
-                EndIf
+                If @error = 0 Then Return
             Next
             If $first Then
                 $first = 0
@@ -948,9 +915,7 @@ Func PatchClient()
         If $RestartLoop Then Return 0
         CloseClient(0, "Neverwinter.exe")
         If $RestartLoop Then Return 0
-        If Not Number($auto) Then
-            RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 1)
-        EndIf
+        If Not Number($auto) Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 1)
         ShellExecute($ArcLauncherLocation, "gamecustom nw")
         While Not ProcessExists("Neverwinter.exe")
             Sleep(1000)
@@ -964,9 +929,7 @@ Func PatchClient()
             Sleep(1000)
         WEnd
         Sleep(1000)
-        If Not Number($auto) Then
-            RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
-        EndIf
+        If Not Number($auto) Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
         CloseClient()
         If $RestartLoop Then Return 0
         Splash("", 0)
@@ -1020,22 +983,19 @@ EndFunc
 
 ; add after: If $RestartLoop Then Return 0
 Func TimeOut($r = 0)
-    If TimerDiff($WaitingTimer) >= $TimeOut Then
-        AddAccountCountValue("TimedOut")
-        If Not $LoggingIn Then
-            AddCharacterCountInfo("TimedOut")
-        EndIf
-        If Not $r And GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And ImageExists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
-            Splash("[ " & Localize("RestartingNeverwinter") & " ]")
-            $DisableRelogCount = 1
-            CloseClient(1)
-            If $RestartLoop Then Return 0
-            Position(1)
-            If $RestartLoop Then Return 0
-        Else
-            Error(Localize("OperationTimedOut"))
-            If $RestartLoop Then Return 0
-        EndIf
+    If TimerDiff($WaitingTimer) < $TimeOut Then Return
+    AddAccountCountValue("TimedOut")
+    If Not $LoggingIn Then AddCharacterCountInfo("TimedOut")
+    If Not $r And GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And ImageExists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
+        Splash("[ " & Localize("RestartingNeverwinter") & " ]")
+        $DisableRelogCount = 1
+        CloseClient(1)
+        If $RestartLoop Then Return 0
+        Position(1)
+        If $RestartLoop Then Return 0
+    Else
+        Error(Localize("OperationTimedOut"))
+        If $RestartLoop Then Return 0
     EndIf
 EndFunc
 
@@ -1137,9 +1097,7 @@ Func Message($s, $n = $MB_OK, $ontop = 0)
 EndFunc
 
 Func SaveItemCount($item, $value = 0)
-    If $value then
-        SetCharacterInfo($item, $value)
-    EndIf
+    If $value then SetCharacterInfo($item, $value)
     Local $ItemCount = 0
     Local $ItemStart = GetAllAccountsValue($item)
     For $a = 1 To GetValue("TotalAccounts")
@@ -1148,18 +1106,14 @@ Func SaveItemCount($item, $value = 0)
         Next
     Next
     $ItemCount = $ItemStart + $ItemCount
-    If Number(Statistics_GetIniAllAccounts($item)) < $ItemCount Then
-        Statistics_SaveIniAllAccounts($item, $ItemCount)
-    EndIf
+    If Number(Statistics_GetIniAllAccounts($item)) < $ItemCount Then Statistics_SaveIniAllAccounts($item, $ItemCount)
     $ItemCount = 0
     $ItemStart = GetAccountValue($item)
     For $c = 1 To GetAccountValue("TotalSlots")
         $ItemCount += GetCharacterInfo($item, $c)
     Next
     $ItemCount = $ItemStart + $ItemCount
-    If Number(Statistics_GetIniAccount($item)) < $ItemCount Then
-        Statistics_SaveIniAccount($item, $ItemCount)
-    EndIf
+    If Number(Statistics_GetIniAccount($item)) < $ItemCount Then Statistics_SaveIniAccount($item, $ItemCount)
 EndFunc
 
 Func SendMessage($s, $n = $MB_OK, $ontop = 0)
@@ -1180,9 +1134,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
         $VIPAccountRewardCount += GetCharacterInfo("TotalVIPAccountRewards", $i)
         If GetCharacterInfo("IdleLogout", $i) Then
             Local $times = ""
-            If GetCharacterInfo("IdleLogout", $i) > 1 Then
-                $times = GetCharacterInfo("IdleLogout", $i) & "x"
-            EndIf
+            If GetCharacterInfo("IdleLogout", $i) > 1 Then $times = GetCharacterInfo("IdleLogout", $i) & "x"
             If $IdleLogoutText <> "" Then
                 $IdleLogoutText &= ", " & $times & "#" & $i
             Else
@@ -1191,9 +1143,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
         EndIf
         If GetCharacterInfo("TimedOut", $i) Then
             Local $times = ""
-            If GetCharacterInfo("TimedOut", $i) > 1 Then
-                $times = GetCharacterInfo("TimedOut", $i) & "x"
-            EndIf
+            If GetCharacterInfo("TimedOut", $i) > 1 Then $times = GetCharacterInfo("TimedOut", $i) & "x"
             If $TimedOutText <> "" Then
                 $TimedOutText &= ", " & $times & "#" & $i
             Else
@@ -1202,9 +1152,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
         EndIf
         If GetCharacterInfo("FailedInvoke", $i) Then
             Local $times = ""
-            If GetCharacterInfo("FailedInvoke", $i) > 1 Then
-                $times = GetCharacterInfo("FailedInvoke", $i) & "x"
-            EndIf
+            If GetCharacterInfo("FailedInvoke", $i) > 1 Then $times = GetCharacterInfo("FailedInvoke", $i) & "x"
             If $FailedInvokeText <> "" Then
                 $FailedInvokeText &= ", " & $times & "#" & $i
             Else
@@ -1212,15 +1160,9 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
             EndIf
         EndIf
     Next
-    If $IdleLogoutText <> "" Then
-        $IdleLogoutText = " ( " & $IdleLogoutText & " )"
-    EndIf
-    If $TimedOutText <> "" Then
-        $TimedOutText = " ( " & $TimedOutText & " )"
-    EndIf
-    If $FailedInvokeText <> "" Then
-        $FailedInvokeText = " ( " & $FailedInvokeText & " )"
-    EndIf
+    If $IdleLogoutText <> "" Then $IdleLogoutText = " ( " & $IdleLogoutText & " )"
+    If $TimedOutText <> "" Then $TimedOutText = " ( " & $TimedOutText & " )"
+    If $FailedInvokeText <> "" Then $FailedInvokeText = " ( " & $FailedInvokeText & " )"
     If GetValue("Invoked") Then
         $text &= @CRLF & @CRLF & Localize("InvokedTimes", "<INVOKED>", GetValue("Invoked"), "<INVOKETOTAL>", GetValue("TotalSlots") * $MaxLoops, "<PERCENT>", Floor((GetValue("Invoked") / (GetValue("TotalSlots") * $MaxLoops)) * 100))
     EndIf
@@ -1263,9 +1205,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
         $text &= @CRLF & @CRLF & Localize("Invoking", "<CURRENT>", GetValue("Current"), "<ENDAT>", GetValue("EndAt"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop"))
     EndIf
     If $LogDate Then
-        If Not FileExists($SettingsDir & "\Logs") Then
-            DirCreate($SettingsDir & "\Logs")
-        EndIf
+        If Not FileExists($SettingsDir & "\Logs") Then DirCreate($SettingsDir & "\Logs")
         Local $LogStart = "", $LogEnd = @CRLF
         If $LogSessionStart Then
             $LogStart = @CRLF & Localize("SessionStart") & @CRLF & @CRLF
@@ -1275,9 +1215,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
             $LogTime = @HOUR & ":" & @MIN & ":" & @SEC
             $LogStart &= @YEAR & "-" & @MON & "-" & @MDAY & " " & $LogTime & @CRLF
         EndIf
-        If $CurrentAccount = GetValue("TotalAccounts") Then
-            $LogEnd = @CRLF & @CRLF
-        EndIf
+        If $CurrentAccount = GetValue("TotalAccounts") Then $LogEnd = @CRLF & @CRLF
         FileWrite($SettingsDir & "\Logs\Log_" & $LogDate & ".txt", $LogStart & StringReplace($text, @CRLF & @CRLF, @CRLF) & $LogEnd)
     EndIf
     If Not $UnattendedMode Then
@@ -1381,6 +1319,7 @@ Func Start()
         $SkipAllConfigurations = 1
     EndIf
     If Not $UnattendedMode And Not $SkipAllConfigurations Then
+        If Not $FirstRun Then ChooseOptions()
         Local $old = $CurrentAccount
         For $i = 1 To GetValue("TotalAccounts")
             $CurrentAccount = $i
@@ -1401,7 +1340,7 @@ EndFunc
 Func Begin()
     $SkipAllConfigurations = 0
     If Not $UnattendedMode Then
-        If $FirstRun Or $MinutesToStart Then
+        If ( $FirstRun Or $MinutesToStart ) And GetValue("UnattendedMode") <> 2 Then
             While 1
                 If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("GetMinutesUntilServerReset")) = $IDYES Then
                     Local $m = _GetUTCMinutes(10, 1, True, True, False, $Title)
@@ -1464,9 +1403,7 @@ Func Go()
         WEnd
         $MinutesToStart = 0
     EndIf
-    If Not $LogDate Then
-        $LogDate = @YEAR & "-" & @MON & "-" & @MDAY
-    EndIf
+    If Not $LogDate Then $LogDate = @YEAR & "-" & @MON & "-" & @MDAY
     Local $check = CheckAccounts()
     If $check > 0 Then
         $ETAText = ""
@@ -1510,12 +1447,8 @@ Func Initialize()
         $CurrentAccount = $i
         SetAccountValue("Current", GetValue("StartAt"))
         SetAccountValue("CurrentLoop", GetValue("StartAtLoop"))
-        If Not $UnattendedMode And Not $SkipAllConfigurations Then
-            Load()
-        EndIf
-        If Not GetValue("EndAt") Then
-            SetAccountValue("EndAt", GetValue("TotalSlots"))
-        EndIf
+        If Not $UnattendedMode And Not $SkipAllConfigurations Then Load()
+        If Not GetValue("EndAt") Then SetAccountValue("EndAt", GetValue("TotalSlots"))
     Next
     $CurrentAccount = $old
 EndFunc
@@ -1547,9 +1480,7 @@ Func Load()
                 SaveIniPrivate("LogInUserName")
             EndIf
         EndIf
-        If Not GetValue("LogInPassword") Then
-            SetAccountValue("LogInPassword", "")
-        EndIf
+        If Not GetValue("LogInPassword") Then SetAccountValue("LogInPassword", "")
         _Crypt_Startup()
         While 1
             Local $string = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterPassword"), BinaryToString(GetValue("LogInPassword"), 4), "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
@@ -1613,38 +1544,28 @@ Func Load()
         EndIf
         MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
     WEnd
-    If GetIniAccount("TotalSlots") <> GetValue("TotalSlots") Then
-        SaveIniAccount("TotalSlots", GetValue("TotalSlots"))
-    EndIf
+    If GetIniAccount("TotalSlots") <> GetValue("TotalSlots") Then SaveIniAccount("TotalSlots", GetValue("TotalSlots"))
 EndFunc
 
 Func SetCharacterInfo($name, $value = 0, $character = GetValue("Current"), $account = $CurrentAccount)
-    If IsDeclared("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name) Then
-        Return Assign("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name, $value)
-    EndIf
+    If IsDeclared("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name) Then Return Assign("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name, $value)
     Return Assign("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name, $value, 2)
 EndFunc
 
 Func GetCharacterInfo($name, $character = GetValue("Current"), $account = $CurrentAccount)
-    If IsDeclared("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name) Then
-        Return Eval("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name)
-    EndIf
+    If IsDeclared("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name) Then Return Eval("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name)
     Return 0
 EndFunc
 
 Func AddCharacterCountInfo($name, $value = 1, $character = GetValue("Current"), $account = $CurrentAccount)
-    If IsDeclared("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name) Then
-        Return Assign("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name, GetCharacterInfo($name, $character, $account) + $value)
-    EndIf
+    If IsDeclared("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name) Then Return Assign("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name, GetCharacterInfo($name, $character, $account) + $value)
     Return Assign("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name, GetCharacterInfo($name, $character, $account) + $value, 2)
 EndFunc
 
 Func ChooseOptions()
     Local $overflowxpdefault = GetValue("DisableOverflowXPRewardCollection"), $cofferdefault = GetValue("Coffer"), $list = Localize($cofferdefault), $coffers = Array("CofferOfCelestialEnchantments, CofferOfCelestialArtifacts, CofferOfCelestialArtifactEquipment, BlessedProfessionsElementalPack, ElixirOfFate")
     For $i = 1 To $coffers[0]
-        If Not ($coffers[$i] == $cofferdefault) Then
-            $list &= "|" & Localize($coffers[$i])
-        EndIf
+        If Not ($coffers[$i] == $cofferdefault) Then $list &= "|" & Localize($coffers[$i])
     Next
     Local $hGUI = GUICreate($Title, 320, 170)
     GUICtrlCreateLabel(Localize("ChooseCoffer"), 25, 20, 270)
@@ -1694,11 +1615,8 @@ Global $AllLoginInfoFound = 1, $SkipAllConfigurations = 0, $FirstRun = 1, $Unatt
 
 Func RunScript()
     If $CmdLine[0] Then
-        If Number($CmdLine[1]) = 1 Then
-            SetValue("UnattendedMode", 1)
-        ElseIf Number($CmdLine[1]) = -1 Then
-            $UnattendedModeCheckSettings = 1
-        EndIf
+        SetValue("UnattendedMode", Number($CmdLine[1]))
+        If GetValue("UnattendedMode") = 0 Then $UnattendedModeCheckSettings = 1
     EndIf
     Local $old = $CurrentAccount
     For $i = 1 To GetValue("TotalAccounts")
@@ -1709,7 +1627,7 @@ Func RunScript()
         EndIf
     Next
     $CurrentAccount = $old
-    If $AllLoginInfoFound Then $UnattendedMode = GetValue("UnattendedMode")
+    If $AllLoginInfoFound And GetValue("UnattendedMode") <> 2 Then $UnattendedMode = GetValue("UnattendedMode")
     If Not $UnattendedModeCheckSettings And Not GetValue("DisableDonationPrompts") And ( GetAllAccountsValue("TotalInvoked") - GetAllAccountsValue("DonationPrompts") * 10000 ) >= 10000 Then
         Statistics_SaveIniAllAccounts("DonationPrompts", Floor(GetAllAccountsValue("TotalInvoked") / 10000))
         CloseClient(0, "DonationPrompt.exe")
@@ -1752,9 +1670,7 @@ Func RunScript()
         EndIf
     EndIf
     If $AllLoginInfoFound And $UnattendedModeCheckSettings Then Exit
-    If Not $UnattendedModeCheckSettings And Not $UnattendedMode And $AllLoginInfoFound And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAllConfigurations", "<NUMBER>", GetValue("TotalAccounts"))) = $IDYES Then
-        $SkipAllConfigurations = 1
-    EndIf
+    If Not $UnattendedModeCheckSettings And Not $UnattendedMode And $AllLoginInfoFound And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAllConfigurations", "<NUMBER>", GetValue("TotalAccounts"))) = $IDYES Then $SkipAllConfigurations = 1
     If Not $UnattendedMode And Not $SkipAllConfigurations Then
         ChooseOptions()
         While 1
@@ -1767,9 +1683,7 @@ Func RunScript()
             EndIf
             MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
         WEnd
-        If GetIniAllAccounts("TotalAccounts") <> GetValue("TotalAccounts") Then
-            SaveIniAllAccounts("TotalAccounts", GetValue("TotalAccounts"))
-        EndIf
+        If GetIniAllAccounts("TotalAccounts") <> GetValue("TotalAccounts") Then SaveIniAllAccounts("TotalAccounts", GetValue("TotalAccounts"))
     EndIf
     Initialize()
     If $UnattendedModeCheckSettings Then Exit

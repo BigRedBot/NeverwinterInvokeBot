@@ -7,35 +7,22 @@ If Not @Compiled Then Exit MsgBox($MB_ICONWARNING, $Title, "The script must be a
 #include <Misc.au3>
 #include "Localization.au3"
 LoadLocalizations(0, 0, 0)
-If _Singleton($Name & " Uninstaller" & "Jp4g9QRntjYP", 1) = 0 Then
-    MsgBox($MB_ICONWARNING, $Title, Localize("UninstallerAlreadyRunning"))
-    Exit
-EndIf
+If _Singleton($Name & " Uninstaller" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("UninstallerAlreadyRunning"))
 #include "_SelfDelete.au3"
 
-If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DoYouWantToUninstall", "<VERSION>", $Version)) <> $IDYES Then
-    Exit
-EndIf
+If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DoYouWantToUninstall", "<VERSION>", $Version)) <> $IDYES Then Exit
 
 Local $delete = StringSplit(@StartupCommonDir & "\" & $Name & " Unattended Launcher.lnk," & @DesktopCommonDir & "\" & $Name & ".lnk," & @DesktopCommonDir & "\" & $Name & " Donation.lnk," & $Name & ".exe,ImageCapture.exe,ScreenDetection.exe,Unattended.exe,DonationPrompt.exe", ",")
 FileChangeDir(@ScriptDir)
 For $i = 1 To $delete[0]
-    If FileExists($delete[$i]) And Not FileDelete($delete[$i]) Then
-        MsgBox($MB_ICONWARNING, $Title, Localize("FailedToDeleteFile", "<FILE>", $delete[$i]))
-        Exit
-    EndIf
+    If FileExists($delete[$i]) And Not FileDelete($delete[$i]) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("FailedToDeleteFile", "<FILE>", $delete[$i]))
 Next
 
 Local $RegLocation = "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & $Name
 
-If ( RegRead($RegLocation, "DisplayName") <> "" Or RegRead($RegLocation, "DisplayVersion") <> "" Or RegRead($RegLocation, "Publisher") <> "" Or RegRead($RegLocation, "DisplayIcon") <> "" Or RegRead($RegLocation, "UninstallString") <> "" Or RegRead($RegLocation, "InstallLocation") <> "" ) And Not RegDelete($RegLocation) Then
-    MsgBox($MB_ICONWARNING, $Title, Localize("FailedToDeleteRegistry"))
-    Exit
-EndIf
+If ( RegRead($RegLocation, "DisplayName") <> "" Or RegRead($RegLocation, "DisplayVersion") <> "" Or RegRead($RegLocation, "Publisher") <> "" Or RegRead($RegLocation, "DisplayIcon") <> "" Or RegRead($RegLocation, "UninstallString") <> "" Or RegRead($RegLocation, "InstallLocation") <> "" ) And Not RegDelete($RegLocation) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("FailedToDeleteRegistry"))
 
-If FileExists(@AppDataCommonDir & "\" & $Name) And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("KeepSettingsFiles")) <> $IDYES Then
-    DirRemove(@AppDataCommonDir & "\" & $Name, 1)
-EndIf
+If FileExists(@AppDataCommonDir & "\" & $Name) And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("KeepSettingsFiles")) <> $IDYES Then DirRemove(@AppDataCommonDir & "\" & $Name, 1)
 
 _SelfDelete(5, 1, 1)
 If @error = 1 Then Exit MsgBox($MB_ICONWARNING, "_SelfDelete()", "The script must be a compiled exe to work correctly!")

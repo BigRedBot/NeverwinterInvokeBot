@@ -1,13 +1,11 @@
+#NoTrayIcon
 #RequireAdmin
 AutoItSetOption("TrayAutoPause", 0)
-TraySetIcon(@ScriptDir & "\images\purple.ico")
 Global $Name = "Neverwinter Client Image Capture"
 Global $Title = $Name
 #include "Shared.au3"
-If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
-    MsgBox($MB_ICONWARNING, $Title, Localize("ImageCaptureAlreadyRunning"))
-    Exit
-EndIf
+TraySetIcon(@ScriptDir & "\images\purple.ico")
+If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ImageCaptureAlreadyRunning"))
 #include <ScreenCapture.au3>
 #include <Clipboard.au3>
 
@@ -44,10 +42,7 @@ Func Position()
                 MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
                 Capture()
             EndIf
-            If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
-                MsgBox($MB_ICONWARNING, $Title, Localize("UnableToMove"))
-                Exit
-            EndIf
+            If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("UnableToMove"))
             MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterMoved"))
             Capture()
         EndIf
@@ -55,9 +50,7 @@ Func Position()
 EndFunc
 
 Func Capture()
-    If MsgBox($MB_OKCANCEL, $Title, Localize("ClickOKToCapture")) <> $IDOK Then
-        Exit
-    EndIf
+    If MsgBox($MB_OKCANCEL, $Title, Localize("ClickOKToCapture")) <> $IDOK Then Exit
     Position()
     WinSetOnTop($WinHandle, "", 1)
     Sleep(500)
@@ -78,10 +71,7 @@ Func Capture()
     EndIf
     _ClipBoard_Close()
     _WinAPI_DeleteObject($hHBITMAP)
-    If $err Then
-        MsgBox($MB_ICONWARNING, $Title, Localize("ErrorOccuredWith", "<ERROR>", $err_txt), 10)
-        Exit
-    EndIf
+    If $err Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorOccuredWith", "<ERROR>", $err_txt), 10)
     MsgBox($MB_OK, $Title, Localize("NeverwinterCaptured"))
     Exit
 EndFunc
