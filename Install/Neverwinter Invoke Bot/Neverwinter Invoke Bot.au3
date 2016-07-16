@@ -74,6 +74,7 @@ Func Position($r = 0)
     Focus()
     If Not $WinFound Or Not GetPosition() Then
         If GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And ImageExists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
+            $LogInTries = 0
             $LastLoginTry = 0
             $DisableRelogCount = 1
             Splash("[ " & Localize("NeverwinterNotFound") & " ]")
@@ -848,7 +849,15 @@ Func FindLogInScreen()
                 If $LastLoginTry And TimerDiff($LastLoginTry) / 1000 >= 60 Then
                     $LogInTries = 0
                     $LastLoginTry = 0
+                    Position()
+                    If $RestartLoop Then Return 0
+                    BlockInput(0)
+                    WinSetOnTop($WinHandle, "", 0)
                     WaitMinutes(15, "WaitingToRetryLogin")
+                    Position()
+                    If $RestartLoop Then Return 0
+                    If Not GetValue("NoInputBlocking") Then BlockInput(1)
+                    WinSetOnTop($WinHandle, "", 1)
                 Else
                     Splash()
                     Sleep(1000)
@@ -873,7 +882,15 @@ Func FindLogInScreen()
                                 ExitLoop
                             ElseIf ImageSearch("Unavailable") Then
                                 $LogInTries = 0
+                                Position()
+                                If $RestartLoop Then Return 0
+                                BlockInput(0)
+                                WinSetOnTop($WinHandle, "", 0)
                                 WaitMinutes(15, "WaitingToRetryLogin")
+                                Position()
+                                If $RestartLoop Then Return 0
+                                If Not GetValue("NoInputBlocking") Then BlockInput(1)
+                                WinSetOnTop($WinHandle, "", 1)
                                 ExitLoop
                             ElseIf ImageSearch("Mismatch") And PatchClient() Then
                                 If $RestartLoop Then Return 0
@@ -924,6 +941,7 @@ Func PatchClient()
         CheckServer()
         $LogInTries = 0
         BlockInput(0)
+        WinSetOnTop($WinHandle, "", 0)
         Splash("[ " & Localize("PatchingGame") & " ]", 0)
         Local $arc = ProcessExists("Arc.exe"), $auto = RegRead("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch")
         CloseClient()
@@ -1628,14 +1646,14 @@ Func ChooseOptions()
             $list &= "|" & Localize($coffers[$i])
         EndIf
     Next
-    Local $hGUI = GUICreate($Title, 320, 165)
+    Local $hGUI = GUICreate($Title, 320, 170)
     GUICtrlCreateLabel(Localize("ChooseCoffer"), 25, 20, 270)
     Local $hCombo = GUICtrlCreateCombo("", 25, 50, 270)
     GUICtrlSetData(-1, $list, Localize($cofferdefault))
-    Local $Checkbox = GUICtrlCreateCheckbox(Localize("CollectOverflowXPRewards"), 25, 95, 270)
+    Local $Checkbox = GUICtrlCreateCheckbox(" " & Localize("CollectOverflowXPRewards"), 25, 95, 270)
     If Not GetValue("DisableOverflowXPRewardCollection") Then GUICtrlSetState(-1, $GUI_CHECKED)
-    Local $hButton = GUICtrlCreateButton("OK", 118, 130, 84, -1, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 130, 75, 25)
+    Local $hButton = GUICtrlCreateButton("OK", 118, 135, 84, -1, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 135, 75, 25)
     GUISetState()
     While 1
         Switch GUIGetMsg()
@@ -1649,11 +1667,19 @@ Func ChooseOptions()
                         GUIDelete()
                         If Not ($cofferdefault == $coffers[$i]) Then
                             SetValue("Coffer", $coffers[$i])
-                            SaveIniAllAccounts("Coffer", GetValue("Coffer"))
+                            If GetValue("Coffer") == GetDefaultValue("Coffer") Then
+                                SaveIniAllAccounts("Coffer")
+                            Else
+                                SaveIniAllAccounts("Coffer", GetValue("Coffer"))
+                            EndIf
                         EndIf
                         If $overflowxpdefault <> $overflowxpdisabled Then
                             SetValue("DisableOverflowXPRewardCollection", $overflowxpdisabled)
-                            SaveIniAllAccounts("DisableOverflowXPRewardCollection", GetValue("DisableOverflowXPRewardCollection"))
+                            If GetValue("DisableOverflowXPRewardCollection") == GetDefaultValue("DisableOverflowXPRewardCollection") Then
+                                SaveIniAllAccounts("DisableOverflowXPRewardCollection")
+                            Else
+                                SaveIniAllAccounts("DisableOverflowXPRewardCollection", GetValue("DisableOverflowXPRewardCollection"))
+                            EndIf
                         EndIf
                         Return
                     EndIf

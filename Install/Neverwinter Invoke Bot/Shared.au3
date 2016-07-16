@@ -138,7 +138,17 @@ Func GetAccountValue($name, $account = $CurrentAccount)
     Return 0
 EndFunc
 
+Func GetDefaultValue($name)
+    If IsDeclared("SETTINGS_Default_" & $name) Then
+        Return Eval("SETTINGS_Default_" & $name)
+    EndIf
+    Return 0
+EndFunc
+
 Func SaveIniAllAccounts($name, $value = "")
+    If $value == "" Then
+        Return IniDelete($SettingsDir & "\Settings.ini", "AllAccounts", $name)
+    EndIf
     Return IniWrite($SettingsDir & "\Settings.ini", "AllAccounts", $name, $value)
 EndFunc
 
@@ -147,6 +157,9 @@ Func GetIniAllAccounts($name)
 EndFunc
 
 Func SaveIniAccount($name, $value = "", $account = $CurrentAccount)
+    If $value == "" Then
+        Return IniDelete($SettingsDir & "\Settings.ini", "Account" & $account, $name)
+    EndIf
     Return IniWrite($SettingsDir & "\Settings.ini", "Account" & $account, $name, $value)
 EndFunc
 
@@ -155,6 +168,9 @@ Func GetIniAccount($name, $account = $CurrentAccount)
 EndFunc
 
 Func SaveIniPrivate($name, $value = "", $account = $CurrentAccount)
+    If $value == "" Then
+        Return IniDelete($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name)
+    EndIf
     Return IniWrite($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name, $value)
 EndFunc
 
@@ -163,6 +179,9 @@ Func GetIniPrivate($name, $account = $CurrentAccount)
 EndFunc
 
 Func Statistics_SaveIniAllAccounts($name, $value = "")
+    If $value == "" Then
+        Return IniDelete($SettingsDir & "\Statistics.ini", "AllAccounts", $name)
+    EndIf
     If Not GetAllAccountsValue("StartDate") Then
         Local $Month[13] = [12, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], $Date = $Month[Number(@MON)] & " " & Number(@MDAY) & ", " & @YEAR
         IniWrite($SettingsDir & "\Statistics.ini", "AllAccounts", "StartDate", $Date)
@@ -176,6 +195,9 @@ Func Statistics_GetIniAllAccounts($name)
 EndFunc
 
 Func Statistics_SaveIniAccount($name, $value = "", $account = $CurrentAccount)
+    If $value == "" Then
+        Return IniDelete($SettingsDir & "\Statistics.ini", "Account" & $account, $name)
+    EndIf
     If Not GetAccountValue("StartDate", $account) Then
         Local $Month[13] = [12, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], $Date = $Month[Number(@MON)] & " " & Number(@MDAY) & ", " & @YEAR
         IniWrite($SettingsDir & "\Statistics.ini", "Account" & $account, "StartDate", $Date)
