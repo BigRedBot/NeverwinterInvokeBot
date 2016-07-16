@@ -121,6 +121,8 @@ While 1
             $text &= @CRLF & @CRLF & Localize("VIPAccountRewardDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
             If ScreenDetection_ImageSearch("VIPAccountRewardBorder", -1, $X, $Y-10) Then
                 $text &= @CRLF & @CRLF & Localize("VIPAccountRewardBorderDetected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
+            ElseIf ScreenDetection_ImageSearch("VIPAccountRewardBorder2", -1, $X, $Y-10) Then
+                $text &= @CRLF & @CRLF & Localize("VIPAccountRewardBorder2Detected") & " @ " & $X-$OffsetX & ", " & $Y-$OffsetY
             EndIf
         EndIf
         If ScreenDetection_ImageSearch("Unavailable") Then

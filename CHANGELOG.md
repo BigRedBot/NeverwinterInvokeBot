@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.3
+- Fixed bug with account bound VIP reward claiming.
+
 7.2
 - Added Run Now option to the Unattended Launcher's tray icon menu.
 

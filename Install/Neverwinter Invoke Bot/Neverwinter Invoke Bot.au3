@@ -508,17 +508,19 @@ Func GetVIPAccountReward()
         AddAccountCountValue("VIPAccountRewardTries")
         Send(GetValue("InventoryKey"))
         Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
+        MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
         If ImageSearch("VIPAccountReward", -1) Then
             Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom
-            If ImageSearch("VIPAccountRewardBorder", -1, $X, $Y-10) Then
+            If ImageSearch("VIPAccountRewardBorder", -1, $X, $Y-10) Or ImageSearch("VIPAccountRewardBorder2", -1, $X, $Y-10) Then
                 $X = Random($X + GetValue("VIPAccountRewardButtonTopLeftOffsetX"), $X + GetValue("VIPAccountRewardButtonBottomRightOffsetX"), 1)
                 $Y = Random($Y + GetValue("VIPAccountRewardButtonTopLeftOffsetY"), $Y + GetValue("VIPAccountRewardButtonBottomRightOffsetY"), 1)
                 MouseMove($X, $Y)
                 SingleClick()
                 Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
+                MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
                 If Not ImageSearch("VIPAccountReward", -1, $left, $top, $right, $bottom) Then
                     SaveItemCount("TotalVIPAccountRewards", 1)
-                ElseIf ImageSearch("VIPAccountRewardBorder", -1, $X, $Y-10) Then
+                ElseIf ImageSearch("VIPAccountRewardBorder", -1, $X, $Y-10) Or ImageSearch("VIPAccountRewardBorder2", -1, $X, $Y-10) Then
                     $X = Random($X + GetValue("VIPAccountRewardButtonTopLeftOffsetX"), $X + GetValue("VIPAccountRewardButtonBottomRightOffsetX"), 1)
                     $Y = Random($Y + GetValue("VIPAccountRewardButtonTopLeftOffsetY"), $Y + GetValue("VIPAccountRewardButtonBottomRightOffsetY"), 1)
                     MouseMove($X, $Y)
