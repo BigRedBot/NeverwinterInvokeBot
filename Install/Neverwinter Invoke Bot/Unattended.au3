@@ -33,14 +33,6 @@ Func RunNow()
     TrayItemSetText($RunItem, " ")
     TraySetToolTip($Title & @CRLF & Localize("UnattendedRunning"))
     TraySetIcon(@ScriptDir & "\images\green.ico")
-    While ProcessExists("Neverwinter Invoke Bot.exe")
-        ProcessClose("Neverwinter Invoke Bot.exe")
-        Sleep(500)
-    WEnd
-    While ProcessExists("GameClient.exe")
-        ProcessClose("GameClient.exe")
-        Sleep(500)
-    WEnd
     If @Compiled Then
         ShellExecuteWait(@ScriptDir & "\Neverwinter Invoke Bot.exe", 2, @ScriptDir)
     Else
