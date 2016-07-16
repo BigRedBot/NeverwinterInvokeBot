@@ -6,10 +6,10 @@ AutoItSetOption("TrayAutoPause", 0)
 #include <TrayConstants.au3>
 #include "_GetUTCMinutes.au3"
 #include "Localization.au3"
-Global $Title = $Name & ": Unattended Launcher"
+Global $Title = $Name & " " & $Version & ": Unattended Launcher"
 TraySetToolTip($Title)
 LoadLocalizations()
-If _Singleton($Title & "Jp4g9QRntjYP", 1) = 0 Then
+If _Singleton($Name & ": Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then
     MsgBox($MB_ICONWARNING, $Title, Localize("UnattendedAlreadyRunning"))
     Exit
 EndIf

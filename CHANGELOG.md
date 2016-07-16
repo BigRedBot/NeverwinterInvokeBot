@@ -1,8 +1,13 @@
 RELEASE NOTES
 =============
 
+7.1
+- Will now detect if the login server is unavailable and wait 15 minutes to retry login.
+- Will now detect if there is a version mismatch and try to patch the server if detected.
+- Added option to disable overflow XP collection.
+
 7.0.3
-- Added VIPAccountRewardCharacter option that can be added to the Settings.ini file, that may be set to the character number that you want to claim the VIP account reward on.
+- Added VIPAccountRewardCharacter option that can be added to the Settings.ini file. ( This may be set to the character number that you want to claim the VIP account reward on. )
 
 7.0.2
 - Put session start indicator back in the log files.
