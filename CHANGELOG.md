@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+7.3.1
+- Total invoke time now always starts from beginning of session.
+- Reset invokes until donation prompt back to 2,000.
+
 7.3
 - Fixed bug with account bound VIP reward claiming.
 

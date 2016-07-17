@@ -55,7 +55,7 @@ Func CloseClient($r = 0, $p = "GameClient.exe")
             TimeOut($r)
             If $RestartLoop Then Return 0
             ProcessClose($PID)
-            Sleep(500)
+            Sleep(100)
         WEnd
     Next
 EndFunc
@@ -84,9 +84,7 @@ Func Position($r = 0)
                 Focus()
                 Sleep(1000)
             WEnd
-            If Not $r And $StartTimer Then
-                $Restarted += 1
-            EndIf
+            If Not $r And $StartTimer Then $Restarted += 1
             Position($r)
             If $RestartLoop Then Return 0
             WinSetOnTop($WinHandle, "", 1)
@@ -1375,7 +1373,6 @@ EndFunc
 ; add after: If $RestartLoop Then Return 0
 Func Go()
     $UnattendedMode = GetValue("UnattendedMode")
-    $StartTimer = 0
     $LogInTries = 0
     $LoggingIn = 1
     $LogIn = 1
@@ -1437,7 +1434,7 @@ Func Go()
         If $RestartLoop Then Return 0
         Exit
     EndIf
-    $StartTimer = TimerInit()
+    If Not $StartTimer Then $StartTimer = TimerInit()
     $DisableRelogCount = 1
     StartLoop()
     If $RestartLoop Then Return 0
@@ -1630,8 +1627,8 @@ Func RunScript()
     Next
     $CurrentAccount = $old
     If $AllLoginInfoFound And GetValue("UnattendedMode") <> 2 Then $UnattendedMode = GetValue("UnattendedMode")
-    If Not $UnattendedModeCheckSettings And Not GetValue("DisableDonationPrompts") And ( GetAllAccountsValue("TotalInvoked") - GetAllAccountsValue("DonationPrompts") * 10000 ) >= 10000 Then
-        Statistics_SaveIniAllAccounts("DonationPrompts", Floor(GetAllAccountsValue("TotalInvoked") / 10000))
+    If Not $UnattendedModeCheckSettings And Not GetValue("DisableDonationPrompts") And ( GetAllAccountsValue("TotalInvoked") - GetAllAccountsValue("DonationPrompts") * 2000 ) >= 2000 Then
+        Statistics_SaveIniAllAccounts("DonationPrompts", Floor(GetAllAccountsValue("TotalInvoked") / 2000))
         CloseClient(0, "DonationPrompt.exe")
         If $RestartLoop Then Return 0
         If $UnattendedMode Then
