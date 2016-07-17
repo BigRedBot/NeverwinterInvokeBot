@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.3.2
+- Unattended Launcher will no longer give a warning message when starting when Neverwinter Invoke Bot is running.
+
 7.3.1
 - Total invoke time now always starts from beginning of session.
 - Reset invokes until donation prompt back to 2,000.

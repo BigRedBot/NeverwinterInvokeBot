@@ -7,7 +7,10 @@ Global $LoadPrivateSettings = 1
 TraySetIcon(@ScriptDir & "\images\red.ico")
 Global $Title = $Name & " v" & $Version
 TraySetToolTip($Title)
-If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("AlreadyRunning"))
+If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
+    If Not $CmdLine[0] Or Number($CmdLine[1]) <> 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("AlreadyRunning"))
+    Exit
+EndIf
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
 #include "_DownloadFile.au3"
 #include "_GetUTCMinutes.au3"
