@@ -585,81 +585,82 @@ EndFunc
 
 ; add after: If $RestartLoop Then Return 0
 Func ChangeCharacter()
-    TimeOut()
-    If $RestartLoop Then Return 0
-    FindLogInScreen()
-    If $RestartLoop Then Return 0
-    Send(GetValue("JumpKey"))
-    Sleep(500)
-    Send(GetValue("GameMenuKey"))
-    Sleep(1500)
-    If ImageExists("ChangeCharacterButton") And Not ImageSearch("ChangeCharacterButton") Then
-        MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
-        While Not ImageSearch("ChangeCharacterButton")
+    While 1
+        While 1
             TimeOut()
             If $RestartLoop Then Return 0
             FindLogInScreen()
             If $RestartLoop Then Return 0
-            Send("{ESC}")
-            Sleep(500)
-            Send("{ESC}")
-            Sleep(1500)
-            MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
-            If ImageSearch("ChangeCharacterButton") Then
-                Send("{ESC}")
-                Sleep(500)
-            EndIf
             Send(GetValue("JumpKey"))
             Sleep(500)
             Send(GetValue("GameMenuKey"))
             Sleep(1500)
-            MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
+            If ImageExists("ChangeCharacterButton") And Not ImageSearch("ChangeCharacterButton") Then
+                MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
+                While Not ImageSearch("ChangeCharacterButton")
+                    TimeOut()
+                    If $RestartLoop Then Return 0
+                    FindLogInScreen()
+                    If $RestartLoop Then Return 0
+                    Send("{ESC}")
+                    Sleep(500)
+                    Send("{ESC}")
+                    Sleep(1500)
+                    MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
+                    If ImageSearch("ChangeCharacterButton") Then
+                        Send("{ESC}")
+                        Sleep(500)
+                    EndIf
+                    Send(GetValue("JumpKey"))
+                    Sleep(500)
+                    Send(GetValue("GameMenuKey"))
+                    Sleep(1500)
+                    MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
+                WEnd
+            EndIf
+            If ImageExists("ChangeCharacterButton") Then
+                MouseMove($_ImageSearchX, $_ImageSearchY)
+                DoubleClick()
+            Else
+                For $n = 1 To 3
+                    Send("{DOWN}")
+                    Sleep($KeyDelay)
+                Next
+                Sleep(500)
+                Send("{ENTER}")
+            EndIf
+            Sleep(500)
+            If ImageExists("ChangeCharacterConfirmation") And Not ImageSearch("ChangeCharacterConfirmation") Then
+                Send("{ESC}")
+                Sleep(500)
+                Send("{ESC}")
+                Sleep(1500)
+                MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
+                If ImageSearch("ChangeCharacterButton") Then
+                    Send("{ESC}")
+                    Sleep(500)
+                EndIf
+                ExitLoop
+            EndIf
+            For $n = 1 To 4
+                Send("{ENTER}")
+                Sleep(500)
+            Next
+            If ImageSearch("ChangeCharacterConfirmation") Then
+                Send("{ESC}")
+                Sleep(500)
+                Send("{ESC}")
+                Sleep(1500)
+                MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
+                If ImageSearch("ChangeCharacterButton") Then
+                    Send("{ESC}")
+                    Sleep(500)
+                EndIf
+                ExitLoop
+            EndIf
+            Return
         WEnd
-    EndIf
-    If ImageExists("ChangeCharacterButton") Then
-        MouseMove($_ImageSearchX, $_ImageSearchY)
-        DoubleClick()
-    Else
-        For $n = 1 To 3
-            Send("{DOWN}")
-            Sleep($KeyDelay)
-        Next
-        Sleep(500)
-        Send("{ENTER}")
-    EndIf
-    Sleep(500)
-    If ImageExists("ChangeCharacterConfirmation") And Not ImageSearch("ChangeCharacterConfirmation") Then
-        Send("{ESC}")
-        Sleep(500)
-        Send("{ESC}")
-        Sleep(1500)
-        MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
-        If ImageSearch("ChangeCharacterButton") Then
-            Send("{ESC}")
-            Sleep(500)
-        EndIf
-        ChangeCharacter()
-        If $RestartLoop Then Return 0
-        Return
-    EndIf
-    For $n = 1 To 4
-        Send("{ENTER}")
-        Sleep(500)
-    Next
-    If ImageSearch("ChangeCharacterConfirmation") Then
-        Send("{ESC}")
-        Sleep(500)
-        Send("{ESC}")
-        Sleep(1500)
-        MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
-        If ImageSearch("ChangeCharacterButton") Then
-            Send("{ESC}")
-            Sleep(500)
-        EndIf
-        ChangeCharacter()
-        If $RestartLoop Then Return 0
-        Return
-    EndIf
+    WEnd
 EndFunc
 
 Func DoubleClick()
