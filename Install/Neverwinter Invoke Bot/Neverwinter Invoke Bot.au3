@@ -74,7 +74,6 @@ Func Position($r = 0)
             Splash("[ " & Localize("NeverwinterNotFound") & " ]")
             CloseClient($r)
             If $RestartLoop Then Return 0
-            If Not GetValue("NoInputBlocking") Then BlockInput(1)
             Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
             FileChangeDir($GameClientInstallLocation & "\Neverwinter\Live")
             Run("GameClient.exe" & GetLogInServerAddressString(), $GameClientInstallLocation & "\Neverwinter\Live")
@@ -90,7 +89,6 @@ Func Position($r = 0)
             If Not $r And $StartTimer Then $Restarted += 1
             Position($r)
             If $RestartLoop Then Return 0
-            WinSetOnTop($WinHandle, "", 1)
             $WaitingTimer = TimerInit()
             While Not ImageSearch("LogInScreen")
                 Sleep(500)
@@ -106,21 +104,13 @@ Func Position($r = 0)
     EndIf
     If GetValue("GameWidth") And GetValue("GameHeight") Then
         If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight Then
-            BlockInput(0)
-            WinSetOnTop($WinHandle, "", 0)
-            SplashOff()
-            $SplashWindow = 0
-            HotKeySet("{F4}")
+            Splash(0)
             Error(Localize("UnMaximize"))
             If $RestartLoop Then Return 0
             Return
-        ElseIf $DeskTopWidth <= (GetValue("GameWidth") + $PaddingLeft) Or $DeskTopHeight <= (GetValue("GameHeight") + $PaddingTop) Or ( $DeskTopWidth <= (GetValue("GameWidth") + $PaddingLeft + GetValue("SplashWidth")) And $DeskTopHeight <= (GetValue("GameHeight") + $PaddingTop + GetValue("SplashHeight")) ) Then
-            BlockInput(0)
-            WinSetOnTop($WinHandle, "", 0)
-            SplashOff()
-            $SplashWindow = 0
-            HotKeySet("{F4}")
-            Error(Localize("ResolutionHigherThan", "<RESOLUTION>", (GetValue("GameWidth") + $PaddingLeft) & "x" & (GetValue("GameHeight") + $PaddingTop + GetValue("SplashHeight"))))
+        ElseIf $DeskTopWidth <= (GetValue("GameWidth") + $PaddingLeft) Or $DeskTopHeight <= (GetValue("GameHeight") + $PaddingTop) Or ( $DeskTopWidth <= (GetValue("GameWidth") + $PaddingLeft + GetValue("SplashWidth") + 70) And $DeskTopHeight <= (GetValue("GameHeight") + $PaddingTop + GetValue("SplashHeight") + 50) ) Then
+            Splash(0)
+            Error(Localize("ResolutionHigherThan", "<RESOLUTION>", (GetValue("GameWidth") + $PaddingLeft) & "x" & (GetValue("GameHeight") + $PaddingTop + GetValue("SplashHeight") + 50)))
             If $RestartLoop Then Return 0
             Return
         EndIf
@@ -176,6 +166,9 @@ Func Loop()
                 If $RestartLoop Then ExitLoop 1
                 Exit
             EndIf
+            Position()
+            If $RestartLoop Then Return 0
+            Splash()
             $WaitingTimer = TimerInit()
             FindLogInScreen()
             If $RestartLoop Then ExitLoop 1
@@ -209,11 +202,11 @@ Func Loop()
                         Next
                         For $n = 1 To GetValue("TotalSlots")
                             Send("{UP}")
+                            Position()
+                            If $RestartLoop Then ExitLoop 3
                             If FindPixels(GetValue("TopScrollBarX"), GetValue("TopScrollBarY"), GetValue("TopScrollBarC")) And FindPixels(GetValue("TopSelectedCharacterX"), GetValue("TopSelectedCharacterY"), GetValue("TopSelectedCharacterC")) Then
-                                If $RestartLoop Then ExitLoop 3
                                 ExitLoop
                             EndIf
-                            If $RestartLoop Then ExitLoop 3
                         Next
                     Else
                         For $n = 1 To GetValue("TotalSlots")
@@ -232,11 +225,11 @@ Func Loop()
                         Next
                         For $n = 1 To GetValue("TotalSlots")
                             Send("{DOWN}")
+                            Position()
+                            If $RestartLoop Then ExitLoop 3
                             If FindPixels(GetValue("BottomScrollBarX"), GetValue("BottomScrollBarY"), GetValue("BottomScrollBarC")) And FindPixels(GetValue("BottomSelectedCharacterX"), GetValue("BottomSelectedCharacterY"), GetValue("BottomSelectedCharacterC")) Then
-                                If $RestartLoop Then ExitLoop 3
                                 ExitLoop
                             EndIf
-                            If $RestartLoop Then ExitLoop 3
                         Next
                     Else
                         For $n = 1 To GetValue("TotalSlots")
@@ -274,7 +267,7 @@ Func Loop()
                 If Not GetValue("DisableOverflowXPRewardCollection") And ImageSearch("OverflowXPReward") Then
                     Send(GetValue("CursorModeKey"))
                     Sleep(500)
-                    MouseMove($X, $Y)
+                    MouseMove($_ImageSearchX, $_ImageSearchY)
                     SingleClick()
                     SaveItemCount("TotalOverflowXPRewards", 1)
                     Sleep(1000)
@@ -406,15 +399,13 @@ Func WaitToInvoke()
                 $ETAText = ""
                 Position()
                 If $RestartLoop Then Return 0
-                If Not GetValue("NoInputBlocking") Then BlockInput(1)
-                WinSetOnTop($WinHandle, "", 1)
                 Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
                 $WaitingTimer = TimerInit()
                 WaitForScreen("SelectionScreen")
                 If $RestartLoop Then Return 0
                 Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
                 If ImageSearch("SelectionScreen") Then
-                    MouseMove($X, $Y)
+                    MouseMove($_ImageSearchX, $_ImageSearchY)
                     SingleClick()
                     Sleep(1000)
                     $DisableRelogCount = 1
@@ -441,13 +432,7 @@ Func WaitToInvoke()
         $ETAText = ""
         Position()
         If $RestartLoop Then Return 0
-        BlockInput(0)
-        WinSetOnTop($WinHandle, "", 0)
         WaitMinutes($Minutes, "WaitingForInvokeDelay")
-        Position()
-        If $RestartLoop Then Return 0
-        If Not GetValue("NoInputBlocking") Then BlockInput(1)
-        WinSetOnTop($WinHandle, "", 1)
         StartLoop()
         If $RestartLoop Then Return 0
     EndIf
@@ -470,7 +455,7 @@ Func Invoke()
             EndIf
             For $k = 1 To 10
                 If ImageSearch("VaultOfPietyButton") Then
-                    MouseMove($X, $Y)
+                    MouseMove($_ImageSearchX, $_ImageSearchY)
                     SingleClick()
                     GetCoffer()
                     If $RestartLoop Then Return 0
@@ -496,7 +481,7 @@ Func Invoke()
             Sleep(5000)
         Next
         If ImageSearch("VaultOfPietyButton") Then
-            MouseMove($X, $Y)
+            MouseMove($_ImageSearchX, $_ImageSearchY)
             SingleClick()
             GetCoffer()
             If $RestartLoop Then Return 0
@@ -512,19 +497,19 @@ Func GetVIPAccountReward()
         MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
         If ImageSearch("VIPAccountReward", -1) Then
             Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom
-            If ImageSearch("VIPAccountRewardBorder", -1, $X, $Y-10) Or ImageSearch("VIPAccountRewardBorder2", -1, $X, $Y-10) Then
-                $X = Random($X + GetValue("VIPAccountRewardButtonTopLeftOffsetX"), $X + GetValue("VIPAccountRewardButtonBottomRightOffsetX"), 1)
-                $Y = Random($Y + GetValue("VIPAccountRewardButtonTopLeftOffsetY"), $Y + GetValue("VIPAccountRewardButtonBottomRightOffsetY"), 1)
-                MouseMove($X, $Y)
+            If ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-10) Or ImageSearch("VIPAccountRewardBorder2", -1, $_ImageSearchX, $_ImageSearchY-10) Then
+                $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonLeftOffset"), $_ImageSearchRight + GetValue("VIPAccountRewardButtonRightOffset"), 1)
+                $_ImageSearchY = Random($_ImageSearchTop + GetValue("VIPAccountRewardButtonTopOffset"), $_ImageSearchTop + GetValue("VIPAccountRewardButtonBottomOffset"), 1)
+                MouseMove($_ImageSearchX, $_ImageSearchY)
                 SingleClick()
                 Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
                 MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
                 If Not ImageSearch("VIPAccountReward", -1, $left, $top, $right, $bottom) Then
                     SaveItemCount("TotalVIPAccountRewards", 1)
-                ElseIf ImageSearch("VIPAccountRewardBorder", -1, $X, $Y-10) Or ImageSearch("VIPAccountRewardBorder2", -1, $X, $Y-10) Then
-                    $X = Random($X + GetValue("VIPAccountRewardButtonTopLeftOffsetX"), $X + GetValue("VIPAccountRewardButtonBottomRightOffsetX"), 1)
-                    $Y = Random($Y + GetValue("VIPAccountRewardButtonTopLeftOffsetY"), $Y + GetValue("VIPAccountRewardButtonBottomRightOffsetY"), 1)
-                    MouseMove($X, $Y)
+                ElseIf ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-10) Or ImageSearch("VIPAccountRewardBorder2", -1, $_ImageSearchX, $_ImageSearchY-10) Then
+                    $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonLeftOffset"), $_ImageSearchRight + GetValue("VIPAccountRewardButtonRightOffset"), 1)
+                    $_ImageSearchY = Random($_ImageSearchTop + GetValue("VIPAccountRewardButtonTopOffset"), $_ImageSearchTop + GetValue("VIPAccountRewardButtonBottomOffset"), 1)
+                    MouseMove($_ImageSearchX, $_ImageSearchY)
                     SingleClick()
                     Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
                     If Not ImageSearch("VIPAccountReward", -1, $left, $top, $right, $bottom) Then
@@ -548,12 +533,12 @@ Func GetCoffer()
     If $CofferTries >= 5 Then Return
     Sleep(GetValue("ClaimCofferDelay") * 1000)
     If ImageSearch("CelestialSynergyTab") Then
-        MouseMove($X, $Y)
+        MouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
         Sleep(GetValue("ClaimCofferDelay") * 1000)
     EndIf
     If ImageSearch(GetValue("Coffer")) Then
-        MouseMove($X, $Y)
+        MouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
         Sleep(GetValue("ClaimCofferDelay") * 1000)
         If GetValue("Coffer") = "ElixirOfFate" Then
@@ -561,7 +546,7 @@ Func GetCoffer()
                 Send("{BS 2}4")
                 Sleep(500)
                 If ImageSearch("OK") Then
-                    MouseMove($X, $Y)
+                    MouseMove($_ImageSearchX, $_ImageSearchY)
                     DoubleClick()
                     SaveItemCount("TotalElixirsOfFate", 4)
                 EndIf
@@ -573,7 +558,7 @@ Func GetCoffer()
             Sleep(500)
             Sleep(GetValue("ClaimCofferDelay") * 1000)
             If ImageSearch(GetValue("Coffer")) Then
-                MouseMove($X, $Y)
+                MouseMove($_ImageSearchX, $_ImageSearchY)
                 DoubleClick()
                 Sleep(GetValue("ClaimCofferDelay") * 1000)
                 Send("{ENTER}")
@@ -634,7 +619,7 @@ Func ChangeCharacter()
         WEnd
     EndIf
     If ImageExists("ChangeCharacterButton") Then
-        MouseMove($X, $Y)
+        MouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
     Else
         For $n = 1 To 3
@@ -703,9 +688,18 @@ Func SingleRightClick()
     MouseUp("right")
 EndFunc
 
-Global $SplashWindow, $SplashWindowOnTop = 1, $LastSplashText = "", $SplashStartText = "", $ETAText = "", $SplashLeft = @DesktopWidth - GetValue("SplashWidth") - 1, $SplashTop = @DesktopHeight - GetValue("SplashHeight") - 1
+Global $SplashWindow, $SplashWindowOnTop = 1, $LastSplashText = "", $SplashStartText = "", $ETAText = "", $SplashLeft = @DesktopWidth - GetValue("SplashWidth") - 70 - 1, $SplashTop = @DesktopHeight - GetValue("SplashHeight") - 50 - 1
 
 Func Splash($s = "", $ontop = 1)
+    If $s == 0 Then
+        If Not $SplashWindow Then Return
+        BlockInput(0)
+        WinSetOnTop($WinHandle, "", 0)
+        SplashOff()
+        $SplashWindow = 0
+        HotKeySet("{F4}")
+        Return
+    EndIf
     Local $Message = Localize("Invoking", "<CURRENT>", GetValue("Current"), "<ENDAT>", GetValue("EndAt"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & $s & @CRLF & $ETAText
     If $SplashWindow And $ontop = $SplashWindowOnTop Then
         $Message = Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & $SplashStartText & $Message
@@ -714,23 +708,24 @@ Func Splash($s = "", $ontop = 1)
             $LastSplashText = $Message
         EndIf
     Else
-        Local $setontop = $DLG_NOTITLE, $toplocation = $SplashTop, $leftlocation = $SplashLeft
-        If $SplashWindow And $ontop <> $SplashWindowOnTop Then SplashOff()
+        Local $setontop = $DLG_NOTITLE, $leftlocation = $SplashLeft, $toplocation = $SplashTop
         If $ontop Then
+            If Not GetValue("NoInputBlocking") Then BlockInput(1)
             $SplashWindowOnTop = 1
             $SplashStartText = Localize("ToStopPressCtrlAltDel") & @CRLF & @CRLF
         Else
+            BlockInput(0)
             $SplashWindowOnTop = 0
-            $setontop = $DLG_NOTONTOP + $DLG_MOVEABLE
+            $setontop = $DLG_MOVEABLE
             $SplashStartText = Localize("ToStopPressF4") & @CRLF & @CRLF & @CRLF
-            $toplocation = 30
-            $leftlocation = $SplashLeft - 30
+            $toplocation = 50
         EndIf
-        HotKeySet("{F4}", "Pause")
-        If $RestartLoop Then Return 0
         $Message = Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & $SplashStartText & $Message
         $SplashWindow = SplashTextOn("", $Message, GetValue("SplashWidth"), GetValue("SplashHeight"), $leftlocation, $toplocation, $setontop)
         $LastSplashText = $Message
+        WinSetOnTop($WinHandle, "", $ontop)
+        WinSetOnTop($SplashWindow, "", $ontop)
+        HotKeySet("{F4}", "Pause")
     EndIf
 EndFunc
 
@@ -748,20 +743,16 @@ Func WaitForScreen($image, $resultPosition = -2, $left = $ClientLeft, $top = $Cl
     WEnd
 EndFunc
 
-; add after: If $RestartLoop Then Return 0
-Func FindPixels(ByRef $x, ByRef $y, ByRef $c)
-    If $RestartLoop Then Return 0
-    Position()
-    If $RestartLoop Then Return 0
+Func FindPixels($x, $y, $c)
     If $x And Hex(PixelGetColor($x + $OffsetX, $y + $OffsetY), 6) = String($c) Then Return 1
     Return 0
 EndFunc
 
-Global $X = 0, $Y = 0, $LogIn = 1
+Global $LogIn = 1
 
 Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom)
     If ImageExists($image) Then
-        If _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $X, $Y, GetValue("ImageSearchTolerance")) Then
+        If _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then
             If $image <> "LogInScreen" And $image <> "Unavailable" And $image <> "Mismatch" Then
                 $LoggingIn = 0
                 $LogInTries = 0
@@ -808,7 +799,7 @@ Func FindLogInScreen()
         SetAccountValue("FinishedInvoke", 1)
         $FailedInvoke = 0
         Splash()
-        MouseMove($X, $Y)
+        MouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
         Sleep(1000)
     EndIf
@@ -823,13 +814,7 @@ Func FindLogInScreen()
                     $LastLoginTry = 0
                     Position()
                     If $RestartLoop Then Return 0
-                    BlockInput(0)
-                    WinSetOnTop($WinHandle, "", 0)
                     WaitMinutes(15, "WaitingToRetryLogin")
-                    Position()
-                    If $RestartLoop Then Return 0
-                    If Not GetValue("NoInputBlocking") Then BlockInput(1)
-                    WinSetOnTop($WinHandle, "", 1)
                 Else
                     Splash()
                     Sleep(1000)
@@ -856,13 +841,7 @@ Func FindLogInScreen()
                                 $LogInTries = 0
                                 Position()
                                 If $RestartLoop Then Return 0
-                                BlockInput(0)
-                                WinSetOnTop($WinHandle, "", 0)
                                 WaitMinutes(15, "WaitingToRetryLogin")
-                                Position()
-                                If $RestartLoop Then Return 0
-                                If Not GetValue("NoInputBlocking") Then BlockInput(1)
-                                WinSetOnTop($WinHandle, "", 1)
                                 ExitLoop
                             ElseIf ImageSearch("Mismatch") And PatchClient() Then
                                 If $RestartLoop Then Return 0
@@ -894,8 +873,6 @@ Func CheckServer()
             Next
             If $first Then
                 $first = 0
-                BlockInput(0)
-                WinSetOnTop($WinHandle, "", 0)
                 Splash("[ " & Localize("WaitingForGameServer") & " ]", 0)
             EndIf
             Sleep(10000)
@@ -910,8 +887,6 @@ Func PatchClient()
         $LogInTries = 0
         CheckServer()
         $LogInTries = 0
-        BlockInput(0)
-        WinSetOnTop($WinHandle, "", 0)
         Splash("[ " & Localize("PatchingGame") & " ]", 0)
         Local $arc = ProcessExists("Arc.exe"), $auto = RegRead("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch")
         CloseClient()
@@ -950,13 +925,10 @@ Func LogIn()
             Error(Localize("MaxLoginAttempts"))
             If $RestartLoop Then Return 0
         EndIf
-        If $RestartLoop Then Return 0
         CheckServer()
-        Splash()
-        If Not GetValue("NoInputBlocking") Then BlockInput(1)
         Position()
         If $RestartLoop Then Return 0
-        WinSetOnTop($WinHandle, "", 1)
+        Splash()
         If GetValue("UsernameBoxY") Then
             MouseMove(GetValue("UsernameBoxX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("UsernameBoxY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
         Else
@@ -1011,11 +983,9 @@ Func End()
                 $ETAText = ""
                 Position()
                 If $RestartLoop Then Return 0
-                If Not GetValue("NoInputBlocking") Then BlockInput(1)
-                WinSetOnTop($WinHandle, "", 1)
                 Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
                 If ImageSearch("SelectionScreen") Then
-                    MouseMove($X, $Y)
+                    MouseMove($_ImageSearchX, $_ImageSearchY)
                     SingleClick()
                     Sleep(1000)
                     $DisableRelogCount = 1
@@ -1034,12 +1004,11 @@ Func End()
             If $RestartLoop Then Return 0
         EndIf
     EndIf
-    Splash()
     Position()
     If $RestartLoop Then Return 0
-    WinSetOnTop($WinHandle, "", 1)
+    Splash()
     If ImageSearch("SelectionScreen") Then
-        MouseMove($X, $Y)
+        MouseMove($_ImageSearchX, $_ImageSearchY)
         SingleClick()
         Sleep(1000)
         $DisableRelogCount = 1
@@ -1120,12 +1089,7 @@ Func SaveItemCount($item, $value = 0)
 EndFunc
 
 Func SendMessage($s, $n = $MB_OK, $ontop = 0)
-    BlockInput(0)
-    WinSetOnTop($WinHandle, "", 0)
-    AutoItSetOption("SendKeyDownDelay", $KeyDelay)
-    SplashOff()
-    $SplashWindow = 0
-    HotKeySet("{F4}")
+    Splash(0)
     $ETAText = ""
     Local $text = "    " & Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & $s
     Local $CofferCount = 0, $ProfessionPackCount = 0, $ElixirOfFateCount = 0, $OverflowXPRewardCount = 0, $VIPAccountRewardCount = 0, $IdleLogoutText = "", $TimedOutText = "", $FailedInvokeText = ""
@@ -1384,8 +1348,6 @@ Func Go()
         Local $t = TimerInit(), $time = $MinutesToStart, $left = $time, $lastmin = 0, $leftover
         Position()
         If $RestartLoop Then Return 0
-        BlockInput(0)
-        WinSetOnTop($WinHandle, "", 0)
         While $left > 0
             $MinutesToStart = Ceiling($left)
             Splash("[ " & Localize("WaitingToStart", "<MINUTES>", HoursAndMinutes($left)) & " ]", 0)
@@ -1409,15 +1371,13 @@ Func Go()
     Local $check = CheckAccounts()
     If $check > 0 Then
         $ETAText = ""
-        If Not GetValue("NoInputBlocking") Then BlockInput(1)
         Position()
         If $RestartLoop Then Return 0
-        WinSetOnTop($WinHandle, "", 1)
         Splash()
         If $check <> $CurrentAccount Then
             Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
             If ImageSearch("SelectionScreen") Then
-                MouseMove($X, $Y)
+                MouseMove($_ImageSearchX, $_ImageSearchY)
                 SingleClick()
                 Sleep(1000)
                 $DisableRelogCount = 1

@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+7.3.3
+- Moved splash window so that there is some space between it and the edge of the screen.
+- Splash window is no longer sometimes set to always on top when waiting.
+
 7.3.2
 - Unattended Launcher will no longer give a warning message when starting when Neverwinter Invoke Bot is running.
 

@@ -16,9 +16,8 @@
 ;                   $findImage - the image to locate on the desktop
 ;                   $tolerance - 0 for no tolerance (0-255). Needed when colors of
 ;                                image differ from desktop. e.g GIF
-;                   $resultPosition - Set where the returned x,y location of the image is.
+;                   $resultPosition - Set where the returned $_ImageSearchX, $_ImageSearchY location of the image is.
 ;                                     0 for centre of image, 1 or greater for random number of pixels away from center of image, -1 for top left of image,  -2 for random location within image
-;                   $x $y - Return the x and y location of the image
 ;
 ; Return Value(s):  On Success - Returns 1
 ;                   On Failure - Returns 0
@@ -27,43 +26,38 @@
 ;       a desktop region to search
 ;
 ;===============================================================================
-Global $_ImageSearchLeft = 0, $_ImageSearchTop = 0, $_ImageSearchRight = 0, $_ImageSearchBottom = 0
+Global $_ImageSearchLeft = 0, $_ImageSearchTop = 0, $_ImageSearchRight = 0, $_ImageSearchBottom = 0, $_ImageSearchWidth = 0, $_ImageSearchHeight = 0, $_ImageSearchX = 0, $_ImageSearchY = 0
 
-Func _ImageSearch($findImage,$resultPosition, ByRef $x, ByRef $y,$tolerance,$width = @DesktopWidth, $height = @DesktopHeight)
+Func _ImageSearch($findImage, $resultPosition, $tolerance, $width = @DesktopWidth, $height = @DesktopHeight)
     If $width = 0 Then $width = @DesktopWidth
     If $height = 0 Then $height = @DesktopHeight
-    return _ImageSearchArea($findImage,$resultPosition,0,0,$width,$height,$x,$y,$tolerance)
+    return _ImageSearchArea($findImage, $resultPosition, 0, 0, $width - 1, $height - 1, $tolerance)
 EndFunc
 
-Func _ImageSearchArea($findImage,$resultPosition,$x1,$y1,$right,$bottom,ByRef $x, ByRef $y, $tolerance)
-    ;MsgBox(0,"asd","" & $x1 & " " & $y1 & " " & $right & " " & $bottom)
-    if $tolerance>0 then $findImage = "*" & $tolerance & " " & $findImage
-    $result = DllCall("ImageSearchDLL.dll","str","ImageSearch","int",$x1,"int",$y1,"int",$right,"int",$bottom,"str",$findImage)
-
-    ; If error exit
-    if not IsArray($result) or $result[0]="0" then return 0
-
-    ; Otherwise get the x,y location of the match and the size of the image to
-    ; compute the centre of search
-    $array = StringSplit($result[0],"|")
-
-    $_ImageSearchLeft=Int(Number($array[2]))
-    $_ImageSearchTop=Int(Number($array[3]))
-    $_ImageSearchRight=$_ImageSearchLeft+Int(Number($array[4]))
-    $_ImageSearchBottom=$_ImageSearchTop+Int(Number($array[5]))
-    $x=$_ImageSearchLeft
-    $y=$_ImageSearchTop
-    if $resultPosition>=0 then
-        if $resultPosition>0 then
-            $x+=Random(-$resultPosition, $resultPosition, 1)
-            $y+=Random(-$resultPosition, $resultPosition, 1)
+Func _ImageSearchArea($findImage, $resultPosition, $left, $top, $right, $bottom, $tolerance)
+    if $tolerance > 0 then $findImage = "*" & $tolerance & " " & $findImage
+    Local $result = DllCall("ImageSearchDLL.dll", "str", "ImageSearch", "int", $left, "int", $top, "int", $right, "int", $bottom, "str", $findImage)
+    if not IsArray($result) or $result[0] = "0" then return 0
+    Local $array = StringSplit($result[0], "|")
+    $_ImageSearchLeft = Int(Number($array[2]))
+    $_ImageSearchTop = Int(Number($array[3]))
+    $_ImageSearchWidth = Int(Number($array[4]))
+    $_ImageSearchHeight = Int(Number($array[5]))
+    $_ImageSearchRight = $_ImageSearchLeft + $_ImageSearchWidth-1
+    $_ImageSearchBottom = $_ImageSearchTop + $_ImageSearchHeight-1
+    $_ImageSearchX = $_ImageSearchLeft
+    $_ImageSearchY = $_ImageSearchTop
+    if $resultPosition >= 0 then
+        if $resultPosition > 0 then
+            $_ImageSearchX += Random(-$resultPosition, $resultPosition, 1)
+            $_ImageSearchY += Random(-$resultPosition, $resultPosition, 1)
         else
-            $x+=Int(Number($array[4])/2)
-            $y+=Int(Number($array[5])/2)
+            $_ImageSearchX += Int(($_ImageSearchWidth-1)/2)
+            $_ImageSearchY += Int(($_ImageSearchHeight-1)/2)
         endif
-    elseif $resultPosition<-1 then
-        $x=Random($_ImageSearchLeft, $_ImageSearchRight, 1)
-        $y=Random($_ImageSearchTop, $_ImageSearchBottom, 1)
+    elseif $resultPosition < -1 then
+        $_ImageSearchX = Random($_ImageSearchLeft, $_ImageSearchRight, 1)
+        $_ImageSearchY = Random($_ImageSearchTop, $_ImageSearchBottom, 1)
     endif
     return 1
 EndFunc
@@ -78,26 +72,21 @@ EndFunc
 ;                   $findImage - the image to locate on the desktop
 ;                   $tolerance - 0 for no tolerance (0-255). Needed when colors of
 ;                                image differ from desktop. e.g GIF
-;                   $resultPosition - Set where the returned x,y location of the image is.
+;                   $resultPosition - Set where the returned $_ImageSearchX, $_ImageSearchY location of the image is.
 ;                                     0 for centre of image, 1 or greater for random number of pixels away from center of image, -1 for top left of image,  -2 for random location within image
-;                   $x $y - Return the x and y location of the image
 ;
 ; Return Value(s):  On Success - Returns 1
 ;                   On Failure - Returns 0
 ;
 ;
 ;===============================================================================
-Func _WaitForImageSearch($findImage,$waitSecs,$resultPosition,ByRef $x, ByRef $y,$tolerance,$width = @DesktopWidth, $height = @DesktopHeight)
+Func _WaitForImageSearch($findImage, $waitSecs, $resultPosition, $tolerance, $width = @DesktopWidth, $height = @DesktopHeight)
     If $width = 0 Then $width = @DesktopWidth
     If $height = 0 Then $height = @DesktopHeight
-    $waitSecs = $waitSecs * 1000
-    $startTime=TimerInit()
-    While TimerDiff($startTime) < $waitSecs
-        ;sleep(100)
-        $result=_ImageSearch($findImage,$resultPosition,$x, $y,$tolerance,$width,$height)
-        if $result > 0 Then
-            return 1
-        EndIf
+    Local $startTime = TimerInit()
+    While TimerDiff($startTime) < $waitSecs * 1000
+        if _ImageSearch($findImage, $resultPosition, $tolerance, $width, $height) Then return 1
+        sleep(100)
     WEnd
     return 0
 EndFunc
@@ -115,27 +104,21 @@ EndFunc
 ;								 ARRAY[1] is the first image
 ;                   $tolerance - 0 for no tolerance (0-255). Needed when colors of
 ;                                image differ from desktop. e.g GIF
-;                   $resultPosition - Set where the returned x,y location of the image is.
+;                   $resultPosition - Set where the returned $_ImageSearchX, $_ImageSearchY location of the image is.
 ;                                     0 for centre of image, 1 or greater for random number of pixels away from center of image, -1 for top left of image,  -2 for random location within image
-;                   $x $y - Return the x and y location of the image
 ;
 ; Return Value(s):  On Success - Returns the index of the successful find
 ;                   On Failure - Returns 0
 ;
 ;
 ;===============================================================================
-Func _WaitForImagesSearch($findImage,$waitSecs,$resultPosition,ByRef $x, ByRef $y,$tolerance)
-    $waitSecs = $waitSecs * 1000
-    $startTime=TimerInit()
-    While TimerDiff($startTime) < $waitSecs
+Func _WaitForImagesSearch($findImage, $waitSecs, $resultPosition, $tolerance, $width = @DesktopWidth, $height = @DesktopHeight)
+    Local $startTime = TimerInit()
+    While TimerDiff($startTime) < $waitSecs * 1000
         for $i = 1 to $findImage[0]
+            if _ImageSearch($findImage[$i], $resultPosition, $tolerance, $width, $height) Then return $i
             sleep(100)
-            $result=_ImageSearch($findImage[$i],$resultPosition,$x, $y,$tolerance)
-            if $result > 0 Then
-                return $i
-            EndIf
         Next
     WEnd
     return 0
 EndFunc
-
