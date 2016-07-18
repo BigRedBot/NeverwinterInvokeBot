@@ -13,7 +13,7 @@ Local $text
 
 Func ScreenDetection_Position()
     FindWindow()
-    If Not $WinFound Or Not GetPosition() Then
+    If Not $WinHandle Or Not GetPosition() Then
         $text = Localize("NeverwinterNotFound")
         Return 0
     EndIf

@@ -48,16 +48,24 @@ EndFunc
 #include <WinAPIFiles.au3>
 
 Func GetLanguage($default = "English", $file = @ScriptDir & "\Localization.ini")
-    Local $langlist = $default
+    Local $d = $default
+    If Not IsString($d) Or $d = "" Then $d = "English"
+    $d = IniRead($file, $d, "Language", "English")
+    If @error <> 0 Then Exit
+    $d = BinaryToString(StringToBinary($d), 4)
+    Local $langlist = $d
     Local $sections = IniReadSectionNames($file)
-    If @error = 0 Then
-        For $i = 1 To $sections[0]
-            If $sections[$i] <> $default Then $langlist &= "|" & $sections[$i]
-        Next
-    EndIf
+    If @error <> 0 Then Exit
+    Local $translated_sections[$sections[0] + 1]
+    For $i = 1 To $sections[0]
+        $translated_sections[$i] = IniRead($file, $sections[$i], "Language", $sections[$i])
+        If @error <> 0 Then Exit
+        $translated_sections[$i] = BinaryToString(StringToBinary($translated_sections[$i]), 4)
+        If $translated_sections[$i] <> $d Then $langlist &= "|" & $translated_sections[$i]
+    Next
     Local $hGUI = GUICreate("Language", 200, 85)
     Local $hCombo = GUICtrlCreateCombo("", 25, 15, 150, -1)
-    GUICtrlSetData(-1, $langlist, $default)
+    GUICtrlSetData(-1, $langlist, $d)
     Local $hButton = GUICtrlCreateButton("OK", 58, 50, 84, -1, $BS_DEFPUSHBUTTON)
     GUISetState()
     While 1
@@ -67,23 +75,23 @@ Func GetLanguage($default = "English", $file = @ScriptDir & "\Localization.ini")
             Case $hButton
                 Local $sCurrCombo = GUICtrlRead($hCombo)
                 For $i = 1 To $sections[0]
-                    If $sections[$i] == $sCurrCombo Then
+                    If $translated_sections[$i] == $sCurrCombo Then
                         GUIDelete()
-                        Return $sCurrCombo
+                        Return $sections[$i]
                     EndIf
                 Next
         EndSwitch
     WEnd
 EndFunc
 
-Func LoadLocalizations($lang = 0, $file = 0, $iniwrite = 1)
+Func LoadLocalizations($lang = "", $file = "", $iniwrite = 1)
     Local $l = $lang, $f = $file
-    If Not $f Then $f = @ScriptDir & "\Localization.ini"
-    If Not $l Or ( IsNumber($l) And $l = 1 ) Then
+    If Not IsString($f) Or $f = "" Then $f = @ScriptDir & "\Localization.ini"
+    If Not IsString($l) Or $l = "" Then
         Local $s = @AppDataCommonDir & "\Neverwinter Invoke Bot"
         $l = IniRead($s & "\Settings.ini", "AllAccounts", "Language", "")
+        If @error <> 0 Then Exit
         If $l = "" Or $lang Then
-            If $l = "" Then $l = "English"
             $l = GetLanguage($l, $f)
             If $iniwrite Then
                 DirCreate($s)
@@ -92,13 +100,16 @@ Func LoadLocalizations($lang = 0, $file = 0, $iniwrite = 1)
         EndIf
     EndIf
     Local $values = IniReadSection($f, $l)
-    If @error = 0 Then
-        For $i = 1 To $values[0][0]
-            Local $v = BinaryToString(StringToBinary($values[$i][1]), 4)
-            If $v = "" Then $v = BinaryToString(StringToBinary(IniRead($f, "English", $values[$i][0], "")), 4)
-            If Not IsDeclared("LOCALIZATION_" & $values[$i][0]) Then Assign("LOCALIZATION_" & $values[$i][0], StringReplace($v, "<BR>", @CRLF), 2)
-        Next
-    EndIf
+    If @error <> 0 Then Exit
+    For $i = 1 To $values[0][0]
+        Local $v = BinaryToString(StringToBinary($values[$i][1]), 4)
+        If $v = "" Then
+            $v = IniRead($f, "English", $values[$i][0], "")
+            If @error <> 0 Then Exit
+            $v = BinaryToString(StringToBinary($v), 4)
+        EndIf
+        If Not IsDeclared("LOCALIZATION_" & $values[$i][0]) Then Assign("LOCALIZATION_" & $values[$i][0], StringReplace($v, "<BR>", @CRLF), 2)
+    Next
     If $l <> "English" Then LoadLocalizations("English", $f)
     Return $l
 EndFunc

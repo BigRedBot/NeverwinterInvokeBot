@@ -66,7 +66,7 @@ EndFunc
 ; add after: If $RestartLoop Then Return 0
 Func Position($r = 0)
     Focus()
-    If Not $WinFound Or Not GetPosition() Then
+    If Not $WinHandle Or Not GetPosition() Then
         If GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And ImageExists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
             $LogInTries = 0
             $LastLoginTry = 0
@@ -80,7 +80,7 @@ Func Position($r = 0)
             FileChangeDir(@ScriptDir)
             Sleep(1000)
             Focus()
-            While Not $WinFound
+            While Not $WinHandle
                 TimeOut($r)
                 If $RestartLoop Then Return 0
                 Focus()
@@ -104,29 +104,27 @@ Func Position($r = 0)
     EndIf
     If GetValue("GameWidth") And GetValue("GameHeight") Then
         If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight Then
-            Splash(0)
             Error(Localize("UnMaximize"))
             If $RestartLoop Then Return 0
             Return
-        ElseIf $DeskTopWidth <= (GetValue("GameWidth") + $PaddingLeft) Or $DeskTopHeight <= (GetValue("GameHeight") + $PaddingTop) Or ( $DeskTopWidth <= (GetValue("GameWidth") + $PaddingLeft + GetValue("SplashWidth") + 70) And $DeskTopHeight <= (GetValue("GameHeight") + $PaddingTop + GetValue("SplashHeight") + 50) ) Then
-            Splash(0)
-            Error(Localize("ResolutionHigherThan", "<RESOLUTION>", (GetValue("GameWidth") + $PaddingLeft) & "x" & (GetValue("GameHeight") + $PaddingTop + GetValue("SplashHeight") + 50)))
+        ElseIf $DeskTopWidth < ( GetValue("GameWidth") + $PaddingLeft ) Or $DeskTopHeight < ( GetValue("GameHeight") + $PaddingTop ) Then
+            Error(Localize("ResolutionHigherThan", "<RESOLUTION>", (GetValue("GameWidth") + $PaddingLeft) & "x" & (GetValue("GameHeight") + $PaddingTop)))
             If $RestartLoop Then Return 0
             Return
         EndIf
         If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
             WinMove($WinHandle, "", $WinLeft, $WinTop, GetValue("GameWidth") + $PaddingWidth, GetValue("GameHeight") + $PaddingHeight)
             Focus()
-            If Not $WinFound Or Not GetPosition() Then
+            If Not $WinHandle Or Not GetPosition() Then
                 Position($r)
                 If $RestartLoop Then Return 0
                 Return
             EndIf
         EndIf
-        If $ClientLeft < 0 Or $ClientTop < 0 Or ( $ClientRight >= $SplashLeft And $ClientBottom >= $SplashTop ) Then
+        If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
             WinMove($WinHandle, "", 0, 0)
             Focus()
-            If Not $WinFound Or Not GetPosition() Then
+            If Not $WinHandle Or Not GetPosition() Then
                 Position($r)
                 If $RestartLoop Then Return 0
                 Return
@@ -135,7 +133,7 @@ Func Position($r = 0)
         If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
             Error(Localize("UnableToResize"))
             If $RestartLoop Then Return 0
-        ElseIf $ClientLeft < 0 Or $ClientTop < 0 Or ( $ClientRight >= $SplashLeft And $ClientBottom >= $SplashTop ) Then
+        ElseIf $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
             Error(Localize("UnableToMove"))
             If $RestartLoop Then Return 0
         EndIf
@@ -497,7 +495,7 @@ Func GetVIPAccountReward()
         MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
         If ImageSearch("VIPAccountReward", -1) Then
             Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom
-            If ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-10) Or ImageSearch("VIPAccountRewardBorder2", -1, $_ImageSearchX, $_ImageSearchY-10) Then
+            If ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-10) Then
                 $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonLeftOffset"), $_ImageSearchRight + GetValue("VIPAccountRewardButtonRightOffset"), 1)
                 $_ImageSearchY = Random($_ImageSearchTop + GetValue("VIPAccountRewardButtonTopOffset"), $_ImageSearchTop + GetValue("VIPAccountRewardButtonBottomOffset"), 1)
                 MouseMove($_ImageSearchX, $_ImageSearchY)
@@ -506,7 +504,7 @@ Func GetVIPAccountReward()
                 MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
                 If Not ImageSearch("VIPAccountReward", -1, $left, $top, $right, $bottom) Then
                     SaveItemCount("TotalVIPAccountRewards", 1)
-                ElseIf ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-10) Or ImageSearch("VIPAccountRewardBorder2", -1, $_ImageSearchX, $_ImageSearchY-10) Then
+                ElseIf ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-10) Then
                     $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonLeftOffset"), $_ImageSearchRight + GetValue("VIPAccountRewardButtonRightOffset"), 1)
                     $_ImageSearchY = Random($_ImageSearchTop + GetValue("VIPAccountRewardButtonTopOffset"), $_ImageSearchTop + GetValue("VIPAccountRewardButtonBottomOffset"), 1)
                     MouseMove($_ImageSearchX, $_ImageSearchY)
@@ -692,12 +690,12 @@ Global $SplashWindow, $SplashWindowOnTop = 1, $LastSplashText = "", $SplashStart
 
 Func Splash($s = "", $ontop = 1)
     If $s == 0 Then
-        If Not $SplashWindow Then Return
+        HotKeySet("{F4}")
+        FindWindow()
+        If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
         BlockInput(0)
-        WinSetOnTop($WinHandle, "", 0)
         SplashOff()
         $SplashWindow = 0
-        HotKeySet("{F4}")
         Return
     EndIf
     Local $Message = Localize("Invoking", "<CURRENT>", GetValue("Current"), "<ENDAT>", GetValue("EndAt"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & $s & @CRLF & $ETAText
@@ -708,6 +706,7 @@ Func Splash($s = "", $ontop = 1)
             $LastSplashText = $Message
         EndIf
     Else
+        HotKeySet("{F4}", "Pause")
         Local $setontop = $DLG_NOTITLE, $leftlocation = $SplashLeft, $toplocation = $SplashTop
         If $ontop Then
             If Not GetValue("NoInputBlocking") Then BlockInput(1)
@@ -723,9 +722,13 @@ Func Splash($s = "", $ontop = 1)
         $Message = Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & $SplashStartText & $Message
         $SplashWindow = SplashTextOn("", $Message, GetValue("SplashWidth"), GetValue("SplashHeight"), $leftlocation, $toplocation, $setontop)
         $LastSplashText = $Message
-        WinSetOnTop($WinHandle, "", $ontop)
         WinSetOnTop($SplashWindow, "", $ontop)
-        HotKeySet("{F4}", "Pause")
+        If $ontop Then
+            Focus()
+        Else
+            FindWindow()
+        EndIf
+        If $WinHandle Then WinSetOnTop($WinHandle, "", $ontop)
     EndIf
 EndFunc
 
@@ -751,8 +754,8 @@ EndFunc
 Global $LogIn = 1
 
 Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom)
-    If ImageExists($image) Then
-        If _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then
+    If FileExists(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png") Then
+        If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then
             If $image <> "LogInScreen" And $image <> "Unavailable" And $image <> "Mismatch" Then
                 $LoggingIn = 0
                 $LogInTries = 0
@@ -760,15 +763,27 @@ Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $Clie
                 If $image = "InGameScreen" Then $LogIn = 0
             EndIf
             Return 1
-        ElseIf $LogIn And $image = "InGameScreen" Then
-            Send(GetValue("JumpKey"))
         EndIf
+        Local $i = 2
+        While FileExists(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & $i & ".png")
+            If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & $i & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then
+                If $image <> "LogInScreen" And $image <> "Unavailable" And $image <> "Mismatch" Then
+                    $LoggingIn = 0
+                    $LogInTries = 0
+                    $LastLoginTry = 0
+                    If $image = "InGameScreen" Then $LogIn = 0
+                EndIf
+                Return 1
+            EndIf
+            $i += 1
+        WEnd
+        If $LogIn And $image = "InGameScreen" Then Send(GetValue("JumpKey"))
     EndIf
     Return 0
 EndFunc
 
 Func ImageExists($image)
-    Return FileExists("images\" & GetValue("Language") & "\" & $image & ".png")
+    Return FileExists(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png")
 EndFunc
 
 Func WaitMinutes($time, $msg)
@@ -974,6 +989,26 @@ Func TimeOut($r = 0)
     EndIf
 EndFunc
 
+Func SaveItemCount($item, $value = 0)
+    If $value then SetCharacterInfo($item, $value)
+    Local $ItemCount = 0
+    Local $ItemStart = GetAllAccountsValue($item)
+    For $a = 1 To GetValue("TotalAccounts")
+        For $c = 1 To GetAccountValue("TotalSlots", $a)
+            $ItemCount += GetCharacterInfo($item, $c, $a)
+        Next
+    Next
+    $ItemCount = $ItemStart + $ItemCount
+    If Number(Statistics_GetIniAllAccounts($item)) < $ItemCount Then Statistics_SaveIniAllAccounts($item, $ItemCount)
+    $ItemCount = 0
+    $ItemStart = GetAccountValue($item)
+    For $c = 1 To GetAccountValue("TotalSlots")
+        $ItemCount += GetCharacterInfo($item, $c)
+    Next
+    $ItemCount = $ItemStart + $ItemCount
+    If Number(Statistics_GetIniAccount($item)) < $ItemCount Then Statistics_SaveIniAccount($item, $ItemCount)
+EndFunc
+
 ; add after: If $RestartLoop Then Return 0
 Func End()
     If ImageExists("SelectionScreen") And ImageExists("LogInScreen") Then
@@ -1017,6 +1052,7 @@ Func End()
     $DisableRelogCount = 1
     CloseClient()
     If $RestartLoop Then Return 0
+    Splash(0)
     Local $old = $CurrentAccount
     For $i = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $i
@@ -1056,6 +1092,7 @@ Func Message($s, $n = $MB_OK, $ontop = 0)
         Exit
     EndIf
     $UnattendedMode = 0
+    Splash(0)
     Local $old = $CurrentAccount
     For $i = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $i
@@ -1068,28 +1105,7 @@ Func Message($s, $n = $MB_OK, $ontop = 0)
     Exit
 EndFunc
 
-Func SaveItemCount($item, $value = 0)
-    If $value then SetCharacterInfo($item, $value)
-    Local $ItemCount = 0
-    Local $ItemStart = GetAllAccountsValue($item)
-    For $a = 1 To GetValue("TotalAccounts")
-        For $c = 1 To GetAccountValue("TotalSlots", $a)
-            $ItemCount += GetCharacterInfo($item, $c, $a)
-        Next
-    Next
-    $ItemCount = $ItemStart + $ItemCount
-    If Number(Statistics_GetIniAllAccounts($item)) < $ItemCount Then Statistics_SaveIniAllAccounts($item, $ItemCount)
-    $ItemCount = 0
-    $ItemStart = GetAccountValue($item)
-    For $c = 1 To GetAccountValue("TotalSlots")
-        $ItemCount += GetCharacterInfo($item, $c)
-    Next
-    $ItemCount = $ItemStart + $ItemCount
-    If Number(Statistics_GetIniAccount($item)) < $ItemCount Then Statistics_SaveIniAccount($item, $ItemCount)
-EndFunc
-
 Func SendMessage($s, $n = $MB_OK, $ontop = 0)
-    Splash(0)
     $ETAText = ""
     Local $text = "    " & Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & $s
     Local $CofferCount = 0, $ProfessionPackCount = 0, $ElixirOfFateCount = 0, $OverflowXPRewardCount = 0, $VIPAccountRewardCount = 0, $IdleLogoutText = "", $TimedOutText = "", $FailedInvokeText = ""

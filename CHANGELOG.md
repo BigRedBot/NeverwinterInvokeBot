@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.4
+- No longer requires the splash screen to fit next to the game client.
+
 7.3.3
 - Moved splash window so that there is some space between it and the edge of the screen.
 - Splash window is no longer sometimes set to always on top when waiting.

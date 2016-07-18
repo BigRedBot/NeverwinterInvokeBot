@@ -232,10 +232,9 @@ If $LoadPrivateSettings Then LoadSettings($SettingsDir & "\PrivateSettings.ini")
 LoadDefaults()
 PruneLogs()
 
-Global $WinHandle, $WinFound
+Global $WinHandle
 Func FindWindow()
     $WinHandle = 0
-    $WinFound = 0
     Local $list = ProcessList("GameClient.exe")
     If @error <> 0 Then Return
     For $i = 1 To $list[0][0]
@@ -244,7 +243,6 @@ Func FindWindow()
             For $i2 = 1 To $Data[0][0]
                 If $Data[$i2][1] == "CrypticWindowClass" And WinExists($Data[$i2][0]) Then
                     $WinHandle = $Data[$i2][0]
-                    $WinFound = 1
                     Return
                 EndIf
             Next
@@ -254,7 +252,7 @@ EndFunc
 
 Func Focus()
     FindWindow()
-    If $WinFound And Not WinActive($WinHandle) Then
+    If $WinHandle And Not WinActive($WinHandle) Then
         WinActivate($WinHandle)
         Sleep(500)
     EndIf
