@@ -247,17 +247,12 @@ Func Loop()
                     DoubleClick()
                 EndIf
                 Splash("[ " & Localize("WaitingForInGameScreen") & " ]")
-                If ImageExists("InGameScreen") Then
+                If ImageExists("ChangeCharacterButton") Then
                     $WaitingTimer = TimerInit()
-                    WaitForScreen("InGameScreen")
+                    WaitForScreen("ChangeCharacterButton")
                     If $RestartLoop Then ExitLoop 2
                     Splash()
                     Sleep(GetValue("LogInDelaySeconds") * 1000)
-                    Sleep(500)
-                    If Not ImageSearch("InGameScreen") Then
-                        Send(GetValue("JumpKey"))
-                        Sleep(500)
-                    EndIf
                 Else
                     Sleep(GetValue("LogInSeconds") * 1000)
                     Splash()
@@ -269,7 +264,8 @@ Func Loop()
                     SingleClick()
                     SaveItemCount("TotalOverflowXPRewards", 1)
                     Sleep(1000)
-                    Send(GetValue("JumpKey"))
+                    ClearWindows()
+                    If $RestartLoop Then Return 0
                     Sleep(500)
                 EndIf
                 GetVIPAccountReward()
@@ -289,7 +285,6 @@ Func Loop()
                     SetAccountValue("FinishedLoop", 1)
                     If GetValue("CurrentLoop") >= GetValue("EndAtLoop") Then SetAccountValue("CompletedAccount", 1)
                 EndIf
-                $WaitingTimer = TimerInit()
                 ChangeCharacter()
                 If $RestartLoop Then ExitLoop 2
                 Local $LogOutTimer = TimerInit()
@@ -520,7 +515,8 @@ Func GetVIPAccountReward()
         EndIf
         If GetValue("VIPAccountRewardTries") >= 0 Then
             SetAccountValue("VIPAccountRewardTries", -1)
-            Send(GetValue("JumpKey"))
+            ClearWindows()
+            If $RestartLoop Then Return 0
             Sleep(500)
         EndIf
     EndIf
@@ -576,48 +572,64 @@ Func GetCoffer()
         EndIf
     EndIf
     Sleep(GetValue("ClaimCofferDelay") * 1000)
-    Send(GetValue("JumpKey"))
+    ClearWindows()
+    If $RestartLoop Then Return 0
     Sleep(500)
     $CofferTries += 1
     Invoke()
     If $RestartLoop Then Return 0
 EndFunc
 
+
+Global $AlternateLogInCommands = 1
+
+Func SearchForChangeCharacterButton()
+    If $AlternateLogInCommands = 2 Or GetValue("GameMenuKey") = "{ESC}" Then
+        Send("{ESC}")
+    Else
+        Send(GetValue("GameMenuKey"))
+    EndIf
+    Sleep(1500)
+    If ImageSearch("ChangeCharacterButton") Then Return 1
+    MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
+    If ImageSearch("ChangeCharacterButton") Then Return 1
+    If $AlternateLogInCommands = 1 Then
+        $AlternateLogInCommands = 2
+    Else
+        $AlternateLogInCommands = 1
+    EndIf
+    Return 0
+EndFunc
+
+; add after: If $RestartLoop Then Return 0
+Func WaitForChangeCharacterButton()
+    If Not ImageExists("ChangeCharacterButton") Then Return
+    $AlternateLogInCommands = 1
+    While Not SearchForChangeCharacterButton()
+        TimeOut()
+        If $RestartLoop Then Return 0
+        FindLogInScreen()
+        If $RestartLoop Then Return 0
+    WEnd
+EndFunc
+
+; add after: If $RestartLoop Then Return 0
+Func ClearWindows()
+    While 1
+        WaitForChangeCharacterButton()
+        If $RestartLoop Then Return 0
+        Send("{ESC}")
+        If Not ImageSearch("ChangeCharacterButton") Then Return 1
+    WEnd
+EndFunc
+
 ; add after: If $RestartLoop Then Return 0
 Func ChangeCharacter()
+    $WaitingTimer = TimerInit()
     While 1
         While 1
-            TimeOut()
+            WaitForChangeCharacterButton()
             If $RestartLoop Then Return 0
-            FindLogInScreen()
-            If $RestartLoop Then Return 0
-            Send(GetValue("JumpKey"))
-            Sleep(500)
-            Send(GetValue("GameMenuKey"))
-            Sleep(1500)
-            If ImageExists("ChangeCharacterButton") And Not ImageSearch("ChangeCharacterButton") Then
-                MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
-                While Not ImageSearch("ChangeCharacterButton")
-                    TimeOut()
-                    If $RestartLoop Then Return 0
-                    FindLogInScreen()
-                    If $RestartLoop Then Return 0
-                    Send("{ESC}")
-                    Sleep(500)
-                    Send("{ESC}")
-                    Sleep(1500)
-                    MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
-                    If ImageSearch("ChangeCharacterButton") Then
-                        Send("{ESC}")
-                        Sleep(500)
-                    EndIf
-                    Send(GetValue("JumpKey"))
-                    Sleep(500)
-                    Send(GetValue("GameMenuKey"))
-                    Sleep(1500)
-                    MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
-                WEnd
-            EndIf
             If ImageExists("ChangeCharacterButton") Then
                 MouseMove($_ImageSearchX, $_ImageSearchY)
                 DoubleClick()
@@ -752,34 +764,58 @@ Func FindPixels($x, $y, $c)
     Return 0
 EndFunc
 
-Global $LogIn = 1
+Global $DoLogInCommands = 1
 
 Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom)
-    If FileExists(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png") Then
-        If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then
+    If Not FileExists(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png") Then Return 0
+    If $DoLogInCommands And $image = "ChangeCharacterButton" Then
+        If $DoLogInCommands = 2 Or GetValue("GameMenuKey") = "{ESC}" Then
+            Send("{ESC}")
+        Else
+            Send(GetValue("GameMenuKey"))
+        EndIf
+        Sleep(1500)
+        MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
+        If $DoLogInCommands = 1 Then
+            $DoLogInCommands = 2
+        Else
+            $DoLogInCommands = 1
+        EndIf
+    EndIf
+    If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then
+        If $image <> "LogInScreen" And $image <> "Unavailable" And $image <> "Mismatch" Then
+            $LoggingIn = 0
+            $LogInTries = 0
+            $LastLoginTry = 0
+            If $image = "SelectionScreen" Then
+                $DoLogInCommands = 1
+            ElseIf $DoLogInCommands And $image = "ChangeCharacterButton" Then
+                Send("{ESC}")
+                If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then Return 0
+                $DoLogInCommands = 0
+            EndIf
+        EndIf
+        Return 1
+    EndIf
+    Local $i = 2
+    While FileExists(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & $i & ".png")
+        If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & $i & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then
             If $image <> "LogInScreen" And $image <> "Unavailable" And $image <> "Mismatch" Then
                 $LoggingIn = 0
                 $LogInTries = 0
                 $LastLoginTry = 0
-                If $image = "InGameScreen" Then $LogIn = 0
+                If $image = "SelectionScreen" Then
+                    $DoLogInCommands = 1
+                ElseIf $DoLogInCommands And $image = "ChangeCharacterButton" Then
+                    Send("{ESC}")
+                    If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then Return 0
+                    $DoLogInCommands = 0
+                EndIf
             EndIf
             Return 1
         EndIf
-        Local $i = 2
-        While FileExists(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & $i & ".png")
-            If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & $i & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then
-                If $image <> "LogInScreen" And $image <> "Unavailable" And $image <> "Mismatch" Then
-                    $LoggingIn = 0
-                    $LogInTries = 0
-                    $LastLoginTry = 0
-                    If $image = "InGameScreen" Then $LogIn = 0
-                EndIf
-                Return 1
-            EndIf
-            $i += 1
-        WEnd
-        If $LogIn And $image = "InGameScreen" Then Send(GetValue("JumpKey"))
-    EndIf
+        $i += 1
+    WEnd
     Return 0
 EndFunc
 
@@ -824,7 +860,7 @@ Func FindLogInScreen()
             While 1
                 $DoRelogCount = 1
                 $LoggingIn = 1
-                $LogIn = 1
+                $DoLogInCommands = 1
                 If $LastLoginTry And TimerDiff($LastLoginTry) / 1000 >= 60 Then
                     $LogInTries = 0
                     $LastLoginTry = 0
@@ -840,7 +876,7 @@ Func FindLogInScreen()
                     Sleep(1000)
                     If ImageExists("SelectionScreen") Then
                         While Not ImageSearch("SelectionScreen")
-                            If ImageSearch("InGameScreen") Then
+                            If ImageSearch("ChangeCharacterButton") Then
                                 Splash()
                                 Sleep(1000)
                                 ChangeCharacter()
@@ -1359,7 +1395,7 @@ Func Go()
     $UnattendedMode = GetValue("UnattendedMode")
     $LogInTries = 0
     $LoggingIn = 1
-    $LogIn = 1
+    $DoLogInCommands = 1
     $DisableRelogCount = 1
     If $MinutesToStart Then
         Local $t = TimerInit(), $time = $MinutesToStart, $left = $time, $lastmin = 0, $leftover

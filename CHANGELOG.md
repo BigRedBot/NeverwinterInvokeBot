@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+7.5
+- No longer searches for image on the spell bar to detect when in game.
+- No longer uses jumping to clear in game windows.
+
 7.4
 - No longer requires the splash screen to fit next to the game client.
 

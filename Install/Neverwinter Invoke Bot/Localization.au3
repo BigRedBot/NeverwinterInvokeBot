@@ -3,7 +3,6 @@
 Func LoadLocalizationDefaults()
     If GetValue("Language") = "Russian" Then
         SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
-        SetDefault("JumpKey", "{SPACE}")
         SetDefault("GameMenuKey", "{ESC}")
         SetDefault("CursorModeKey", "{F2}")
         SetDefault("InventoryKey", "i")
@@ -22,7 +21,6 @@ Func LoadLocalizationDefaults()
         SetDefault("LogInServerAddress", "208.95.186.167, 208.95.186.168, 208.95.186.96")
     Else
         SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
-        SetDefault("JumpKey", "{SPACE}")
         SetDefault("GameMenuKey", "{ESC}")
         SetDefault("CursorModeKey", "{ALT}")
         SetDefault("InventoryKey", "i")

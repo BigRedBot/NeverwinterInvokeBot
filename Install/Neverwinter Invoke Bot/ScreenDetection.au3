@@ -68,9 +68,6 @@ While 1
         If ScreenDetection_FindPixels(GetValue("BottomSelectedCharacterX"), GetValue("BottomSelectedCharacterY"), GetValue("BottomSelectedCharacterC")) Then
             $text &= @CRLF & @CRLF & Localize("BottomSelectedCharacterDetected") & @CRLF & GetValue("BottomSelectedCharacterX") & ", " & GetValue("BottomSelectedCharacterY")
         EndIf
-        If ScreenDetection_ImageSearch("InGameScreen") Then
-            $text &= @CRLF & @CRLF & Localize("InGameScreenDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        EndIf
         If ScreenDetection_ImageSearch("Invoked") Then
             $text &= @CRLF & @CRLF & Localize("AlreadyInvokedDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         EndIf
