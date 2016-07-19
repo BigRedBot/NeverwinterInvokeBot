@@ -140,7 +140,7 @@ Func Position($r = 0)
     EndIf
 EndFunc
 
-Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DoRelogCount = 0, $DisableRelogCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogTime = 0, $LogDate = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn
+Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DoRelogCount = 0, $DisableRelogCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn
 
 Func SyncValues()
     If GetValue("FinishedLoop") Then
@@ -1223,19 +1223,20 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
     If Not CompletedAccount() Then
         $text &= @CRLF & @CRLF & Localize("Invoking", "<CURRENT>", GetValue("Current"), "<ENDAT>", GetValue("EndAt"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop"))
     EndIf
-    If $LogDate Then
+    If $StartTimer Then
         If Not FileExists($SettingsDir & "\Logs") Then DirCreate($SettingsDir & "\Logs")
         Local $LogStart = "", $LogEnd = @CRLF
         If $LogSessionStart Then
-            $LogStart = @CRLF & Localize("SessionStart") & @CRLF & @CRLF
+            $LogStart = @CRLF & Localize("SessionStart") & @CRLF & $LogStartDate & " " & $LogStartTime & @CRLF & @CRLF
             $LogSessionStart = 0
         EndIf
         If Not $LogTime Then
+            $LogDate = @YEAR & "-" & @MON & "-" & @MDAY
             $LogTime = @HOUR & ":" & @MIN & ":" & @SEC
-            $LogStart &= @YEAR & "-" & @MON & "-" & @MDAY & " " & $LogTime & @CRLF
+            $LogStart &= $LogDate & " " & $LogTime & @CRLF
         EndIf
         If $CurrentAccount = GetValue("TotalAccounts") Then $LogEnd = @CRLF & @CRLF
-        FileWrite($SettingsDir & "\Logs\Log_" & $LogDate & ".txt", $LogStart & StringReplace($text, @CRLF & @CRLF, @CRLF) & $LogEnd)
+        FileWrite($SettingsDir & "\Logs\Log_" & $LogStartDate & ".txt", $LogStart & StringReplace($text, @CRLF & @CRLF, @CRLF) & $LogEnd)
     EndIf
     If Not $UnattendedMode Then
         If $ontop Then
@@ -1419,37 +1420,41 @@ Func Go()
         WEnd
         $MinutesToStart = 0
     EndIf
-    If Not $LogDate Then $LogDate = @YEAR & "-" & @MON & "-" & @MDAY
-    Local $check = CheckAccounts()
-    If $check > 0 Then
-        $ETAText = ""
-        Position()
-        If $RestartLoop Then Return 0
-        Splash()
-        If $check <> $CurrentAccount Then
-            Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
-            If ImageSearch("SelectionScreen") Then
-                MouseMove($_ImageSearchX, $_ImageSearchY)
-                SingleClick()
-                Sleep(1000)
-                $DisableRelogCount = 1
+    If $StartTimer Then
+        Local $check = CheckAccounts()
+        If $check > 0 Then
+            $ETAText = ""
+            Position()
+            If $RestartLoop Then Return 0
+            Splash()
+            If $check <> $CurrentAccount Then
+                Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
+                If ImageSearch("SelectionScreen") Then
+                    MouseMove($_ImageSearchX, $_ImageSearchY)
+                    SingleClick()
+                    Sleep(1000)
+                    $DisableRelogCount = 1
+                EndIf
+                $CurrentAccount = $check
+                $WaitingTimer = TimerInit()
+                While Not ImageSearch("LogInScreen")
+                    Sleep(500)
+                    TimeOut(1)
+                    If $RestartLoop Then Return 0
+                    Position(1)
+                    If $RestartLoop Then Return 0
+                WEnd
             EndIf
-            $CurrentAccount = $check
-            $WaitingTimer = TimerInit()
-            While Not ImageSearch("LogInScreen")
-                Sleep(500)
-                TimeOut(1)
-                If $RestartLoop Then Return 0
-                Position(1)
-                If $RestartLoop Then Return 0
-            WEnd
+        Else
+            End()
+            If $RestartLoop Then Return 0
+            Exit
         EndIf
     Else
-        End()
-        If $RestartLoop Then Return 0
-        Exit
+        $LogStartDate = @YEAR & "-" & @MON & "-" & @MDAY
+        $LogStartTime = @HOUR & ":" & @MIN & ":" & @SEC
+        $StartTimer = TimerInit()
     EndIf
-    If Not $StartTimer Then $StartTimer = TimerInit()
     $DisableRelogCount = 1
     StartLoop()
     If $RestartLoop Then Return 0

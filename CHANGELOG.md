@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.5.3
+- Added session start date and time to the log files.
+
 7.5.2
 - Improved overflow XP reward detection.
 - Improved in game menu detection.
