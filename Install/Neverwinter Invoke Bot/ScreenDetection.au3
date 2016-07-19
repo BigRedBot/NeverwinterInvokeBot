@@ -41,7 +41,13 @@ Func ScreenDetection_FindPixels($x, $y, $c)
 EndFunc
 
 Func ScreenDetection_ImageSearch($image, $resultPosition = -1, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom)
-    If FileExists("images\" & GetValue("Language") & "\" & $image & ".png") And _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then Return 1
+    If Not FileExists("images\" & GetValue("Language") & "\" & $image & ".png") Then Return 0
+    If _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then Return 1
+    Local $i = 2
+    While FileExists(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & $i & ".png")
+        If _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & $i & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then Return $i
+        $i += 1
+    WEnd
     Return 0
 EndFunc
 
@@ -117,8 +123,6 @@ While 1
             $text &= @CRLF & @CRLF & Localize("VIPAccountRewardDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
             If ScreenDetection_ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-10) Then
                 $text &= @CRLF & @CRLF & Localize("VIPAccountRewardBorderDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-            ElseIf ScreenDetection_ImageSearch("VIPAccountRewardBorder2", -1, $_ImageSearchX, $_ImageSearchY-10) Then
-                $text &= @CRLF & @CRLF & Localize("VIPAccountRewardBorder2Detected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
             EndIf
         EndIf
         If ScreenDetection_ImageSearch("Unavailable") Then

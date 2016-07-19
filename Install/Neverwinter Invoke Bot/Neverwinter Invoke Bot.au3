@@ -487,7 +487,6 @@ Func GetVIPAccountReward()
         AddAccountCountValue("VIPAccountRewardTries")
         Send(GetValue("InventoryKey"))
         Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
-        MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
         If ImageSearch("VIPAccountReward", -1) Then
             Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom
             If ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-10) Then
@@ -496,7 +495,6 @@ Func GetVIPAccountReward()
                 MouseMove($_ImageSearchX, $_ImageSearchY)
                 SingleClick()
                 Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
-                MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
                 If Not ImageSearch("VIPAccountReward", -1, $left, $top, $right, $bottom) Then
                     SaveItemCount("TotalVIPAccountRewards", 1)
                 ElseIf ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-10) Then
@@ -584,18 +582,17 @@ EndFunc
 Global $AlternateLogInCommands = 1
 
 Func SearchForChangeCharacterButton()
-    If $AlternateLogInCommands = 2 Or $AlternateLogInCommands = 4 Then
-        MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
-        If $AlternateLogInCommands = 4 Then $AlternateLogInCommands = 0
+    If $AlternateLogInCommands = 2 Or GetValue("GameMenuKey") = "{ESC}" Then
+        Send("{ESC}")
     Else
-        If $AlternateLogInCommands = 3 Or GetValue("GameMenuKey") = "{ESC}" Then
-            Send("{ESC}")
-        Else
-            Send(GetValue("GameMenuKey"))
-        EndIf
-        Sleep(1500)
+        Send(GetValue("GameMenuKey"))
     EndIf
-    $AlternateLogInCommands += 1
+    Sleep(1500)
+    If $AlternateLogInCommands = 1 Then
+        $AlternateLogInCommands = 2
+    Else
+        $AlternateLogInCommands = 1
+    EndIf
     If ImageSearch("ChangeCharacterButton") Then Return 1
     Return 0
 EndFunc
@@ -768,18 +765,17 @@ Global $DoLogInCommands = 1
 Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom)
     If Not FileExists(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png") Then Return 0
     If $DoLogInCommands And $image = "ChangeCharacterButton" Then
-        If $DoLogInCommands = 2 Or $DoLogInCommands = 4 Then
-            MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
-            If $DoLogInCommands = 4 Then $DoLogInCommands = 0
+        If $DoLogInCommands = 2 Or GetValue("GameMenuKey") = "{ESC}" Then
+            Send("{ESC}")
         Else
-            If $DoLogInCommands = 3 Or GetValue("GameMenuKey") = "{ESC}" Then
-                Send("{ESC}")
-            Else
-                Send(GetValue("GameMenuKey"))
-            EndIf
-            Sleep(1500)
+            Send(GetValue("GameMenuKey"))
         EndIf
-        $DoLogInCommands += 1
+        Sleep(1500)
+        If $DoLogInCommands = 1 Then
+            $DoLogInCommands = 2
+        Else
+            $DoLogInCommands = 1
+        EndIf
     EndIf
     If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then
         If $image <> "LogInScreen" And $image <> "Unavailable" And $image <> "Mismatch" Then
@@ -789,7 +785,7 @@ Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $Clie
             If $image = "SelectionScreen" Then
                 $DoLogInCommands = 1
             ElseIf $DoLogInCommands And $image = "ChangeCharacterButton" Then
-                $DoLogInCommands = 3
+                $DoLogInCommands = 2
                 Send("{ESC}")
                 Sleep(500)
                 If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then Return 0
@@ -808,14 +804,14 @@ Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $Clie
                 If $image = "SelectionScreen" Then
                     $DoLogInCommands = 1
                 ElseIf $DoLogInCommands And $image = "ChangeCharacterButton" Then
-                    $DoLogInCommands = 3
+                    $DoLogInCommands = 2
                     Send("{ESC}")
                     Sleep(500)
                     If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then Return 0
                     $DoLogInCommands = 0
                 EndIf
             EndIf
-            Return 1
+            Return $i
         EndIf
         $i += 1
     WEnd

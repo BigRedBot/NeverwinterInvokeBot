@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+7.5.2
+- Improved overflow XP reward detection.
+- Improved in game menu detection.
+
 7.5.1
 - Made in game menu detection a little faster.
 
