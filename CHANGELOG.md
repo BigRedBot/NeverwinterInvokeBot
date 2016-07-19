@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.5.1
+- Made in game menu detection a little faster.
+
 7.5
 - No longer searches for image on the spell bar to detect when in game.
 - No longer uses jumping to clear in game windows.
