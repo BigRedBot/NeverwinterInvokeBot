@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.5.4
+- Removed a half second delay between game menu detection checks.
+
 7.5.3
 - Added session start date and time to the log files.
 

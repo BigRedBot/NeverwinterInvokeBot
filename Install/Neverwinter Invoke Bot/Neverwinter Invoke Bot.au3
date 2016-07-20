@@ -266,7 +266,6 @@ Func Loop()
                     Sleep(1000)
                     ClearWindows()
                     If $RestartLoop Then Return 0
-                    Sleep(500)
                 EndIf
                 GetVIPAccountReward()
                 $WaitingTimer = TimerInit()
@@ -515,7 +514,6 @@ Func GetVIPAccountReward()
             SetAccountValue("VIPAccountRewardTries", -1)
             ClearWindows()
             If $RestartLoop Then Return 0
-            Sleep(500)
         EndIf
     EndIf
 EndFunc
@@ -572,7 +570,6 @@ Func GetCoffer()
     Sleep(GetValue("ClaimCofferDelay") * 1000)
     ClearWindows()
     If $RestartLoop Then Return 0
-    Sleep(500)
     $CofferTries += 1
     Invoke()
     If $RestartLoop Then Return 0
@@ -582,6 +579,7 @@ EndFunc
 Global $AlternateLogInCommands = 1
 
 Func SearchForChangeCharacterButton()
+    If $ChangingCharacter And ImageSearch("ChangeCharacterButton") Then Return 1
     If $AlternateLogInCommands = 2 Or GetValue("GameMenuKey") = "{ESC}" Then
         Send("{ESC}")
     Else
@@ -601,6 +599,7 @@ EndFunc
 Func WaitForChangeCharacterButton()
     If Not ImageExists("ChangeCharacterButton") Then Return
     $AlternateLogInCommands = 1
+    $DoLogInCommands = 0
     While Not SearchForChangeCharacterButton()
         TimeOut()
         If $RestartLoop Then Return 0
@@ -615,13 +614,17 @@ Func ClearWindows()
         WaitForChangeCharacterButton()
         If $RestartLoop Then Return 0
         Send("{ESC}")
+        Sleep(500)
         If Not ImageSearch("ChangeCharacterButton") Then Return 1
     WEnd
 EndFunc
 
+Global $ChangingCharacter = 1
+
 ; add after: If $RestartLoop Then Return 0
 Func ChangeCharacter()
     $WaitingTimer = TimerInit()
+    $ChangingCharacter = 1
     While 1
         While 1
             WaitForChangeCharacterButton()
@@ -749,7 +752,7 @@ Func WaitForScreen($image, $resultPosition = -2, $left = $ClientLeft, $top = $Cl
         If ImageSearch($image, $resultPosition, $left, $top, $right, $bottom) Then Return
         FindLogInScreen()
         If $RestartLoop Then Return 0
-        Sleep(500)
+        If Not $DoLogInCommands Or $image <> "ChangeCharacterButton" Then Sleep(500)
         TimeOut()
         If $RestartLoop Then Return 0
     WEnd
@@ -784,7 +787,8 @@ Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $Clie
             $LastLoginTry = 0
             If $image = "SelectionScreen" Then
                 $DoLogInCommands = 1
-            ElseIf $DoLogInCommands And $image = "ChangeCharacterButton" Then
+                $ChangingCharacter = 0
+            ElseIf Not $ChangingCharacter And $DoLogInCommands And $image = "ChangeCharacterButton" Then
                 $DoLogInCommands = 2
                 Send("{ESC}")
                 Sleep(500)
@@ -803,7 +807,8 @@ Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $Clie
                 $LastLoginTry = 0
                 If $image = "SelectionScreen" Then
                     $DoLogInCommands = 1
-                ElseIf $DoLogInCommands And $image = "ChangeCharacterButton" Then
+                    $ChangingCharacter = 0
+                ElseIf Not $ChangingCharacter And $DoLogInCommands And $image = "ChangeCharacterButton" Then
                     $DoLogInCommands = 2
                     Send("{ESC}")
                     Sleep(500)
@@ -860,6 +865,7 @@ Func FindLogInScreen()
                 $DoRelogCount = 1
                 $LoggingIn = 1
                 $DoLogInCommands = 1
+                $ChangingCharacter = 1
                 If $LastLoginTry And TimerDiff($LastLoginTry) / 1000 >= 60 Then
                     $LogInTries = 0
                     $LastLoginTry = 0
@@ -877,7 +883,6 @@ Func FindLogInScreen()
                         While Not ImageSearch("SelectionScreen")
                             If ImageSearch("ChangeCharacterButton") Then
                                 Splash()
-                                Sleep(1000)
                                 ChangeCharacter()
                                 If $RestartLoop Then Return 0
                                 Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
@@ -902,7 +907,7 @@ Func FindLogInScreen()
                             TimeOut()
                             If $RestartLoop Then Return 0
                             If ImageSearch("LogInScreen") Then ExitLoop 2
-                            Sleep(500)
+                            If Not $DoLogInCommands Then Sleep(500)
                         WEnd
                     EndIf
                 EndIf
