@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.5.5
+- Improved game restart tracking.
+
 7.5.4
 - Removed a half second delay between game menu detection checks.
 
