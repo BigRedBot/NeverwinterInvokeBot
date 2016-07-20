@@ -1,9 +1,5 @@
 # Neverwinter Invoke Bot
 
-Some anti-virus software may falsely detect this program as a virus.  
-It is a false positive. Please read here for more information about this:  
-https://github.com/BigRedBot/NeverwinterInvokeBot/issues/41
-
 The latest version has included Russian client support.
 
 **You can download the installer here:**  
@@ -14,6 +10,11 @@ https://github.com/BigRedBot/NeverwinterInvokeBot/blob/master/CHANGELOG.md
 
 Please post your questions or requests for this script here:  
 https://github.com/BigRedBot/NeverwinterInvokeBot/issues
+
+
+Some anti-virus software may falsely detect this program as a virus.  
+It is a false positive. Please read here for more information about this:  
+https://github.com/BigRedBot/NeverwinterInvokeBot/issues/41
 
 
 **If you have even five or ten dollars to spare, it would mean an awful lot. Thank you for your support.**
