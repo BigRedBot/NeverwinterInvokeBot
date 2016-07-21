@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.5.6
+- Added limit for consecutive time-out retries to 3.
+
 7.5.5
 - Improved game restart tracking.
 

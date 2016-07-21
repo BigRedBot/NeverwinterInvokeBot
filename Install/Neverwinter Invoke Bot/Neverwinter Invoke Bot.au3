@@ -141,7 +141,7 @@ Func Position()
     EndIf
 EndFunc
 
-Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DoRelogCount = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn
+Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn
 
 Func SyncValues()
     If GetValue("FinishedLoop") Then
@@ -275,6 +275,7 @@ Func Loop()
                 SetCharacterInfo("InvokeTime", TimerInit())
                 SetCharacterInfo("InvokeLoop", GetValue("CurrentLoop"))
                 SetAccountValue("FinishedInvoke", 1)
+                $TimeOutRetries = 0
                 If $FailedInvoke Then
                     AddAccountCountValue("FailedInvoke")
                     AddCharacterCountInfo("FailedInvoke")
@@ -1013,11 +1014,12 @@ Func TimeOut()
     AddAccountCountValue("TimedOut")
     If Not $LoggingIn Then AddCharacterCountInfo("TimedOut")
     $DisableRelogCount = 1
-    If GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And ImageExists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
+    If $TimeOutRetries < GetValue("TimeOutRetries") And GetValue("RestartGameClient") And $GameClientInstallLocation And $GameClientInstallLocation <> "" And GetValue("LogInServerAddress") And GetValue("LogInServerAddress") <> "" And GetValue("LogInUserName") And GetValue("LogInPassword") And ImageExists("LogInScreen") And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") Then
+        $TimeOutRetries += 1
         Splash("[ " & Localize("RestartingNeverwinter") & " ]")
         If CloseClient() Then $DisableRestartCount = 1
         If $RestartLoop Then Return 0
-        Position()
+        StartLoop()
         If $RestartLoop Then Return 0
     Else
         Error(Localize("OperationTimedOut"))
