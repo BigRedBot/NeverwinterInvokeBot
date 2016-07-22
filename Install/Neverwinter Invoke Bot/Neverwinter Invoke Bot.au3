@@ -1245,7 +1245,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
         If Not FileExists($SettingsDir & "\Logs") Then DirCreate($SettingsDir & "\Logs")
         Local $LogStart = "", $LogEnd = @CRLF
         If $LogSessionStart Then
-            $LogStart = @CRLF & Localize("SessionStart") & @CRLF & $LogStartDate & " " & $LogStartTime & @CRLF & @CRLF
+            $LogStart = @CRLF & $LogStartDate & " " & $LogStartTime & @CRLF & Localize("SessionStart") & @CRLF & @CRLF
             $LogSessionStart = 0
         EndIf
         If Not $LogTime Then

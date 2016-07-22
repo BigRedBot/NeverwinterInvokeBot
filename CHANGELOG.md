@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.6.3
+- Small change to log format.
+
 7.6.2
 - Will now try to collect account bound VIP reward once every loop until it is collected.
 
