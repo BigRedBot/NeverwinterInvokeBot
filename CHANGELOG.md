@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.6.1
+- Removed time-out when starting the game client.
+
 7.6
 - Will now always use the arc launcher to start the game client.
 

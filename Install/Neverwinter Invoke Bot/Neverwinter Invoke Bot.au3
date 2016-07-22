@@ -882,15 +882,15 @@ Func FindLogInScreen()
 EndFunc
 
 Func CheckServer()
-    Local $ip = Array(GetValue("LogInServerAddress")), $first = 1
+    Local $ip = Array(GetValue("LogInServerAddress")), $set = 1
     If $ip[1] And IsString($ip[1]) And $ip[1] <> "" Then
         While 1
             For $i = 1 to $ip[0]
                 Ping($ip[$i])
                 If @error = 0 Then Return
             Next
-            If $first Then
-                $first = 0
+            If $set Then
+                $set = 0
                 Splash("[ " & Localize("WaitingForGameServer") & " ]", 0)
             EndIf
             Sleep(10000)
@@ -920,8 +920,15 @@ Func StartClient()
         If $RestartLoop Then Return 0
     EndIf
     Sleep(1000)
+    Local $set = 1
     While Not $WinHandle
-        TimeOut()
+        If Not ProcessExists("Neverwinter.exe") Then
+            If $set Then
+                $set = 0
+                $WaitingTimer = TimerInit()
+            EndIf
+            TimeOut()
+        EndIf
         If $RestartLoop Then Return 0
         Focus()
         Sleep(1000)
