@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.6.2
+- Will now try to collect account bound VIP reward once every loop until it is collected.
+
 7.6.1
 - Removed time-out when starting the game client.
 
