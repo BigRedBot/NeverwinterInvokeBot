@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.6
+- Will now always use the arc launcher to start the game client.
+
 7.5.6
 - Added limit for consecutive time-out retries to 3.
 

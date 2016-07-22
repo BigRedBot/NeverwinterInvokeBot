@@ -69,6 +69,7 @@ Func LoadDefaults()
     SetDefault("LogInUserName")
     SetDefault("LogInPassword")
     SetDefault("PasswordHash")
+    SetDefault("LogInServerAddress", "patchserver.crypticstudios.com")
 EndFunc
 
 Global $CurrentAccount = 1
