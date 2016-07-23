@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.6.4
+- Will now only use the arc launcher if it is installed.
+
 7.6.3
 - Small change to log format.
 

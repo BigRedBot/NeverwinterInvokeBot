@@ -18,6 +18,7 @@ Func LoadLocalizationDefaults()
         SetDefault("SplashHeight", 185)
         SetDefault("ScreenDetectionSplashWidth", 380)
         SetDefault("ScreenDetectionSplashHeight", 400)
+        SetDefault("LogInServerAddress", "208.95.186.167, 208.95.186.168, 208.95.186.96")
     Else
         SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
         SetDefault("GameMenuKey", "{ESC}")
@@ -35,6 +36,7 @@ Func LoadLocalizationDefaults()
         SetDefault("SplashHeight", 185)
         SetDefault("ScreenDetectionSplashWidth", 380)
         SetDefault("ScreenDetectionSplashHeight", 400)
+        SetDefault("LogInServerAddress", "208.95.186.167, 208.95.186.168, 208.95.186.96")
     EndIf
 EndFunc
 
