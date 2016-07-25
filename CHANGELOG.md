@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.6.5
+- Replaced login screen image to be compatible with Storm King's Thunder.
+
 7.6.4
 - Will now only use the arc launcher if it is installed.
 
