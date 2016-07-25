@@ -621,7 +621,6 @@ Func ChangeCharacter()
                 Sleep(500)
                 Send("{ESC}")
                 Sleep(1500)
-                MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
                 If ImageSearch("ChangeCharacterButton") Then
                     Send("{ESC}")
                     Sleep(500)
@@ -637,7 +636,6 @@ Func ChangeCharacter()
                 Sleep(500)
                 Send("{ESC}")
                 Sleep(1500)
-                MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientTop + Round($ClientHeight * 0.60) + Random(-$MouseOffset, $MouseOffset, 1))
                 If ImageSearch("ChangeCharacterButton") Then
                     Send("{ESC}")
                     Sleep(500)
@@ -1026,11 +1024,7 @@ Func LogIn()
         Position()
         If $RestartLoop Then Return 0
         Splash()
-        If GetValue("UsernameBoxY") Then
-            MouseMove(GetValue("UsernameBoxX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("UsernameBoxY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
-        Else
-            MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
-        EndIf
+        MouseMove(GetValue("UsernameBoxX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("UsernameBoxY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
         DoubleClick()
         AutoItSetOption("SendKeyDownDelay", 5)
         Send("{RIGHT 254}{BS 254}")
