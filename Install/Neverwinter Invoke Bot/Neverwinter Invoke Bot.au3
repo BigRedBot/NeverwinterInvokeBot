@@ -692,7 +692,7 @@ Func Splash($s = "", $ontop = 1)
         EndIf
     Else
         HotKeySet("{F4}", "Pause")
-        Local $setontop = $DLG_NOTITLE, $leftlocation = $SplashLeft, $toplocation = $SplashTop
+        Local $setontop = $DLG_NOTITLE + $DLG_NOTONTOP, $leftlocation = $SplashLeft, $toplocation = $SplashTop
         If $ontop Then
             If Not GetValue("NoInputBlocking") Then BlockInput(1)
             $SplashWindowOnTop = 1
@@ -700,14 +700,14 @@ Func Splash($s = "", $ontop = 1)
         Else
             BlockInput(0)
             $SplashWindowOnTop = 0
-            $setontop = $DLG_MOVEABLE
+            $setontop = $DLG_MOVEABLE + $DLG_NOTONTOP
             $SplashStartText = Localize("ToStopPressF4") & @CRLF & @CRLF & @CRLF
             $toplocation = 50
         EndIf
         $Message = Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & $SplashStartText & $Message
         $SplashWindow = SplashTextOn("", $Message, GetValue("SplashWidth"), GetValue("SplashHeight"), $leftlocation, $toplocation, $setontop)
         $LastSplashText = $Message
-        WinSetOnTop($SplashWindow, "", $ontop)
+        WinSetOnTop($SplashWindow, "", 0)
         If $ontop Then
             Focus()
         Else

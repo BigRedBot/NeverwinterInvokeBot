@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.6.7
+- Will no longer set the splash window to always on top.
+
 7.6.6
 - Added DisableCloseClient and DisableLogOut options to the Settings.ini file.
 
