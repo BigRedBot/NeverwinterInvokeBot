@@ -1116,18 +1116,19 @@ Func End()
             If $RestartLoop Then Return 0
         EndIf
     EndIf
-    Position()
-    If $RestartLoop Then Return 0
-    Splash()
-    If ImageSearch("SelectionScreen") Then
-        MouseMove($_ImageSearchX, $_ImageSearchY)
-        SingleClick()
-        Sleep(1000)
-        $DisableRelogCount = 1
-    EndIf
     Local $EndTime = HoursAndMinutes(TimerDiff($StartTimer) / 60000)
-    $DisableRelogCount = 1
-    If CloseClient() Then $DisableRestartCount = 1
+    Splash()
+    If Not GetValue("DisableCloseClient") Or Not GetValue("DisableLogOut") Then
+        Position()
+        If $RestartLoop Then Return 0
+        If ImageSearch("SelectionScreen") Then
+            MouseMove($_ImageSearchX, $_ImageSearchY)
+            SingleClick()
+            Sleep(1000)
+            $DisableRelogCount = 1
+        EndIf
+    EndIf
+    If Not GetValue("DisableCloseClient") And CloseClient() Then $DisableRestartCount = 1
     If $RestartLoop Then Return 0
     Splash(0)
     Local $old = $CurrentAccount
@@ -1268,7 +1269,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
         If Not FileExists($SettingsDir & "\Logs") Then DirCreate($SettingsDir & "\Logs")
         Local $LogStart = "", $LogEnd = @CRLF
         If $LogSessionStart Then
-            $LogStart = @CRLF & $LogStartDate & " " & $LogStartTime & @CRLF & Localize("SessionStart") & @CRLF & @CRLF
+            $LogStart = @CRLF & Localize("SessionStart") & @CRLF & $LogStartDate & " " & $LogStartTime & @CRLF & @CRLF
             $LogSessionStart = 0
         EndIf
         If Not $LogTime Then

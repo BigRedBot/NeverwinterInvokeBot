@@ -1,5 +1,5 @@
 @ECHO OFF
-SET VERSION=7.6.5
+SET VERSION=7.6.6
 SET NAME=Neverwinter Invoke Bot
 SET INSTALLER=NeverwinterInvokeBot
 

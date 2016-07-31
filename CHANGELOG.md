@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.6.6
+- Added DisableCloseClient and DisableLogOut options to the Settings.ini file.
+
 7.6.5
 - Replaced login screen image to be compatible with Storm King's Thunder.
 
