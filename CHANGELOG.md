@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+7.6.8
+- Added character selection screen images to be compatible with Storm King's Thunder.
+- Will now reset auto launch setting back even if script is paused after changing it.
+
 7.6.7
 - Will no longer set the splash window to always on top.
 

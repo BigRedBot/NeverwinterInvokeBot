@@ -107,7 +107,7 @@ Func Position()
     EndIf
 EndFunc
 
-Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn
+Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $NoAutoLaunch
 
 Func SyncValues()
     If GetValue("FinishedLoop") Then
@@ -929,10 +929,11 @@ Func StartClient()
     CloseClient()
     If $RestartLoop Then Return 0
     If $ArcLauncherLocation And FileExists($ArcLauncherLocation) Then
-        Local $arc = ProcessExists("Arc.exe"), $auto = RegRead("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch")
+        Local $arc = ProcessExists("Arc.exe")
         CloseClient("Neverwinter.exe")
         If $RestartLoop Then Return 0
-        If Not Number($auto) Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 1)
+        If Not Number(RegRead("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch")) Then $NoAutoLaunch = 1
+        If $NoAutoLaunch Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 1)
         ShellExecute($ArcLauncherLocation, "gamecustom nw")
         While Not ProcessExists("Neverwinter.exe")
             Sleep(1000)
@@ -956,7 +957,7 @@ Func StartClient()
             Focus()
             Sleep(1000)
         WEnd
-        If Not Number($auto) Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
+        If $NoAutoLaunch Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
         Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
         If Not $DisableRestartCount Then $Restarted += 1
         $WaitingTimer = TimerInit()
@@ -1054,6 +1055,7 @@ Func TimeOut()
     If Not $LoggingIn Then AddCharacterCountInfo("TimedOut")
     $DisableRelogCount = 1
     If $TimeOutRetries < GetValue("TimeOutRetries") And GetValue("RestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And $ArcLauncherLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And FileExists($ArcLauncherLocation) And ImageExists("LogInScreen") Then
+        If $NoAutoLaunch Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
         $TimeOutRetries += 1
         Splash("[ " & Localize("RestartingNeverwinter") & " ]")
         If CloseClient() Then $DisableRestartCount = 1
@@ -1130,6 +1132,7 @@ Func End()
     EndIf
     If Not GetValue("DisableCloseClient") And CloseClient() Then $DisableRestartCount = 1
     If $RestartLoop Then Return 0
+    If $NoAutoLaunch Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
     Splash(0)
     Local $old = $CurrentAccount
     For $i = 1 To GetValue("TotalAccounts")
@@ -1169,6 +1172,7 @@ Func Message($s, $n = $MB_OK, $ontop = 0)
         If $RestartLoop Then Return 0
         Exit
     EndIf
+    If $NoAutoLaunch Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
     $UnattendedMode = 0
     Splash(0)
     Local $old = $CurrentAccount
@@ -1751,6 +1755,7 @@ Func RunScript()
     Initialize()
     If $UnattendedModeCheckSettings Then Exit
     Start()
+    If $RestartLoop Then Return 0
 EndFunc
 
 RunScript()
