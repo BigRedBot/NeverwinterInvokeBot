@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+7.7
+- No longer uses Arc Launcher.
+- Updated character selection screen pixel detection.
+
 7.6.8
 - Added character selection screen images to be compatible with Storm King's Thunder.
 - Will now reset auto launch setting back even if script is paused after changing it.

@@ -29,8 +29,24 @@ EndFunc
 Global $GameClientInstallLocation = RegRead("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "InstallLocation")
 If @error <> 0 Then $GameClientInstallLocation = 0
 
-Global $ArcLauncherLocation = RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Perfect World Entertainment\Arc", "launcher")
-If @error <> 0 Then $ArcLauncherLocation = 0
+Func GetClientLauncherPath()
+    Local $i = 1
+    While 1
+        Local $k = RegEnumKey("HKEY_LOCAL_MACHINE\SOFTWARE\Perfect World Entertainment\Core", $i)
+        If @error <> 0 Then ExitLoop
+        If RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Perfect World Entertainment\Core\" & $k, "APP_ABBR") = "nw" And Number(RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Perfect World Entertainment\Core\" & $k, "installed")) Then
+            Local $p = RegRead("HKEY_LOCAL_MACHINE\SOFTWARE\Perfect World Entertainment\Core\" & $k, "INSTALL_PATH")
+            If @error = 0 Then
+                $p = StringRegExpReplace($p, "\\+$", "")
+                If FileExists($p & "\Neverwinter.exe") Then Return $p
+            EndIf
+        EndIf
+        $i += 1
+    WEnd
+    Return 0
+EndFunc
+
+Global $GameClientLauncherInstallLocation = GetClientLauncherPath()
 
 ; add after: If $RestartLoop Then Return 0
 Func CloseClient($p = "GameClient.exe")
@@ -60,8 +76,6 @@ Func Position()
             Splash("[ " & Localize("NeverwinterNotFound") & " ]")
             CloseClient()
             If $RestartLoop Then Return 0
-            CheckServer()
-            Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
             StartClient()
             If $RestartLoop Then Return 0
             Return
@@ -922,28 +936,61 @@ EndFunc
 
 ; add after: If $RestartLoop Then Return 0
 Func StartClient()
+    CheckServer()
+    Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
     $DisableRelogCount = 1
     $DisableRestartCount = 1
     $LogInTries = 0
     $ETAText = ""
     CloseClient()
     If $RestartLoop Then Return 0
-    If $ArcLauncherLocation And FileExists($ArcLauncherLocation) Then
-        Local $arc = ProcessExists("Arc.exe")
+    If $GameClientLauncherInstallLocation And FileExists($GameClientLauncherInstallLocation & "\Neverwinter.exe") Then
         CloseClient("Neverwinter.exe")
         If $RestartLoop Then Return 0
         If Not Number(RegRead("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch")) Then $NoAutoLaunch = 1
         If $NoAutoLaunch Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 1)
-        ShellExecute($ArcLauncherLocation, "gamecustom nw")
+        FileChangeDir($GameClientLauncherInstallLocation)
+        Run("Neverwinter.exe", $GameClientLauncherInstallLocation)
+        FileChangeDir(@ScriptDir)
         While Not ProcessExists("Neverwinter.exe")
             Sleep(1000)
         WEnd
-        If Not $arc Then
-            Sleep(1000)
-            CloseClient("Arc.exe")
-            If $RestartLoop Then Return 0
-        EndIf
-        Sleep(1000)
+        While 1
+            Sleep(500)
+            Local $l = ProcessList("Neverwinter.exe")
+            If @error <> 0 Then Return
+            For $i = 1 To $l[0][0]
+                Local $Data = _WinAPI_EnumProcessWindows($l[$i][1], False)
+                If @error = 0 Then
+                    For $i2 = 1 To $Data[0][0]
+                        If StringRegExp($Data[$i2][1], "^\#") And WinExists($Data[$i2][0]) Then
+                            Splash()
+                            Sleep(2000)
+                            If $Data[$i2][0] And Not WinActive($Data[$i2][0]) Then
+                                WinActivate($Data[$i2][0])
+                                Sleep(500)
+                            EndIf
+                            ExitLoop 3
+                        EndIf
+                    Next
+                EndIf
+            Next
+        WEnd
+        AutoItSetOption("SendKeyDownDelay", 15)
+        Send("+{TAB}")
+        Send("{BS}")
+        Sleep(500)
+        AutoItSetOption("SendKeyDownDelay", 15)
+        Send(_SendUnicodeReturn(BinaryToString(GetValue("LogInUserName"), 4)))
+        Sleep(500)
+        AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+        Send("{TAB}")
+        AutoItSetOption("SendKeyDownDelay", 15)
+        Send(_SendUnicodeReturn(BinaryToString(GetValue("LogInPassword"), 4)))
+        Sleep(500)
+        AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+        Send("{ENTER}")
+        Splash("[ " & Localize("PatchingGame") & " ]", 0)
         Focus()
         Local $set = 1
         While Not $WinHandle
@@ -951,30 +998,24 @@ Func StartClient()
                 If $set Then
                     $set = 0
                     $WaitingTimer = TimerInit()
+                    Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
                 EndIf
                 TimeOut()
             EndIf
             Focus()
             Sleep(1000)
         WEnd
+        Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
         If $NoAutoLaunch Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
-        Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
         If Not $DisableRestartCount Then $Restarted += 1
         $WaitingTimer = TimerInit()
-        While ( Not ImageSearch("SelectionScreen") And Not ImageSearch("LogInScreen") )
+        While Not ( ImageSearch("SelectionScreen") Or ImageSearch("LogInScreen") )
             Sleep(500)
             TimeOut()
             If $RestartLoop Then Return 0
             Position()
             If $RestartLoop Then Return 0
         WEnd
-        If GetValue("TotalAccounts") = 1 Then Return
-        If ImageSearch("SelectionScreen") Then
-            MouseMove($_ImageSearchX, $_ImageSearchY)
-            SingleClick()
-            Sleep(1000)
-            $DisableRelogCount = 1
-        EndIf
     Else
         FileChangeDir($GameClientInstallLocation & "\Neverwinter\Live")
         Run("GameClient.exe" & GetLogInServerAddressString(), $GameClientInstallLocation & "\Neverwinter\Live")
@@ -989,22 +1030,20 @@ Func StartClient()
             Sleep(1000)
         WEnd
         If Not $DisableRestartCount Then $Restarted += 1
+        $WaitingTimer = TimerInit()
+        While Not ImageSearch("LogInScreen")
+            Sleep(500)
+            TimeOut()
+            If $RestartLoop Then Return 0
+            Position()
+            If $RestartLoop Then Return 0
+        WEnd
     EndIf
-    $WaitingTimer = TimerInit()
-    While Not ImageSearch("LogInScreen")
-        Sleep(500)
-        TimeOut()
-        If $RestartLoop Then Return 0
-        Position()
-        If $RestartLoop Then Return 0
-    WEnd
 EndFunc
 
 ; add after: If $RestartLoop Then Return 0
 Func PatchClient()
-    If GetValue("RestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And $ArcLauncherLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And FileExists($ArcLauncherLocation) And ImageExists("LogInScreen") Then
-        CheckServer()
-        Splash("[ " & Localize("PatchingGame") & " ]", 0)
+    If GetValue("RestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And $GameClientLauncherInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And FileExists($GameClientLauncherInstallLocation & "\Neverwinter.exe") And ImageExists("LogInScreen") Then
         StartClient()
         If $RestartLoop Then Return 0
         Splash("", 0)
@@ -1054,7 +1093,7 @@ Func TimeOut()
     AddAccountCountValue("TimedOut")
     If Not $LoggingIn Then AddCharacterCountInfo("TimedOut")
     $DisableRelogCount = 1
-    If $TimeOutRetries < GetValue("TimeOutRetries") And GetValue("RestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And $ArcLauncherLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And FileExists($ArcLauncherLocation) And ImageExists("LogInScreen") Then
+    If $TimeOutRetries < GetValue("TimeOutRetries") And GetValue("RestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And $GameClientLauncherInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And FileExists($GameClientLauncherInstallLocation & "\Neverwinter.exe") And ImageExists("LogInScreen") Then
         If $NoAutoLaunch Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
         $TimeOutRetries += 1
         Splash("[ " & Localize("RestartingNeverwinter") & " ]")
