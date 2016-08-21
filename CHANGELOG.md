@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.7.1
+- Added a LoginWindowLoadWaitTime option to the Settings.ini file.
+
 7.7
 - No longer uses Arc Launcher.
 - Updated character selection screen pixel detection.

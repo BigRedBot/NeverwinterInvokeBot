@@ -964,12 +964,14 @@ Func StartClient()
                 If @error = 0 Then
                     For $i2 = 1 To $Data[0][0]
                         If StringRegExp($Data[$i2][1], "^\#") And WinExists($Data[$i2][0]) Then
-                            Splash()
-                            Sleep(2000)
-                            If $Data[$i2][0] And Not WinActive($Data[$i2][0]) Then
+                            $WaitingTimer = TimerInit()
+                            While Not WinActive($Data[$i2][0])
+                                TimeOut()
                                 WinActivate($Data[$i2][0])
                                 Sleep(500)
-                            EndIf
+                            WEnd
+                            Splash()
+                            Sleep(GetValue("LoginWindowLoadWaitTime") * 1000)
                             ExitLoop 3
                         EndIf
                     Next
@@ -978,6 +980,7 @@ Func StartClient()
         WEnd
         AutoItSetOption("SendKeyDownDelay", 15)
         Send("+{TAB}")
+        Sleep(500)
         Send("{BS}")
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", 15)
@@ -985,11 +988,13 @@ Func StartClient()
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", $KeyDelay)
         Send("{TAB}")
+        Sleep(500)
         AutoItSetOption("SendKeyDownDelay", 15)
         Send(_SendUnicodeReturn(BinaryToString(GetValue("LogInPassword"), 4)))
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", $KeyDelay)
         Send("{ENTER}")
+        Sleep(2000)
         Splash("[ " & Localize("PatchingGame") & " ]", 0)
         Focus()
         Local $set = 1
@@ -1074,6 +1079,7 @@ Func LogIn()
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", $KeyDelay)
         Send("{TAB}")
+        Sleep(500)
         AutoItSetOption("SendKeyDownDelay", 15)
         Send(_SendUnicodeReturn(BinaryToString(GetValue("LogInPassword"), 4)))
         Sleep(500)
