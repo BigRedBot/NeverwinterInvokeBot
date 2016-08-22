@@ -43,6 +43,7 @@ Func GetClientLauncherPath()
         EndIf
         $i += 1
     WEnd
+    If $GameClientInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter.exe") Then Return $GameClientInstallLocation & "\Neverwinter.exe"
     Return 0
 EndFunc
 

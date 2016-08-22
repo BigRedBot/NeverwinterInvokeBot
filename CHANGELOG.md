@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.8
+- Will now look for the game launcher that is installed with steam if the one from arc is not found.
+
 7.7.1
 - Added a LoginWindowLoadWaitTime option to the Settings.ini file.
 
