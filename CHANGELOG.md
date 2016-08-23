@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.9.1
+- Fixed an error.
+
 7.9
 - Will now try to detect login failures with the launcher.
 
