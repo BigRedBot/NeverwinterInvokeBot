@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.9
+- Will now try to detect login failures with the launcher.
+
 7.8.1
 - Will now look for the game launcher that is installed with steam if the one from arc is not found.
 

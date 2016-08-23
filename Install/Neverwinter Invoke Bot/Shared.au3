@@ -41,7 +41,6 @@ Func LoadDefaults()
     SetDefault("LogInSeconds", 16)
     SetDefault("LogOutSeconds", 9)
     SetDefault("LogInDelaySeconds", 3)
-    SetDefault("LoginWindowLoadWaitTime", 5)
     SetDefault("RestartGameClient", 1)
     SetDefault("GameWidth", 752)
     SetDefault("GameHeight", 522)
@@ -236,15 +235,15 @@ LoadDefaults()
 PruneLogs()
 
 Global $WinHandle
-Func FindWindow()
+Func FindWindow($p = "GameClient.exe", $c = "CrypticWindowClass")
     $WinHandle = 0
-    Local $list = ProcessList("GameClient.exe")
+    Local $list = ProcessList($p)
     If @error <> 0 Then Return
     For $i = 1 To $list[0][0]
         Local $Data = _WinAPI_EnumProcessWindows($list[$i][1], False)
         If @error = 0 Then
             For $i2 = 1 To $Data[0][0]
-                If $Data[$i2][1] == "CrypticWindowClass" And WinExists($Data[$i2][0]) Then
+                If ( Not $c Or StringRegExp($Data[$i2][1], "^" & $c & "$") ) And WinExists($Data[$i2][0]) Then
                     $WinHandle = $Data[$i2][0]
                     Return
                 EndIf
@@ -253,16 +252,18 @@ Func FindWindow()
     Next
 EndFunc
 
-Func Focus()
-    FindWindow()
-    If $WinHandle And Not WinActive($WinHandle) Then
-        WinActivate($WinHandle)
-        Sleep(500)
-    EndIf
+Func Focus($p = "GameClient.exe", $c = "CrypticWindowClass")
+    FindWindow($p, $c)
+    If Not $WinHandle Then Return 0
+    If WinActive($WinHandle) Then Return 1
+    WinActivate($WinHandle)
+    Sleep(500)
+    Return 0
 EndFunc
 
 Global $ClientInfo, $ClientSize, $ClientWidth, $ClientHeight, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $ClientWidthCenter, $ClientHeightCenter, $WinWidth, $WinHeight, $WinLeft, $WinTop, $WinRight, $WinBottom, $WinWidthCenter, $WinHeightCenter, $PaddingWidth, $PaddingHeight, $PaddingLeft, $PaddingTop, $PaddingRight, $PaddingBottom, $DeskTopWidth, $DeskTopHeight, $OffsetX = 0, $OffsetY = 0
 Func GetPosition()
+    If Not $WinHandle Then Return 0
     $ClientInfo = WinGetPos($WinHandle)
     If @error <> 0 Then Return 0
     $ClientSize = WinGetClientSize($WinHandle)
