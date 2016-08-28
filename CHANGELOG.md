@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.9.2
+- Updated character selection screen pixel detection.
+
 7.9.1
 - Fixed an error.
 

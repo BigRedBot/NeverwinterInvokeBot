@@ -173,7 +173,7 @@ Func Loop()
                 MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
                 If GetValue("Current") <= Ceiling(GetValue("TotalSlots") / 2) Then
                     If GetValue("TopScrollBarX") And GetValue("TopSelectedCharacterX") Then
-                        For $n = 1 To 2
+                        For $n = 1 To 3
                             Send("{DOWN}")
                         Next
                         For $n = 1 To GetValue("TotalSlots")
@@ -196,7 +196,7 @@ Func Loop()
                     Next
                 Else
                     If GetValue("BottomScrollBarX") And GetValue("BottomSelectedCharacterX") Then
-                        For $n = 1 To 2
+                        For $n = 1 To 3
                             Send("{UP}")
                         Next
                         For $n = 1 To GetValue("TotalSlots")
@@ -737,9 +737,14 @@ Func WaitForScreen($image, $resultPosition = -2, $left = $ClientLeft, $top = $Cl
     WEnd
 EndFunc
 
-Func FindPixels($x, $y, $c)
-    If $x And Hex(PixelGetColor($x + $OffsetX, $y + $OffsetY), 6) = String($c) Then Return 1
-    Return 0
+Func FindPixels($x, $y, $c, $t = 5)
+    Local $a = StringSplit(StringRegExpReplace(Hex(PixelGetColor($x + $OffsetX, $y + $OffsetY), 6), "(..)(..)(..)", "$1|$2|$3"), "|")
+    Local $b = StringSplit(StringRegExpReplace($c, "(..)(..)(..)", "$1|$2|$3"), "|")
+    For $i = 1 To 3
+        Local $d = Dec($a[$i]) - Dec($b[$i])
+        If $d > $t Or $d < -$t Then Return 0
+    Next
+    Return 1
 EndFunc
 
 Global $DoLogInCommands = 1
