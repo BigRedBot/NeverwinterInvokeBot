@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.10
+- Fixed version mismatch detection.
+
 7.9.2
 - Updated character selection screen pixel detection.
 

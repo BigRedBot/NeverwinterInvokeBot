@@ -1,7 +1,8 @@
 @ECHO OFF
-SET VERSION=7.9.2
+SET VERSION=7.10
 SET NAME=Neverwinter Invoke Bot
 SET INSTALLER=NeverwinterInvokeBot
+ECHO %NAME% v%VERSION%
 
 (
     ECHO [version]
@@ -35,9 +36,9 @@ DEL %INSTALLER%.exe
 
 COPY /b 7zS.sfx + config.txt + Installer.7z %INSTALLER%.exe
 
+PAUSE
+
 DEL Installer.7z
 DEL config.txt
 DEL .\Install\*.exe
 DEL ".\Install\%NAME%\*.exe"
-
-PAUSE
