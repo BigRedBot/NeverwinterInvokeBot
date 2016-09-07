@@ -172,6 +172,7 @@ Func Loop()
                 DoubleRightClick()
                 MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
                 If GetValue("Current") <= Ceiling(GetValue("TotalSlots") / 2) Then
+                    AutoItSetOption("SendKeyDownDelay", 15)
                     If GetValue("TopScrollBarX") And GetValue("TopSelectedCharacterX") Then
                         For $n = 1 To 3
                             Send("{DOWN}")
@@ -189,12 +190,14 @@ Func Loop()
                             Send("{UP}")
                         Next
                     EndIf
+                    AutoItSetOption("SendKeyDownDelay", $KeyDelay)
                     Sleep($KeyDelay)
                     For $n = 2 To GetValue("Current")
                         Send("{DOWN}")
                         Sleep(50)
                     Next
                 Else
+                    AutoItSetOption("SendKeyDownDelay", 15)
                     If GetValue("BottomScrollBarX") And GetValue("BottomSelectedCharacterX") Then
                         For $n = 1 To 3
                             Send("{UP}")
@@ -212,6 +215,7 @@ Func Loop()
                             Send("{DOWN}")
                         Next
                     EndIf
+                    AutoItSetOption("SendKeyDownDelay", $KeyDelay)
                     Sleep($KeyDelay)
                     For $n = 1 To (GetValue("TotalSlots") - GetValue("Current"))
                         Send("{UP}")

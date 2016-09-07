@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.11
+- Fixed locations for character selection screen.
+
 7.10
 - Fixed version mismatch detection.
 
