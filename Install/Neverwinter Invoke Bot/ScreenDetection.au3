@@ -136,6 +136,9 @@ While 1
         If ScreenDetection_ImageSearch("Mismatch") Then
             $text &= @CRLF & @CRLF & Localize("VersionMismatchDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         EndIf
+        If ScreenDetection_ImageSearch("VIPInventory") Then
+            $text &= @CRLF & @CRLF & Localize("VIPInventoryDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+        EndIf
         If ScreenDetection_ImageSearch("OpenAnother") Then
             $text &= @CRLF & @CRLF & Localize("OpenAnotherButtonDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         EndIf

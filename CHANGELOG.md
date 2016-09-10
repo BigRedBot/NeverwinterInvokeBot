@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.13
+- Will now select the correct tab when trying to open Celestial Bags of Refining.
+
 7.12
 - Will now try to open Celestial Bags of Refining.
 

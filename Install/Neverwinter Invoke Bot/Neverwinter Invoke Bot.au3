@@ -267,7 +267,8 @@ Func Loop()
                     SetAccountValue("FinishedLoop", 1)
                     If GetValue("CurrentLoop") >= GetValue("EndAtLoop") Then SetAccountValue("CompletedAccount", 1)
                 EndIf
-                OpenCelestialBagsOfRefining()
+                OpenCelestialBagsOfRefining(); If $RestartLoop Then Return 0
+                If $RestartLoop Then ExitLoop 2
                 ChangeCharacter(); If $RestartLoop Then Return 0
                 If $RestartLoop Then ExitLoop 2
                 Local $LogOutTimer = TimerInit()
@@ -506,10 +507,18 @@ Func GetVIPAccountReward()
     WEnd
 EndFunc
 
-Func OpenCelestialBagsOfRefining()
-    Sleep(1000)
+Func OpenCelestialBagsOfRefining(); If $RestartLoop Then Return 0
+    ClearWindows(); If $RestartLoop Then Return 0
+    If $RestartLoop Then Return 0
     Send(GetValue("InventoryKey"))
     Sleep(1000)
+    If ImageSearch("VIPInventory") Then
+        $_ImageSearchX = Random($_ImageSearchLeft + GetValue("InventoryBagTabLeftOffset"), $_ImageSearchLeft + GetValue("InventoryBagTabRightOffset"), 1)
+        $_ImageSearchY = Random($_ImageSearchTop + GetValue("InventoryBagTabTopOffset"), $_ImageSearchTop + GetValue("InventoryBagTabBottomOffset"), 1)
+        MouseMove($_ImageSearchX, $_ImageSearchY)
+        DoubleClick()
+        Sleep(1000)
+    EndIf
     If ImageSearch("CelestialBagOfRefining", -2, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("CelestialBagSearchTolerance")) Then
         MouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
