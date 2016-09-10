@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.12
+- Will now try to open Celestial Bags of Refining.
+
 7.11
 - Fixed locations for character selection screen.
 

@@ -249,8 +249,7 @@ Func Loop()
                     ClearWindows(); If $RestartLoop Then Return 0
                     If $RestartLoop Then ExitLoop 2
                 EndIf
-                GetVIPAccountReward(); If $RestartLoop Then Return 0
-                If $RestartLoop Then ExitLoop 2
+                GetVIPAccountReward()
                 $WaitingTimer = TimerInit()
                 $FailedInvoke = 1
                 $CofferTries = 0
@@ -268,6 +267,7 @@ Func Loop()
                     SetAccountValue("FinishedLoop", 1)
                     If GetValue("CurrentLoop") >= GetValue("EndAtLoop") Then SetAccountValue("CompletedAccount", 1)
                 EndIf
+                OpenCelestialBagsOfRefining()
                 ChangeCharacter(); If $RestartLoop Then Return 0
                 If $RestartLoop Then ExitLoop 2
                 Local $LogOutTimer = TimerInit()
@@ -462,7 +462,7 @@ Func Invoke(); If $RestartLoop Then Return 0
     EndIf
 EndFunc
 
-Func GetVIPAccountReward(); If $RestartLoop Then Return 0
+Func GetVIPAccountReward()
     While 1
         While 1
             If Not GetValue("SkipVIPAccountReward") And Not GetValue("CollectedVIPAccountReward") And GetValue("LastVIPAccountRewardTryLoop") < GetValue("CurrentLoop") And ( GetValue("VIPAccountRewardCharacter") < GetValue("StartAt") Or GetValue("VIPAccountRewardCharacter") > GetValue("EndAt") Or GetValue("VIPAccountRewardCharacter") = GetValue("Current") ) And ImageExists("VIPAccountReward") Then
@@ -500,12 +500,26 @@ Func GetVIPAccountReward(); If $RestartLoop Then Return 0
                 SetAccountValue("VIPAccountRewardTries")
                 SetAccountValue("TriedVIPAccountReward", 1)
                 SetAccountValue("LastVIPAccountRewardTryLoop", GetValue("CurrentLoop"))
-                ClearWindows(); If $RestartLoop Then Return 0
-                If $RestartLoop Then Return 0
             EndIf
             Return
         WEnd
     WEnd
+EndFunc
+
+Func OpenCelestialBagsOfRefining()
+    Sleep(1000)
+    Send(GetValue("InventoryKey"))
+    Sleep(1000)
+    If ImageSearch("CelestialBagOfRefining", -2, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("CelestialBagSearchTolerance")) Then
+        MouseMove($_ImageSearchX, $_ImageSearchY)
+        DoubleClick()
+        Sleep(1000)
+        While ImageSearch("OpenAnother")
+            MouseMove($_ImageSearchX, $_ImageSearchY)
+            SingleClick()
+            Sleep(500)
+        WEnd
+    EndIf
 EndFunc
 
 Func GetCoffer(); If $RestartLoop Then Return 0
@@ -753,7 +767,7 @@ EndFunc
 
 Global $DoLogInCommands = 1
 
-Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $do = 1)
+Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("ImageSearchTolerance"), $do = 1)
     If $do And Not ImageExists($image) Then Return 0
     If $do And $DoLogInCommands And $image = "ChangeCharacterButton" Then
         If $DoLogInCommands = 2 Or GetValue("GameMenuKey") = "{ESC}" Then
@@ -768,14 +782,14 @@ Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $Clie
             $DoLogInCommands = 1
         EndIf
     EndIf
-    If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then
-        If $do And Not SetImageSearchVariables($image, $resultPosition, $left, $top, $right, $bottom) Then Return 0
+    If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then
+        If $do And Not SetImageSearchVariables($image, $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return 0
         Return 1
     EndIf
     Local $i = 2
     While ImageExists($image & $i)
-        If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & $i & ".png", $resultPosition, $left, $top, $right, $bottom, GetValue("ImageSearchTolerance")) Then
-            If $do And Not SetImageSearchVariables($image, $resultPosition, $left, $top, $right, $bottom) Then Return 0
+        If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & $i & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then
+            If $do And Not SetImageSearchVariables($image, $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return 0
             Return $i
         EndIf
         $i += 1
@@ -783,7 +797,7 @@ Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $Clie
     Return 0
 EndFunc
 
-Func SetImageSearchVariables($image, $resultPosition, $left, $top, $right, $bottom)
+Func SetImageSearchVariables($image, $resultPosition, $left, $top, $right, $bottom, $tolerance)
     If $image <> "LogInScreen" And $image <> "Unavailable" And $image <> "Mismatch" And $image <> "Idle" And $image <> "OK" Then
         $LoggingIn = 0
         $LogInTries = 0
@@ -800,7 +814,7 @@ Func SetImageSearchVariables($image, $resultPosition, $left, $top, $right, $bott
             $DoLogInCommands = 2
             Send("{ESC}")
             Sleep(500)
-            If ImageSearch($image, $resultPosition, $left, $top, $right, $bottom, 0) Then Return 0
+            If ImageSearch($image, $resultPosition, $left, $top, $right, $bottom, $tolerance, 0) Then Return 0
             $DoLogInCommands = 0
         EndIf
     EndIf
