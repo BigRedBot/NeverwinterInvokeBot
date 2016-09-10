@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.13.1
+- Improved inventory bags tab detection.
+
 7.13
 - Will now select the correct tab when trying to open Celestial Bags of Refining.
 
