@@ -508,6 +508,7 @@ Func GetVIPAccountReward()
 EndFunc
 
 Func OpenCelestialBagsOfRefining(); If $RestartLoop Then Return 0
+    If GetValue("DisableOpeningBags") Then Return
     ClearWindows(); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
     Send(GetValue("InventoryKey"))
@@ -1381,12 +1382,41 @@ Func HoursAndMinutes($n)
     Return Localize("Minutes", "<MINUTES>", $Minutes)
 EndFunc
 
+Func ChooseOpenBagsAccountOption()
+    If GetAllAccountsValue("DisableOpeningBags") Then Return
+    Local $hGUI = GUICreate($Title, 320, 120)
+    GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 270)
+    Local $Checkbox = GUICtrlCreateCheckbox(" " & Localize("OpenCelestialBagsOfRefining"), 25, 45, 270)
+    If Not GetAccountValue("DisableOpeningBags") Then GUICtrlSetState(-1, $GUI_CHECKED)
+    Local $hButton = GUICtrlCreateButton("OK", 118, 85, 84, -1, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 85, 75, 25)
+    GUISetState()
+    While 1
+        Switch GUIGetMsg()
+            Case $GUI_EVENT_CLOSE
+                Exit
+            Case $hButton
+                Local $openbagsdisabled = 1
+                If GUICtrlRead($Checkbox) = $GUI_CHECKED Then $openbagsdisabled = 0
+                GUIDelete()
+                If GetAccountValue("DisableOpeningBags") <> $openbagsdisabled Then
+                    SetAccountValue("DisableOpeningBags", $openbagsdisabled)
+                    If GetAccountValue("DisableOpeningBags") == GetDefaultValue("DisableOpeningBags") Then
+                        SaveIniAccount("DisableOpeningBags")
+                    Else
+                        SaveIniAccount("DisableOpeningBags", GetAccountValue("DisableOpeningBags"))
+                    EndIf
+                EndIf
+                Return
+            Case $ButtonCancel
+                Exit
+        EndSwitch
+    WEnd
+EndFunc
+
 Func ConfigureAccount()
-    If CompletedAccount() Then
-        Return
-    ElseIf MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAccountOptions", "<ACCOUNT>", $CurrentAccount)) = $IDYES Then
-        Return
-    EndIf
+    If CompletedAccount() Or (MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAccountOptions", "<ACCOUNT>", $CurrentAccount)) = $IDYES) Then Return
+    ChooseOpenBagsAccountOption()
     While 1
         Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $MaxLoops), GetValue("CurrentLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then Exit
@@ -1693,26 +1723,29 @@ Func AddCharacterCountInfo($name, $value = 1, $character = GetValue("Current"), 
 EndFunc
 
 Func ChooseOptions()
-    Local $overflowxpdefault = GetValue("DisableOverflowXPRewardCollection"), $cofferdefault = GetValue("Coffer"), $list = Localize($cofferdefault), $coffers = Array("CofferOfCelestialEnchantments, CofferOfCelestialArtifacts, CofferOfCelestialArtifactEquipment, BlessedProfessionsElementalPack, ElixirOfFate")
+    Local $overflowxpdefault = GetValue("DisableOverflowXPRewardCollection"), $openbagsdefault = GetAllAccountsValue("DisableOpeningBags"), $cofferdefault = GetValue("Coffer"), $list = Localize($cofferdefault), $coffers = Array("CofferOfCelestialEnchantments, CofferOfCelestialArtifacts, CofferOfCelestialArtifactEquipment, BlessedProfessionsElementalPack, ElixirOfFate")
     For $i = 1 To $coffers[0]
         If Not ($coffers[$i] == $cofferdefault) Then $list &= "|" & Localize($coffers[$i])
     Next
-    Local $hGUI = GUICreate($Title, 320, 170)
+    Local $hGUI = GUICreate($Title, 320, 200)
     GUICtrlCreateLabel(Localize("ChooseCoffer"), 25, 20, 270)
     Local $hCombo = GUICtrlCreateCombo("", 25, 50, 270)
     GUICtrlSetData(-1, $list, Localize($cofferdefault))
-    Local $Checkbox = GUICtrlCreateCheckbox(" " & Localize("CollectOverflowXPRewards"), 25, 95, 270)
+    Local $Checkbox1 = GUICtrlCreateCheckbox(" " & Localize("CollectOverflowXPRewards"), 25, 95, 270)
     If Not GetValue("DisableOverflowXPRewardCollection") Then GUICtrlSetState(-1, $GUI_CHECKED)
-    Local $hButton = GUICtrlCreateButton("OK", 118, 135, 84, -1, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 135, 75, 25)
+    Local $Checkbox2 = GUICtrlCreateCheckbox(" " & Localize("OpenCelestialBagsOfRefining"), 25, 125, 270)
+    If Not GetAllAccountsValue("DisableOpeningBags") Then GUICtrlSetState(-1, $GUI_CHECKED)
+    Local $hButton = GUICtrlCreateButton("OK", 118, 165, 84, -1, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 165, 75, 25)
     GUISetState()
     While 1
         Switch GUIGetMsg()
             Case $GUI_EVENT_CLOSE
                 Exit
             Case $hButton
-                Local $CurrCombo = GUICtrlRead($hCombo), $overflowxpdisabled = 1
-                If GUICtrlRead($Checkbox) = $GUI_CHECKED Then $overflowxpdisabled = 0
+                Local $CurrCombo = GUICtrlRead($hCombo), $overflowxpdisabled = 1, $openbagsdisabled = 1
+                If GUICtrlRead($Checkbox1) = $GUI_CHECKED Then $overflowxpdisabled = 0
+                If GUICtrlRead($Checkbox2) = $GUI_CHECKED Then $openbagsdisabled = 0
                 For $i = 1 To $coffers[0]
                     If Localize($coffers[$i]) == $CurrCombo Then
                         GUIDelete()
@@ -1730,6 +1763,14 @@ Func ChooseOptions()
                                 SaveIniAllAccounts("DisableOverflowXPRewardCollection")
                             Else
                                 SaveIniAllAccounts("DisableOverflowXPRewardCollection", GetValue("DisableOverflowXPRewardCollection"))
+                            EndIf
+                        EndIf
+                        If $openbagsdefault <> $openbagsdisabled Then
+                            SetAllAccountsValue("DisableOpeningBags", $openbagsdisabled)
+                            If GetAllAccountsValue("DisableOpeningBags") == GetDefaultValue("DisableOpeningBags") Then
+                                SaveIniAllAccounts("DisableOpeningBags")
+                            Else
+                                SaveIniAllAccounts("DisableOpeningBags", GetAllAccountsValue("DisableOpeningBags"))
                             EndIf
                         EndIf
                         Return

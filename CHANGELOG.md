@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.14
+- Added options to disable opening Celestial Bags of Refining globally and per account.
+
 7.13.1
 - Improved inventory bags tab detection.
 
