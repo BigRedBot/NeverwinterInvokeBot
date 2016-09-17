@@ -11,68 +11,68 @@ Func _IniWriteEx($sIniFile, $sSection, $sKey, $sValue, $iUTFMode = $FO_UTF8)
         Return SetError($e, 0, $r)
     EndIf
     If @error <> 0 Then
-        FileWrite($hFile, $sReadFile & @CRLF & "[" & $sSection & "]" & @CRLF)
-        FileWrite($hFile, $sKey & "=" & $sValue & @CRLF)
+        FileWrite($hFile, $sReadFile & @CRLF & "[" & $sSection & "]" & @CRLF & $sKey & "=" & $sValue & @CRLF)
         FileClose($hFile)
         _IniWriteEx_BlankLines($sIniFile)
         Return SetError(0, 0, 1)
     EndIf
-    Local $aFileArr = StringSplit(StringStripCR($sReadFile), @LF), $aSplitKeyValue, $iValueWasWritten = 0
+    Local $aFileArr = StringSplit(StringStripCR($sReadFile), @LF), $aSplitKeyValue, $iValueWasWritten = 0, $sWriteFile = ""
     For $i = 1 To $aFileArr[0]
-        If $i = 1 And StringRegExp($aFileArr[$i], "^\[.+\]$") Then FileWrite($hFile, "" & @CRLF)
+        If $i = 1 And StringRegExp($aFileArr[$i], "^\[.+\]$") Then $sWriteFile &= @CRLF
         If $iValueWasWritten Then
             If $aFileArr[$i] = "" And $i = $aFileArr[0] Then ExitLoop
-            FileWrite($hFile, $aFileArr[$i] & @CRLF)
+            $sWriteFile &= $aFileArr[$i] & @CRLF
         ElseIf $aFileArr[$i] = "[" & $sSection & "]" Then
-            FileWrite($hFile, $aFileArr[$i] & @CRLF)
+            $sWriteFile &= $aFileArr[$i] & @CRLF
             For $j = $i + 1 To $aFileArr[0]
                 If $iValueWasWritten Then
                     If $aFileArr[$j] = "" And $j = $aFileArr[0] Then ExitLoop
-                    FileWrite($hFile, $aFileArr[$j] & @CRLF)
+                    $sWriteFile &= $aFileArr[$j] & @CRLF
                 ElseIf StringRegExp(StringRegExpReplace($aFileArr[$j], '\s+=', '='), $sKey & '=') Then
                     $aSplitKeyValue = StringSplit($aFileArr[$j], "=")
-                    FileWrite($hFile, $aSplitKeyValue[1] & "=" & $sValue & @CRLF)
+                    $sWriteFile &= $aSplitKeyValue[1] & "=" & $sValue & @CRLF
                     $iValueWasWritten = 1
                 ElseIf StringRegExp($aFileArr[$j], "^\[.+\]$") Then
-                    FileWrite($hFile, $sKey & "=" & $sValue & @CRLF & $aFileArr[$j] & @CRLF)
+                    $sWriteFile &= $sKey & "=" & $sValue & @CRLF & $aFileArr[$j] & @CRLF
                     $iValueWasWritten = 1
                 ElseIf $j = $aFileArr[0] Then
                     Local $newline = @CRLF
                     If $aFileArr[$j] = "" Then $newline = ""
-                    FileWrite($hFile, $newline & $aFileArr[$j] & @CRLF & $sKey & "=" & $sValue & @CRLF)
+                    $sWriteFile &= $newline & $aFileArr[$j] & @CRLF & $sKey & "=" & $sValue & @CRLF
                     $iValueWasWritten = 1
                 ElseIf $aFileArr[$j] = "" Then
                     For $k = $j + 1 To $aFileArr[0]
                         If $aFileArr[$k] <> "" Then
                             If StringRegExp($aFileArr[$k], "^\[.+\]$") Then
-                                FileWrite($hFile, $sKey & "=" & $sValue & @CRLF)
+                                $sWriteFile &= $sKey & "=" & $sValue & @CRLF
                                 $iValueWasWritten = 1
                             EndIf
                             ExitLoop
                         EndIf
                     Next
                 EndIf
-                If Not $iValueWasWritten Then FileWrite($hFile, $aFileArr[$j] & @CRLF)
+                If Not $iValueWasWritten Then $sWriteFile &= $aFileArr[$j] & @CRLF
             Next
             ExitLoop
         ElseIf $i = $aFileArr[0] Then
             Local $newline = @CRLF
             If $aFileArr[$i] = "" Then $newline = ""
-            FileWrite($hFile, $newline & "[" & $sSection & "]" & @CRLF & $sKey & "=" & $sValue & @CRLF)
+            $sWriteFile &= $newline & "[" & $sSection & "]" & @CRLF & $sKey & "=" & $sValue & @CRLF
             $iValueWasWritten = 1
         ElseIf $aFileArr[$i] = "" Then
             For $j = $i + 1 To $aFileArr[0]
                 If $aFileArr[$j] <> "" Then
                     ExitLoop
                 ElseIf $j = $aFileArr[0] Then
-                    FileWrite($hFile, "[" & $sSection & "]" & @CRLF & $sKey & "=" & $sValue & @CRLF)
+                    $sWriteFile &= "[" & $sSection & "]" & @CRLF & $sKey & "=" & $sValue & @CRLF
                     $iValueWasWritten = 1
                     ExitLoop
                 EndIf
             Next
         EndIf
-        If Not $iValueWasWritten Then FileWrite($hFile, $aFileArr[$i] & @CRLF)
+        If Not $iValueWasWritten Then $sWriteFile &= $aFileArr[$i] & @CRLF
     Next
+    FileWrite($hFile, $sWriteFile)
     FileClose($hFile)
     _IniWriteEx_BlankLines($sIniFile)
     Return SetError(0, 0, 1)
