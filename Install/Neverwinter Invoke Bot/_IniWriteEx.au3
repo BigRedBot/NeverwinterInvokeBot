@@ -81,7 +81,7 @@ EndFunc
 Func _IniReadEx($sIniFile, $sSection, $sKey, $sDefault = "")
     _IniWriteEx_BlankLines($sIniFile)
     Local $r = IniRead($sIniFile, $sSection, $sKey, $sDefault)
-    Return SetError(@error, 0, BinaryToString(StringToBinary($r), 4))
+    Return SetError(@error, 0, BinaryToString(StringToBinary(BinaryToString($r, 4)), 4))
 EndFunc
 
 Func _IniDeleteEx($sIniFile, $sSection, $sKey = 0)

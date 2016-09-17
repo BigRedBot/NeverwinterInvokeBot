@@ -198,7 +198,7 @@ Func SavePrivateIniAllAccounts($name, $value = "")
 EndFunc
 
 Func GetPrivateIniAllAccounts($name)
-    Return BinaryToString(_IniReadEx($SettingsDir & "\PrivateSettings.ini", "AllAccounts", $name, ""), 4)
+    Return _IniReadEx($SettingsDir & "\PrivateSettings.ini", "AllAccounts", $name, "")
 EndFunc
 
 Func SavePrivateIniAccount($name, $value = "", $account = $CurrentAccount)
@@ -207,7 +207,7 @@ Func SavePrivateIniAccount($name, $value = "", $account = $CurrentAccount)
 EndFunc
 
 Func GetPrivateIniAccount($name, $account = $CurrentAccount)
-    Return BinaryToString(_IniReadEx($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name, ""), 4)
+    Return _IniReadEx($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name, "")
 EndFunc
 
 Func SavePrivateIniCharacter($name, $value = "", $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
@@ -216,7 +216,7 @@ Func SavePrivateIniCharacter($name, $value = "", $character = GetAccountValue("C
 EndFunc
 
 Func GetPrivateIniCharacter($name, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
-    Return BinaryToString(_IniReadEx($SettingsDir & "\PrivateSettings.ini", "Account" & $account & "_Character" & $character, $name, ""), 4)
+    Return _IniReadEx($SettingsDir & "\PrivateSettings.ini", "Account" & $account & "_Character" & $character, $name, "")
 EndFunc
 
 Func Statistics_SaveIniAllAccounts($name, $value = "")
@@ -254,7 +254,7 @@ Func LoadSettings($file)
         Local $values = IniReadSection($file, $sections[$i])
         If @error = 0 Then
             For $i2 = 1 To $values[0][0]
-                Local $v = BinaryToString(StringToBinary($values[$i2][1]), 4)
+                Local $v = BinaryToString(StringToBinary(BinaryToString($values[$i2][1], 4)), 4)
                 If String(Number($v)) = String($v) Or $v = "" Then $v = Number($v)
                 If Not IsDeclared("SETTINGS_" & $sections[$i] & "_" & $values[$i2][0]) Then Assign("SETTINGS_" & $sections[$i] & "_" & $values[$i2][0], $v, 2)
             Next
