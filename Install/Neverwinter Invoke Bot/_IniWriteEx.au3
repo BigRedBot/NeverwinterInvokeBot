@@ -5,86 +5,73 @@
 Func _IniWriteEx($sIniFile, $sSection, $sKey, $sValue, $iUTFMode = $FO_UTF8)
     If _IniReadEx($sIniFile, $sSection, $sKey) == $sValue Then Return SetError(0, 0, 1)
     If BitOR($iUTFMode, $FO_BINARY, $FO_UNICODE, $FO_UTF16_BE, $FO_UTF8) <> Number($FO_BINARY + $FO_UNICODE + $FO_UTF16_BE + $FO_UTF8) Then $iUTFMode = $FO_UTF8
-    Local $sReadFile = FileRead($sIniFile)
-    Local $hFile = FileOpen($sIniFile, $FO_OVERWRITE + $FO_CREATEPATH + $iUTFMode)
+    Local $sReadFile = FileRead($sIniFile), $hFile = FileOpen($sIniFile, $FO_OVERWRITE + $FO_CREATEPATH + $iUTFMode)
     If $hFile = -1 Then
         Local $r = IniWrite($sIniFile, $sSection, $sKey, $sValue), $e = @error
         Return SetError($e, 0, $r)
     EndIf
-    If @error Then
+    If @error <> 0 Then
         FileWrite($hFile, $sReadFile & @CRLF & "[" & $sSection & "]" & @CRLF)
         FileWrite($hFile, $sKey & "=" & $sValue & @CRLF)
         FileClose($hFile)
         _IniWriteEx_BlankLines($sIniFile)
         Return SetError(0, 0, 1)
     EndIf
-    Local $aFileArr = StringSplit(StringStripCR($sReadFile), @LF)
-    Local $aSplitKeyValue, $iValueWasWritten = False
+    Local $aFileArr = StringSplit(StringStripCR($sReadFile), @LF), $aSplitKeyValue, $iValueWasWritten = 0
     For $i = 1 To $aFileArr[0]
         If $i = 1 And StringRegExp($aFileArr[$i], "^\[.+\]$") Then FileWrite($hFile, "" & @CRLF)
-        If $aFileArr[$i] = "[" & $sSection & "]" Then
+        If $iValueWasWritten Then
+            If $aFileArr[$i] = "" And $i = $aFileArr[0] Then ExitLoop
+            FileWrite($hFile, $aFileArr[$i] & @CRLF)
+        ElseIf $aFileArr[$i] = "[" & $sSection & "]" Then
             FileWrite($hFile, $aFileArr[$i] & @CRLF)
             For $j = $i + 1 To $aFileArr[0]
                 If $iValueWasWritten Then
-                    If $aFileArr[$j] = "" Then
-                        For $k = $j + 1 To $aFileArr[0]
-                            If $aFileArr[$k] <> "" Then
-                                ExitLoop
-                            ElseIf $k = $aFileArr[0] Then
-                                ExitLoop 3
-                            EndIf
-                        Next
-                    EndIf
+                    If $aFileArr[$j] = "" And $j = $aFileArr[0] Then ExitLoop
                     FileWrite($hFile, $aFileArr[$j] & @CRLF)
                 ElseIf StringRegExp(StringRegExpReplace($aFileArr[$j], '\s+=', '='), $sKey & '=') Then
                     $aSplitKeyValue = StringSplit($aFileArr[$j], "=")
                     FileWrite($hFile, $aSplitKeyValue[1] & "=" & $sValue & @CRLF)
-                    $iValueWasWritten = True
-                ElseIf $aFileArr[$j] = "" Then
-                    If $j = $aFileArr[0] Then
-                        FileWrite($hFile, $sKey & "=" & $sValue & @CRLF)
-                        $iValueWasWritten = True
-                    Else
-                        For $k = $j + 1 To $aFileArr[0]
-                            If $aFileArr[$k] <> "" Then
-                                If StringRegExp($aFileArr[$k], "^\[.+\]$") Then
-                                    FileWrite($hFile, $sKey & "=" & $sValue & @CRLF)
-                                    $iValueWasWritten = True
-                                EndIf
-                                ExitLoop
-                            EndIf
-                        Next
-                        If Not $iValueWasWritten Then FileWrite($hFile, $aFileArr[$j] & @CRLF)
-                    EndIf
+                    $iValueWasWritten = 1
                 ElseIf StringRegExp($aFileArr[$j], "^\[.+\]$") Then
                     FileWrite($hFile, $sKey & "=" & $sValue & @CRLF & $aFileArr[$j] & @CRLF)
-                    $iValueWasWritten = True
+                    $iValueWasWritten = 1
                 ElseIf $j = $aFileArr[0] Then
-                    FileWrite($hFile, $aFileArr[$j] & @CRLF & $sKey & "=" & $sValue & @CRLF)
-                    $iValueWasWritten = True
-                Else
-                    FileWrite($hFile, $aFileArr[$j] & @CRLF)
+                    Local $newline = @CRLF
+                    If $aFileArr[$j] = "" Then $newline = ""
+                    FileWrite($hFile, $newline & $aFileArr[$j] & @CRLF & $sKey & "=" & $sValue & @CRLF)
+                    $iValueWasWritten = 1
+                ElseIf $aFileArr[$j] = "" Then
+                    For $k = $j + 1 To $aFileArr[0]
+                        If $aFileArr[$k] <> "" Then
+                            If StringRegExp($aFileArr[$k], "^\[.+\]$") Then
+                                FileWrite($hFile, $sKey & "=" & $sValue & @CRLF)
+                                $iValueWasWritten = 1
+                            EndIf
+                            ExitLoop
+                        EndIf
+                    Next
                 EndIf
+                If Not $iValueWasWritten Then FileWrite($hFile, $aFileArr[$j] & @CRLF)
             Next
             ExitLoop
         ElseIf $i = $aFileArr[0] Then
             Local $newline = @CRLF
             If $aFileArr[$i] = "" Then $newline = ""
             FileWrite($hFile, $newline & "[" & $sSection & "]" & @CRLF & $sKey & "=" & $sValue & @CRLF)
-            $iValueWasWritten = True
+            $iValueWasWritten = 1
         ElseIf $aFileArr[$i] = "" Then
             For $j = $i + 1 To $aFileArr[0]
                 If $aFileArr[$j] <> "" Then
                     ExitLoop
                 ElseIf $j = $aFileArr[0] Then
                     FileWrite($hFile, "[" & $sSection & "]" & @CRLF & $sKey & "=" & $sValue & @CRLF)
-                    $iValueWasWritten = True
-                    ExitLoop 2
+                    $iValueWasWritten = 1
+                    ExitLoop
                 EndIf
             Next
-        Else
-            FileWrite($hFile, $aFileArr[$i] & @CRLF)
         EndIf
+        If Not $iValueWasWritten Then FileWrite($hFile, $aFileArr[$i] & @CRLF)
     Next
     FileClose($hFile)
     _IniWriteEx_BlankLines($sIniFile)
@@ -120,14 +107,13 @@ EndFunc
 
 Func _IniWriteEx_BlankLines($sIniFile)
     Local $sText = FileRead($sIniFile)
-    If StringRegExp(String($sText), "\[") Then
-        Local $sTextReplace = @CRLF & StringRegExpReplace(StringRegExpReplace($sText, "(\v)+", @CRLF), "(^\v*)|(\v*\Z)", "") & @CRLF
-        If Not ($sTextReplace == $sText) Then
-            Local $hFile = FileOpen($sIniFile, 2)
-            FileWrite($hFile, $sTextReplace)
-            FileClose($hFile)
-            Return
-        EndIf
+    If @error <> 0 Then Return
+    Local $sTextReplace = @CRLF & StringRegExpReplace(StringRegExpReplace(String($sText), "(\v)+", @CRLF), "(^\v*)|(\v*\Z)", "") & @CRLF
+    If Not ($sTextReplace == $sText) Then
+        Local $hFile = FileOpen($sIniFile, 2)
+        FileWrite($hFile, $sTextReplace)
+        FileClose($hFile)
+        Return
     EndIf
     If StringRegExp(String(FileReadLine($sIniFile, 1)), "^\[.+\]$") Then
         Local $hFile = FileOpen($sIniFile, 2)
