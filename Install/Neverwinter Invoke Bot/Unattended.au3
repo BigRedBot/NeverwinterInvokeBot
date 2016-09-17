@@ -6,6 +6,7 @@ AutoItSetOption("TrayAutoPause", 0)
 #include <MsgBoxConstants.au3>
 #include <TrayConstants.au3>
 #include "_GetUTCMinutes.au3"
+#include "_IniWriteEx.au3"
 #include "Localization.au3"
 Global $Title = $Name & " " & $Version & ": Unattended Launcher"
 TraySetToolTip($Title)

@@ -142,7 +142,7 @@ While 1
         If ScreenDetection_ImageSearch("OpenAnother") Then
             $text &= @CRLF & @CRLF & Localize("OpenAnotherButtonDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         EndIf
-        If ScreenDetection_ImageSearch("CelestialBagOfRefining", -1, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("CelestialBagSearchTolerance")) Then
+        If ScreenDetection_ImageSearch("CelestialBagOfRefining", -1, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("InventoryBagSearchTolerance")) Then
             $text &= @CRLF & @CRLF & Localize("CelestialBagOfRefiningDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         EndIf
     EndIf

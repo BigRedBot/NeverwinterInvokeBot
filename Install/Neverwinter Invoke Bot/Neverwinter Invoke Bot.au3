@@ -267,7 +267,7 @@ Func Loop()
                     SetAccountValue("FinishedLoop", 1)
                     If GetValue("CurrentLoop") >= GetValue("EndAtLoop") Then SetAccountValue("CompletedAccount", 1)
                 EndIf
-                OpenCelestialBagsOfRefining(); If $RestartLoop Then Return 0
+                OpenInventoryBags(); If $RestartLoop Then Return 0
                 If $RestartLoop Then ExitLoop 2
                 ChangeCharacter(); If $RestartLoop Then Return 0
                 If $RestartLoop Then ExitLoop 2
@@ -507,7 +507,7 @@ Func GetVIPAccountReward()
     WEnd
 EndFunc
 
-Func OpenCelestialBagsOfRefining(); If $RestartLoop Then Return 0
+Func OpenInventoryBags(); If $RestartLoop Then Return 0
     If GetValue("DisableOpeningBags") Then Return
     ClearWindows(); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
@@ -520,7 +520,7 @@ Func OpenCelestialBagsOfRefining(); If $RestartLoop Then Return 0
         DoubleClick()
         Sleep(1000)
     EndIf
-    If ImageSearch("CelestialBagOfRefining", -2, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("CelestialBagSearchTolerance")) Then
+    If ImageSearch("CelestialBagOfRefining", -2, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("InventoryBagSearchTolerance")) Then
         MouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
         Sleep(1000)
@@ -995,13 +995,13 @@ Func StartClient(); If $RestartLoop Then Return 0
                 Send("{BS}")
                 Sleep(500)
                 AutoItSetOption("SendKeyDownDelay", 15)
-                Send(_SendUnicodeReturn(BinaryToString(GetValue("LogInUserName"), 4)))
+                Send(_SendUnicodeReturn(GetValue("LogInUserName")))
                 Sleep(500)
                 AutoItSetOption("SendKeyDownDelay", $KeyDelay)
                 Send("{TAB}")
                 Sleep(500)
                 AutoItSetOption("SendKeyDownDelay", 15)
-                Send(_SendUnicodeReturn(BinaryToString(GetValue("LogInPassword"), 4)))
+                Send(_SendUnicodeReturn(GetValue("LogInPassword")))
                 Sleep(500)
                 AutoItSetOption("SendKeyDownDelay", $KeyDelay)
                 Send("{ENTER}")
@@ -1101,13 +1101,13 @@ Func LogIn(); If $RestartLoop Then Return 0
         Send("{RIGHT 254}{BS 254}")
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", 15)
-        Send(_SendUnicodeReturn(BinaryToString(GetValue("LogInUserName"), 4)))
+        Send(_SendUnicodeReturn(GetValue("LogInUserName")))
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", $KeyDelay)
         Send("{TAB}")
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", 15)
-        Send(_SendUnicodeReturn(BinaryToString(GetValue("LogInPassword"), 4)))
+        Send(_SendUnicodeReturn(GetValue("LogInPassword")))
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", $KeyDelay)
         Send("{ENTER}")
@@ -1386,7 +1386,7 @@ Func ChooseOpenBagsAccountOption()
     If GetAllAccountsValue("DisableOpeningBags") Then Return
     Local $hGUI = GUICreate($Title, 320, 120)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 270)
-    Local $Checkbox = GUICtrlCreateCheckbox(" " & Localize("OpenCelestialBagsOfRefining"), 25, 45, 270)
+    Local $Checkbox = GUICtrlCreateCheckbox(" " & Localize("OpenInventoryBags"), 25, 45, 270)
     If Not GetAccountValue("DisableOpeningBags") Then GUICtrlSetState(-1, $GUI_CHECKED)
     Local $hButton = GUICtrlCreateButton("OK", 118, 85, 84, -1, $BS_DEFPUSHBUTTON)
     Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 85, 75, 25)
@@ -1619,39 +1619,37 @@ Func Load()
             SetAccountValue("LogInUserName", "")
         EndIf
         While 1
-            Local $string = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterUsername"), BinaryToString(GetValue("LogInUserName"), 4), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+            Local $string = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterUsername"), GetValue("LogInUserName"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
             If @error <> 0 Then Exit
-            $string = String(StringToBinary($string, 4))
             If $string And $string <> "" Then
                 SetAccountValue("LogInUserName", $string)
                 ExitLoop
             EndIf
-            If GetIniPrivate("LogInUserName") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DeleteUsername")) = $IDYES Then
+            If GetPrivateIniAccount("LogInUserName") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DeleteUsername")) = $IDYES Then
                 SetAccountValue("LogInUserName", "")
-                SaveIniPrivate("LogInUserName")
+                SavePrivateIniAccount("LogInUserName")
             Else
                 MsgBox($MB_ICONWARNING, $Title, Localize("ValidUsername"))
             EndIf
         WEnd
-        If BinaryToString(GetIniPrivate("LogInUserName"), 4) <> BinaryToString(GetValue("LogInUserName"), 4) Then
+        If GetPrivateIniAccount("LogInUserName") <> GetValue("LogInUserName") Then
             If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SaveUsername")) = $IDYES Then
-                SaveIniPrivate("LogInUserName", GetValue("LogInUserName"))
+                SavePrivateIniAccount("LogInUserName", GetValue("LogInUserName"))
             Else
-                SaveIniPrivate("LogInUserName")
+                SavePrivateIniAccount("LogInUserName")
             EndIf
         EndIf
         If Not GetValue("LogInPassword") Then SetAccountValue("LogInPassword", "")
         _Crypt_Startup()
         While 1
-            Local $string = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterPassword"), BinaryToString(GetValue("LogInPassword"), 4), "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+            Local $string = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterPassword"), GetValue("LogInPassword"), "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
             If @error <> 0 Then Exit
-            $string = String(StringToBinary($string, 4))
             If $string And $string <> "" Then
-                If BinaryToString(GetIniPrivate("LogInPassword"), 4) == BinaryToString($string, 4) Then
+                If GetPrivateIniAccount("LogInPassword") == $string Then
                     SetAccountValue("LogInPassword", $string)
                     ExitLoop
                 ElseIf GetValue("PasswordHash") Then
-                    Local $Hash = Hex(_Crypt_HashData(BinaryToString($string, 4), $CALG_SHA1))
+                    Local $Hash = Hex(_Crypt_HashData($string, $CALG_SHA1))
                     If $Hash = GetValue("PasswordHash") Then
                         SetAccountValue("LogInPassword", $string)
                         ExitLoop
@@ -1660,20 +1658,20 @@ Func Load()
                 Else
                     Local $string2 = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterPasswordAgain"), "", "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
                     If @error <> 0 Then Exit
-                    If $string == String(StringToBinary($string2, 4)) Then
+                    If $string == $string2 Then
                         SetAccountValue("LogInPassword", $string)
                         If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SavePassword")) = $IDYES Then
-                            SaveIniPrivate("LogInPassword", GetValue("LogInPassword"))
-                            If GetIniPrivate("PasswordHash") <> "" Then
-                                SaveIniPrivate("PasswordHash")
+                            SavePrivateIniAccount("LogInPassword", GetValue("LogInPassword"))
+                            If GetPrivateIniAccount("PasswordHash") <> "" Then
+                                SavePrivateIniAccount("PasswordHash")
                             EndIf
                         Else
-                            SaveIniPrivate("LogInPassword")
+                            SavePrivateIniAccount("LogInPassword")
                             If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SavePasswordHash")) = $IDYES Then
-                                SetAccountValue("PasswordHash", Hex(_Crypt_HashData(BinaryToString(GetValue("LogInPassword"), 4), $CALG_SHA1)))
-                                SaveIniPrivate("PasswordHash", GetValue("PasswordHash"))
-                            ElseIf GetIniPrivate("PasswordHash") <> "" Then
-                                SaveIniPrivate("PasswordHash")
+                                SetAccountValue("PasswordHash", Hex(_Crypt_HashData(GetValue("LogInPassword"), $CALG_SHA1)))
+                                SavePrivateIniAccount("PasswordHash", GetValue("PasswordHash"))
+                            ElseIf GetPrivateIniAccount("PasswordHash") <> "" Then
+                                SavePrivateIniAccount("PasswordHash")
                             EndIf
                         EndIf
                         ExitLoop
@@ -1681,12 +1679,12 @@ Func Load()
                     MsgBox($MB_ICONWARNING, $Title, Localize("PasswordNotMatch"))
                 EndIf
             Else
-                If GetIniPrivate("LogInPassword") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DeletePassword")) = $IDYES Then
+                If GetPrivateIniAccount("LogInPassword") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DeletePassword")) = $IDYES Then
                     SetAccountValue("LogInPassword", "")
-                    SaveIniPrivate("LogInPassword")
-                ElseIf GetIniPrivate("PasswordHash") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DeletePasswordHash")) = $IDYES Then
+                    SavePrivateIniAccount("LogInPassword")
+                ElseIf GetPrivateIniAccount("PasswordHash") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DeletePasswordHash")) = $IDYES Then
                     SetAccountValue("PasswordHash")
-                    SaveIniPrivate("PasswordHash")
+                    SavePrivateIniAccount("PasswordHash")
                 Else
                     MsgBox($MB_ICONWARNING, $Title, Localize("ValidPassword"))
                 EndIf
@@ -1733,7 +1731,7 @@ Func ChooseOptions()
     GUICtrlSetData(-1, $list, Localize($cofferdefault))
     Local $Checkbox1 = GUICtrlCreateCheckbox(" " & Localize("CollectOverflowXPRewards"), 25, 95, 270)
     If Not GetValue("DisableOverflowXPRewardCollection") Then GUICtrlSetState(-1, $GUI_CHECKED)
-    Local $Checkbox2 = GUICtrlCreateCheckbox(" " & Localize("OpenCelestialBagsOfRefining"), 25, 125, 270)
+    Local $Checkbox2 = GUICtrlCreateCheckbox(" " & Localize("OpenInventoryBags"), 25, 125, 270)
     If Not GetAllAccountsValue("DisableOpeningBags") Then GUICtrlSetState(-1, $GUI_CHECKED)
     Local $hButton = GUICtrlCreateButton("OK", 118, 165, 84, -1, $BS_DEFPUSHBUTTON)
     Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 165, 75, 25)

@@ -11,6 +11,7 @@
 #include <WinAPI.au3>
 #include <File.au3>
 #include <Array.au3>
+#include "_IniWriteEx.au3"
 #include "Localization.au3"
 AutoItSetOption("WinTitleMatchMode", 3)
 Opt("TrayMenuMode", 3)
@@ -45,7 +46,7 @@ Func LoadDefaults()
     SetDefault("GameWidth", 752)
     SetDefault("GameHeight", 522)
     SetDefault("ImageSearchTolerance", 50)
-    SetDefault("CelestialBagSearchTolerance", 100)
+    SetDefault("InventoryBagSearchTolerance", 100)
     SetDefault("Coffer", "CofferOfCelestialEnchantments")
     SetDefault("RelativePixelLocation", 1)
     SetDefault("SafeLogInX", 471)
@@ -75,23 +76,26 @@ EndFunc
 
 Global $CurrentAccount = 1
 If Not IsDeclared("LoadPrivateSettings") Then Assign("LoadPrivateSettings", 0, 2)
-Global $SettingsDir = @AppDataCommonDir & "\Neverwinter Invoke Bot"
+Global $SettingsDir = @AppDataDir & "\Neverwinter Invoke Bot"
 
 SetValue("Language", LoadLocalizations())
 
 Func SetDefault($name, $value = 0)
-    If Not IsDeclared("SETTINGS_Default_" & $name) Then Assign("SETTINGS_Default_" & $name, $value, 2)
+    If Not IsDeclared("SETTINGS_Default_" & $name) Then Return Assign("SETTINGS_Default_" & $name, $value, 2)
 EndFunc
 
-Func SetValue($name, $value = 0, $account = 0)
+Func SetValue($name, $value = 0, $account = 0, $character = 0)
     If $account Then
+        If $character Then
+            If IsDeclared("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) Then Return Assign("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name, $value)
+            Return Assign("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name, $value, 2)
+        EndIf
         If IsDeclared("SETTINGS_Account" & $account & "_" & $name) Then Return Assign("SETTINGS_Account" & $account & "_" & $name, $value)
         Return Assign("SETTINGS_Account" & $account & "_" & $name, $value, 2)
-    ElseIf IsDeclared("SETTINGS_Account" & $CurrentAccount & "_" & $name) Then
-        Return Assign("SETTINGS_Account" & $CurrentAccount & "_" & $name, $value)
-    ElseIf IsDeclared("SETTINGS_AllAccounts_" & $name) Then
-        Return Assign("SETTINGS_AllAccounts_" & $name, $value)
     EndIf
+    If IsDeclared("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("Current", $CurrentAccount) & "_" & $name) Then Return Assign("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("Current", $CurrentAccount) & "_" & $name, $value)
+    If IsDeclared("SETTINGS_Account" & $CurrentAccount & "_" & $name) Then Return Assign("SETTINGS_Account" & $CurrentAccount & "_" & $name, $value)
+    If IsDeclared("SETTINGS_AllAccounts_" & $name) Then Return Assign("SETTINGS_AllAccounts_" & $name, $value)
     Return Assign("SETTINGS_AllAccounts_" & $name, $value, 2)
 EndFunc
 
@@ -104,42 +108,55 @@ Func SetAccountValue($name, $value = 0, $account = $CurrentAccount)
     Return SetValue($name, $value, $account)
 EndFunc
 
-Func AddCountValue($name, $value = 1, $account = 0)
-    Return SetValue($name, GetValue($name, $account) + $value, $account)
+Func SetCharacterValue($name, $value = 0, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
+    Return SetValue($name, $value, $account, $character)
+EndFunc
+
+Func AddCountValue($name, $value = 1)
+    Return SetValue($name, GetValue($name) + $value)
+EndFunc
+
+Func AddAllAccountsCountValue($name, $value = 1)
+    Return SetAllAccountsValue($name, GetAllAccountsValue($name) + $value)
 EndFunc
 
 Func AddAccountCountValue($name, $value = 1, $account = $CurrentAccount)
-    Return SetValue($name, GetValue($name, $account) + $value, $account)
+    Return SetValue($name, GetAccountValue($name, $account) + $value, $account)
 EndFunc
 
-Func GetValue($name, $account = $CurrentAccount)
-    If $account And @NumParams = 2 Then
+Func AddCharacterCountValue($name, $value = 1, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
+    Return SetValue($name, GetCharacterValue($name, $character, $account) + $value, $account, $character)
+EndFunc
+
+Func GetValue($name, $account = $CurrentAccount, $character = GetAccountValue("Current", $CurrentAccount))
+    If $account And @NumParams > 1 Then
+        If $character And @NumParams = 3 Then
+            If IsDeclared("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) Then Return Eval("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name)
+        EndIf
         If IsDeclared("SETTINGS_Account" & $account & "_" & $name) Then Return Eval("SETTINGS_Account" & $account & "_" & $name)
-    ElseIf IsDeclared("SETTINGS_Account" & $CurrentAccount & "_" & $name) Then
-        Return Eval("SETTINGS_Account" & $CurrentAccount & "_" & $name)
-    ElseIf IsDeclared("SETTINGS_AllAccounts_" & $name) Then
-        Return Eval("SETTINGS_AllAccounts_" & $name)
-    ElseIf IsDeclared("SETTINGS_Default_" & $name) Then
-        Return Eval("SETTINGS_Default_" & $name)
     EndIf
+    If IsDeclared("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("Current", $CurrentAccount) & "_" & $name) Then Return Eval("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("Current", $CurrentAccount) & "_" & $name)
+    If IsDeclared("SETTINGS_Account" & $CurrentAccount & "_" & $name) Then Return Eval("SETTINGS_Account" & $CurrentAccount & "_" & $name)
+    If IsDeclared("SETTINGS_AllAccounts_" & $name) Then Return Eval("SETTINGS_AllAccounts_" & $name)
+    If IsDeclared("SETTINGS_Default_" & $name) Then Return Eval("SETTINGS_Default_" & $name)
     Return 0
 EndFunc
 
 Func GetAllAccountsValue($name)
-    If IsDeclared("SETTINGS_AllAccounts_" & $name) Then
-        Return Eval("SETTINGS_AllAccounts_" & $name)
-    ElseIf IsDeclared("SETTINGS_Default_" & $name) Then
-        Return Eval("SETTINGS_Default_" & $name)
-    EndIf
+    If IsDeclared("SETTINGS_AllAccounts_" & $name) Then Return Eval("SETTINGS_AllAccounts_" & $name)
+    If IsDeclared("SETTINGS_Default_" & $name) Then Return Eval("SETTINGS_Default_" & $name)
     Return 0
 EndFunc
 
 Func GetAccountValue($name, $account = $CurrentAccount)
-    If IsDeclared("SETTINGS_Account" & $account & "_" & $name) Then
-        Return Eval("SETTINGS_Account" & $account & "_" & $name)
-    ElseIf IsDeclared("SETTINGS_Default_" & $name) Then
-        Return Eval("SETTINGS_Default_" & $name)
-    EndIf
+    If IsDeclared("SETTINGS_Account" & $account & "_" & $name) Then Return Eval("SETTINGS_Account" & $account & "_" & $name)
+    If IsDeclared("SETTINGS_Default_" & $name) Then Return Eval("SETTINGS_Default_" & $name)
+    Return 0
+EndFunc
+
+Func GetCharacterValue($name, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
+    If IsDeclared("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) Then Return Eval("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name)
+    If IsDeclared("SETTINGS_Default_" & $name) Then Return Eval("SETTINGS_Default_" & $name)
     Return 0
 EndFunc
 
@@ -149,58 +166,85 @@ Func GetDefaultValue($name)
 EndFunc
 
 Func SaveIniAllAccounts($name, $value = "")
-    If $value == "" Then Return IniDelete($SettingsDir & "\Settings.ini", "AllAccounts", $name)
-    Return IniWrite($SettingsDir & "\Settings.ini", "AllAccounts", $name, $value)
+    If $value == "" Then Return _IniDeleteEx($SettingsDir & "\Settings.ini", "AllAccounts", $name)
+    Return _IniWriteEx($SettingsDir & "\Settings.ini", "AllAccounts", $name, $value)
 EndFunc
 
 Func GetIniAllAccounts($name)
-    Return IniRead($SettingsDir & "\Settings.ini", "AllAccounts", $name, "")
+    Return _IniReadEx($SettingsDir & "\Settings.ini", "AllAccounts", $name, "")
 EndFunc
 
 Func SaveIniAccount($name, $value = "", $account = $CurrentAccount)
-    If $value == "" Then Return IniDelete($SettingsDir & "\Settings.ini", "Account" & $account, $name)
-    Return IniWrite($SettingsDir & "\Settings.ini", "Account" & $account, $name, $value)
+    If $value == "" Then Return _IniDeleteEx($SettingsDir & "\Settings.ini", "Account" & $account, $name)
+    Return _IniWriteEx($SettingsDir & "\Settings.ini", "Account" & $account, $name, $value)
 EndFunc
 
 Func GetIniAccount($name, $account = $CurrentAccount)
-    Return IniRead($SettingsDir & "\Settings.ini", "Account" & $account, $name, "")
+    Return _IniReadEx($SettingsDir & "\Settings.ini", "Account" & $account, $name, "")
 EndFunc
 
-Func SaveIniPrivate($name, $value = "", $account = $CurrentAccount)
-    If $value == "" Then Return IniDelete($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name)
-    Return IniWrite($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name, $value)
+Func SaveIniCharacter($name, $value = "", $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
+    If $value == "" Then Return _IniDeleteEx($SettingsDir & "\Settings.ini", "Account" & $account & "_Character" & $character, $name)
+    Return _IniWriteEx($SettingsDir & "\Settings.ini", "Account" & $account & "_Character" & $character, $name, $value)
 EndFunc
 
-Func GetIniPrivate($name, $account = $CurrentAccount)
-    Return IniRead($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name, "")
+Func GetIniCharacter($name, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
+    Return _IniReadEx($SettingsDir & "\Settings.ini", "Account" & $account & "_Character" & $character, $name, "")
+EndFunc
+
+Func SavePrivateIniAllAccounts($name, $value = "")
+    If $value == "" Then Return _IniDeleteEx($SettingsDir & "\PrivateSettings.ini", "AllAccounts", $name)
+    Return _IniWriteEx($SettingsDir & "\PrivateSettings.ini", "AllAccounts", $name, StringToBinary(String($value), 4))
+EndFunc
+
+Func GetPrivateIniAllAccounts($name)
+    Return BinaryToString(_IniReadEx($SettingsDir & "\PrivateSettings.ini", "AllAccounts", $name, ""), 4)
+EndFunc
+
+Func SavePrivateIniAccount($name, $value = "", $account = $CurrentAccount)
+    If $value == "" Then Return _IniDeleteEx($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name)
+    Return _IniWriteEx($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name, StringToBinary(String($value), 4))
+EndFunc
+
+Func GetPrivateIniAccount($name, $account = $CurrentAccount)
+    Return BinaryToString(_IniReadEx($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name, ""), 4)
+EndFunc
+
+Func SavePrivateIniCharacter($name, $value = "", $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
+    If $value == "" Then Return _IniDeleteEx($SettingsDir & "\PrivateSettings.ini", "Account" & $account & "_Character" & $character, $name)
+    Return _IniWriteEx($SettingsDir & "\PrivateSettings.ini", "Account" & $account & "_Character" & $character, $name, StringToBinary(String($value), 4))
+EndFunc
+
+Func GetPrivateIniCharacter($name, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
+    Return BinaryToString(_IniReadEx($SettingsDir & "\PrivateSettings.ini", "Account" & $account & "_Character" & $character, $name, ""), 4)
 EndFunc
 
 Func Statistics_SaveIniAllAccounts($name, $value = "")
-    If $value == "" Then Return IniDelete($SettingsDir & "\Statistics.ini", "AllAccounts", $name)
+    If $value == "" Then Return _IniDeleteEx($SettingsDir & "\Statistics.ini", "AllAccounts", $name)
     If Not GetAllAccountsValue("StartDate") Then
         Local $Month[13] = [12, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], $Date = $Month[Number(@MON)] & " " & Number(@MDAY) & ", " & @YEAR
-        IniWrite($SettingsDir & "\Statistics.ini", "AllAccounts", "StartDate", $Date)
+        _IniWriteEx($SettingsDir & "\Statistics.ini", "AllAccounts", "StartDate", $Date)
         SetAllAccountsValue("StartDate", $Date)
     EndIf
-    Return IniWrite($SettingsDir & "\Statistics.ini", "AllAccounts", $name, $value)
+    Return _IniWriteEx($SettingsDir & "\Statistics.ini", "AllAccounts", $name, $value)
 EndFunc
 
 Func Statistics_GetIniAllAccounts($name)
-    Return IniRead($SettingsDir & "\Statistics.ini", "AllAccounts", $name, "")
+    Return _IniReadEx($SettingsDir & "\Statistics.ini", "AllAccounts", $name, "")
 EndFunc
 
 Func Statistics_SaveIniAccount($name, $value = "", $account = $CurrentAccount)
-    If $value == "" Then Return IniDelete($SettingsDir & "\Statistics.ini", "Account" & $account, $name)
+    If $value == "" Then Return _IniDeleteEx($SettingsDir & "\Statistics.ini", "Account" & $account, $name)
     If Not GetAccountValue("StartDate", $account) Then
         Local $Month[13] = [12, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], $Date = $Month[Number(@MON)] & " " & Number(@MDAY) & ", " & @YEAR
-        IniWrite($SettingsDir & "\Statistics.ini", "Account" & $account, "StartDate", $Date)
+        _IniWriteEx($SettingsDir & "\Statistics.ini", "Account" & $account, "StartDate", $Date)
         SetAccountValue("StartDate", $Date, $account)
     EndIf
-    Return IniWrite($SettingsDir & "\Statistics.ini", "Account" & $account, $name, $value)
+    Return _IniWriteEx($SettingsDir & "\Statistics.ini", "Account" & $account, $name, $value)
 EndFunc
 
 Func Statistics_GetIniAccount($name, $account = $CurrentAccount)
-    Return IniRead($SettingsDir & "\Statistics.ini", "Account" & $account, $name, "")
+    Return _IniReadEx($SettingsDir & "\Statistics.ini", "Account" & $account, $name, "")
 EndFunc
 
 Func LoadSettings($file)
@@ -210,7 +254,7 @@ Func LoadSettings($file)
         Local $values = IniReadSection($file, $sections[$i])
         If @error = 0 Then
             For $i2 = 1 To $values[0][0]
-                Local $v = $values[$i2][1]
+                Local $v = BinaryToString(StringToBinary($values[$i2][1]), 4)
                 If String(Number($v)) = String($v) Or $v = "" Then $v = Number($v)
                 If Not IsDeclared("SETTINGS_" & $sections[$i] & "_" & $values[$i2][0]) Then Assign("SETTINGS_" & $sections[$i] & "_" & $values[$i2][0], $v, 2)
             Next

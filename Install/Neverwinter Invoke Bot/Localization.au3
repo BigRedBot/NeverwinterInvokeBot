@@ -56,7 +56,7 @@ EndFunc
 Func GetLanguage($default = "English", $file = @ScriptDir & "\Localization.ini")
     Local $d = $default
     If Not IsString($d) Or $d = "" Then $d = "English"
-    $d = IniRead($file, $d, "Language", "English")
+    $d = _IniReadEx($file, $d, "Language", "English")
     If @error <> 0 Then Exit
     $d = BinaryToString(StringToBinary($d), 4)
     Local $langlist = $d
@@ -64,7 +64,7 @@ Func GetLanguage($default = "English", $file = @ScriptDir & "\Localization.ini")
     If @error <> 0 Then Exit
     Local $translated_sections[$sections[0] + 1]
     For $i = 1 To $sections[0]
-        $translated_sections[$i] = IniRead($file, $sections[$i], "Language", $sections[$i])
+        $translated_sections[$i] = _IniReadEx($file, $sections[$i], "Language", $sections[$i])
         If @error <> 0 Then Exit
         $translated_sections[$i] = BinaryToString(StringToBinary($translated_sections[$i]), 4)
         If $translated_sections[$i] <> $d Then $langlist &= "|" & $translated_sections[$i]
@@ -94,8 +94,9 @@ Func LoadLocalizations($lang = "", $file = "", $iniwrite = 1)
     Local $l = $lang, $f = $file
     If Not IsString($f) Or $f = "" Then $f = @ScriptDir & "\Localization.ini"
     If Not IsString($l) Or $l = "" Then
-        Local $s = @AppDataCommonDir & "\Neverwinter Invoke Bot"
-        $l = IniRead($s & "\Settings.ini", "AllAccounts", "Language", "")
+        Local $s = @AppDataDir & "\Neverwinter Invoke Bot", $o = @AppDataCommonDir & "\Neverwinter Invoke Bot"
+        If Not FileExists($s) And FileExists($o) Then DirMove($o, $s)
+        $l = _IniReadEx($s & "\Settings.ini", "AllAccounts", "Language", "")
         If @error <> 0 Then Exit
         If $l = "" Or $lang Then
             $l = GetLanguage($l, $f)
@@ -110,7 +111,7 @@ Func LoadLocalizations($lang = "", $file = "", $iniwrite = 1)
     For $i = 1 To $values[0][0]
         Local $v = BinaryToString(StringToBinary($values[$i][1]), 4)
         If $v = "" Then
-            $v = IniRead($f, "English", $values[$i][0], "")
+            $v = _IniReadEx($f, "English", $values[$i][0], "")
             If @error <> 0 Then Exit
             $v = BinaryToString(StringToBinary($v), 4)
         EndIf

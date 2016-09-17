@@ -5,6 +5,7 @@ Global $Title = $Name & " v" & $Version & " Uninstaller"
 #include <MsgBoxConstants.au3>
 If Not @Compiled Then Exit MsgBox($MB_ICONWARNING, $Title, "The script must be a compiled exe to work correctly!")
 #include <Misc.au3>
+#include "_IniWriteEx.au3"
 #include "Localization.au3"
 LoadLocalizations(0, 0, 0)
 If _Singleton($Name & " Uninstaller" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("UninstallerAlreadyRunning"))
@@ -22,7 +23,7 @@ Local $RegLocation = "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersi
 
 If ( RegRead($RegLocation, "DisplayName") <> "" Or RegRead($RegLocation, "DisplayVersion") <> "" Or RegRead($RegLocation, "Publisher") <> "" Or RegRead($RegLocation, "DisplayIcon") <> "" Or RegRead($RegLocation, "UninstallString") <> "" Or RegRead($RegLocation, "InstallLocation") <> "" ) And Not RegDelete($RegLocation) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("FailedToDeleteRegistry"))
 
-If FileExists(@AppDataCommonDir & "\" & $Name) And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("KeepSettingsFiles")) <> $IDYES Then DirRemove(@AppDataCommonDir & "\" & $Name, 1)
+If FileExists(@AppDataDir & "\" & $Name) And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("KeepSettingsFiles")) <> $IDYES Then DirRemove(@AppDataDir & "\" & $Name, 1)
 
 _SelfDelete(5, 1, 1)
 If @error = 1 Then Exit MsgBox($MB_ICONWARNING, "_SelfDelete()", "The script must be a compiled exe to work correctly!")
