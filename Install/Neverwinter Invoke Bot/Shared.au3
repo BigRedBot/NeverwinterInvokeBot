@@ -11,7 +11,7 @@
 #include <WinAPI.au3>
 #include <File.au3>
 #include <Array.au3>
-#include "_IniWriteEx.au3"
+#include "_UnicodeIni.au3"
 #include "Localization.au3"
 AutoItSetOption("WinTitleMatchMode", 3)
 Opt("TrayMenuMode", 3)
@@ -166,85 +166,85 @@ Func GetDefaultValue($name)
 EndFunc
 
 Func SaveIniAllAccounts($name, $value = "")
-    If $value == "" Then Return _IniDeleteEx($SettingsDir & "\Settings.ini", "AllAccounts", $name)
-    Return _IniWriteEx($SettingsDir & "\Settings.ini", "AllAccounts", $name, $value)
+    If $value == "" Then Return _UnicodeIniDelete($SettingsDir & "\Settings.ini", "AllAccounts", $name)
+    Return _UnicodeIniWrite($SettingsDir & "\Settings.ini", "AllAccounts", $name, $value)
 EndFunc
 
 Func GetIniAllAccounts($name)
-    Return _IniReadEx($SettingsDir & "\Settings.ini", "AllAccounts", $name, "")
+    Return _UnicodeIniRead($SettingsDir & "\Settings.ini", "AllAccounts", $name, "")
 EndFunc
 
 Func SaveIniAccount($name, $value = "", $account = $CurrentAccount)
-    If $value == "" Then Return _IniDeleteEx($SettingsDir & "\Settings.ini", "Account" & $account, $name)
-    Return _IniWriteEx($SettingsDir & "\Settings.ini", "Account" & $account, $name, $value)
+    If $value == "" Then Return _UnicodeIniDelete($SettingsDir & "\Settings.ini", "Account" & $account, $name)
+    Return _UnicodeIniWrite($SettingsDir & "\Settings.ini", "Account" & $account, $name, $value)
 EndFunc
 
 Func GetIniAccount($name, $account = $CurrentAccount)
-    Return _IniReadEx($SettingsDir & "\Settings.ini", "Account" & $account, $name, "")
+    Return _UnicodeIniRead($SettingsDir & "\Settings.ini", "Account" & $account, $name, "")
 EndFunc
 
 Func SaveIniCharacter($name, $value = "", $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
-    If $value == "" Then Return _IniDeleteEx($SettingsDir & "\Settings.ini", "Account" & $account & "_Character" & $character, $name)
-    Return _IniWriteEx($SettingsDir & "\Settings.ini", "Account" & $account & "_Character" & $character, $name, $value)
+    If $value == "" Then Return _UnicodeIniDelete($SettingsDir & "\Settings.ini", "Account" & $account & "_Character" & $character, $name)
+    Return _UnicodeIniWrite($SettingsDir & "\Settings.ini", "Account" & $account & "_Character" & $character, $name, $value)
 EndFunc
 
 Func GetIniCharacter($name, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
-    Return _IniReadEx($SettingsDir & "\Settings.ini", "Account" & $account & "_Character" & $character, $name, "")
+    Return _UnicodeIniRead($SettingsDir & "\Settings.ini", "Account" & $account & "_Character" & $character, $name, "")
 EndFunc
 
 Func SavePrivateIniAllAccounts($name, $value = "")
-    If $value == "" Then Return _IniDeleteEx($SettingsDir & "\PrivateSettings.ini", "AllAccounts", $name)
-    Return _IniWriteEx($SettingsDir & "\PrivateSettings.ini", "AllAccounts", $name, StringToBinary(String($value), 4))
+    If $value == "" Then Return _UnicodeIniDelete($SettingsDir & "\PrivateSettings.ini", "AllAccounts", $name)
+    Return _UnicodeIniWrite($SettingsDir & "\PrivateSettings.ini", "AllAccounts", $name, StringToBinary(String($value), $SB_UTF8))
 EndFunc
 
 Func GetPrivateIniAllAccounts($name)
-    Return _IniReadEx($SettingsDir & "\PrivateSettings.ini", "AllAccounts", $name, "")
+    Return _UnicodeIniRead($SettingsDir & "\PrivateSettings.ini", "AllAccounts", $name, "")
 EndFunc
 
 Func SavePrivateIniAccount($name, $value = "", $account = $CurrentAccount)
-    If $value == "" Then Return _IniDeleteEx($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name)
-    Return _IniWriteEx($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name, StringToBinary(String($value), 4))
+    If $value == "" Then Return _UnicodeIniDelete($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name)
+    Return _UnicodeIniWrite($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name, StringToBinary(String($value), $SB_UTF8))
 EndFunc
 
 Func GetPrivateIniAccount($name, $account = $CurrentAccount)
-    Return _IniReadEx($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name, "")
+    Return _UnicodeIniRead($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name, "")
 EndFunc
 
 Func SavePrivateIniCharacter($name, $value = "", $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
-    If $value == "" Then Return _IniDeleteEx($SettingsDir & "\PrivateSettings.ini", "Account" & $account & "_Character" & $character, $name)
-    Return _IniWriteEx($SettingsDir & "\PrivateSettings.ini", "Account" & $account & "_Character" & $character, $name, StringToBinary(String($value), 4))
+    If $value == "" Then Return _UnicodeIniDelete($SettingsDir & "\PrivateSettings.ini", "Account" & $account & "_Character" & $character, $name)
+    Return _UnicodeIniWrite($SettingsDir & "\PrivateSettings.ini", "Account" & $account & "_Character" & $character, $name, StringToBinary(String($value), $SB_UTF8))
 EndFunc
 
 Func GetPrivateIniCharacter($name, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
-    Return _IniReadEx($SettingsDir & "\PrivateSettings.ini", "Account" & $account & "_Character" & $character, $name, "")
+    Return _UnicodeIniRead($SettingsDir & "\PrivateSettings.ini", "Account" & $account & "_Character" & $character, $name, "")
 EndFunc
 
 Func Statistics_SaveIniAllAccounts($name, $value = "")
-    If $value == "" Then Return _IniDeleteEx($SettingsDir & "\Statistics.ini", "AllAccounts", $name)
+    If $value == "" Then Return _UnicodeIniDelete($SettingsDir & "\Statistics.ini", "AllAccounts", $name)
     If Not GetAllAccountsValue("StartDate") Then
         Local $Month[13] = [12, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], $Date = $Month[Number(@MON)] & " " & Number(@MDAY) & ", " & @YEAR
-        _IniWriteEx($SettingsDir & "\Statistics.ini", "AllAccounts", "StartDate", $Date)
+        _UnicodeIniWrite($SettingsDir & "\Statistics.ini", "AllAccounts", "StartDate", $Date)
         SetAllAccountsValue("StartDate", $Date)
     EndIf
-    Return _IniWriteEx($SettingsDir & "\Statistics.ini", "AllAccounts", $name, $value)
+    Return _UnicodeIniWrite($SettingsDir & "\Statistics.ini", "AllAccounts", $name, $value)
 EndFunc
 
 Func Statistics_GetIniAllAccounts($name)
-    Return _IniReadEx($SettingsDir & "\Statistics.ini", "AllAccounts", $name, "")
+    Return _UnicodeIniRead($SettingsDir & "\Statistics.ini", "AllAccounts", $name, "")
 EndFunc
 
 Func Statistics_SaveIniAccount($name, $value = "", $account = $CurrentAccount)
-    If $value == "" Then Return _IniDeleteEx($SettingsDir & "\Statistics.ini", "Account" & $account, $name)
+    If $value == "" Then Return _UnicodeIniDelete($SettingsDir & "\Statistics.ini", "Account" & $account, $name)
     If Not GetAccountValue("StartDate", $account) Then
         Local $Month[13] = [12, "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], $Date = $Month[Number(@MON)] & " " & Number(@MDAY) & ", " & @YEAR
-        _IniWriteEx($SettingsDir & "\Statistics.ini", "Account" & $account, "StartDate", $Date)
+        _UnicodeIniWrite($SettingsDir & "\Statistics.ini", "Account" & $account, "StartDate", $Date)
         SetAccountValue("StartDate", $Date, $account)
     EndIf
-    Return _IniWriteEx($SettingsDir & "\Statistics.ini", "Account" & $account, $name, $value)
+    Return _UnicodeIniWrite($SettingsDir & "\Statistics.ini", "Account" & $account, $name, $value)
 EndFunc
 
 Func Statistics_GetIniAccount($name, $account = $CurrentAccount)
-    Return _IniReadEx($SettingsDir & "\Statistics.ini", "Account" & $account, $name, "")
+    Return _UnicodeIniRead($SettingsDir & "\Statistics.ini", "Account" & $account, $name, "")
 EndFunc
 
 Func LoadSettings($file)
@@ -254,7 +254,7 @@ Func LoadSettings($file)
         Local $values = IniReadSection($file, $sections[$i])
         If @error = 0 Then
             For $i2 = 1 To $values[0][0]
-                Local $v = BinaryToString(StringToBinary(BinaryToString($values[$i2][1], 4)), 4)
+                Local $v = _UnicodeIni_BinaryToString($values[$i2][1])
                 If String(Number($v)) = String($v) Or $v = "" Then $v = Number($v)
                 If Not IsDeclared("SETTINGS_" & $sections[$i] & "_" & $values[$i2][0]) Then Assign("SETTINGS_" & $sections[$i] & "_" & $values[$i2][0], $v, 2)
             Next

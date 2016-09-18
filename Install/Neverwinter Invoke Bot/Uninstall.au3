@@ -5,7 +5,7 @@ Global $Title = $Name & " v" & $Version & " Uninstaller"
 #include <MsgBoxConstants.au3>
 If Not @Compiled Then Exit MsgBox($MB_ICONWARNING, $Title, "The script must be a compiled exe to work correctly!")
 #include <Misc.au3>
-#include "_IniWriteEx.au3"
+#include "_UnicodeIni.au3"
 #include "Localization.au3"
 LoadLocalizations(0, 0, 0)
 If _Singleton($Name & " Uninstaller" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("UninstallerAlreadyRunning"))

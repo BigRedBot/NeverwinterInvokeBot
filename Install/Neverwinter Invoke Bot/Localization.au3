@@ -56,17 +56,15 @@ EndFunc
 Func GetLanguage($default = "English", $file = @ScriptDir & "\Localization.ini")
     Local $d = $default
     If Not IsString($d) Or $d = "" Then $d = "English"
-    $d = _IniReadEx($file, $d, "Language", "English")
+    $d = _UnicodeIniRead($file, $d, "Language", "English")
     If @error <> 0 Then Exit
-    $d = BinaryToString(StringToBinary($d), 4)
     Local $langlist = $d
     Local $sections = IniReadSectionNames($file)
     If @error <> 0 Then Exit
     Local $translated_sections[$sections[0] + 1]
     For $i = 1 To $sections[0]
-        $translated_sections[$i] = _IniReadEx($file, $sections[$i], "Language", $sections[$i])
+        $translated_sections[$i] = _UnicodeIniRead($file, $sections[$i], "Language", $sections[$i])
         If @error <> 0 Then Exit
-        $translated_sections[$i] = BinaryToString(StringToBinary($translated_sections[$i]), 4)
         If $translated_sections[$i] <> $d Then $langlist &= "|" & $translated_sections[$i]
     Next
     Local $hGUI = GUICreate("Language", 200, 85)
@@ -96,7 +94,7 @@ Func LoadLocalizations($lang = "", $file = "", $iniwrite = 1)
     If Not IsString($l) Or $l = "" Then
         Local $s = @AppDataDir & "\Neverwinter Invoke Bot", $o = @AppDataCommonDir & "\Neverwinter Invoke Bot"
         If Not FileExists($s) And FileExists($o) Then DirMove($o, $s)
-        $l = _IniReadEx($s & "\Settings.ini", "AllAccounts", "Language", "")
+        $l = _UnicodeIniRead($s & "\Settings.ini", "AllAccounts", "Language", "")
         If @error <> 0 Then Exit
         If $l = "" Or $lang Then
             $l = GetLanguage($l, $f)
@@ -109,11 +107,10 @@ Func LoadLocalizations($lang = "", $file = "", $iniwrite = 1)
     Local $values = IniReadSection($f, $l)
     If @error <> 0 Then Exit
     For $i = 1 To $values[0][0]
-        Local $v = BinaryToString(StringToBinary($values[$i][1]), 4)
+        Local $v = _UnicodeIni_BinaryToString($values[$i][1])
         If $v = "" Then
-            $v = _IniReadEx($f, "English", $values[$i][0], "")
+            $v = _UnicodeIniRead($f, "English", $values[$i][0], "")
             If @error <> 0 Then Exit
-            $v = BinaryToString(StringToBinary($v), 4)
         EndIf
         If Not IsDeclared("LOCALIZATION_" & $values[$i][0]) Then Assign("LOCALIZATION_" & $values[$i][0], StringReplace($v, "<BR>", @CRLF), 2)
     Next

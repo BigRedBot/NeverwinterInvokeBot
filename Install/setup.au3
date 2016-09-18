@@ -12,7 +12,7 @@ If Not @Compiled Then Exit MsgBox($MB_ICONWARNING, $Title, "The script must be a
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
 #include <StringConstants.au3>
-#include ".\Neverwinter Invoke Bot\_IniWriteEx.au3"
+#include ".\Neverwinter Invoke Bot\_UnicodeIni.au3"
 #include ".\Neverwinter Invoke Bot\Localization.au3"
 Local $Language = LoadLocalizations(1, @ScriptDir & "\" & $Name & "\Localization.ini", 0)
 
@@ -70,9 +70,9 @@ Else
 EndIf
 Local $SettingsDir = @AppDataDir & "\Neverwinter Invoke Bot", $OldSettingsDir = @AppDataCommonDir & "\Neverwinter Invoke Bot"
 If Not FileExists($SettingsDir) And FileExists($OldSettingsDir) Then DirMove($OldSettingsDir, $SettingsDir)
-If _IniReadEx($SettingsDir & "\Settings.ini", "AllAccounts", "Language", "") <> $Language Then
+If _UnicodeIniRead($SettingsDir & "\Settings.ini", "AllAccounts", "Language", "") <> $Language Then
     DirCreate($SettingsDir)
-    _IniWriteEx($SettingsDir & "\Settings.ini", "AllAccounts", "Language", $Language)
+    _UnicodeIniWrite($SettingsDir & "\Settings.ini", "AllAccounts", "Language", $Language)
 EndIf
 If Not DirCopy($Name, $InstallDir, 1) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCopyingFilesToProgramsFolder"))
 If Not RegWrite($RegLocation, "DisplayName", "REG_SZ", $Name) Or Not RegWrite($RegLocation, "DisplayVersion", "REG_SZ", $Version) Or Not RegWrite($RegLocation, "Publisher", "REG_SZ", "BigRedBot") Or Not RegWrite($RegLocation, "DisplayIcon", "REG_SZ", $InstallDir & "\" & $Name & ".exe") Or Not RegWrite($RegLocation, "UninstallString", "REG_SZ", '"' & $InstallDir & '\Uninstall.exe"') Or Not RegWrite($RegLocation, "InstallLocation", "REG_SZ", $InstallDir) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingUninstallerRegistry"))
