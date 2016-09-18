@@ -109,7 +109,7 @@ EndFunc
 
 Func _UnicodeIni_BlankLines($sIniFile, $bRemoveBlankLines = 1, $iUTFMode = $FO_UTF8)
     If BitOR($iUTFMode, $FO_BINARY, $FO_UNICODE, $FO_UTF16_BE, $FO_UTF8) <> Number($FO_BINARY + $FO_UNICODE + $FO_UTF16_BE + $FO_UTF8) Then $iUTFMode = $FO_UTF8
-    Local $sText = 0
+    Local $sText = Default
     If $bRemoveBlankLines Then
         $sText = FileRead($sIniFile)
         If @error <> 0 Then Return
@@ -122,7 +122,7 @@ Func _UnicodeIni_BlankLines($sIniFile, $bRemoveBlankLines = 1, $iUTFMode = $FO_U
         EndIf
     EndIf
     If StringRegExp(String(FileReadLine($sIniFile, 1)), "^\[.+\]$") Then
-        If $sText == 0 Then
+        If VarGetType($sText) = "Keyword" Then
             $sText = FileRead($sIniFile)
             If @error <> 0 Then Return
         EndIf
