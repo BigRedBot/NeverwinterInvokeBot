@@ -18,34 +18,33 @@ Func _UnicodeIniWrite($sIniFile, $sSection, $sKey, $sValue, $iUTFMode = $FO_UTF8
         _UnicodeIni_BlankLines($sIniFile)
         Return SetError(0, 0, 1)
     EndIf
-    Local $aFileArr = StringSplit(StringStripCR($sReadFile), @LF), $aSplitKeyValue, $iValueWasWritten = 0, $sWriteFile = ""
+    Local $aFileArr = StringSplit(StringStripCR($sReadFile), @LF), $iValueWasWritten = 0, $sWriteFile = ""
     For $i = 1 To $aFileArr[0]
-        If $i = 1 And StringRegExp($aFileArr[$i], "^\[.+\]$") Then $sWriteFile &= @CRLF
+        If $i = 1 And StringRegExp($aFileArr[$i], "^\s*\[.+]") Then $sWriteFile &= @CRLF
         If $iValueWasWritten Then
-            If $aFileArr[$i] = "" And $i = $aFileArr[0] Then ExitLoop
+            If StringRegExp($aFileArr[$i], "^\s*$") And $i = $aFileArr[0] Then ExitLoop
             $sWriteFile &= $aFileArr[$i] & @CRLF
-        ElseIf $aFileArr[$i] = "[" & $sSection & "]" Then
+        ElseIf StringRegExp($aFileArr[$i], "^\s*\[" & $sSection & "]") Then
             $sWriteFile &= $aFileArr[$i] & @CRLF
             For $j = $i + 1 To $aFileArr[0]
                 If $iValueWasWritten Then
-                    If $aFileArr[$j] = "" And $j = $aFileArr[0] Then ExitLoop
+                    If StringRegExp($aFileArr[$j], "^\s*$") And $j = $aFileArr[0] Then ExitLoop
                     $sWriteFile &= $aFileArr[$j] & @CRLF
-                ElseIf StringRegExp(StringRegExpReplace($aFileArr[$j], '\s+=', '='), $sKey & '=') Then
-                    $aSplitKeyValue = StringSplit($aFileArr[$j], "=")
-                    $sWriteFile &= $aSplitKeyValue[1] & "=" & $sValue & @CRLF
+                ElseIf StringRegExp($aFileArr[$j], "^\s*" & $sKey & "\s*=") Then
+                    $sWriteFile &= $sKey & "=" & $sValue & @CRLF
                     $iValueWasWritten = 1
-                ElseIf StringRegExp($aFileArr[$j], "^\[.+\]$") Then
+                ElseIf StringRegExp($aFileArr[$j], "^\s*\[.+]") Then
                     $sWriteFile &= $sKey & "=" & $sValue & @CRLF & $aFileArr[$j] & @CRLF
                     $iValueWasWritten = 1
                 ElseIf $j = $aFileArr[0] Then
                     Local $newline = @CRLF
-                    If $aFileArr[$j] = "" Then $newline = ""
+                    If StringRegExp($aFileArr[$j], "^\s*$") Then $newline = ""
                     $sWriteFile &= $newline & $aFileArr[$j] & @CRLF & $sKey & "=" & $sValue & @CRLF
                     $iValueWasWritten = 1
-                ElseIf $aFileArr[$j] = "" Then
+                ElseIf StringRegExp($aFileArr[$j], "^\s*$") Then
                     For $k = $j + 1 To $aFileArr[0]
-                        If $aFileArr[$k] <> "" Then
-                            If StringRegExp($aFileArr[$k], "^\[.+\]$") Then
+                        If Not StringRegExp($aFileArr[$k], "^\s*$") Then
+                            If StringRegExp($aFileArr[$k], "^\s*\[.+]") Then
                                 $sWriteFile &= $sKey & "=" & $sValue & @CRLF
                                 $iValueWasWritten = 1
                             EndIf
@@ -58,12 +57,12 @@ Func _UnicodeIniWrite($sIniFile, $sSection, $sKey, $sValue, $iUTFMode = $FO_UTF8
             ExitLoop
         ElseIf $i = $aFileArr[0] Then
             Local $newline = @CRLF
-            If $aFileArr[$i] = "" Then $newline = ""
+            If StringRegExp($aFileArr[$i], "^\s*$") Then $newline = ""
             $sWriteFile &= $newline & "[" & $sSection & "]" & @CRLF & $sKey & "=" & $sValue & @CRLF
             $iValueWasWritten = 1
-        ElseIf $aFileArr[$i] = "" Then
+        ElseIf StringRegExp($aFileArr[$i], "^\s*$") Then
             For $j = $i + 1 To $aFileArr[0]
-                If $aFileArr[$j] <> "" Then
+                If Not StringRegExp($aFileArr[$j], "^\s*$") Then
                     ExitLoop
                 ElseIf $j = $aFileArr[0] Then
                     $sWriteFile &= "[" & $sSection & "]" & @CRLF & $sKey & "=" & $sValue & @CRLF
@@ -109,25 +108,21 @@ EndFunc
 
 Func _UnicodeIni_BlankLines($sIniFile, $bRemoveBlankLines = 1, $iUTFMode = $FO_UTF8)
     If BitOR($iUTFMode, $FO_BINARY, $FO_UNICODE, $FO_UTF16_BE, $FO_UTF8) <> Number($FO_BINARY + $FO_UNICODE + $FO_UTF16_BE + $FO_UTF8) Then $iUTFMode = $FO_UTF8
-    Local $sText = Default
-    If $bRemoveBlankLines Then
-        $sText = FileRead($sIniFile)
-        If @error <> 0 Then Return
-        Local $sTextReplace = @CRLF & StringRegExpReplace(StringRegExpReplace(String($sText), "(\v)+", @CRLF), "(^\v*)|(\v*\Z)", "") & @CRLF
+    Local $lines = _FileCountLines($sIniFile)
+    If @error <> 0 Then Return
+    Local $hFile = FileOpen($sIniFile, $iUTFMode)
+    If @error <> 0 Then Return FileClose($hFile)
+    Local $sText = FileRead($hFile)
+    If @error <> 0 Then Return FileClose($hFile)
+    If $bRemoveBlankLines Or StringRegExp(FileReadLine($hFile, 1), "^\s*\[.+]") Or StringRegExp(FileReadLine($hFile, $lines), "^\s*\[.+]") Then
+        FileClose($hFile)
+        Local $sTextReplace = @CRLF & StringRegExpReplace(StringRegExpReplace($sText, "(\s*\v)+", @CRLF), "\A\s*\v|\v\s*\Z", "") & @CRLF
         If Not ($sTextReplace == $sText) Then
-            Local $hFile = FileOpen($sIniFile, $FO_OVERWRITE + $iUTFMode)
+            $hFile = FileOpen($sIniFile, $FO_OVERWRITE + $iUTFMode)
             FileWrite($hFile, $sTextReplace)
             FileClose($hFile)
-            Return
         EndIf
-    EndIf
-    If StringRegExp(String(FileReadLine($sIniFile, 1)), "^\[.+\]$") Then
-        If VarGetType($sText) = "Keyword" Then
-            $sText = FileRead($sIniFile)
-            If @error <> 0 Then Return
-        EndIf
-        Local $hFile = FileOpen($sIniFile, $FO_OVERWRITE + $iUTFMode)
-        FileWrite($hFile, @CRLF & $sText)
+    Else
         FileClose($hFile)
     EndIf
 EndFunc
