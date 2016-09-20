@@ -145,6 +145,9 @@ While 1
         If ScreenDetection_ImageSearch("CelestialBagOfRefining", -1, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("InventoryBagSearchTolerance")) Then
             $text &= @CRLF & @CRLF & Localize("CelestialBagOfRefiningDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         EndIf
+        If ScreenDetection_ImageSearch("VIPAccountRewards", -1, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("InventoryBagSearchTolerance")) Then
+            $text &= @CRLF & @CRLF & Localize("VIPAccountRewardsDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+        EndIf
     EndIf
     ScreenDetection_Splash($text)
     Sleep(500)

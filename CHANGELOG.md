@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+7.15
+- Moved settings folder to: "C:\Users\UserName\AppData\Roaming\Neverwinter Invoke Bot"
+- Will now try to open VIP Account Rewards bags.
+
 7.14
 - Added options to disable opening Celestial Bags of Refining globally and per account.
 

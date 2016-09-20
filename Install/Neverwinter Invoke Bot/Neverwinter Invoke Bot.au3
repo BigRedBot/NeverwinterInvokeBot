@@ -249,7 +249,8 @@ Func Loop()
                     ClearWindows(); If $RestartLoop Then Return 0
                     If $RestartLoop Then ExitLoop 2
                 EndIf
-                GetVIPAccountReward()
+                GetVIPAccountReward(); If $RestartLoop Then Return 0
+                If $RestartLoop Then ExitLoop 2
                 $WaitingTimer = TimerInit()
                 $FailedInvoke = 1
                 $CofferTries = 0
@@ -267,7 +268,7 @@ Func Loop()
                     SetAccountValue("FinishedLoop", 1)
                     If GetValue("CurrentLoop") >= GetValue("EndAtLoop") Then SetAccountValue("CompletedAccount", 1)
                 EndIf
-                OpenInventoryBags(); If $RestartLoop Then Return 0
+                OpenInventoryBags("CelestialBagOfRefining"); If $RestartLoop Then Return 0
                 If $RestartLoop Then ExitLoop 2
                 ChangeCharacter(); If $RestartLoop Then Return 0
                 If $RestartLoop Then ExitLoop 2
@@ -463,11 +464,13 @@ Func Invoke(); If $RestartLoop Then Return 0
     EndIf
 EndFunc
 
-Func GetVIPAccountReward()
+Func GetVIPAccountReward(); If $RestartLoop Then Return 0
+    Local $tried = 0
     While 1
         While 1
             If Not GetValue("SkipVIPAccountReward") And Not GetValue("CollectedVIPAccountReward") And GetValue("LastVIPAccountRewardTryLoop") < GetValue("CurrentLoop") And ( GetValue("VIPAccountRewardCharacter") < GetValue("StartAt") Or GetValue("VIPAccountRewardCharacter") > GetValue("EndAt") Or GetValue("VIPAccountRewardCharacter") = GetValue("Current") ) And ImageExists("VIPAccountReward") Then
                 If GetValue("VIPAccountRewardTries") < 3 Then
+                    $tried = 1
                     AddAccountCountValue("VIPAccountRewardTries")
                     Send(GetValue("InventoryKey"))
                     Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
@@ -502,32 +505,36 @@ Func GetVIPAccountReward()
                 SetAccountValue("TriedVIPAccountReward", 1)
                 SetAccountValue("LastVIPAccountRewardTryLoop", GetValue("CurrentLoop"))
             EndIf
+            If $tried Then
+                OpenInventoryBags("VIPAccountRewards"); If $RestartLoop Then Return 0
+                If $RestartLoop Then Return 0
+            EndIf
             Return
         WEnd
     WEnd
 EndFunc
 
-Func OpenInventoryBags(); If $RestartLoop Then Return 0
+Func OpenInventoryBags($bag); If $RestartLoop Then Return 0
     If GetValue("DisableOpeningBags") Then Return
     ClearWindows(); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
     Send(GetValue("InventoryKey"))
-    Sleep(1000)
+    Sleep(GetValue("OpenInventoryBagDelay") * 1000)
     If ImageSearch("VIPInventory") Then
         $_ImageSearchX = Random($_ImageSearchLeft + GetValue("InventoryBagTabLeftOffset"), $_ImageSearchLeft + GetValue("InventoryBagTabRightOffset"), 1)
         $_ImageSearchY = Random($_ImageSearchTop + GetValue("InventoryBagTabTopOffset"), $_ImageSearchTop + GetValue("InventoryBagTabBottomOffset"), 1)
         MouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
-        Sleep(1000)
+        Sleep(GetValue("OpenInventoryBagDelay") * 1000)
     EndIf
-    If ImageSearch("CelestialBagOfRefining", -2, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("InventoryBagSearchTolerance")) Then
+    If ImageSearch($bag, -2, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("InventoryBagSearchTolerance")) Then
         MouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
-        Sleep(1000)
+        Sleep(GetValue("OpenInventoryBagDelay") * 1000)
         While ImageSearch("OpenAnother")
             MouseMove($_ImageSearchX, $_ImageSearchY)
             SingleClick()
-            Sleep(500)
+            Sleep(GetValue("OpenAnotherInventoryBagDelay") * 1000)
         WEnd
     EndIf
 EndFunc
