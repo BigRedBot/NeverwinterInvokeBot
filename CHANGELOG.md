@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+7.16
+- Fixed login screen detection.
+
 7.15
 - Moved settings folder to: "C:\Users\UserName\AppData\Roaming\Neverwinter Invoke Bot"
 - Will now try to open VIP Account Rewards bags.
