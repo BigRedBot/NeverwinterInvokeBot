@@ -20,6 +20,8 @@ https://github.com/BigRedBot/NeverwinterInvokeBot/issues/41
 Use this link to purchase the Neverwinter Invoke Bot Professions Unlock Code:  
 https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HBA5U7LQQ33BA
 
+The unlock code is automatically emailed to you using your PayPal email address.
+
 
 **If you have even five or ten dollars to spare, it would mean an awful lot. Thank you for your support.**
 
