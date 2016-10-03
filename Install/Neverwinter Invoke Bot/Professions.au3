@@ -16,7 +16,10 @@ Func CheckProfessionsUnlockCode()
         While 1
             Local $input = InputBox($Title, @CRLF & @CRLF & @CRLF & @CRLF & Localize("EnterProfessionsUnlockCode"))
             If @error <> 0 Then
-                If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("BuyProfessionsUnlockCode"), 900) = $IDYES Then Exit ShellExecute("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HBA5U7LQQ33BA")
+                If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("BuyProfessionsUnlockCode")) = $IDYES Then
+                    _Crypt_Shutdown()
+                    Exit ShellExecute("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HBA5U7LQQ33BA")
+                EndIf
                 ExitLoop
             EndIf
             $input = StringUpper(StringStripWS($input, $STR_STRIPALL))
