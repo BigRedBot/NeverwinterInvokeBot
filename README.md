@@ -17,6 +17,10 @@ It is a false positive. Please read here for more information about this:
 https://github.com/BigRedBot/NeverwinterInvokeBot/issues/41
 
 
+Use this link to purchase the Neverwinter Invoke Bot Professions Unlock Code:  
+https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HBA5U7LQQ33BA
+
+
 **If you have even five or ten dollars to spare, it would mean an awful lot. Thank you for your support.**
 
 Use this link to send donations of $12 or more:  

@@ -12,18 +12,19 @@ If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
     Exit
 EndIf
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
+Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions
+Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $NoAutoLaunch
+Global $KeyDelay = GetValue("KeyDelaySeconds") * 1000, $TimeOut = GetValue("TimeOutMinutes") * 60000, $MouseOffset = 5
+AutoItSetOption("SendKeyDownDelay", $KeyDelay)
 #include "_DownloadFile.au3"
 #include "_GetUTCMinutes.au3"
 #include "_ImageSearch.au3"
 #include "_SendUnicode.au3"
 #include <Crypt.au3>
-Global $KeyDelay = GetValue("KeyDelaySeconds") * 1000
-Global $TimeOut = GetValue("TimeOutMinutes") * 60000
-AutoItSetOption("SendKeyDownDelay", $KeyDelay)
-Global $MouseOffset = 5
+#include "Professions.au3"
 
 Func Array($x)
-    Return StringSplit(StringRegExpReplace(StringRegExpReplace(StringStripWS($x, 8), "^,", ""), ",$", ""), ",")
+    Return StringSplit(StringRegExpReplace(StringRegExpReplace(StringStripWS($x, $STR_STRIPALL), "^,", ""), ",$", ""), ",")
 EndFunc
 
 Global $GameClientInstallLocation = RegRead("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "InstallLocation")
@@ -119,8 +120,6 @@ Func Position(); If $RestartLoop Then Return 0
         EndIf
     EndIf
 EndFunc
-
-Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $NoAutoLaunch
 
 Func SyncValues()
     If GetValue("FinishedLoop") Then
@@ -269,6 +268,8 @@ Func Loop()
                     If GetValue("CurrentLoop") >= GetValue("EndAtLoop") Then SetAccountValue("CompletedAccount", 1)
                 EndIf
                 OpenInventoryBags("CelestialBagOfRefining"); If $RestartLoop Then Return 0
+                If $RestartLoop Then ExitLoop 2
+                RunProfessions()
                 If $RestartLoop Then ExitLoop 2
                 ChangeCharacter(); If $RestartLoop Then Return 0
                 If $RestartLoop Then ExitLoop 2
@@ -1391,7 +1392,7 @@ EndFunc
 
 Func ChooseOpenBagsAccountOption()
     If GetAllAccountsValue("DisableOpeningBags") Then Return
-    Local $hGUI = GUICreate($Title, 320, 120)
+    GUICreate($Title, 320, 120)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 270)
     Local $Checkbox = GUICtrlCreateCheckbox(" " & Localize("OpenInventoryBags"), 25, 45, 270)
     If Not GetAccountValue("DisableOpeningBags") Then GUICtrlSetState(-1, $GUI_CHECKED)
@@ -1405,7 +1406,6 @@ Func ChooseOpenBagsAccountOption()
             Case $hButton
                 Local $openbagsdisabled = 1
                 If GUICtrlRead($Checkbox) = $GUI_CHECKED Then $openbagsdisabled = 0
-                GUIDelete()
                 If GetAccountValue("DisableOpeningBags") <> $openbagsdisabled Then
                     SetAccountValue("DisableOpeningBags", $openbagsdisabled)
                     If GetAccountValue("DisableOpeningBags") == GetDefaultValue("DisableOpeningBags") Then
@@ -1414,6 +1414,7 @@ Func ChooseOpenBagsAccountOption()
                         SaveIniAccount("DisableOpeningBags", GetAccountValue("DisableOpeningBags"))
                     EndIf
                 EndIf
+                GUIDelete()
                 Return
             Case $ButtonCancel
                 Exit
@@ -1423,6 +1424,7 @@ EndFunc
 
 Func ConfigureAccount()
     If CompletedAccount() Or (MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAccountOptions", "<ACCOUNT>", $CurrentAccount)) = $IDYES) Then Return
+    ChooseProfessionsAccountOption()
     ChooseOpenBagsAccountOption()
     While 1
         Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $MaxLoops), GetValue("CurrentLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
@@ -1732,7 +1734,7 @@ Func ChooseOptions()
     For $i = 1 To $coffers[0]
         If Not ($coffers[$i] == $cofferdefault) Then $list &= "|" & Localize($coffers[$i])
     Next
-    Local $hGUI = GUICreate($Title, 320, 200)
+    GUICreate($Title, 320, 200)
     GUICtrlCreateLabel(Localize("ChooseCoffer"), 25, 20, 270)
     Local $hCombo = GUICtrlCreateCombo("", 25, 50, 270)
     GUICtrlSetData(-1, $list, Localize($cofferdefault))
@@ -1753,7 +1755,6 @@ Func ChooseOptions()
                 If GUICtrlRead($Checkbox2) = $GUI_CHECKED Then $openbagsdisabled = 0
                 For $i = 1 To $coffers[0]
                     If Localize($coffers[$i]) == $CurrCombo Then
-                        GUIDelete()
                         If Not ($cofferdefault == $coffers[$i]) Then
                             SetValue("Coffer", $coffers[$i])
                             If GetValue("Coffer") == GetDefaultValue("Coffer") Then
@@ -1778,6 +1779,7 @@ Func ChooseOptions()
                                 SaveIniAllAccounts("DisableOpeningBags", GetAllAccountsValue("DisableOpeningBags"))
                             EndIf
                         EndIf
+                        GUIDelete()
                         Return
                     EndIf
                 Next
@@ -1786,8 +1788,6 @@ Func ChooseOptions()
         EndSwitch
     WEnd
 EndFunc
-
-Global $AllLoginInfoFound = 1, $SkipAllConfigurations = 0, $FirstRun = 1, $UnattendedMode = 0, $UnattendedModeCheckSettings = 0
 
 Func RunScript(); If $RestartLoop Then Return 0
     If $CmdLine[0] Then
@@ -1831,8 +1831,7 @@ Func RunScript(); If $RestartLoop Then Return 0
                     If $tmpinstallfile Then
                         If FileCopy($tmpinstallfile, @ScriptDir & "\Install.exe", $FC_OVERWRITE) Then
                             FileDelete($tmpinstallfile)
-                            ShellExecute(@ScriptDir & "\Install.exe")
-                            Exit
+                            Exit ShellExecute(@ScriptDir & "\Install.exe")
                         EndIf
                         FileDelete($tmpinstallfile)
                     EndIf
@@ -1846,6 +1845,7 @@ Func RunScript(); If $RestartLoop Then Return 0
         EndIf
     EndIf
     If $AllLoginInfoFound And $UnattendedModeCheckSettings Then Exit
+    CheckProfessionsUnlockCode()
     If Not $UnattendedModeCheckSettings And Not $UnattendedMode And $AllLoginInfoFound And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAllConfigurations", "<NUMBER>", GetValue("TotalAccounts"))) = $IDYES Then $SkipAllConfigurations = 1
     If Not $UnattendedMode And Not $SkipAllConfigurations Then
         ChooseOptions()
