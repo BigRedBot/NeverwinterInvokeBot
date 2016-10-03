@@ -16,11 +16,14 @@ Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $Unattende
 Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $NoAutoLaunch
 Global $KeyDelay = GetValue("KeyDelaySeconds") * 1000, $TimeOut = GetValue("TimeOutMinutes") * 60000, $MouseOffset = 5
 AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+#include <StringConstants.au3>
+#include <Math.au3>
+#include <Crypt.au3>
 #include "_DownloadFile.au3"
 #include "_GetUTCMinutes.au3"
 #include "_ImageSearch.au3"
 #include "_SendUnicode.au3"
-#include <Crypt.au3>
+#include "_MultilineInputBox.au3"
 #include "Professions.au3"
 
 Func Array($x)

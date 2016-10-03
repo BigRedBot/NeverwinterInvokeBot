@@ -1,6 +1,6 @@
 
 Func RunProfessions(); If $RestartLoop Then Return 0
-    If Not $EnableProfessions Then Return
+    If Not $EnableProfessions Or Not GetValue("EnableProfessions") Then Return
     ClearWindows(); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
     
@@ -81,18 +81,18 @@ Func ChooseProfessionsAccountOption()
                     If GetAccountValue("EnableProfessions") == GetDefaultValue("EnableProfessions") Then
                         SaveIniAccount("EnableProfessions")
                     Else
-                        SaveIniAccount("EnableProfessions", GetAccountValue("EnableProfessions"))
+                        SaveIniAccount("EnableProfessions", $enabled)
                     EndIf
                 EndIf
                 For $i = 1 To $Total
                     $enabled = 0
-                    If GUICtrlRead($Checkbox[$i]) = $GUI_CHECKED And Not GetAccountValue("EnableProfessions") Then $enabled = 1
+                    If Not GetAccountValue("EnableProfessions") And GUICtrlRead($Checkbox[$i]) = $GUI_CHECKED Then $enabled = 1
                     If GetCharacterValue("EnableProfessions", $i) <> $enabled Then
                         SetCharacterValue("EnableProfessions", $enabled, $i)
                         If GetCharacterValue("EnableProfessions", $i) == GetDefaultValue("EnableProfessions") Then
                             SaveIniCharacter("EnableProfessions", "", $i)
                         Else
-                            SaveIniCharacter("EnableProfessions", GetCharacterValue("EnableProfessions", $i), $i)
+                            SaveIniCharacter("EnableProfessions", $enabled, $i)
                         EndIf
                     EndIf
                 Next

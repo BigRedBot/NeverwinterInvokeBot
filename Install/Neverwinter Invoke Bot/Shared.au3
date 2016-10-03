@@ -6,13 +6,11 @@
 #include <GUIConstants.au3>
 #include <GUIConstantsEx.au3>
 #include <TrayConstants.au3>
-#include <StringConstants.au3>
 #include <WinAPIFiles.au3>
 #include <WinAPIProc.au3>
 #include <WinAPI.au3>
 #include <File.au3>
 #include <Array.au3>
-#include <Math.au3>
 #include "_UnicodeIni.au3"
 #include "Localization.au3"
 AutoItSetOption("WinTitleMatchMode", 3)
