@@ -1428,6 +1428,7 @@ EndFunc
 Func ConfigureAccount()
     If CompletedAccount() Or (MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAccountOptions", "<ACCOUNT>", $CurrentAccount)) = $IDYES) Then Return
     ChooseProfessionsAccountOption()
+    ChooseProfessionsAccountTaskOption()
     ChooseOpenBagsAccountOption()
     While 1
         Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $MaxLoops), GetValue("CurrentLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))

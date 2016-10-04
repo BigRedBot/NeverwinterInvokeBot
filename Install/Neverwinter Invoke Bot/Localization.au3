@@ -23,6 +23,7 @@ Func LoadLocalizationDefaults()
         SetDefault("ScreenDetectionSplashWidth", 380)
         SetDefault("ScreenDetectionSplashHeight", 400)
         SetDefault("LogInServerAddress", "208.95.186.167, 208.95.186.168, 208.95.186.96")
+        SetDefault("LeadershipProfessionTasks", "Capture Bandit Leader<BR>Kill a Young Dragon<BR>Escort a Wizard's Seneschal<BR>Guard Young Noble on Trip<BR>Protect Magical Goods Market")
     Else
         SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
         SetDefault("GameMenuKey", "{ESC}")
@@ -45,6 +46,7 @@ Func LoadLocalizationDefaults()
         SetDefault("ScreenDetectionSplashWidth", 380)
         SetDefault("ScreenDetectionSplashHeight", 400)
         SetDefault("LogInServerAddress", "208.95.186.167, 208.95.186.168, 208.95.186.96")
+        SetDefault("LeadershipProfessionTasks", "Capture Bandit Leader<BR>Kill a Young Dragon<BR>Escort a Wizard's Seneschal<BR>Guard Young Noble on Trip<BR>Protect Magical Goods Market")
     EndIf
 EndFunc
 
