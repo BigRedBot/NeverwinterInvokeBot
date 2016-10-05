@@ -14,7 +14,7 @@ EndIf
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
 Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions
 Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $NoAutoLaunch
-Global $KeyDelay = GetValue("KeyDelaySeconds") * 1000, $TimeOut = GetValue("TimeOutMinutes") * 60000, $MouseOffset = 5
+Global $KeyDelay = GetValue("KeyDelaySeconds") * 1000, $CharacterSelectionScrollAwayKeyDelay = GetValue("CharacterSelectionScrollAwayKeyDelaySeconds") * 1000, $CharacterSelectionScrollTowardKeyDelay = GetValue("CharacterSelectionScrollTowardKeyDelaySeconds") * 1000, $TimeOut = GetValue("TimeOutMinutes") * 60000, $MouseOffset = 5
 AutoItSetOption("SendKeyDownDelay", $KeyDelay)
 #include <StringConstants.au3>
 #include <Math.au3>
@@ -141,6 +141,7 @@ Func Loop()
         While 1
             $LoopStarted = 1
             $RestartLoop = 0
+            AutoItSetOption("SendKeyDownDelay", $KeyDelay)
             If CompletedAccount() Then
                 End(); If $RestartLoop Then Return 0
                 If $RestartLoop Then ExitLoop 1
@@ -174,7 +175,7 @@ Func Loop()
                 DoubleRightClick()
                 MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
                 If GetValue("Current") <= Ceiling(GetValue("TotalSlots") / 2) Then
-                    AutoItSetOption("SendKeyDownDelay", 15)
+                    AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
                     If GetValue("TopScrollBarX") And GetValue("TopSelectedCharacterX") Then
                         For $n = 1 To 3
                             Send("{DOWN}")
@@ -192,14 +193,15 @@ Func Loop()
                             Send("{UP}")
                         Next
                     EndIf
-                    AutoItSetOption("SendKeyDownDelay", $KeyDelay)
-                    Sleep($KeyDelay)
+                    AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollTowardKeyDelay)
+                    Sleep($CharacterSelectionScrollTowardKeyDelay)
                     For $n = 2 To GetValue("Current")
                         Send("{DOWN}")
                         Sleep(50)
                     Next
+                    AutoItSetOption("SendKeyDownDelay", $KeyDelay)
                 Else
-                    AutoItSetOption("SendKeyDownDelay", 15)
+                    AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
                     If GetValue("BottomScrollBarX") And GetValue("BottomSelectedCharacterX") Then
                         For $n = 1 To 3
                             Send("{UP}")
@@ -217,12 +219,13 @@ Func Loop()
                             Send("{DOWN}")
                         Next
                     EndIf
-                    AutoItSetOption("SendKeyDownDelay", $KeyDelay)
-                    Sleep($KeyDelay)
+                    AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollTowardKeyDelay)
+                    Sleep($CharacterSelectionScrollTowardKeyDelay)
                     For $n = 1 To (GetValue("TotalSlots") - GetValue("Current"))
                         Send("{UP}")
                         Sleep(50)
                     Next
+                    AutoItSetOption("SendKeyDownDelay", $KeyDelay)
                 EndIf
                 Sleep(1000)
                 Send("{ENTER}")
