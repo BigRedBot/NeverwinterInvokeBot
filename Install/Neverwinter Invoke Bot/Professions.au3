@@ -58,7 +58,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                                     Send("{END}{BS 50}")
                                     Sleep(500)
                                     AutoItSetOption("SendKeyDownDelay", 15)
-                                    Send(_SendUnicodeReturn(StringLeft($tasklist[$task], 50)))
+                                    Send(StringLeft($tasklist[$task], 50), $SEND_RAW)
                                     Sleep(500)
                                     AutoItSetOption("SendKeyDownDelay", $KeyDelay)
                                     Send("{ENTER}")
