@@ -1,9 +1,110 @@
 
 Func RunProfessions(); If $RestartLoop Then Return 0
     If Not $EnableProfessions Or Not GetValue("EnableProfessions") Then Return
-    ClearWindows(); If $RestartLoop Then Return 0
+    Local $ProfessionLoops = 0, $ProfessionTaskLoops = 0, $OverviewX, $OverviewY, $task = 1, $lasttask = 0, $tasklist = StringSplit(GetValue("LeadershipProfessionTasks"), "|")
+    While 1
+        If $ProfessionLoops > 9 Then Return
+        ClearWindows(); If $RestartLoop Then Return 0
+        If $RestartLoop Then Return 0
+        $lasttask = 0
+        Send(GetValue("ProfessionsKey"))
+        ProfessionsSleep(); If $RestartLoop Then Return 0
+        If $RestartLoop Then Return 0
+        While 1
+            While 1
+                $ProfessionLoops += 1
+                If $ProfessionLoops > 10 Then Return
+                If ImageSearch("Professions_Overview") Then
+                    $OverviewX = $_ImageSearchX
+                    $OverviewY = $_ImageSearchY
+                    If Not ImageSearch("Professions_Leadership") Then Return
+                    If ImageSearch("Professions_Search") Then
+                        ProfessionsClickImage($OverviewX, $OverviewY); If $RestartLoop Then Return 0
+                        If $RestartLoop Then Return 0
+                    EndIf
+                    $ProfessionTaskLoops = 0
+                    MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
+                    While ImageSearch("Professions_CollectResult")
+                        $ProfessionTaskLoops += 1
+                        If $ProfessionTaskLoops > 10 Then Return
+                        $lasttask = 0
+                        $task = 1
+                        ProfessionsClickImage(); If $RestartLoop Then Return 0
+                        If $RestartLoop Then Return 0
+                        If ImageSearch("Professions_TakeRewards") Then
+                            ProfessionsClickImage(); If $RestartLoop Then Return 0
+                            If $RestartLoop Then Return 0
+                        Else
+                            ExitLoop 3
+                        EndIf
+                        MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
+                    WEnd
+                    If $task > $tasklist[0] Then Return
+                    MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
+                    If Not ImageSearch("Professions_EmptySlot") Then Return
+                    $ProfessionTaskLoops = 0
+                    If ImageSearch("Professions_Leadership") Then
+                        ProfessionsClickImage(); If $RestartLoop Then Return 0
+                        If $RestartLoop Then Return 0
+                        While 1
+                            $ProfessionTaskLoops += 1
+                            If $ProfessionTaskLoops > 10 Then Return
+                            If ImageSearch("Professions_Search") Then
+                                If $task <> $lasttask Then
+                                    $lasttask = $task
+                                    ProfessionsClickImage($_ImageSearchLeft - 100 + Random(-$MouseOffset, $MouseOffset, 1), $_ImageSearchTop + Int(($_ImageSearchHeight-1)/2) + Random(-$MouseOffset, $MouseOffset, 1))
+                                    If $RestartLoop Then Return 0
+                                    AutoItSetOption("SendKeyDownDelay", 10)
+                                    Send("{END}{BS 50}")
+                                    Sleep(500)
+                                    AutoItSetOption("SendKeyDownDelay", 15)
+                                    Send(_SendUnicodeReturn(StringLeft($tasklist[$task], 50)))
+                                    Sleep(500)
+                                    AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+                                    Send("{ENTER}")
+                                    ProfessionsSleep(); If $RestartLoop Then Return 0
+                                    If $RestartLoop Then Return 0
+                                EndIf
+                                If ImageSearch("Professions_Continue") Then
+                                    ProfessionsClickImage(); If $RestartLoop Then Return 0
+                                    If $RestartLoop Then Return 0
+                                    If ImageSearch("Professions_StartTask") Then
+                                        ProfessionsClickImage(); If $RestartLoop Then Return 0
+                                        If $RestartLoop Then Return 0
+                                        ExitLoop 2
+                                    Else
+                                        ExitLoop 3
+                                    EndIf
+                                Else
+                                    $task += 1
+                                    If $task > $tasklist[0] Then ExitLoop 2
+                                EndIf
+                            Else
+                                ExitLoop 3
+                            EndIf
+                        WEnd
+                    Else
+                        ExitLoop 2
+                    EndIf
+                Else
+                    ExitLoop 2
+                EndIf
+            WEnd
+        WEnd
+    WEnd
+EndFunc
+
+Func ProfessionsClickImage($x = $_ImageSearchX, $y = $_ImageSearchY, $sleeptime = GetValue("ProfessionsDelay") * 1000); If $RestartLoop Then Return 0
+    MouseMove($x, $y)
+    SingleClick()
+    ProfessionsSleep($sleeptime); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
-    
+EndFunc
+
+Func ProfessionsSleep($sleeptime = GetValue("ProfessionsDelay") * 1000); If $RestartLoop Then Return 0
+    Sleep($sleeptime)
+    FindLogInScreen(); If $RestartLoop Then Return 0
+    If $RestartLoop Then Return 0
 EndFunc
 
 Func CheckProfessionsUnlockCode()
@@ -137,9 +238,9 @@ Func ChooseProfessionsAccountTaskOption()
             Case $GUI_EVENT_CLOSE
                 Exit
             Case $Button[0]
-                Local $input = _MultilineInputBox($Title, @CRLF & @CRLF & @CRLF & Localize("EditProfessionTasksForAllCharacters"), StringReplace(GetAccountValue("LeadershipProfessionTasks"), "<BR>", @CRLF))
+                Local $input = _MultilineInputBox($Title, @CRLF & @CRLF & @CRLF & Localize("EditProfessionTasksForAllCharacters"), StringReplace(GetAccountValue("LeadershipProfessionTasks"), "|", @CRLF))
                 If @error = 0 And ( Not ( GetAccountValue("LeadershipProfessionTasks") == GetDefaultValue("LeadershipProfessionTasks") ) Or MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2, $Title, Localize("OverwriteProfessionTasksForAllOtherCharacters", "<ACCOUNT>", $CurrentAccount)) = $IDYES ) Then
-                    $input = StringStripWS(StringRegExpReplace(StringRegExpReplace(StringRegExpReplace($input, "(\s*\v)+", @CRLF), "\A\s*\v|\v\s*\Z", ""), "\s*" & @CRLF & "\s*", "<BR>"), $STR_STRIPLEADING + $STR_STRIPTRAILING)
+                    $input = StringStripWS(StringRegExpReplace(StringRegExpReplace(StringRegExpReplace($input, "(\s*\v)+", @CRLF), "\A\s*\v|\v\s*\Z", ""), "\s*" & @CRLF & "\s*", "|"), $STR_STRIPLEADING + $STR_STRIPTRAILING)
                     If $input = "" Then $input = GetDefaultValue("LeadershipProfessionTasks")
                     SetAccountValue("LeadershipProfessionTasks", $input)
                     If GetAccountValue("LeadershipProfessionTasks") == GetDefaultValue("LeadershipProfessionTasks") Then
@@ -163,9 +264,9 @@ Func ChooseProfessionsAccountTaskOption()
             Case $Button[1] To $Button[$Total]
                 For $i = 1 To $Total
                     If $Button[$i] = $nMsg Then
-                        Local $input = _MultilineInputBox($Title, @CRLF & @CRLF & @CRLF & Localize("EditProfessionTasksForCharacter", "<NUMBER>", $i), StringReplace(GetCharacterValue("LeadershipProfessionTasks", $i), "<BR>", @CRLF))
+                        Local $input = _MultilineInputBox($Title, @CRLF & @CRLF & @CRLF & Localize("EditProfessionTasksForCharacter", "<NUMBER>", $i), StringReplace(GetCharacterValue("LeadershipProfessionTasks", $i), "|", @CRLF))
                         If @error = 0 Then
-                            $input = StringStripWS(StringRegExpReplace(StringRegExpReplace(StringRegExpReplace($input, "(\s*\v)+", @CRLF), "\A\s*\v|\v\s*\Z", ""), "\s*" & @CRLF & "\s*", "<BR>"), $STR_STRIPLEADING + $STR_STRIPTRAILING)
+                            $input = StringStripWS(StringRegExpReplace(StringRegExpReplace(StringRegExpReplace($input, "(\s*\v)+", @CRLF), "\A\s*\v|\v\s*\Z", ""), "\s*" & @CRLF & "\s*", "|"), $STR_STRIPLEADING + $STR_STRIPTRAILING)
                             If $input = "" Then $input = GetDefaultValue("LeadershipProfessionTasks")
                             SetCharacterValue("LeadershipProfessionTasks", $input, $i)
                             If GetCharacterValue("LeadershipProfessionTasks", $i) == GetDefaultValue("LeadershipProfessionTasks") Then

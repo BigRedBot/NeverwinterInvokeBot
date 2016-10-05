@@ -1109,7 +1109,7 @@ Func LogIn(); If $RestartLoop Then Return 0
         MouseMove(GetValue("UsernameBoxX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("UsernameBoxY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
         DoubleClick()
         AutoItSetOption("SendKeyDownDelay", 5)
-        Send("{RIGHT 254}{BS 254}")
+        Send("{END}{BS 254}")
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", 15)
         Send(_SendUnicodeReturn(GetValue("LogInUserName")))
