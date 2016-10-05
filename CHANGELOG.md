@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+8.0.1
+- Small change to uninstaller.
+
 8.0
 - Added option to do professions when you purchase the unlock code.
 
