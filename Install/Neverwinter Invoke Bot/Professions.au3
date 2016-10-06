@@ -64,6 +64,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                                     Send("{ENTER}")
                                     ProfessionsSleep(); If $RestartLoop Then Return 0
                                     If $RestartLoop Then Return 0
+                                    MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
                                 EndIf
                                 If ImageSearch("Professions_Continue") Then
                                     ProfessionsClickImage(); If $RestartLoop Then Return 0

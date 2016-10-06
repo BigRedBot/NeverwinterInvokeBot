@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+8.3
+- Will now move the cursor out of the way after typing a profession task name
+
 8.2
 - Replaced the default leadership task "Guard Young Noble on Trip" with "Guard Clerics of Ilmater"
 
