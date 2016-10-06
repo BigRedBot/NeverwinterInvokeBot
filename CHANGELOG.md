@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+8.2
+- Replaced the default leadership task "Guard Young Noble on Trip" with "Guard Clerics of Ilmater"
+
 8.1
 - Reverted key down delay for character selection screen to previous version 7.10 values of 0.15 instead of 0.015
 - Added CharacterSelectionScrollAwayKeyDelaySeconds and CharacterSelectionScrollTowardKeyDelaySeconds options to the Settings.ini file
