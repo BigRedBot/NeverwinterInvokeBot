@@ -51,8 +51,8 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                             If ImageSearch("Professions_Search") Then
                                 If $task <> $lasttask Then
                                     $lasttask = $task
-                                    $_ImageSearchX = $_ImageSearchLeft - 100 + Random(-$MouseOffset, $MouseOffset, 1)
-                                    $_ImageSearchY = $_ImageSearchTop + Int(($_ImageSearchHeight-1)/2) + Random(-$MouseOffset, $MouseOffset, 1)
+                                    $_ImageSearchX = $_ImageSearchLeft - 100 + Random(-50, 50, 1)
+                                    $_ImageSearchY = $_ImageSearchTop + Int(($_ImageSearchHeight-1)/2) + Random(-5, 5, 1)
                                     ProfessionsClickImage(); If $RestartLoop Then Return 0
                                     If $RestartLoop Then Return 0
                                     AutoItSetOption("SendKeyDownDelay", 10)
