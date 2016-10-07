@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+8.4
+- Added default leadership profession leveling tasks
+
 8.3
 - Will now move the cursor out of the way after typing a profession task name
 

@@ -1,9 +1,9 @@
 
 Func RunProfessions(); If $RestartLoop Then Return 0
     If Not $EnableProfessions Or Not GetValue("EnableProfessions") Then Return
-    Local $ProfessionLoops = 0, $ProfessionTaskLoops = 0, $OverviewX, $OverviewY, $task = 1, $lasttask = 0, $tasklist = StringSplit(GetValue("LeadershipProfessionTasks"), "|")
+    Local $ProfessionLoops = 0, $ProfessionTakeRewardsFailed = 0, $OverviewX, $OverviewY, $task = 1, $lasttask = 0, $tasklist = StringSplit(GetValue("LeadershipProfessionTasks"), "|")
     While 1
-        If $ProfessionLoops > 9 Then Return
+        If $ProfessionLoops >= 10 Then Return
         ClearWindows(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         $lasttask = 0
@@ -19,40 +19,41 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                     $OverviewY = $_ImageSearchY
                     If Not ImageSearch("Professions_Leadership") Then Return
                     If ImageSearch("Professions_Search") Then
-                        ProfessionsClickImage($OverviewX, $OverviewY); If $RestartLoop Then Return 0
-                        If $RestartLoop Then Return 0
-                    EndIf
-                    $ProfessionTaskLoops = 0
-                    MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
-                    While ImageSearch("Professions_CollectResult")
-                        $ProfessionTaskLoops += 1
-                        If $ProfessionTaskLoops > 10 Then Return
-                        $lasttask = 0
-                        $task = 1
+                        $_ImageSearchX = $OverviewX
+                        $_ImageSearchY = $OverviewY
                         ProfessionsClickImage(); If $RestartLoop Then Return 0
                         If $RestartLoop Then Return 0
-                        If ImageSearch("Professions_TakeRewards") Then
+                    EndIf
+                    MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
+                    If Not $ProfessionTakeRewardsFailed Then
+                        While ImageSearch("Professions_CollectResult")
                             ProfessionsClickImage(); If $RestartLoop Then Return 0
                             If $RestartLoop Then Return 0
-                        Else
-                            ExitLoop 3
-                        EndIf
-                        MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
-                    WEnd
+                            MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
+                            If ImageSearch("Professions_TakeRewards") Then
+                                $lasttask = 0
+                                $task = 1
+                                ProfessionsClickImage(); If $RestartLoop Then Return 0
+                                If $RestartLoop Then Return 0
+                            Else
+                                $ProfessionTakeRewardsFailed = 1
+                                ExitLoop 3
+                            EndIf
+                            MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
+                        WEnd
+                    EndIf
                     If $task > $tasklist[0] Then Return
-                    MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
                     If Not ImageSearch("Professions_EmptySlot") Then Return
-                    $ProfessionTaskLoops = 0
                     If ImageSearch("Professions_Leadership") Then
                         ProfessionsClickImage(); If $RestartLoop Then Return 0
                         If $RestartLoop Then Return 0
                         While 1
-                            $ProfessionTaskLoops += 1
-                            If $ProfessionTaskLoops > 10 Then Return
                             If ImageSearch("Professions_Search") Then
                                 If $task <> $lasttask Then
                                     $lasttask = $task
-                                    ProfessionsClickImage($_ImageSearchLeft - 100 + Random(-$MouseOffset, $MouseOffset, 1), $_ImageSearchTop + Int(($_ImageSearchHeight-1)/2) + Random(-$MouseOffset, $MouseOffset, 1))
+                                    $_ImageSearchX = $_ImageSearchLeft - 100 + Random(-$MouseOffset, $MouseOffset, 1)
+                                    $_ImageSearchY = $_ImageSearchTop + Int(($_ImageSearchHeight-1)/2) + Random(-$MouseOffset, $MouseOffset, 1)
+                                    ProfessionsClickImage(); If $RestartLoop Then Return 0
                                     If $RestartLoop Then Return 0
                                     AutoItSetOption("SendKeyDownDelay", 10)
                                     Send("{END}{BS 50}")
@@ -95,8 +96,8 @@ Func RunProfessions(); If $RestartLoop Then Return 0
     WEnd
 EndFunc
 
-Func ProfessionsClickImage($x = $_ImageSearchX, $y = $_ImageSearchY, $sleeptime = GetValue("ProfessionsDelay") * 1000); If $RestartLoop Then Return 0
-    MouseMove($x, $y)
+Func ProfessionsClickImage($sleeptime = GetValue("ProfessionsDelay") * 1000); If $RestartLoop Then Return 0
+    MouseMove($_ImageSearchX, $_ImageSearchY)
     SingleClick()
     ProfessionsSleep($sleeptime); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
