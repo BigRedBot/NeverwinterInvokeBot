@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+8.4.1
+- Removed "Kill a Young Dragon" from default leadership profession tasks
+
 8.4
 - Added default leadership profession leveling tasks
 

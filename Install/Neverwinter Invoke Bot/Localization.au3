@@ -24,7 +24,7 @@ Func LoadLocalizationDefaults()
         SetDefault("ScreenDetectionSplashWidth", 380)
         SetDefault("ScreenDetectionSplashHeight", 400)
         SetDefault("LogInServerAddress", "208.95.186.167, 208.95.186.168, 208.95.186.96")
-        SetDefault("LeadershipProfessionTasks", "Capture Bandit Leader|Kill a Young Dragon|Escort a Wizard's Seneschal|Protect Magical Goods Market|Guard Clerics of Ilmater|Guard Young Noble on Trip|Train for the Protector's Tourney|Chart Region|War Games Training|Patrol the Mines|Explore Local Area|Tactical Training|Martial Training|Raid Enemy Supply Depot|Guard Duty|Protect Caravan|Feed the Needy|Train a Footman|Train a Guard|Hire a Mercenary|Emergency Hire|Hire your first Mercenary|Basic Training|Pick Up Package|Protect Grateful Merchant|Complete Advanced Training")
+        SetDefault("LeadershipProfessionTasks", "Capture Bandit Leader|Escort a Wizard's Seneschal|Protect Magical Goods Market|Guard Clerics of Ilmater|Guard Young Noble on Trip|Train for the Protector's Tourney|Chart Region|War Games Training|Patrol the Mines|Explore Local Area|Tactical Training|Martial Training|Raid Enemy Supply Depot|Guard Duty|Protect Caravan|Feed the Needy|Train a Footman|Train a Guard|Hire a Mercenary|Emergency Hire|Hire your first Mercenary|Basic Training|Pick Up Package|Protect Grateful Merchant|Complete Advanced Training")
     Else
         SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
         SetDefault("GameMenuKey", "{ESC}")
@@ -48,7 +48,7 @@ Func LoadLocalizationDefaults()
         SetDefault("ScreenDetectionSplashWidth", 380)
         SetDefault("ScreenDetectionSplashHeight", 400)
         SetDefault("LogInServerAddress", "208.95.186.167, 208.95.186.168, 208.95.186.96")
-        SetDefault("LeadershipProfessionTasks", "Capture Bandit Leader|Kill a Young Dragon|Escort a Wizard's Seneschal|Protect Magical Goods Market|Guard Clerics of Ilmater|Guard Young Noble on Trip|Train for the Protector's Tourney|Chart Region|War Games Training|Patrol the Mines|Explore Local Area|Tactical Training|Martial Training|Raid Enemy Supply Depot|Guard Duty|Protect Caravan|Feed the Needy|Train a Footman|Train a Guard|Hire a Mercenary|Emergency Hire|Hire your first Mercenary|Basic Training|Pick Up Package|Protect Grateful Merchant|Complete Advanced Training")
+        SetDefault("LeadershipProfessionTasks", "Capture Bandit Leader|Escort a Wizard's Seneschal|Protect Magical Goods Market|Guard Clerics of Ilmater|Guard Young Noble on Trip|Train for the Protector's Tourney|Chart Region|War Games Training|Patrol the Mines|Explore Local Area|Tactical Training|Martial Training|Raid Enemy Supply Depot|Guard Duty|Protect Caravan|Feed the Needy|Train a Footman|Train a Guard|Hire a Mercenary|Emergency Hire|Hire your first Mercenary|Basic Training|Pick Up Package|Protect Grateful Merchant|Complete Advanced Training")
     EndIf
 EndFunc
 
