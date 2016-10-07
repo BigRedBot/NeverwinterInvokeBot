@@ -24,12 +24,12 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                         ProfessionsClickImage(); If $RestartLoop Then Return 0
                         If $RestartLoop Then Return 0
                     EndIf
-                    MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
+                    MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
                     If Not $ProfessionTakeRewardsFailed Then
                         While ImageSearch("Professions_CollectResult")
                             ProfessionsClickImage(); If $RestartLoop Then Return 0
                             If $RestartLoop Then Return 0
-                            MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
+                            MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
                             If ImageSearch("Professions_TakeRewards") Then
                                 $lasttask = 0
                                 $task = 1
@@ -39,7 +39,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                                 $ProfessionTakeRewardsFailed = 1
                                 ExitLoop 3
                             EndIf
-                            MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
+                            MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
                         WEnd
                     EndIf
                     If $task > $tasklist[0] Then Return
@@ -65,7 +65,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                                     Send("{ENTER}")
                                     ProfessionsSleep(); If $RestartLoop Then Return 0
                                     If $RestartLoop Then Return 0
-                                    MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
+                                    MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
                                 EndIf
                                 If ImageSearch("Professions_Continue") Then
                                     ProfessionsClickImage(); If $RestartLoop Then Return 0

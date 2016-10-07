@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+8.4.2
+- Changed the default professions delay from 2 seconds to 1 second
+
 8.4.1
 - Removed "Kill a Young Dragon" from default leadership profession tasks
 

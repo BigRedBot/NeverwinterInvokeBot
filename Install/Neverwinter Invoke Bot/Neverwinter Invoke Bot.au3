@@ -534,11 +534,12 @@ Func OpenInventoryBags($bag); If $RestartLoop Then Return 0
         DoubleClick()
         Sleep(GetValue("OpenInventoryBagDelay") * 1000)
     EndIf
-    MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientBottom)
+    MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
     If ImageSearch($bag, -2, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("InventoryBagSearchTolerance")) Then
         MouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
         Sleep(GetValue("OpenInventoryBagDelay") * 1000)
+        MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
         While ImageSearch("OpenAnother")
             MouseMove($_ImageSearchX, $_ImageSearchY)
             SingleClick()
