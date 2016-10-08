@@ -33,7 +33,6 @@ Func _GetUTCMinutes($Hour = 0, $Minute = 0, $Until = False, $Splash = False, $Fl
         Sleep(1000)
         $t = TimerDiff($_GetUTCMinutes_TimerDelaySet)
     WEnd
-    Local $r = -1, $data = ""
 	TCPStartup()
     If @error = 0 Then
         UDPStartup()
@@ -98,7 +97,7 @@ Func _GetUTCMinutes($Hour = 0, $Minute = 0, $Until = False, $Splash = False, $Fl
             If $data <> "" Then
                 Local $h = StringMid($data, 83, 8)
                 $data = Dec(StringTrimRight($h, 1)) * 16 + Dec(StringRight($h, 1))
-                $r = Floor(((($data/24/60/60)-Floor($data/24/60/60))*24)*60)
+                $r = ( ($data/24/60/60) - Floor($data/24/60/60) ) * 24 * 60
                 If $Hour Or $Minute Then
                     Local $t = $Hour * 60 + $Minute
                     If $r > $t Then

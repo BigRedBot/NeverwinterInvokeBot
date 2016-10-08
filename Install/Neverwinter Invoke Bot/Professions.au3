@@ -140,12 +140,14 @@ EndFunc
 Func ChooseProfessionsAccountOption()
     If Not $EnableProfessions Or $UnattendedMode Or $UnattendedModeCheckSettings Then Return
     Local $Total = GetValue("TotalSlots")
-    Local $Checkbox[$Total + 1]
+    Local $Checkbox[$Total + 2]
     GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 460)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 270)
     GUICtrlCreateLabel(Localize("EnableProfessions", "<ACCOUNT>", $CurrentAccount), 150, 40, 270)
     $Checkbox[0] = GUICtrlCreateCheckbox(Localize("AllCharacters"), 40, 70, 100)
     If GetAccountValue("EnableProfessions") Then GUICtrlSetState($Checkbox[0], $GUI_CHECKED)
+    $Checkbox[$Total + 1] = GUICtrlCreateCheckbox(Localize("EnableInfiniteLoops"), 140, 70, 200)
+    If GetAccountValue("InfiniteLoops") Then GUICtrlSetState($Checkbox[$Total + 1], $GUI_CHECKED)
     For $i = 1 To $Total
         Local $Row = Ceiling($i / 10), $Column = $i - (($Row - 1) * 10)
         $Checkbox[$i] = GUICtrlCreateCheckbox(Localize("CharacterNumber", "<NUMBER>", $i), 40 + (($Row - 1) * 100), 80 + ($Column * 30), 100)
@@ -184,6 +186,16 @@ Func ChooseProfessionsAccountOption()
                         SaveIniAccount("EnableProfessions")
                     Else
                         SaveIniAccount("EnableProfessions", $enabled)
+                    EndIf
+                EndIf
+                $enabled = 0
+                If GUICtrlRead($Checkbox[$Total + 1]) = $GUI_CHECKED Then $enabled = 1
+                If GetAccountValue("InfiniteLoops") <> $enabled Then
+                    SetAccountValue("InfiniteLoops", $enabled)
+                    If GetAccountValue("InfiniteLoops") == GetDefaultValue("InfiniteLoops") Then
+                        SaveIniAccount("InfiniteLoops")
+                    Else
+                        SaveIniAccount("InfiniteLoops", $enabled)
                     EndIf
                 EndIf
                 For $i = 1 To $Total

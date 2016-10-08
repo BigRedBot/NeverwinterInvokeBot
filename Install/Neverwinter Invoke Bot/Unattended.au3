@@ -99,22 +99,18 @@ While 1
         TraySetIcon(@ScriptDir & "\images\teal.ico")
         Local $min = 0
         While 1
-            $min = _GetUTCMinutes(10, 1, True, False, True, $Title & @CRLF & Localize("GettingTimeUntilServerReset"))
+            $min = _GetUTCMinutes(10, 0, True, False, True, $Title & @CRLF & Localize("GettingTimeUntilServerReset"))
             If $min >= 0 Then ExitLoop
             WaitMinutes(10, "WaitingToRetryGettingTimeUntilServerReset")
             If $Ran Then ExitLoop 2
         WEnd
         TraySetIcon(@ScriptDir & "\images\blue.ico")
-        WaitMinutes($min, "WaitingForServerReset")
+        WaitMinutes(Round($min) + 1, "WaitingForServerReset")
         If $Ran Then ExitLoop
         TraySetToolTip($Title & @CRLF & Localize("UnattendedRunning"))
         TraySetIcon(@ScriptDir & "\images\green.ico")
         While ProcessExists("Neverwinter Invoke Bot.exe")
             ProcessClose("Neverwinter Invoke Bot.exe")
-            Sleep(100)
-        WEnd
-        While ProcessExists("GameClient.exe")
-            ProcessClose("GameClient.exe")
             Sleep(100)
         WEnd
         If @Compiled Then

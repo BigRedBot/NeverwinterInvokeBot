@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+8.5
+- Added option for infinite loops
+
 8.4.2
 - Changed the default professions delay from 2 seconds to 1 second
 
