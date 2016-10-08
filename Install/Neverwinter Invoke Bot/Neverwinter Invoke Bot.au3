@@ -1617,7 +1617,7 @@ Func Begin(); If $RestartLoop Then Return 0
                     If $MinutesToStartSavedTimer Then
                         Local $m = $MinutesToStartSaved - TimerDiff($MinutesToStartSavedTimer) / 60000
                         If $m >= 0 Then
-                            $MinutesToStart = Round($m) + 1
+                            $MinutesToStart = Floor($m) + 2
                             ExitLoop
                         EndIf
                     EndIf
@@ -1625,7 +1625,7 @@ Func Begin(); If $RestartLoop Then Return 0
                     $MinutesToStartSaved = _GetUTCMinutes(10, 0, True, True, False, $Title)
                     If $MinutesToStartSaved >= 0 Then
                         $MinutesToStartSavedTimer = TimerInit()
-                        $MinutesToStart = Round($MinutesToStartSaved) + 1
+                        $MinutesToStart = Floor($MinutesToStartSaved) + 2
                         ExitLoop
                     EndIf
                 Else

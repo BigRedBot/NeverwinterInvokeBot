@@ -105,7 +105,7 @@ While 1
             If $Ran Then ExitLoop 2
         WEnd
         TraySetIcon(@ScriptDir & "\images\blue.ico")
-        WaitMinutes(Round($min) + 1, "WaitingForServerReset")
+        WaitMinutes($min + 2, "WaitingForServerReset")
         If $Ran Then ExitLoop
         TraySetToolTip($Title & @CRLF & Localize("UnattendedRunning"))
         TraySetIcon(@ScriptDir & "\images\green.ico")

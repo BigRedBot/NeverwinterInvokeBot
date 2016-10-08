@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+8.5.1
+- Changed server reset time checking a little
+
 8.5
 - Added option for infinite loops
 
