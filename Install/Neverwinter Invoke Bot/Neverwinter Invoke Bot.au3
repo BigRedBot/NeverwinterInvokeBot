@@ -347,13 +347,13 @@ Func StartLoop(); If $RestartLoop Then Return 0
 EndFunc
 
 Func EndNowTime($waiting = 0)
-    If $MinutesToEndSavedTimer And $MinutesToEndSaved - TimerDiff($MinutesToEndSavedTimer) / 60000 <= _Max($waiting, 10) Then Return 1
+    If $MinutesToEndSavedTimer And $MinutesToEndSaved - TimerDiff($MinutesToEndSavedTimer) / 60000 <= $waiting + 10 Then Return 1
     Return 0
 EndFunc
 
 Func CompletedAccount()
     SyncValues()
-    If Not GetValue("EndNow") And EndNowTime() Then SetValue("EndNow", 1)
+    If EndNowTime() Then SetValue("EndNow", 1)
     If GetValue("EndNow") Or ( Not GetAccountValue("InfiniteLoopsStarted") And ( GetValue("CompletedAccountInvokes") Or ( GetValue("CurrentLoop") > $MaxLoops And GetValue("Invoked") = (GetValue("TotalSlots") * $MaxLoops) ) ) ) Then
         SetAccountValue("CompletedAccountInvokes", 1)
         Return 1
