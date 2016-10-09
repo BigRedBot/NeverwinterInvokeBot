@@ -397,6 +397,7 @@ Func GetTimeToInvoke()
         Local $Time = GetCharacterInfo("CharacterTime"), $m
         If Not $Time Then $Time = $StartTimer
         If GetAccountValue("InfiniteLoopsStarted") Then
+            If GetValue("InfiniteLoopDelayMinutes") < 80 Then SetValue("InfiniteLoopDelayMinutes", 80)
             $m = GetValue("InfiniteLoopDelayMinutes")
         ElseIf GetValue("CurrentLoop") > $MaxLoops Then
             $m = $LoopDelayMinutes[$MaxLoops]

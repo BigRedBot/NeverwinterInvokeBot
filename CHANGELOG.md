@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+8.5.2
+- Set default infinite loop delay time to 480 minutes ( If one hero in each slot is used then 320 minutes would be preferable )
+- The minimum allowed infinite loop delay time is 80 minutes
+
 8.5.1
 - Changed server reset time checking a little
 
