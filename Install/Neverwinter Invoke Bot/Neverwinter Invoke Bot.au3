@@ -454,7 +454,8 @@ Func WaitToInvoke(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         Local $WaitingForDelay = "WaitingForInvokeDelay"
         If GetAccountValue("InfiniteLoopsStarted") Then $WaitingForDelay = "WaitingForProfessionsDelay"
-        WaitMinutes($Minutes, $WaitingForDelay)
+        WaitMinutes($Minutes, $WaitingForDelay); If $RestartLoop Then Return 0
+        If $RestartLoop Then Return 0
         StartLoop(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
     EndIf
@@ -895,7 +896,7 @@ Func ImageExists($image)
     Return FileExists(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png")
 EndFunc
 
-Func WaitMinutes($time, $msg)
+Func WaitMinutes($time, $msg); If $RestartLoop Then Return 0
     Local $t = TimerInit(), $left = $time, $lastmin = 0, $leftover
     If EndNowTime($left) Then
         SetValue("EndNow", 1)
@@ -943,7 +944,8 @@ Func FindLogInScreen(); If $RestartLoop Then Return 0
                     $LastLoginTry = 0
                     Position(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
-                    WaitMinutes(15, "WaitingToRetryLogin")
+                    WaitMinutes(15, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
+                    If $RestartLoop Then Return 0
                 Else
                     Splash()
                     Sleep(1000)
@@ -969,7 +971,8 @@ Func FindLogInScreen(); If $RestartLoop Then Return 0
                                 $LogInTries = 0
                                 Position(); If $RestartLoop Then Return 0
                                 If $RestartLoop Then Return 0
-                                WaitMinutes(15, "WaitingToRetryLogin")
+                                WaitMinutes(15, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
+                                If $RestartLoop Then Return 0
                                 ExitLoop
                             ElseIf ImageSearch("Mismatch") And PatchClient() Then; If $RestartLoop Then Return 0
                                 ExitLoop
@@ -1077,7 +1080,8 @@ Func StartClient(); If $RestartLoop Then Return 0
                     TimeOut(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
                     If ImageSearch("LauncherLogin") Then
-                        WaitMinutes(15, "WaitingToRetryLogin")
+                        WaitMinutes(15, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
+                        If $RestartLoop Then Return 0
                         ExitLoop 2
                     EndIf
                     Sleep(1000)
@@ -1320,8 +1324,7 @@ Func End(); If $RestartLoop Then Return 0
     Exit
 EndFunc
 
-; only call from hot key
-Func Pause()
+Func Pause(); only call from hot key
     $LoopStarted = 0
     $RestartLoop = 0
     Message(Localize("Paused")); If $RestartLoop Then Return 0

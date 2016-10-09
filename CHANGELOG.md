@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+8.5.4
+- Fixed bug with WaitMinutes function
+
 8.5.3
 - Will stop up to 10 minutes before server reset time if running in unattended mode
 
