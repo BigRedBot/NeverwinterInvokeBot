@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+8.6
+- Fixed problem with some profession tasks with long names not being detected
+
 8.5.5
 - Fixed problem with stopping up to 10 minutes before server reset time if running in unattended mode
 
