@@ -166,6 +166,10 @@ Func Loop()
             For $i = $Start To GetValue("EndAt")
                 SetAccountValue("Current", $i)
                 SetAccountValue("FinishedCharacter")
+                If EndNowTime() Then
+                    SetValue("EndNow", 1)
+                    ExitLoop
+                EndIf
                 If Not GetAccountValue("InfiniteLoopsStarted") Or GetValue("EnableProfessions") Then
                     WaitToInvoke(); If $RestartLoop Then Return 0
                     If $RestartLoop Then ExitLoop 2
