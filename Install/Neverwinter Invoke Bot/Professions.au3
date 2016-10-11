@@ -137,17 +137,19 @@ EndFunc
 Func ChooseProfessionsAccountOption()
     If Not $EnableProfessions Or $UnattendedMode Or $UnattendedModeCheckSettings Then Return
     Local $Total = GetValue("TotalSlots")
-    Local $Checkbox[$Total + 2]
-    GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 460)
+    Local $Checkbox[$Total + 1]
+    Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 270)
     GUICtrlCreateLabel(Localize("EnableProfessions", "<ACCOUNT>", $CurrentAccount), 150, 40, 270)
     $Checkbox[0] = GUICtrlCreateCheckbox(Localize("AllCharacters"), 40, 70, 100)
     If GetAccountValue("EnableProfessions") Then GUICtrlSetState($Checkbox[0], $GUI_CHECKED)
-    $Checkbox[$Total + 1] = GUICtrlCreateCheckbox(Localize("EnableInfiniteLoops"), 140, 70, 200)
-    If GetAccountValue("InfiniteLoops") Then GUICtrlSetState($Checkbox[$Total + 1], $GUI_CHECKED)
+    Local $InfiniteLoopCheckbox = GUICtrlCreateCheckbox(Localize("EnableInfiniteLoops"), 140, 70, 200)
+    If GetAccountValue("InfiniteLoops") Then GUICtrlSetState($InfiniteLoopCheckbox, $GUI_CHECKED)
+    Local $InfiniteLoopMinutesButton = GUICtrlCreateButton(Localize("InfiniteLoopMinutes", "<MINUTES>", GetAccountValue("InfiniteLoopDelayMinutes")), 140, 95, 170)
+    If Not GetAccountValue("InfiniteLoops") Then GUICtrlSetState($InfiniteLoopMinutesButton, $GUI_DISABLE)
     For $i = 1 To $Total
         Local $Row = Ceiling($i / 10), $Column = $i - (($Row - 1) * 10)
-        $Checkbox[$i] = GUICtrlCreateCheckbox(Localize("CharacterNumber", "<NUMBER>", $i), 40 + (($Row - 1) * 100), 80 + ($Column * 30), 100)
+        $Checkbox[$i] = GUICtrlCreateCheckbox(Localize("CharacterNumber", "<NUMBER>", $i), 40 + (($Row - 1) * 100), 100 + ($Column * 30), 100)
         If GetAccountValue("EnableProfessions") Then
             GUICtrlSetState($Checkbox[$i], $GUI_CHECKED)
             GUICtrlSetState($Checkbox[$i], $GUI_DISABLE)
@@ -155,8 +157,8 @@ Func ChooseProfessionsAccountOption()
             GUICtrlSetState($Checkbox[$i], $GUI_CHECKED)
         EndIf
     Next
-    Local $ButtonOK = GUICtrlCreateButton("OK", _Max(154 + ((Ceiling($Total / 10) - 3) * 100), 154), 420, 84, -1, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", _Max(250 + ((Ceiling($Total / 10) - 3) * 100), 250), 420, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("OK", _Max(154 + ((Ceiling($Total / 10) - 3) * 100), 154), 450, 84, -1, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("Cancel", _Max(250 + ((Ceiling($Total / 10) - 3) * 100), 250), 450, 75, 25)
     GUISetState()
     While 1
         Switch GUIGetMsg()
@@ -174,6 +176,29 @@ Func ChooseProfessionsAccountOption()
                         GUICtrlSetState($Checkbox[$i], $GUI_UNCHECKED)
                     Next
                 EndIf
+            Case $InfiniteLoopCheckbox
+                If GUICtrlRead($InfiniteLoopCheckbox) = $GUI_CHECKED Then
+                    GUICtrlSetState($InfiniteLoopMinutesButton, $GUI_ENABLE)
+                Else
+                    GUICtrlSetState($InfiniteLoopMinutesButton, $GUI_DISABLE)
+                EndIf
+            Case $InfiniteLoopMinutesButton
+                Local $input = InputBox($Title, @CRLF & @CRLF & @CRLF & @CRLF & Localize("InfiniteLoopMinutes", "<MINUTES>", "( 80+ )"), GetAccountValue("InfiniteLoopDelayMinutes"), "", -1, -1, Default, Default, 0, $hGUI)
+                If @error = 0 Then
+                    $input = Number($input)
+                    If $input <= 0 Then
+                        $input = GetDefaultValue("InfiniteLoopDelayMinutes")
+                    ElseIf $input <= 80 Then
+                        $input = 80
+                    EndIf
+                    SetAccountValue("InfiniteLoopDelayMinutes", $input)
+                    If GetAccountValue("InfiniteLoopDelayMinutes") == GetDefaultValue("InfiniteLoopDelayMinutes") Then
+                        SaveIniAccount("InfiniteLoopDelayMinutes")
+                    Else
+                        SaveIniAccount("InfiniteLoopDelayMinutes", $input)
+                    EndIf
+                    GUICtrlSetData($InfiniteLoopMinutesButton, Localize("InfiniteLoopMinutes", "<MINUTES>", GetAccountValue("InfiniteLoopDelayMinutes")))
+                EndIf
             Case $ButtonOK
                 Local $enabled = 0
                 If GUICtrlRead($Checkbox[0]) = $GUI_CHECKED Then $enabled = 1
@@ -186,7 +211,7 @@ Func ChooseProfessionsAccountOption()
                     EndIf
                 EndIf
                 $enabled = 0
-                If GUICtrlRead($Checkbox[$Total + 1]) = $GUI_CHECKED Then $enabled = 1
+                If GUICtrlRead($InfiniteLoopCheckbox) = $GUI_CHECKED Then $enabled = 1
                 If GetAccountValue("InfiniteLoops") <> $enabled Then
                     SetAccountValue("InfiniteLoops", $enabled)
                     If GetAccountValue("InfiniteLoops") == GetDefaultValue("InfiniteLoops") Then
@@ -205,7 +230,7 @@ Func ChooseProfessionsAccountOption()
                         SaveIniCharacter("EnableProfessions", $enabled, $i)
                     EndIf
                 Next
-                GUIDelete()
+                GUIDelete($hGUI)
                 Return
             Case $ButtonCancel
                 Exit
@@ -217,7 +242,7 @@ Func ChooseProfessionsAccountTaskOption()
     If Not $EnableProfessions Or $UnattendedMode Or $UnattendedModeCheckSettings Then Return
     Local $Total = GetValue("TotalSlots"), $nMsg, $EnabledCharacterFound
     Local $Button[$Total + 1]
-    GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 460)
+    Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 270)
     GUICtrlCreateLabel(Localize("EditProfessionTasks", "<ACCOUNT>", $CurrentAccount), 150, 40, 270)
     If GetAccountValue("LeadershipProfessionTasks") == GetDefaultValue("LeadershipProfessionTasks") Then
@@ -226,11 +251,11 @@ Func ChooseProfessionsAccountTaskOption()
         $Button[0] = GUICtrlCreateButton("* " & Localize("AllCharacters") & " *", 30, 70, 95)
     EndIf
     For $i = 1 To $Total
-        Local $Row = Ceiling($i / 10), $Column = $i - (($Row - 1) * 10), $NotDefault = " * "
+        Local $Row = Ceiling($i / 10), $Column = $i - (($Row - 1) * 10)
         If GetValue("LeadershipProfessionTasks", $CurrentAccount, $i) == GetDefaultValue("LeadershipProfessionTasks") Then
-            $Button[$i] = GUICtrlCreateButton(Localize("CharacterNumber", "<NUMBER>", $i), 30 + (($Row - 1) * 100), 80 + ($Column * 30), 95)
+            $Button[$i] = GUICtrlCreateButton(Localize("CharacterNumber", "<NUMBER>", $i), 30 + (($Row - 1) * 100), 100 + ($Column * 30), 95)
         Else
-            $Button[$i] = GUICtrlCreateButton("* " & Localize("CharacterNumber", "<NUMBER>", $i) & " *", 30 + (($Row - 1) * 100), 80 + ($Column * 30), 95)
+            $Button[$i] = GUICtrlCreateButton("* " & Localize("CharacterNumber", "<NUMBER>", $i) & " *", 30 + (($Row - 1) * 100), 100 + ($Column * 30), 95)
         EndIf
         If GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then
             $EnabledCharacterFound = 1
@@ -240,8 +265,8 @@ Func ChooseProfessionsAccountTaskOption()
         EndIf
     Next
     If Not $EnabledCharacterFound Then Return
-    Local $ButtonOK = GUICtrlCreateButton("OK", _Max(154 + ((Ceiling($Total / 10) - 3) * 100), 154), 420, 84, -1, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", _Max(250 + ((Ceiling($Total / 10) - 3) * 100), 250), 420, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("OK", _Max(154 + ((Ceiling($Total / 10) - 3) * 100), 154), 450, 84, -1, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("Cancel", _Max(250 + ((Ceiling($Total / 10) - 3) * 100), 250), 450, 75, 25)
     GUISetState()
     While 1
         $nMsg = GUIGetMsg()
@@ -249,8 +274,8 @@ Func ChooseProfessionsAccountTaskOption()
             Case $GUI_EVENT_CLOSE
                 Exit
             Case $Button[0]
-                Local $input = _MultilineInputBox($Title, @CRLF & @CRLF & @CRLF & Localize("EditProfessionTasksForAllCharacters"), StringReplace(GetAccountValue("LeadershipProfessionTasks"), "|", @CRLF))
-                If @error = 0 And ( Not ( GetAccountValue("LeadershipProfessionTasks") == GetDefaultValue("LeadershipProfessionTasks") ) Or MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2, $Title, Localize("OverwriteProfessionTasksForAllOtherCharacters", "<ACCOUNT>", $CurrentAccount)) = $IDYES ) Then
+                Local $input = _MultilineInputBox($Title, @CRLF & @CRLF & @CRLF & Localize("EditProfessionTasksForAllCharacters"), StringReplace(GetAccountValue("LeadershipProfessionTasks"), "|", @CRLF), 0, 0, Default, Default, 0, $hGUI)
+                If @error = 0 And ( Not ( GetAccountValue("LeadershipProfessionTasks") == GetDefaultValue("LeadershipProfessionTasks") ) Or MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2, $Title, Localize("OverwriteProfessionTasksForAllOtherCharacters", "<ACCOUNT>", $CurrentAccount), 0, $hGUI) = $IDYES ) Then
                     $input = StringStripWS(StringRegExpReplace(StringRegExpReplace(StringRegExpReplace($input, "(\s*\v)+", @CRLF), "\A\s*\v|\v\s*\Z", ""), "\s*" & @CRLF & "\s*", "|"), $STR_STRIPLEADING + $STR_STRIPTRAILING)
                     If $input = "" Then $input = GetDefaultValue("LeadershipProfessionTasks")
                     SetAccountValue("LeadershipProfessionTasks", $input)
@@ -275,7 +300,7 @@ Func ChooseProfessionsAccountTaskOption()
             Case $Button[1] To $Button[$Total]
                 For $i = 1 To $Total
                     If $Button[$i] = $nMsg Then
-                        Local $input = _MultilineInputBox($Title, @CRLF & @CRLF & @CRLF & Localize("EditProfessionTasksForCharacter", "<NUMBER>", $i), StringReplace(GetCharacterValue("LeadershipProfessionTasks", $i), "|", @CRLF))
+                        Local $input = _MultilineInputBox($Title, @CRLF & @CRLF & @CRLF & Localize("EditProfessionTasksForCharacter", "<NUMBER>", $i), StringReplace(GetCharacterValue("LeadershipProfessionTasks", $i), "|", @CRLF), 0, 0, Default, Default, 0, $hGUI)
                         If @error = 0 Then
                             $input = StringStripWS(StringRegExpReplace(StringRegExpReplace(StringRegExpReplace($input, "(\s*\v)+", @CRLF), "\A\s*\v|\v\s*\Z", ""), "\s*" & @CRLF & "\s*", "|"), $STR_STRIPLEADING + $STR_STRIPTRAILING)
                             If $input = "" Then $input = GetDefaultValue("LeadershipProfessionTasks")
@@ -292,7 +317,7 @@ Func ChooseProfessionsAccountTaskOption()
                     EndIf
                 Next
             Case $ButtonOK
-                GUIDelete()
+                GUIDelete($hGUI)
                 Return
             Case $ButtonCancel
                 Exit

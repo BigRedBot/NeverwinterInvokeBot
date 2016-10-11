@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+8.7.1
+- Added ability to change infinite loop retry minutes in the options menu
+- Will try to get past verify all files prompt
+
 8.7
 - Will now only open inventory bags on the first loop
 - Now uses select all, copy, and paste for inputting the profession tasks

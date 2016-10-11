@@ -1087,6 +1087,11 @@ Func StartClient(); If $RestartLoop Then Return 0
                 While Not ImageSearch("LauncherPatching")
                     TimeOut(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
+                    If ImageSearch("VerifyAllFiles") Then
+                        MouseMove($_ImageSearchX, $_ImageSearchY)
+                        SingleClick()
+                        Sleep(1000)
+                    EndIf
                     If ImageSearch("LauncherLogin") Then
                         WaitMinutes(15, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
                         If $RestartLoop Then Return 0
@@ -2002,11 +2007,12 @@ Func RunScript(); If $RestartLoop Then Return 0
     EndIf
     Initialize()
     If $UnattendedModeCheckSettings Then Exit
-    If GetValue("UnattendedMode") Then
+    If Not $MinutesToEndSavedTimer And GetValue("UnattendedMode") Then
         While 1
             $MinutesToEndSaved = _GetUTCMinutes(10, 0, True, True, False, $Title)
             If $MinutesToEndSaved >= 0 Then
                 $MinutesToEndSavedTimer = TimerInit()
+                If EndNowTime() Then $MinutesToEndSaved += 1440
                 ExitLoop
             EndIf
             If MsgBox($MB_ICONWARNING + $MB_RETRYCANCEL, "", Localize("FailedToGetMinutes"), 900) <> $IDRETRY Then Exit
