@@ -1,6 +1,11 @@
 RELEASE NOTES
 =============
 
+8.7
+- Will now only open inventory bags on the first loop
+- Now uses select all, copy, and paste for inputting the profession tasks
+- Will try to set the keyboard layout to English if a different keyboard layout language is detected ( Will try to set it back if it was changed )
+
 8.6
 - Fixed problem with some profession tasks with long names not being detected
 

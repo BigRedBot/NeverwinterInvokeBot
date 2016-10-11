@@ -13,10 +13,11 @@ If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
 EndIf
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
 Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions
-Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $NoAutoLaunch, $EndTime, $MinutesToEndSaved, $MinutesToEndSavedTimer
+Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $NoAutoLaunch, $EndTime, $MinutesToEndSaved, $MinutesToEndSavedTimer, $StartingKeyboardLayout
 Global $KeyDelay = GetValue("KeyDelaySeconds") * 1000, $CharacterSelectionScrollAwayKeyDelay = GetValue("CharacterSelectionScrollAwayKeyDelaySeconds") * 1000, $CharacterSelectionScrollTowardKeyDelay = GetValue("CharacterSelectionScrollTowardKeyDelaySeconds") * 1000, $TimeOut = GetValue("TimeOutMinutes") * 60000, $MouseOffset = 5
 AutoItSetOption("SendKeyDownDelay", $KeyDelay)
 #include <StringConstants.au3>
+#include <WinAPISys.au3>
 #include <Math.au3>
 #include <Crypt.au3>
 #include "_DownloadFile.au3"
@@ -71,6 +72,7 @@ EndFunc
 
 Func Position(); If $RestartLoop Then Return 0
     Focus()
+    If Not $StartingKeyboardLayout And $WinHandle Then $StartingKeyboardLayout = _WinAPI_GetKeyboardLayout($WinHandle)
     If Not $WinHandle Or Not GetPosition() Then
         If GetValue("RestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And ImageExists("LogInScreen") Then
             $LogInTries = 0
@@ -278,8 +280,10 @@ Func Loop()
                             AddAccountCountValue("FailedInvoke")
                             AddCharacterCountInfo("FailedInvoke")
                         EndIf
-                        OpenInventoryBags("CelestialBagOfRefining"); If $RestartLoop Then Return 0
-                        If $RestartLoop Then ExitLoop 2
+                        If GetValue("CurrentLoop") = GetValue("StartAtLoop") Then
+                            OpenInventoryBags("CelestialBagOfRefining"); If $RestartLoop Then Return 0
+                            If $RestartLoop Then ExitLoop 2
+                        EndIf
                     EndIf
                     RunProfessions()
                     If $RestartLoop Then ExitLoop 2
@@ -1109,7 +1113,7 @@ Func StartClient(); If $RestartLoop Then Return 0
                     Sleep(1000)
                 WEnd
                 Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
-                If $NoAutoLaunch Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
+                Reset()
                 If Not $DisableRestartCount Then $Restarted += 1
                 $WaitingTimer = TimerInit()
                 While Not ( ImageSearch("SelectionScreen") Or ImageSearch("LogInScreen") )
@@ -1198,7 +1202,7 @@ Func TimeOut(); If $RestartLoop Then Return 0
     If Not $LoggingIn Then AddCharacterCountInfo("TimedOut")
     $DisableRelogCount = 1
     If $TimeOutRetries < GetValue("TimeOutRetries") And GetValue("RestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And $GameClientLauncherInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And FileExists($GameClientLauncherInstallLocation & "\Neverwinter.exe") And ImageExists("LogInScreen") Then
-        If $NoAutoLaunch Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
+        Reset()
         $TimeOutRetries += 1
         Splash("[ " & Localize("RestartingNeverwinter") & " ]")
         If CloseClient() Then $DisableRestartCount = 1; If $RestartLoop Then Return 0
@@ -1272,7 +1276,7 @@ Func End(); If $RestartLoop Then Return 0
     EndIf
     If Not GetValue("InfiniteLoopsFound") And Not GetValue("DisableCloseClient") And CloseClient() Then $DisableRestartCount = 1; If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
-    If $NoAutoLaunch Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
+    Reset()
     Splash(0)
     Local $old = $CurrentAccount
     For $i = 1 To GetValue("TotalAccounts")
@@ -1328,6 +1332,17 @@ Func End(); If $RestartLoop Then Return 0
     Exit
 EndFunc
 
+Func Reset()
+        If $StartingKeyboardLayout And Not (Hex($StartingKeyboardLayout, 4) == "0409") And $WinHandle And $ProcessName = "GameClient.exe" And WinExists($WinHandle) Then
+            Local $k = _WinAPI_GetKeyboardLayout($WinHandle)
+            If $k And Not ($k == $StartingKeyboardLayout) Then _WinAPI_SetKeyboardLayout($WinHandle, $StartingKeyboardLayout)
+        EndIf
+        If $NoAutoLaunch Then
+            $NoAutoLaunch = 0
+            RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
+        EndIf
+EndFunc
+
 Func Pause(); only call from hot key
     $LoopStarted = 0
     $RestartLoop = 0
@@ -1346,7 +1361,7 @@ Func Message($s, $n = $MB_OK, $ontop = 0); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         Exit
     EndIf
-    If $NoAutoLaunch Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
+    Reset()
     $UnattendedMode = 0
     Splash(0)
     Local $old = $CurrentAccount

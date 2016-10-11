@@ -285,9 +285,10 @@ If $LoadPrivateSettings Then LoadSettings($SettingsDir & "\PrivateSettings.ini")
 LoadDefaults()
 PruneLogs()
 
-Global $WinHandle
+Global $WinHandle, $ProcessName
 Func FindWindow($p = "GameClient.exe", $c = "CrypticWindowClass")
     $WinHandle = 0
+    $ProcessName = $p
     Local $list = ProcessList($p)
     If @error <> 0 Then Return
     For $i = 1 To $list[0][0]
