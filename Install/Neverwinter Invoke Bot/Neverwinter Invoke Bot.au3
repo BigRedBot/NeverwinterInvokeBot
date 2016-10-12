@@ -1713,6 +1713,17 @@ Func Go(); If $RestartLoop Then Return 0
         WEnd
         $MinutesToStart = 0
     EndIf
+    If $UnattendedMode And Not $MinutesToEndSavedTimer Then
+        While 1
+            $MinutesToEndSaved = _GetUTCMinutes(10, 0, True, False, True, $Title)
+            If $MinutesToEndSaved >= 0 Then
+                $MinutesToEndSavedTimer = TimerInit()
+                If EndNowTime() Then $MinutesToEndSaved += 1440
+                ExitLoop
+            EndIf
+            If MsgBox($MB_RETRYCANCEL + $MB_ICONWARNING, $Title, Localize("FailedToGetMinutes"), 300) = $IDCANCEL Then Exit
+        WEnd
+    EndIf
     If $StartTimer Then
         Local $check = CheckAccounts()
         If $check > 0 Then
@@ -2007,17 +2018,6 @@ Func RunScript(); If $RestartLoop Then Return 0
     EndIf
     Initialize()
     If $UnattendedModeCheckSettings Then Exit
-    If Not $MinutesToEndSavedTimer And GetValue("UnattendedMode") Then
-        While 1
-            $MinutesToEndSaved = _GetUTCMinutes(10, 0, True, True, False, $Title)
-            If $MinutesToEndSaved >= 0 Then
-                $MinutesToEndSavedTimer = TimerInit()
-                If EndNowTime() Then $MinutesToEndSaved += 1440
-                ExitLoop
-            EndIf
-            If MsgBox($MB_ICONWARNING + $MB_RETRYCANCEL, "", Localize("FailedToGetMinutes"), 900) <> $IDRETRY Then Exit
-        WEnd
-    EndIf
     Start(); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
 EndFunc

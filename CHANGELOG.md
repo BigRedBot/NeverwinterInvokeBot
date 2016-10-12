@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+8.7.2
+- No longer shows GUI when getting server reset time in unattended mode
+
 8.7.1
 - Added ability to change infinite loop retry minutes in the options menu
 - Will try to get past verify all files prompt
