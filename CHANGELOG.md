@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+8.7.3
+- Updated the name of this program.
+
 8.7.2
 - No longer shows GUI when getting server reset time in unattended mode
 

@@ -355,7 +355,7 @@ Func StartLoop(); If $RestartLoop Then Return 0
 EndFunc
 
 Func EndNowTime($waiting = 0)
-    If $MinutesToEndSavedTimer And $MinutesToEndSaved - TimerDiff($MinutesToEndSavedTimer) / 60000 <= $waiting + 10 Then Return 1
+    If $MinutesToEndSavedTimer And $MinutesToEndSaved - TimerDiff($MinutesToEndSavedTimer) / 60000 <= $waiting + 15 Then Return 1
     Return 0
 EndFunc
 
@@ -1645,15 +1645,15 @@ Func Begin(); If $RestartLoop Then Return 0
                     If $MinutesToStartSavedTimer Then
                         Local $m = $MinutesToStartSaved - TimerDiff($MinutesToStartSavedTimer) / 60000
                         If $m >= 0 Then
-                            $MinutesToStart = Floor($m) + 2
+                            $MinutesToStart = Round($m)
                             ExitLoop
                         EndIf
                     EndIf
                     $MinutesToStartSavedTimer = 0
-                    $MinutesToStartSaved = _GetUTCMinutes(10, 0, True, True, False, $Title)
+                    $MinutesToStartSaved = _GetUTCMinutes(10, 2, True, True, False, $Title)
                     If $MinutesToStartSaved >= 0 Then
                         $MinutesToStartSavedTimer = TimerInit()
-                        $MinutesToStart = Floor($MinutesToStartSaved) + 2
+                        $MinutesToStart = Round($MinutesToStartSaved)
                         ExitLoop
                     EndIf
                 Else
