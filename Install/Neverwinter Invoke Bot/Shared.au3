@@ -83,26 +83,12 @@ EndFunc
 Global $CurrentAccount = 1
 If Not IsDeclared("LoadPrivateSettings") Then Assign("LoadPrivateSettings", 0, 2)
 Global $SettingsDir = @AppDataDir & "\Neverwinter Invoke Bot"
+Global $DeletedString = "DELETED_Gf3birAeJdpa7bJnP2TheRYGFg7MjdnmpQq4"
 
-SetValue("Language", LoadLocalizations())
+SetAllAccountsValue("Language", LoadLocalizations())
 
 Func SetDefault($name, $value = 0)
     If Not IsDeclared("SETTINGS_Default_" & $name) Then Return Assign("SETTINGS_Default_" & $name, $value, 2)
-EndFunc
-
-Func SetValue($name, $value = 0, $account = 0, $character = 0)
-    If $account Then
-        If $character Then
-            If IsDeclared("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) Then Return Assign("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name, $value)
-            Return Assign("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name, $value, 2)
-        EndIf
-        If IsDeclared("SETTINGS_Account" & $account & "_" & $name) Then Return Assign("SETTINGS_Account" & $account & "_" & $name, $value)
-        Return Assign("SETTINGS_Account" & $account & "_" & $name, $value, 2)
-    EndIf
-    If IsDeclared("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("Current", $CurrentAccount) & "_" & $name) Then Return Assign("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("Current", $CurrentAccount) & "_" & $name, $value)
-    If IsDeclared("SETTINGS_Account" & $CurrentAccount & "_" & $name) Then Return Assign("SETTINGS_Account" & $CurrentAccount & "_" & $name, $value)
-    If IsDeclared("SETTINGS_AllAccounts_" & $name) Then Return Assign("SETTINGS_AllAccounts_" & $name, $value)
-    Return Assign("SETTINGS_AllAccounts_" & $name, $value, 2)
 EndFunc
 
 Func SetAllAccountsValue($name, $value = 0)
@@ -111,15 +97,28 @@ Func SetAllAccountsValue($name, $value = 0)
 EndFunc
 
 Func SetAccountValue($name, $value = 0, $account = $CurrentAccount)
-    Return SetValue($name, $value, $account)
+    If IsDeclared("SETTINGS_Account" & $account & "_" & $name) Then Return Assign("SETTINGS_Account" & $account & "_" & $name, $value)
+    Return Assign("SETTINGS_Account" & $account & "_" & $name, $value, 2)
 EndFunc
 
 Func SetCharacterValue($name, $value = 0, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
-    Return SetValue($name, $value, $account, $character)
+    If IsDeclared("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) Then Return Assign("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name, $value)
+    Return Assign("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name, $value, 2)
 EndFunc
 
-Func AddCountValue($name, $value = 1)
-    Return SetValue($name, GetValue($name) + $value)
+Func DeleteAllAccountsValue($name)
+    If IsDeclared("SETTINGS_AllAccounts_" & $name) Then Return Assign("SETTINGS_AllAccounts_" & $name, $DeletedString)
+    Return 1
+EndFunc
+
+Func DeleteAccountValue($name, $account = $CurrentAccount)
+    If IsDeclared("SETTINGS_Account" & $account & "_" & $name) Then Return Assign("SETTINGS_Account" & $account & "_" & $name, $DeletedString)
+    Return 1
+EndFunc
+
+Func DeleteCharacterValue($name, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
+    If IsDeclared("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) Then Return Assign("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name, $DeletedString)
+    Return 1
 EndFunc
 
 Func AddAllAccountsCountValue($name, $value = 1)
@@ -127,47 +126,46 @@ Func AddAllAccountsCountValue($name, $value = 1)
 EndFunc
 
 Func AddAccountCountValue($name, $value = 1, $account = $CurrentAccount)
-    Return SetValue($name, GetAccountValue($name, $account) + $value, $account)
+    Return SetAccountValue($name, GetAccountValue($name, $account) + $value, $account)
 EndFunc
 
 Func AddCharacterCountValue($name, $value = 1, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
-    Return SetValue($name, GetCharacterValue($name, $character, $account) + $value, $account, $character)
+    Return SetCharacterValue($name, GetCharacterValue($name, $character, $account) + $value, $character, $account)
 EndFunc
 
 Func GetValue($name, $account = $CurrentAccount, $character = GetAccountValue("Current", $CurrentAccount))
+    If IsDeclared("SETTINGS_AllAccounts_" & $name) And Not ( Eval("SETTINGS_AllAccounts_" & $name) == $DeletedString ) Then Return Eval("SETTINGS_AllAccounts_" & $name)
     If $account And @NumParams > 1 Then
-        If $character And @NumParams = 3 Then
-            If IsDeclared("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) Then Return Eval("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name)
-        EndIf
-        If IsDeclared("SETTINGS_Account" & $account & "_" & $name) Then Return Eval("SETTINGS_Account" & $account & "_" & $name)
+        If IsDeclared("SETTINGS_Account" & $account & "_" & $name) And Not ( Eval("SETTINGS_Account" & $account & "_" & $name) == $DeletedString ) Then Return Eval("SETTINGS_Account" & $account & "_" & $name)
+        If $character And @NumParams = 3 And IsDeclared("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) And Not ( Eval("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) == $DeletedString ) Then Return Eval("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name)
+    Else
+        If IsDeclared("SETTINGS_Account" & $CurrentAccount & "_" & $name) And Not ( Eval("SETTINGS_Account" & $CurrentAccount & "_" & $name) == $DeletedString ) Then Return Eval("SETTINGS_Account" & $CurrentAccount & "_" & $name)
+        If IsDeclared("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("Current", $CurrentAccount) & "_" & $name) And Not ( Eval("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("Current", $CurrentAccount) & "_" & $name) == $DeletedString ) Then Return Eval("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("Current", $CurrentAccount) & "_" & $name)
     EndIf
-    If IsDeclared("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("Current", $CurrentAccount) & "_" & $name) Then Return Eval("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("Current", $CurrentAccount) & "_" & $name)
-    If IsDeclared("SETTINGS_Account" & $CurrentAccount & "_" & $name) Then Return Eval("SETTINGS_Account" & $CurrentAccount & "_" & $name)
-    If IsDeclared("SETTINGS_AllAccounts_" & $name) Then Return Eval("SETTINGS_AllAccounts_" & $name)
     If IsDeclared("SETTINGS_Default_" & $name) Then Return Eval("SETTINGS_Default_" & $name)
     Return 0
 EndFunc
 
 Func GetAllAccountsValue($name)
-    If IsDeclared("SETTINGS_AllAccounts_" & $name) Then Return Eval("SETTINGS_AllAccounts_" & $name)
+    If IsDeclared("SETTINGS_AllAccounts_" & $name) And Not ( Eval("SETTINGS_AllAccounts_" & $name) == $DeletedString ) Then Return Eval("SETTINGS_AllAccounts_" & $name)
     If IsDeclared("SETTINGS_Default_" & $name) Then Return Eval("SETTINGS_Default_" & $name)
     Return 0
 EndFunc
 
 Func GetAccountValue($name, $account = $CurrentAccount)
-    If IsDeclared("SETTINGS_Account" & $account & "_" & $name) Then Return Eval("SETTINGS_Account" & $account & "_" & $name)
+    If IsDeclared("SETTINGS_Account" & $account & "_" & $name) And Not ( Eval("SETTINGS_Account" & $account & "_" & $name) == $DeletedString ) Then Return Eval("SETTINGS_Account" & $account & "_" & $name)
     If IsDeclared("SETTINGS_Default_" & $name) Then Return Eval("SETTINGS_Default_" & $name)
     Return 0
 EndFunc
 
 Func GetCharacterValue($name, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
-    If IsDeclared("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) Then Return Eval("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name)
+    If IsDeclared("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) And Not ( Eval("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) == $DeletedString ) Then Return Eval("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name)
     If IsDeclared("SETTINGS_Default_" & $name) Then Return Eval("SETTINGS_Default_" & $name)
     Return 0
 EndFunc
 
 Func GetDefaultValue($name)
-    If IsDeclared("SETTINGS_Default_" & $name) Then Return Eval("SETTINGS_Default_" & $name)
+    If IsDeclared("SETTINGS_Default_" & $name) And Not ( Eval("SETTINGS_Default_" & $name) == $DeletedString ) Then Return Eval("SETTINGS_Default_" & $name)
     Return 0
 EndFunc
 
@@ -286,7 +284,7 @@ LoadDefaults()
 PruneLogs()
 
 Global $WinHandle, $ProcessName
-Func FindWindow($p = "GameClient.exe", $c = "CrypticWindowClass")
+Func FindWindow($p = "GameClient.exe", $c = "CrypticWindowClass", $t = 0)
     $WinHandle = 0
     $ProcessName = $p
     Local $list = ProcessList($p)
@@ -295,7 +293,7 @@ Func FindWindow($p = "GameClient.exe", $c = "CrypticWindowClass")
         Local $Data = _WinAPI_EnumProcessWindows($list[$i][1], False)
         If @error = 0 Then
             For $i2 = 1 To $Data[0][0]
-                If ( Not $c Or StringRegExp($Data[$i2][1], "^" & $c & "$") ) And WinExists($Data[$i2][0]) Then
+                If ( Not $c Or $Data[$i2][1] == $c ) And ( Not $t Or WinGetTitle($Data[$i2][0]) == $t ) And WinExists($Data[$i2][0]) Then
                     $WinHandle = $Data[$i2][0]
                     Return
                 EndIf
@@ -304,8 +302,8 @@ Func FindWindow($p = "GameClient.exe", $c = "CrypticWindowClass")
     Next
 EndFunc
 
-Func Focus($p = "GameClient.exe", $c = "CrypticWindowClass")
-    FindWindow($p, $c)
+Func Focus($p = "GameClient.exe", $c = "CrypticWindowClass", $t = 0)
+    FindWindow($p, $c, $t)
     If Not $WinHandle Then Return 0
     If WinActive($WinHandle) Then Return 1
     WinActivate($WinHandle)

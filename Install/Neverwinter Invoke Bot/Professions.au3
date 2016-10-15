@@ -191,10 +191,11 @@ Func ChooseProfessionsAccountOption()
                     ElseIf $input <= 80 Then
                         $input = 80
                     EndIf
-                    SetAccountValue("InfiniteLoopDelayMinutes", $input)
-                    If GetAccountValue("InfiniteLoopDelayMinutes") == GetDefaultValue("InfiniteLoopDelayMinutes") Then
+                    If $input == GetDefaultValue("InfiniteLoopDelayMinutes") Then
+                        DeleteAccountValue("InfiniteLoopDelayMinutes")
                         SaveIniAccount("InfiniteLoopDelayMinutes")
                     Else
+                        SetAccountValue("InfiniteLoopDelayMinutes", $input)
                         SaveIniAccount("InfiniteLoopDelayMinutes", $input)
                     EndIf
                     GUICtrlSetData($InfiniteLoopMinutesButton, Localize("InfiniteLoopMinutes", "<MINUTES>", GetAccountValue("InfiniteLoopDelayMinutes")))
@@ -203,30 +204,33 @@ Func ChooseProfessionsAccountOption()
                 Local $enabled = 0
                 If GUICtrlRead($Checkbox[0]) = $GUI_CHECKED Then $enabled = 1
                 If GetAccountValue("EnableProfessions") <> $enabled Then
-                    SetAccountValue("EnableProfessions", $enabled)
-                    If GetAccountValue("EnableProfessions") == GetDefaultValue("EnableProfessions") Then
+                    If $enabled == GetDefaultValue("EnableProfessions") Then
+                        DeleteAccountValue("EnableProfessions")
                         SaveIniAccount("EnableProfessions")
                     Else
+                        SetAccountValue("EnableProfessions", $enabled)
                         SaveIniAccount("EnableProfessions", $enabled)
                     EndIf
                 EndIf
                 $enabled = 0
                 If GUICtrlRead($InfiniteLoopCheckbox) = $GUI_CHECKED Then $enabled = 1
                 If GetAccountValue("InfiniteLoops") <> $enabled Then
-                    SetAccountValue("InfiniteLoops", $enabled)
-                    If GetAccountValue("InfiniteLoops") == GetDefaultValue("InfiniteLoops") Then
+                    If $enabled == GetDefaultValue("InfiniteLoops") Then
+                        DeleteAccountValue("InfiniteLoops")
                         SaveIniAccount("InfiniteLoops")
                     Else
+                        SetAccountValue("InfiniteLoops", $enabled)
                         SaveIniAccount("InfiniteLoops", $enabled)
                     EndIf
                 EndIf
                 For $i = 1 To $Total
                     $enabled = 0
                     If GetAccountValue("EnableProfessions") Or GUICtrlRead($Checkbox[$i]) = $GUI_CHECKED Then $enabled = 1
-                    SetCharacterValue("EnableProfessions", $enabled, $i)
-                    If GetAccountValue("EnableProfessions") Or GetCharacterValue("EnableProfessions", $i) == GetDefaultValue("EnableProfessions") Then
+                    If GetAccountValue("EnableProfessions") Or $enabled == GetDefaultValue("EnableProfessions") Then
+                        DeleteCharacterValue("EnableProfessions", $i)
                         SaveIniCharacter("EnableProfessions", "", $i)
                     Else
+                        SetCharacterValue("EnableProfessions", $enabled, $i)
                         SaveIniCharacter("EnableProfessions", $enabled, $i)
                     EndIf
                 Next
@@ -278,19 +282,20 @@ Func ChooseProfessionsAccountTaskOption()
                 If @error = 0 And ( Not ( GetAccountValue("LeadershipProfessionTasks") == GetDefaultValue("LeadershipProfessionTasks") ) Or MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2, $Title, Localize("OverwriteProfessionTasksForAllOtherCharacters", "<ACCOUNT>", $CurrentAccount), 0, $hGUI) = $IDYES ) Then
                     $input = StringStripWS(StringRegExpReplace(StringRegExpReplace(StringRegExpReplace($input, "(\s*\v)+", @CRLF), "\A\s*\v|\v\s*\Z", ""), "\s*" & @CRLF & "\s*", "|"), $STR_STRIPLEADING + $STR_STRIPTRAILING)
                     If $input = "" Then $input = GetDefaultValue("LeadershipProfessionTasks")
-                    SetAccountValue("LeadershipProfessionTasks", $input)
-                    If GetAccountValue("LeadershipProfessionTasks") == GetDefaultValue("LeadershipProfessionTasks") Then
+                    If $input == GetDefaultValue("LeadershipProfessionTasks") Then
+                        DeleteAccountValue("LeadershipProfessionTasks")
                         GUICtrlSetData($Button[0], Localize("AllCharacters"))
                         SaveIniAccount("LeadershipProfessionTasks")
                     Else
+                        SetAccountValue("LeadershipProfessionTasks", $input)
                         GUICtrlSetData($Button[0], "* " & Localize("AllCharacters") & " *")
                         SaveIniAccount("LeadershipProfessionTasks", $input)
                     EndIf
                     For $i = 1 To $Total
-                        SetCharacterValue("LeadershipProfessionTasks", GetAccountValue("LeadershipProfessionTasks"), $i)
                         GUICtrlSetData($Button[$i], Localize("CharacterNumber", "<NUMBER>", $i))
                         SaveIniCharacter("LeadershipProfessionTasks", "", $i)
-                        If GetAccountValue("LeadershipProfessionTasks") == GetDefaultValue("LeadershipProfessionTasks") Then
+                        DeleteCharacterValue("LeadershipProfessionTasks", $i)
+                        If $input == GetDefaultValue("LeadershipProfessionTasks") Then
                             If GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then GUICtrlSetState($Button[$i], $GUI_ENABLE)
                         Else
                             GUICtrlSetState($Button[$i], $GUI_DISABLE)
@@ -304,11 +309,12 @@ Func ChooseProfessionsAccountTaskOption()
                         If @error = 0 Then
                             $input = StringStripWS(StringRegExpReplace(StringRegExpReplace(StringRegExpReplace($input, "(\s*\v)+", @CRLF), "\A\s*\v|\v\s*\Z", ""), "\s*" & @CRLF & "\s*", "|"), $STR_STRIPLEADING + $STR_STRIPTRAILING)
                             If $input = "" Then $input = GetDefaultValue("LeadershipProfessionTasks")
-                            SetCharacterValue("LeadershipProfessionTasks", $input, $i)
-                            If GetCharacterValue("LeadershipProfessionTasks", $i) == GetDefaultValue("LeadershipProfessionTasks") Then
+                            If $input == GetDefaultValue("LeadershipProfessionTasks") Then
+                                DeleteCharacterValue("LeadershipProfessionTasks", $i)
                                 GUICtrlSetData($Button[$i], Localize("CharacterNumber", "<NUMBER>", $i))
                                 SaveIniCharacter("LeadershipProfessionTasks", "", $i)
                             Else
+                                SetCharacterValue("LeadershipProfessionTasks", $input, $i)
                                 GUICtrlSetData($Button[$i], "* " & Localize("CharacterNumber", "<NUMBER>", $i) & " *")
                                 SaveIniCharacter("LeadershipProfessionTasks", $input, $i)
                             EndIf

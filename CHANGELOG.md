@@ -1,6 +1,11 @@
 RELEASE NOTES
 =============
 
+8.8
+- Added Open Inventory Bags on Every Loop option
+- Changed settings priority to choose all accounts settings first, account settings second, character settings third, and default settings last
+- Will try to get past verify all files prompt
+
 8.7.3
 - Updated the name of this program.
 
@@ -9,7 +14,6 @@ RELEASE NOTES
 
 8.7.1
 - Added ability to change infinite loop retry minutes in the options menu
-- Will try to get past verify all files prompt
 
 8.7
 - Will now only open inventory bags on the first loop

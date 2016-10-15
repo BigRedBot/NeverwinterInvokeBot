@@ -129,13 +129,13 @@ EndFunc
 Func SyncValues()
     If GetValue("FinishedLoop") Then
         AddAccountCountValue("CurrentLoop", GetValue("FinishedLoop"))
-        SetAccountValue("FinishedLoop")
+        DeleteAccountValue("FinishedLoop")
         SetAccountValue("Current", GetValue("StartAt"))
-        SetAccountValue("FinishedCharacter")
+        DeleteAccountValue("FinishedCharacter")
         $ETAText = ""
     EndIf
     AddAccountCountValue("Current", GetValue("FinishedCharacter"))
-    SetAccountValue("FinishedCharacter")
+    DeleteAccountValue("FinishedCharacter")
 EndFunc
 
 Func Loop()
@@ -167,9 +167,9 @@ Func Loop()
             Local $Start = GetValue("Current")
             For $i = $Start To GetValue("EndAt")
                 SetAccountValue("Current", $i)
-                SetAccountValue("FinishedCharacter")
+                DeleteAccountValue("FinishedCharacter")
                 If EndNowTime() Then
-                    SetValue("EndNow", 1)
+                    SetAllAccountsValue("EndNow", 1)
                     ExitLoop
                 EndIf
                 If Not GetAccountValue("InfiniteLoopsStarted") Or GetValue("EnableProfessions") Then
@@ -280,7 +280,7 @@ Func Loop()
                             AddAccountCountValue("FailedInvoke")
                             AddCharacterCountInfo("FailedInvoke")
                         EndIf
-                        If GetValue("CurrentLoop") = GetValue("StartAtLoop") Then
+                        If GetValue("OpenBagsOnEveryLoop") Or GetValue("CurrentLoop") = GetValue("StartAtLoop") Then
                             OpenInventoryBags("CelestialBagOfRefining"); If $RestartLoop Then Return 0
                             If $RestartLoop Then ExitLoop 2
                         EndIf
@@ -361,7 +361,7 @@ EndFunc
 
 Func CompletedAccount()
     SyncValues()
-    If EndNowTime() Then SetValue("EndNow", 1)
+    If EndNowTime() Then SetAllAccountsValue("EndNow", 1)
     If GetValue("EndNow") Or ( Not GetAccountValue("InfiniteLoopsStarted") And ( GetValue("CompletedAccountInvokes") Or ( GetValue("CurrentLoop") > $MaxLoops And GetValue("Invoked") = (GetValue("TotalSlots") * $MaxLoops) ) ) ) Then
         SetAccountValue("CompletedAccountInvokes", 1)
         Return 1
@@ -378,7 +378,7 @@ Func CheckAccounts()
             For $c = GetValue("StartAt") To GetValue("EndAt")
                 SetAccountValue("Current", $c)
                 If GetValue("EnableProfessions") Then
-                    SetValue("InfiniteLoopsFound", 1)
+                    SetAllAccountsValue("InfiniteLoopsFound", 1)
                     ExitLoop
                 EndIf
             Next
@@ -405,7 +405,7 @@ Func GetTimeToInvoke()
         Local $Time = GetCharacterInfo("CharacterTime"), $m
         If Not $Time Then $Time = $StartTimer
         If GetAccountValue("InfiniteLoopsStarted") Then
-            If GetValue("InfiniteLoopDelayMinutes") < 80 Then SetValue("InfiniteLoopDelayMinutes", 80)
+            If GetValue("InfiniteLoopDelayMinutes") < 80 Then SetAccountValue("InfiniteLoopDelayMinutes", 80)
             $m = GetValue("InfiniteLoopDelayMinutes")
         ElseIf GetValue("CurrentLoop") > $MaxLoops Then
             $m = $LoopDelayMinutes[$MaxLoops]
@@ -556,7 +556,7 @@ Func GetVIPAccountReward(); If $RestartLoop Then Return 0
                         ExitLoop
                     EndIf
                 EndIf
-                SetAccountValue("VIPAccountRewardTries")
+                DeleteAccountValue("VIPAccountRewardTries")
                 SetAccountValue("TriedVIPAccountReward", 1)
                 SetAccountValue("LastVIPAccountRewardTryLoop", GetValue("CurrentLoop"))
             EndIf
@@ -907,7 +907,7 @@ EndFunc
 Func WaitMinutes($time, $msg); If $RestartLoop Then Return 0
     Local $t = TimerInit(), $left = $time, $lastmin = 0, $leftover
     If EndNowTime($left) Then
-        SetValue("EndNow", 1)
+        SetAllAccountsValue("EndNow", 1)
         End(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
     EndIf
@@ -1059,7 +1059,7 @@ Func StartClient(); If $RestartLoop Then Return 0
                 While 1
                     TimeOut(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
-                    If Focus("Neverwinter.exe", "\#.*") And GetPosition() And ImageSearch("LauncherLogin") Then ExitLoop
+                    If Focus("Neverwinter.exe", "#32770") And GetPosition() And ImageSearch("LauncherLogin") Then ExitLoop
                     Sleep(1000)
                 WEnd
                 Splash()
@@ -1081,31 +1081,28 @@ Func StartClient(); If $RestartLoop Then Return 0
                 Sleep(500)
                 AutoItSetOption("SendKeyDownDelay", $KeyDelay)
                 Send("{ENTER}")
-                Focus("Neverwinter.exe", "\#.*")
+                Focus("Neverwinter.exe", "#32770")
                 GetPosition()
                 $WaitingTimer = TimerInit()
                 While Not ImageSearch("LauncherPatching")
                     TimeOut(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
-                    If ImageSearch("VerifyAllFiles") Then
-                        MouseMove($_ImageSearchX, $_ImageSearchY)
-                        SingleClick()
-                        Sleep(1000)
-                    EndIf
                     If ImageSearch("LauncherLogin") Then
                         WaitMinutes(15, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
                         If $RestartLoop Then Return 0
                         ExitLoop 2
                     EndIf
+                    FindWindow("Neverwinter.exe", "#32770", GetValue("VerifyFilesWindowTitle"))
+                    If $WinHandle Then ControlClick($WinHandle, "", "[CLASS:Button; INSTANCE:1]")
                     Sleep(1000)
-                    Focus("Neverwinter.exe", "\#.*")
+                    Focus("Neverwinter.exe", "#32770")
                     If Not GetPosition() Then ExitLoop 2
                 WEnd
                 Splash("[ " & Localize("PatchingGame") & " ]", 0)
                 Focus()
                 Local $set = 1
                 While Not $WinHandle
-                    If Not ProcessExists("Neverwinter.exe") Or ( Focus("Neverwinter.exe", "\#.*") And GetPosition() And Not ImageSearch("LauncherPatching") ) Then
+                    If Not ProcessExists("Neverwinter.exe") Or ( Focus("Neverwinter.exe", "#32770") And GetPosition() And Not ImageSearch("LauncherPatching") ) Then
                         If $set Then
                             $set = 0
                             $WaitingTimer = TimerInit()
@@ -1516,27 +1513,60 @@ Func HoursAndMinutes($n)
 EndFunc
 
 Func ChooseOpenBagsAccountOption()
-    If GetAllAccountsValue("DisableOpeningBags") Then Return
-    GUICreate($Title, 320, 120)
+    If GetAllAccountsValue("DisableOpeningBags") Then
+        DeleteAccountValue("DisableOpeningBags")
+        SaveIniAccount("DisableOpeningBags")
+        DeleteAccountValue("OpenBagsOnEveryLoop")
+        SaveIniAccount("OpenBagsOnEveryLoop")
+        Return
+    EndIf
+    GUICreate($Title, 320, 150)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 270)
-    Local $Checkbox = GUICtrlCreateCheckbox(" " & Localize("OpenInventoryBags"), 25, 45, 270)
-    If Not GetAccountValue("DisableOpeningBags") Then GUICtrlSetState(-1, $GUI_CHECKED)
-    Local $hButton = GUICtrlCreateButton("OK", 118, 85, 84, -1, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 85, 75, 25)
+    Local $OpenInventoryBagsCheckbox = GUICtrlCreateCheckbox(" " & Localize("OpenInventoryBags"), 25, 45, 270)
+    If Not GetAccountValue("DisableOpeningBags") Then GUICtrlSetState($OpenInventoryBagsCheckbox, $GUI_CHECKED)
+    Local $OpenInventoryBagsOnEveryLoopCheckbox = GUICtrlCreateCheckbox(" " & Localize("OpenInventoryBagsOnEveryLoop"), 25, 75, 270)
+    If GetAccountValue("DisableOpeningBags") Or GetAllAccountsValue("OpenBagsOnEveryLoop") Then GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_DISABLE)
+    If (Not GetAccountValue("DisableOpeningBags") And GetAccountValue("OpenBagsOnEveryLoop")) Or GetAllAccountsValue("OpenBagsOnEveryLoop") Then GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_CHECKED)
+    Local $hButton = GUICtrlCreateButton("OK", 118, 105, 84, -1, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 105, 75, 25)
     GUISetState()
     While 1
         Switch GUIGetMsg()
             Case $GUI_EVENT_CLOSE
                 Exit
+            Case $OpenInventoryBagsCheckbox
+                If GUICtrlRead($OpenInventoryBagsCheckbox) = $GUI_CHECKED And Not GetAllAccountsValue("OpenBagsOnEveryLoop") Then
+                    GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_ENABLE)
+                    If GetAccountValue("OpenBagsOnEveryLoop") Then GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_CHECKED)
+                Else
+                    If GetAllAccountsValue("OpenBagsOnEveryLoop") Then
+                        GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_CHECKED)
+                    Else
+                        GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_UNCHECKED)
+                    EndIf
+                    GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_DISABLE)
+                EndIf
             Case $hButton
-                Local $openbagsdisabled = 1
-                If GUICtrlRead($Checkbox) = $GUI_CHECKED Then $openbagsdisabled = 0
-                If GetAccountValue("DisableOpeningBags") <> $openbagsdisabled Then
-                    SetAccountValue("DisableOpeningBags", $openbagsdisabled)
-                    If GetAccountValue("DisableOpeningBags") == GetDefaultValue("DisableOpeningBags") Then
+                Local $disabled = 1
+                If GUICtrlRead($OpenInventoryBagsCheckbox) = $GUI_CHECKED Then $disabled = 0
+                If GetAccountValue("DisableOpeningBags") <> $disabled Then
+                    If $disabled == GetDefaultValue("DisableOpeningBags") Then
+                        DeleteAccountValue("DisableOpeningBags")
                         SaveIniAccount("DisableOpeningBags")
                     Else
+                        SetAccountValue("DisableOpeningBags", $disabled)
                         SaveIniAccount("DisableOpeningBags", GetAccountValue("DisableOpeningBags"))
+                    EndIf
+                EndIf
+                Local $enabled = 0
+                If GUICtrlRead($OpenInventoryBagsOnEveryLoopCheckbox) = $GUI_CHECKED And Not GetAllAccountsValue("OpenBagsOnEveryLoop") Then $enabled = 1
+                If GetAccountValue("OpenBagsOnEveryLoop") <> $enabled Then
+                    If $enabled == GetDefaultValue("OpenBagsOnEveryLoop") Then
+                        DeleteAccountValue("OpenBagsOnEveryLoop")
+                        SaveIniAccount("OpenBagsOnEveryLoop")
+                    Else
+                        SetAccountValue("OpenBagsOnEveryLoop", $enabled)
+                        SaveIniAccount("OpenBagsOnEveryLoop", GetAccountValue("OpenBagsOnEveryLoop"))
                     EndIf
                 EndIf
                 GUIDelete()
@@ -1690,7 +1720,7 @@ Func Go(); If $RestartLoop Then Return 0
         Position(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         If EndNowTime($left) Then
-            SetValue("EndNow", 1)
+            SetAllAccountsValue("EndNow", 1)
             End(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
         EndIf
@@ -1847,7 +1877,7 @@ Func Load()
                     SetAccountValue("LogInPassword", "")
                     SavePrivateIniAccount("LogInPassword")
                 ElseIf GetPrivateIniAccount("PasswordHash") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DeletePasswordHash")) = $IDYES Then
-                    SetAccountValue("PasswordHash")
+                    DeleteAccountValue("PasswordHash")
                     SavePrivateIniAccount("PasswordHash")
                 Else
                     MsgBox($MB_ICONWARNING, $Title, Localize("ValidPassword"))
@@ -1885,53 +1915,80 @@ Func AddCharacterCountInfo($name, $value = 1, $character = GetValue("Current"), 
 EndFunc
 
 Func ChooseOptions()
-    Local $overflowxpdefault = GetValue("DisableOverflowXPRewardCollection"), $openbagsdefault = GetAllAccountsValue("DisableOpeningBags"), $cofferdefault = GetValue("Coffer"), $list = Localize($cofferdefault), $coffers = Array("CofferOfCelestialEnchantments, CofferOfCelestialArtifacts, CofferOfCelestialArtifactEquipment, BlessedProfessionsElementalPack, ElixirOfFate")
+    Local $overflowxpdefault = GetValue("DisableOverflowXPRewardCollection"), $openbagsdefault = GetAllAccountsValue("DisableOpeningBags"), $openbagsoneveryloopdefault = GetAllAccountsValue("OpenBagsOnEveryLoop"), $cofferdefault = GetValue("Coffer"), $list = Localize($cofferdefault), $coffers = Array("CofferOfCelestialEnchantments, CofferOfCelestialArtifacts, CofferOfCelestialArtifactEquipment, BlessedProfessionsElementalPack, ElixirOfFate")
     For $i = 1 To $coffers[0]
         If Not ($coffers[$i] == $cofferdefault) Then $list &= "|" & Localize($coffers[$i])
     Next
-    GUICreate($Title, 320, 200)
+    GUICreate($Title, 320, 230)
     GUICtrlCreateLabel(Localize("ChooseCoffer"), 25, 20, 270)
     Local $hCombo = GUICtrlCreateCombo("", 25, 50, 270)
     GUICtrlSetData(-1, $list, Localize($cofferdefault))
-    Local $Checkbox1 = GUICtrlCreateCheckbox(" " & Localize("CollectOverflowXPRewards"), 25, 95, 270)
-    If Not GetValue("DisableOverflowXPRewardCollection") Then GUICtrlSetState(-1, $GUI_CHECKED)
-    Local $Checkbox2 = GUICtrlCreateCheckbox(" " & Localize("OpenInventoryBags"), 25, 125, 270)
-    If Not GetAllAccountsValue("DisableOpeningBags") Then GUICtrlSetState(-1, $GUI_CHECKED)
-    Local $hButton = GUICtrlCreateButton("OK", 118, 165, 84, -1, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 165, 75, 25)
+    Local $CollectOverflowXPRewardsCheckbox = GUICtrlCreateCheckbox(" " & Localize("CollectOverflowXPRewards"), 25, 95, 270)
+    If Not GetValue("DisableOverflowXPRewardCollection") Then GUICtrlSetState($CollectOverflowXPRewardsCheckbox, $GUI_CHECKED)
+    Local $OpenInventoryBagsCheckbox = GUICtrlCreateCheckbox(" " & Localize("OpenInventoryBags"), 25, 125, 270)
+    If Not GetAllAccountsValue("DisableOpeningBags") Then GUICtrlSetState($OpenInventoryBagsCheckbox, $GUI_CHECKED)
+    Local $OpenInventoryBagsOnEveryLoopCheckbox = GUICtrlCreateCheckbox(" " & Localize("OpenInventoryBagsOnEveryLoop"), 25, 155, 270)
+    If GetAllAccountsValue("DisableOpeningBags") Then
+        GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_DISABLE)
+    ElseIf GetAllAccountsValue("OpenBagsOnEveryLoop") Then
+        GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_CHECKED)
+    EndIf
+    Local $hButton = GUICtrlCreateButton("OK", 118, 195, 84, -1, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 195, 75, 25)
     GUISetState()
     While 1
         Switch GUIGetMsg()
             Case $GUI_EVENT_CLOSE
                 Exit
+            Case $OpenInventoryBagsCheckbox
+                If GUICtrlRead($OpenInventoryBagsCheckbox) = $GUI_CHECKED Then
+                    GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_ENABLE)
+                    If GetAllAccountsValue("OpenBagsOnEveryLoop") Then GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_CHECKED)
+                Else
+                    GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_UNCHECKED)
+                    GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_DISABLE)
+                EndIf
             Case $hButton
-                Local $CurrCombo = GUICtrlRead($hCombo), $overflowxpdisabled = 1, $openbagsdisabled = 1
-                If GUICtrlRead($Checkbox1) = $GUI_CHECKED Then $overflowxpdisabled = 0
-                If GUICtrlRead($Checkbox2) = $GUI_CHECKED Then $openbagsdisabled = 0
+                Local $CurrCombo = GUICtrlRead($hCombo), $overflowxpdisabled = 1, $openbagsdisabled = 1, $openbagsoneveryloopenabled = 0
+                If GUICtrlRead($CollectOverflowXPRewardsCheckbox) = $GUI_CHECKED Then $overflowxpdisabled = 0
+                If GUICtrlRead($OpenInventoryBagsCheckbox) = $GUI_CHECKED Then $openbagsdisabled = 0
+                If GUICtrlRead($OpenInventoryBagsOnEveryLoopCheckbox) = $GUI_CHECKED Then $openbagsoneveryloopenabled = 1
                 For $i = 1 To $coffers[0]
                     If Localize($coffers[$i]) == $CurrCombo Then
                         If Not ($cofferdefault == $coffers[$i]) Then
-                            SetValue("Coffer", $coffers[$i])
-                            If GetValue("Coffer") == GetDefaultValue("Coffer") Then
+                            If $coffers[$i] == GetDefaultValue("Coffer") Then
+                                DeleteAllAccountsValue("Coffer")
                                 SaveIniAllAccounts("Coffer")
                             Else
+                                SetAllAccountsValue("Coffer", $coffers[$i])
                                 SaveIniAllAccounts("Coffer", GetValue("Coffer"))
                             EndIf
                         EndIf
                         If $overflowxpdefault <> $overflowxpdisabled Then
-                            SetValue("DisableOverflowXPRewardCollection", $overflowxpdisabled)
-                            If GetValue("DisableOverflowXPRewardCollection") == GetDefaultValue("DisableOverflowXPRewardCollection") Then
+                            If $overflowxpdisabled == GetDefaultValue("DisableOverflowXPRewardCollection") Then
+                                DeleteAllAccountsValue("DisableOverflowXPRewardCollection")
                                 SaveIniAllAccounts("DisableOverflowXPRewardCollection")
                             Else
+                                SetAllAccountsValue("DisableOverflowXPRewardCollection", $overflowxpdisabled)
                                 SaveIniAllAccounts("DisableOverflowXPRewardCollection", GetValue("DisableOverflowXPRewardCollection"))
                             EndIf
                         EndIf
                         If $openbagsdefault <> $openbagsdisabled Then
-                            SetAllAccountsValue("DisableOpeningBags", $openbagsdisabled)
-                            If GetAllAccountsValue("DisableOpeningBags") == GetDefaultValue("DisableOpeningBags") Then
+                            If $openbagsdisabled == GetDefaultValue("DisableOpeningBags") Then
+                                DeleteAllAccountsValue("DisableOpeningBags")
                                 SaveIniAllAccounts("DisableOpeningBags")
                             Else
+                                SetAllAccountsValue("DisableOpeningBags", $openbagsdisabled)
                                 SaveIniAllAccounts("DisableOpeningBags", GetAllAccountsValue("DisableOpeningBags"))
+                            EndIf
+                        EndIf
+                        If $openbagsoneveryloopdefault <> $openbagsoneveryloopenabled Then
+                            If $openbagsoneveryloopenabled == GetDefaultValue("OpenBagsOnEveryLoop") Then
+                                DeleteAllAccountsValue("OpenBagsOnEveryLoop")
+                                SaveIniAllAccounts("OpenBagsOnEveryLoop")
+                            Else
+                                SetAllAccountsValue("OpenBagsOnEveryLoop", $openbagsoneveryloopenabled)
+                                SaveIniAllAccounts("OpenBagsOnEveryLoop", GetAllAccountsValue("OpenBagsOnEveryLoop"))
                             EndIf
                         EndIf
                         GUIDelete()
@@ -1946,7 +2003,7 @@ EndFunc
 
 Func RunScript(); If $RestartLoop Then Return 0
     If $CmdLine[0] Then
-        SetValue("UnattendedMode", Number($CmdLine[1]))
+        SetAllAccountsValue("UnattendedMode", Number($CmdLine[1]))
         If GetValue("UnattendedMode") = 0 Then $UnattendedModeCheckSettings = 1
     EndIf
     Local $old = $CurrentAccount
@@ -2009,7 +2066,7 @@ Func RunScript(); If $RestartLoop Then Return 0
             If @error <> 0 Then Exit
             Local $number = Floor(Number($strNumber))
             If $number > 0 Then
-                SetValue("TotalAccounts", $number)
+                SetAllAccountsValue("TotalAccounts", $number)
                 ExitLoop
             EndIf
             MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
