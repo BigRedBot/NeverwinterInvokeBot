@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+8.8.1
+- Added SkipVerifyFiles option to the Settings.ini file
+- Will now remove existing files before installing
+
 8.8
 - Added Open Inventory Bags on Every Loop option
 - Changed settings priority to choose all accounts settings first, account settings second, character settings third, and default settings last

@@ -1,4 +1,5 @@
-﻿#include-once
+﻿
+#include-once
 
 Func LoadLocalizationDefaults()
     If GetValue("Language") = "Russian" Then

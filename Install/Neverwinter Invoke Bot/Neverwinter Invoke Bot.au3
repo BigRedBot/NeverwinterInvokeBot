@@ -1093,7 +1093,13 @@ Func StartClient(); If $RestartLoop Then Return 0
                         ExitLoop 2
                     EndIf
                     FindWindow("Neverwinter.exe", "#32770", GetValue("VerifyFilesWindowTitle"))
-                    If $WinHandle Then ControlClick($WinHandle, "", "[CLASS:Button; INSTANCE:1]")
+                    If $WinHandle Then
+                        If GetValue("SkipVerifyFiles") Then
+                            ControlClick($WinHandle, "", "[CLASS:Button; INSTANCE:2]")
+                        Else
+                            ControlClick($WinHandle, "", "[CLASS:Button; INSTANCE:1]")
+                        EndIf
+                    EndIf
                     Sleep(1000)
                     Focus("Neverwinter.exe", "#32770")
                     If Not GetPosition() Then ExitLoop 2

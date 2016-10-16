@@ -74,6 +74,7 @@ If _UnicodeIniRead($SettingsDir & "\Settings.ini", "AllAccounts", "Language", ""
     DirCreate($SettingsDir)
     _UnicodeIniWrite($SettingsDir & "\Settings.ini", "AllAccounts", "Language", $Language)
 EndIf
+If FileExists($InstallDir) And Not DirRemove($InstallDir, 1) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCleaningUpExistingInstallation"))
 If Not DirCopy($Name, $InstallDir, 1) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCopyingFilesToProgramsFolder"))
 If Not RegWrite($RegLocation, "DisplayName", "REG_SZ", $Name) Or Not RegWrite($RegLocation, "DisplayVersion", "REG_SZ", $Version) Or Not RegWrite($RegLocation, "Publisher", "REG_SZ", "BigRedBot") Or Not RegWrite($RegLocation, "DisplayIcon", "REG_SZ", $InstallDir & "\" & $Name & ".exe") Or Not RegWrite($RegLocation, "UninstallString", "REG_SZ", '"' & $InstallDir & '\Uninstall.exe"') Or Not RegWrite($RegLocation, "InstallLocation", "REG_SZ", $InstallDir) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingUninstallerRegistry"))
 FileDelete(@DesktopDir & "\" & $Name & ".lnk")
