@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+8.8.2
+- Fixed problem with cleaning up existing installation when updating
+
 8.8.1
 - Added SkipVerifyFiles option to the Settings.ini file
 - Will now remove existing files before installing
