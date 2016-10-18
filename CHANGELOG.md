@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+8.8.3
+- Added a Run Professions option to the Unattended Launcher menu
+- No longer needs to wait to get time until server reset to run from the Unattended Launcher
+
 8.8.2
 - Fixed problem with cleaning up existing installation when updating
 
@@ -14,7 +18,7 @@ RELEASE NOTES
 - Will try to get past verify all files prompt
 
 8.7.3
-- Updated the name of this program.
+- Updated the name of this program
 
 8.7.2
 - No longer shows GUI when getting server reset time in unattended mode

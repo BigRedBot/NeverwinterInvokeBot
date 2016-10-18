@@ -12,14 +12,16 @@ Global $Title = $Name & " " & $Version & ": Unattended Launcher"
 TraySetToolTip($Title)
 LoadLocalizations()
 If _Singleton($Name & ": Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("UnattendedAlreadyRunning"))
-Local $CanRun, $Ran
+Local $CanRun = 1, $Ran
 Opt("TrayMenuMode", 3)
 Opt("TrayOnEventMode", 1)
-Local $RunItem = TrayCreateItem(" ")
-TrayItemSetOnEvent(-1, "RunNow")
+Local $RunNowItem = TrayCreateItem(Localize("RunNow"))
+TrayItemSetOnEvent($RunNowItem, "RunNow")
 TrayCreateItem("")
-TrayCreateItem(Localize("Exit"))
-TrayItemSetOnEvent(-1, "ExitScript")
+Local $RunProfessionsItem = TrayCreateItem(Localize("RunProfessions"))
+TrayItemSetOnEvent($RunProfessionsItem, "RunProfessions")
+TrayCreateItem("")
+TrayItemSetOnEvent(TrayCreateItem(Localize("Exit")), "ExitScript")
 TraySetOnEvent($TRAY_EVENT_PRIMARYDOUBLE, "RunNow")
 TraySetState($TRAY_ICONSTATE_SHOW)
 
@@ -27,31 +29,43 @@ Func ExitScript()
     Exit
 EndFunc
 
-Func RunNow()
+Func RunInvokeBot($n = 1, $flash = 0)
     If Not $CanRun Then Return
     $CanRun = 0
     $Ran = 1
-    TrayItemSetText($RunItem, " ")
+    TrayItemSetState($RunNowItem, $TRAY_DISABLE)
+    TrayItemSetState($RunProfessionsItem, $TRAY_DISABLE)
     TraySetToolTip($Title & @CRLF & Localize("UnattendedRunning"))
     TraySetIcon(@ScriptDir & "\images\green.ico")
-    If @Compiled Then
-        ShellExecuteWait(@ScriptDir & "\Neverwinter Invoke Bot.exe", 2, @ScriptDir)
+    If $flash Then
+        TraySetState($TRAY_ICONSTATE_FLASH)
     Else
-        ShellExecuteWait(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Neverwinter Invoke Bot.au3" 2', @ScriptDir)
+        TraySetState($TRAY_ICONSTATE_STOPFLASH)
     EndIf
+    If @Compiled Then
+        ShellExecuteWait(@ScriptDir & "\Neverwinter Invoke Bot.exe", $n, @ScriptDir)
+    Else
+        ShellExecuteWait(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Neverwinter Invoke Bot.au3" ' & $n, @ScriptDir)
+    EndIf
+    TrayItemSetState($RunNowItem, $TRAY_ENABLE)
+    TrayItemSetState($RunProfessionsItem, $TRAY_ENABLE)
+    TraySetIcon(@ScriptDir & "\images\teal.ico")
+    TraySetState($TRAY_ICONSTATE_FLASH)
+    $CanRun = 1
 EndFunc
 
-TraySetIcon(@ScriptDir & "\images\green.ico")
-TraySetState($TRAY_ICONSTATE_FLASH)
-If @Compiled Then
-    Local $deleted = 1
-    If FileExists(@ScriptDir & "\Install.exe") Then $deleted = FileDelete(@ScriptDir & "\Install.exe")
-    ShellExecuteWait(@ScriptDir & "\Neverwinter Invoke Bot.exe", 0, @ScriptDir)
-    If $deleted And FileExists(@ScriptDir & "\Install.exe") Then Exit
-Else
-    ShellExecuteWait(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Neverwinter Invoke Bot.au3" 0', @ScriptDir)
-EndIf
-TraySetState($TRAY_ICONSTATE_STOPFLASH)
+Func RunNow()
+    RunInvokeBot(2)
+EndFunc
+
+Func RunProfessions()
+    RunInvokeBot(3)
+EndFunc
+
+Local $deleted = 1
+If FileExists(@ScriptDir & "\Install.exe") Then $deleted = FileDelete(@ScriptDir & "\Install.exe")
+RunInvokeBot(0, 1)
+If $deleted And FileExists(@ScriptDir & "\Install.exe") Then Exit
 
 Func HoursAndMinutes($n)
     Local $All = Ceiling($n)
@@ -76,8 +90,6 @@ Func HoursAndMinutes($n)
 EndFunc
 
 Func WaitMinutes($time, $msg)
-    $CanRun = 1
-    TrayItemSetText($RunItem, Localize("RunNow"))
     Local $t = TimerInit(), $left = $time, $txt = "", $last = ""
     While $left > 0
         $txt = $Title & @CRLF & Localize($msg) & @CRLF & HoursAndMinutes($left)
@@ -89,8 +101,6 @@ Func WaitMinutes($time, $msg)
         If $Ran Then ExitLoop
         $left = $time - TimerDiff($t) / 60000
     WEnd
-    $CanRun = 0
-    TrayItemSetText($RunItem, " ")
 EndFunc
 
 While 1
@@ -100,6 +110,7 @@ While 1
         Local $min = 0
         While 1
             $min = _GetUTCMinutes(10, 2, True, False, True, $Title & @CRLF & Localize("GettingTimeUntilServerReset"))
+            If $Ran Then ExitLoop 2
             If $min >= 0 Then ExitLoop
             WaitMinutes(10, "WaitingToRetryGettingTimeUntilServerReset")
             If $Ran Then ExitLoop 2
@@ -113,10 +124,7 @@ While 1
             ProcessClose("Neverwinter Invoke Bot.exe")
             Sleep(100)
         WEnd
-        If @Compiled Then
-            ShellExecuteWait(@ScriptDir & "\Neverwinter Invoke Bot.exe", 1, @ScriptDir)
-        Else
-            ShellExecuteWait(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Neverwinter Invoke Bot.au3" 1', @ScriptDir)
-        EndIf
+        If $Ran Then ExitLoop
+        RunInvokeBot()
     WEnd
 WEnd

@@ -1390,7 +1390,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
     Local $CofferCount = 0, $ProfessionPackCount = 0, $ElixirOfFateCount = 0, $OverflowXPRewardCount = 0, $VIPAccountRewardCount = 0, $IdleLogoutText = "", $TimedOutText = "", $FailedInvokeText = "", $etext = ""
     If GetAccountValue("InfiniteLoopsStarted") And GetAccountValue("LastMsg") Then
         $text &= GetAccountValue("LastMsg")
-    Else
+    ElseIf GetValue("UnattendedMode") <> 3 Then
         For $i = 1 To GetValue("TotalSlots")
             $CofferCount += GetCharacterInfo("TotalCelestialCoffers", $i)
             $ProfessionPackCount += GetCharacterInfo("TotalProfessionPacks", $i)
@@ -1588,7 +1588,7 @@ Func ConfigureAccount()
     ChooseProfessionsAccountOption()
     ChooseProfessionsAccountTaskOption()
     ChooseOpenBagsAccountOption()
-    If Not GetAccountValue("InfiniteLoopsStarted") Then
+    If Not GetAccountValue("InfiniteLoopsStarted") And GetValue("UnattendedMode") <> 3 Then
         While 1
             Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $MaxLoops), GetValue("CurrentLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
             If @error <> 0 Then Exit
@@ -1675,7 +1675,7 @@ Global $MinutesToStartSaved, $MinutesToStartSavedTimer
 Func Begin(); If $RestartLoop Then Return 0
     $SkipAllConfigurations = 0
     If Not $UnattendedMode Then
-        If ( $FirstRun Or $MinutesToStart ) And GetValue("UnattendedMode") <> 2 Then
+        If ( $FirstRun Or $MinutesToStart ) And GetValue("UnattendedMode") <> 2 And GetValue("UnattendedMode") <> 3 Then
             While 1
                 If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("GetMinutesUntilServerReset")) = $IDYES Then
                     If $MinutesToStartSavedTimer Then
@@ -1708,6 +1708,26 @@ Func Begin(); If $RestartLoop Then Return 0
             EndIf
             MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
         WEnd
+    EndIf
+    If GetValue("UnattendedMode") = 3 Then
+        Local $old = $CurrentAccount
+        For $i = 1 To GetValue("TotalAccounts")
+            $CurrentAccount = $i
+            SetAccountValue("CompletedAccountInvokes", 1)
+            If GetValue("InfiniteLoops") And $EnableProfessions Then
+                Local $oldc = GetValue("Current")
+                For $c = GetValue("StartAt") To GetValue("EndAt")
+                    SetAccountValue("Current", $c)
+                    If GetValue("EnableProfessions") Then
+                        SetAccountValue("InfiniteLoopsStarted", 1)
+                        ExitLoop
+                    EndIf
+                Next
+                SetAccountValue("Current", $oldc)
+            EndIf
+        Next
+        $CurrentAccount = $old
+        If Not CheckAccounts() Then Exit
     EndIf
     $FirstRun = 0
     Go(); If $RestartLoop Then Return 0
@@ -2021,7 +2041,7 @@ Func RunScript(); If $RestartLoop Then Return 0
         EndIf
     Next
     $CurrentAccount = $old
-    If $AllLoginInfoFound And GetValue("UnattendedMode") <> 2 Then $UnattendedMode = GetValue("UnattendedMode")
+    If $AllLoginInfoFound And GetValue("UnattendedMode") <> 2 And GetValue("UnattendedMode") <> 3 Then $UnattendedMode = GetValue("UnattendedMode")
     If Not $UnattendedModeCheckSettings And Not GetValue("DisableDonationPrompts") And ( GetAllAccountsValue("TotalInvoked") - GetAllAccountsValue("DonationPrompts") * 2000 ) >= 2000 Then
         Statistics_SaveIniAllAccounts("DonationPrompts", Floor(GetAllAccountsValue("TotalInvoked") / 2000))
         CloseClient("DonationPrompt.exe"); If $RestartLoop Then Return 0
