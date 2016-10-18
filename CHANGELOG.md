@@ -1,8 +1,11 @@
 RELEASE NOTES
 =============
 
+8.8.4
+- Renamed Run Professions to Do Professions
+
 8.8.3
-- Added a Run Professions option to the Unattended Launcher menu
+- Added a Do Professions option to the Unattended Launcher menu
 - No longer needs to wait to get time until server reset to run from the Unattended Launcher
 
 8.8.2

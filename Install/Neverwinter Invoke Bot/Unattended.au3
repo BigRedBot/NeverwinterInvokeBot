@@ -18,8 +18,8 @@ Opt("TrayOnEventMode", 1)
 Local $RunNowItem = TrayCreateItem(Localize("RunNow"))
 TrayItemSetOnEvent($RunNowItem, "RunNow")
 TrayCreateItem("")
-Local $RunProfessionsItem = TrayCreateItem(Localize("RunProfessions"))
-TrayItemSetOnEvent($RunProfessionsItem, "RunProfessions")
+Local $DoProfessionsItem = TrayCreateItem(Localize("DoProfessions"))
+TrayItemSetOnEvent($DoProfessionsItem, "DoProfessions")
 TrayCreateItem("")
 TrayItemSetOnEvent(TrayCreateItem(Localize("Exit")), "ExitScript")
 TraySetOnEvent($TRAY_EVENT_PRIMARYDOUBLE, "RunNow")
@@ -34,7 +34,7 @@ Func RunInvokeBot($n = 1, $flash = 0)
     $CanRun = 0
     $Ran = 1
     TrayItemSetState($RunNowItem, $TRAY_DISABLE)
-    TrayItemSetState($RunProfessionsItem, $TRAY_DISABLE)
+    TrayItemSetState($DoProfessionsItem, $TRAY_DISABLE)
     TraySetToolTip($Title & @CRLF & Localize("UnattendedRunning"))
     TraySetIcon(@ScriptDir & "\images\green.ico")
     If $flash Then
@@ -48,7 +48,7 @@ Func RunInvokeBot($n = 1, $flash = 0)
         ShellExecuteWait(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Neverwinter Invoke Bot.au3" ' & $n, @ScriptDir)
     EndIf
     TrayItemSetState($RunNowItem, $TRAY_ENABLE)
-    TrayItemSetState($RunProfessionsItem, $TRAY_ENABLE)
+    TrayItemSetState($DoProfessionsItem, $TRAY_ENABLE)
     TraySetIcon(@ScriptDir & "\images\teal.ico")
     TraySetState($TRAY_ICONSTATE_FLASH)
     $CanRun = 1
@@ -58,7 +58,7 @@ Func RunNow()
     RunInvokeBot(2)
 EndFunc
 
-Func RunProfessions()
+Func DoProfessions()
     RunInvokeBot(3)
 EndFunc
 
