@@ -29,7 +29,7 @@ Func ExitScript()
     Exit
 EndFunc
 
-Func RunInvokeBot($n = 1, $flash = 0)
+Func RunInvokeBot($n, $noflash = 1)
     If Not $CanRun Then Return
     $CanRun = 0
     $Ran = 1
@@ -37,11 +37,7 @@ Func RunInvokeBot($n = 1, $flash = 0)
     TrayItemSetState($DoProfessionsItem, $TRAY_DISABLE)
     TraySetToolTip($Title & @CRLF & Localize("UnattendedRunning"))
     TraySetIcon(@ScriptDir & "\images\green.ico")
-    If $flash Then
-        TraySetState($TRAY_ICONSTATE_FLASH)
-    Else
-        TraySetState($TRAY_ICONSTATE_STOPFLASH)
-    EndIf
+    If $noflash Then TraySetState($TRAY_ICONSTATE_STOPFLASH)
     If @Compiled Then
         ShellExecuteWait(@ScriptDir & "\Neverwinter Invoke Bot.exe", $n, @ScriptDir)
     Else
@@ -64,7 +60,8 @@ EndFunc
 
 Local $deleted = 1
 If FileExists(@ScriptDir & "\Install.exe") Then $deleted = FileDelete(@ScriptDir & "\Install.exe")
-RunInvokeBot(0, 1)
+TraySetState($TRAY_ICONSTATE_FLASH)
+RunInvokeBot(0, 0)
 If $deleted And FileExists(@ScriptDir & "\Install.exe") Then Exit
 
 Func HoursAndMinutes($n)
@@ -126,6 +123,6 @@ While 1
                 If $list[$i][1] <> @AutoItPID Then ProcessClose($list[$i][1])
             Next
         EndIf
-        RunInvokeBot()
+        RunInvokeBot(1)
     WEnd
 WEnd
