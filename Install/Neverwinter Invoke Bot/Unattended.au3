@@ -118,8 +118,6 @@ While 1
         TraySetIcon(@ScriptDir & "\images\blue.ico")
         WaitMinutes($min, "WaitingForServerReset")
         If $Ran Then ExitLoop
-        TraySetToolTip($Title & @CRLF & Localize("UnattendedRunning"))
-        TraySetIcon(@ScriptDir & "\images\green.ico")
         Local $process = "Neverwinter Invoke Bot.exe"
         If Not @Compiled Then $process = StringRegExpReplace(@AutoItExe, ".*\\", "")
         Local $list = ProcessList($process)
