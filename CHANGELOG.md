@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+8.9
+- Will no longer show a message when completing invoking if infinite profession loops is enabled
+
 8.8.4
 - Renamed Run Professions to Do Professions
 

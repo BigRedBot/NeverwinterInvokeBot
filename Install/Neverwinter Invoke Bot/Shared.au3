@@ -101,7 +101,7 @@ Func SetAccountValue($name, $value = 0, $account = $CurrentAccount)
     Return Assign("SETTINGS_Account" & $account & "_" & $name, $value, 2)
 EndFunc
 
-Func SetCharacterValue($name, $value = 0, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
+Func SetCharacterValue($name, $value = 0, $character = GetAccountValue("CurrentCharacter", $CurrentAccount), $account = $CurrentAccount)
     If IsDeclared("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) Then Return Assign("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name, $value)
     Return Assign("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name, $value, 2)
 EndFunc
@@ -116,7 +116,7 @@ Func DeleteAccountValue($name, $account = $CurrentAccount)
     Return 1
 EndFunc
 
-Func DeleteCharacterValue($name, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
+Func DeleteCharacterValue($name, $character = GetAccountValue("CurrentCharacter", $CurrentAccount), $account = $CurrentAccount)
     If IsDeclared("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) Then Return Assign("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name, $DeletedString)
     Return 1
 EndFunc
@@ -129,18 +129,18 @@ Func AddAccountCountValue($name, $value = 1, $account = $CurrentAccount)
     Return SetAccountValue($name, GetAccountValue($name, $account) + $value, $account)
 EndFunc
 
-Func AddCharacterCountValue($name, $value = 1, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
+Func AddCharacterCountValue($name, $value = 1, $character = GetAccountValue("CurrentCharacter", $CurrentAccount), $account = $CurrentAccount)
     Return SetCharacterValue($name, GetCharacterValue($name, $character, $account) + $value, $character, $account)
 EndFunc
 
-Func GetValue($name, $account = $CurrentAccount, $character = GetAccountValue("Current", $CurrentAccount))
+Func GetValue($name, $account = $CurrentAccount, $character = GetAccountValue("CurrentCharacter", $CurrentAccount))
     If IsDeclared("SETTINGS_AllAccounts_" & $name) And Not ( Eval("SETTINGS_AllAccounts_" & $name) == $DeletedString ) Then Return Eval("SETTINGS_AllAccounts_" & $name)
     If $account And @NumParams > 1 Then
         If IsDeclared("SETTINGS_Account" & $account & "_" & $name) And Not ( Eval("SETTINGS_Account" & $account & "_" & $name) == $DeletedString ) Then Return Eval("SETTINGS_Account" & $account & "_" & $name)
         If $character And @NumParams = 3 And IsDeclared("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) And Not ( Eval("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) == $DeletedString ) Then Return Eval("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name)
     Else
         If IsDeclared("SETTINGS_Account" & $CurrentAccount & "_" & $name) And Not ( Eval("SETTINGS_Account" & $CurrentAccount & "_" & $name) == $DeletedString ) Then Return Eval("SETTINGS_Account" & $CurrentAccount & "_" & $name)
-        If IsDeclared("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("Current", $CurrentAccount) & "_" & $name) And Not ( Eval("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("Current", $CurrentAccount) & "_" & $name) == $DeletedString ) Then Return Eval("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("Current", $CurrentAccount) & "_" & $name)
+        If IsDeclared("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("CurrentCharacter", $CurrentAccount) & "_" & $name) And Not ( Eval("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("CurrentCharacter", $CurrentAccount) & "_" & $name) == $DeletedString ) Then Return Eval("SETTINGS_Account" & $CurrentAccount & "_Character" & GetAccountValue("CurrentCharacter", $CurrentAccount) & "_" & $name)
     EndIf
     If IsDeclared("SETTINGS_Default_" & $name) Then Return Eval("SETTINGS_Default_" & $name)
     Return 0
@@ -158,7 +158,7 @@ Func GetAccountValue($name, $account = $CurrentAccount)
     Return 0
 EndFunc
 
-Func GetCharacterValue($name, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
+Func GetCharacterValue($name, $character = GetAccountValue("CurrentCharacter", $CurrentAccount), $account = $CurrentAccount)
     If IsDeclared("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) And Not ( Eval("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name) == $DeletedString ) Then Return Eval("SETTINGS_Account" & $account & "_Character" & $character & "_" & $name)
     If IsDeclared("SETTINGS_Default_" & $name) Then Return Eval("SETTINGS_Default_" & $name)
     Return 0
@@ -187,12 +187,12 @@ Func GetIniAccount($name, $account = $CurrentAccount)
     Return _UnicodeIniRead($SettingsDir & "\Settings.ini", "Account" & $account, $name, "")
 EndFunc
 
-Func SaveIniCharacter($name, $value = "", $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
+Func SaveIniCharacter($name, $value = "", $character = GetAccountValue("CurrentCharacter", $CurrentAccount), $account = $CurrentAccount)
     If $value == "" Then Return _UnicodeIniDelete($SettingsDir & "\Settings.ini", "Account" & $account & "_Character" & $character, $name)
     Return _UnicodeIniWrite($SettingsDir & "\Settings.ini", "Account" & $account & "_Character" & $character, $name, $value)
 EndFunc
 
-Func GetIniCharacter($name, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
+Func GetIniCharacter($name, $character = GetAccountValue("CurrentCharacter", $CurrentAccount), $account = $CurrentAccount)
     Return _UnicodeIniRead($SettingsDir & "\Settings.ini", "Account" & $account & "_Character" & $character, $name, "")
 EndFunc
 
@@ -214,12 +214,12 @@ Func GetPrivateIniAccount($name, $account = $CurrentAccount)
     Return _UnicodeIniRead($SettingsDir & "\PrivateSettings.ini", "Account" & $account, $name, "")
 EndFunc
 
-Func SavePrivateIniCharacter($name, $value = "", $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
+Func SavePrivateIniCharacter($name, $value = "", $character = GetAccountValue("CurrentCharacter", $CurrentAccount), $account = $CurrentAccount)
     If $value == "" Then Return _UnicodeIniDelete($SettingsDir & "\PrivateSettings.ini", "Account" & $account & "_Character" & $character, $name)
     Return _UnicodeIniWrite($SettingsDir & "\PrivateSettings.ini", "Account" & $account & "_Character" & $character, $name, StringToBinary(String($value), $SB_UTF8))
 EndFunc
 
-Func GetPrivateIniCharacter($name, $character = GetAccountValue("Current", $CurrentAccount), $account = $CurrentAccount)
+Func GetPrivateIniCharacter($name, $character = GetAccountValue("CurrentCharacter", $CurrentAccount), $account = $CurrentAccount)
     Return _UnicodeIniRead($SettingsDir & "\PrivateSettings.ini", "Account" & $account & "_Character" & $character, $name, "")
 EndFunc
 

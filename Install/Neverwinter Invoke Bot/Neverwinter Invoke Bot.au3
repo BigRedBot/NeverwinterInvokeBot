@@ -130,11 +130,11 @@ Func SyncValues()
     If GetValue("FinishedLoop") Then
         AddAccountCountValue("CurrentLoop", GetValue("FinishedLoop"))
         DeleteAccountValue("FinishedLoop")
-        SetAccountValue("Current", GetValue("StartAt"))
+        SetAccountValue("CurrentCharacter", GetValue("StartAt"))
         DeleteAccountValue("FinishedCharacter")
         $ETAText = ""
     EndIf
-    AddAccountCountValue("Current", GetValue("FinishedCharacter"))
+    AddAccountCountValue("CurrentCharacter", GetValue("FinishedCharacter"))
     DeleteAccountValue("FinishedCharacter")
 EndFunc
 
@@ -164,9 +164,9 @@ Func Loop()
             EndIf
             Position(); If $RestartLoop Then Return 0
             If $RestartLoop Then ExitLoop 1
-            Local $Start = GetValue("Current")
+            Local $Start = GetValue("CurrentCharacter")
             For $i = $Start To GetValue("EndAt")
-                SetAccountValue("Current", $i)
+                SetAccountValue("CurrentCharacter", $i)
                 DeleteAccountValue("FinishedCharacter")
                 If EndNowTime() Then
                     SetAllAccountsValue("EndNow", 1)
@@ -181,7 +181,7 @@ Func Loop()
                     MouseMove(GetValue("SelectCharacterMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SelectCharacterMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
                     DoubleRightClick()
                     MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
-                    If GetValue("Current") <= Ceiling(GetValue("TotalSlots") / 2) Then
+                    If GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
                         AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
                         If GetValue("TopScrollBarX") And GetValue("TopSelectedCharacterX") Then
                             For $n = 1 To 3
@@ -202,7 +202,7 @@ Func Loop()
                         EndIf
                         AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollTowardKeyDelay)
                         Sleep($CharacterSelectionScrollTowardKeyDelay)
-                        For $n = 2 To GetValue("Current")
+                        For $n = 2 To GetValue("CurrentCharacter")
                             Send("{DOWN}")
                             Sleep(50)
                         Next
@@ -228,7 +228,7 @@ Func Loop()
                         EndIf
                         AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollTowardKeyDelay)
                         Sleep($CharacterSelectionScrollTowardKeyDelay)
-                        For $n = 1 To (GetValue("TotalSlots") - GetValue("Current"))
+                        For $n = 1 To (GetValue("TotalSlots") - GetValue("CurrentCharacter"))
                             Send("{UP}")
                             Sleep(50)
                         Next
@@ -272,7 +272,7 @@ Func Loop()
                         SetCharacterInfo("CharacterTime", TimerInit())
                         SetCharacterInfo("CharacterLoop", GetValue("CurrentLoop"))
                         SetAccountValue("FinishedCharacter", 1)
-                        If GetValue("Current") >= GetValue("EndAt") Then
+                        If GetValue("CurrentCharacter") >= GetValue("EndAt") Then
                             SetAccountValue("FinishedLoop", 1)
                             If GetValue("CurrentLoop") >= GetValue("EndAtLoop") Then SetAccountValue("CompletedAccountInvokes", 1)
                         EndIf
@@ -291,13 +291,13 @@ Func Loop()
                         SetCharacterInfo("CharacterTime", TimerInit())
                         SetCharacterInfo("CharacterLoop", GetValue("CurrentLoop"))
                         SetAccountValue("FinishedCharacter", 1)
-                        If GetValue("Current") >= GetValue("EndAt") Then SetAccountValue("FinishedLoop", 1)
+                        If GetValue("CurrentCharacter") >= GetValue("EndAt") Then SetAccountValue("FinishedLoop", 1)
                     EndIf
                     ChangeCharacter(); If $RestartLoop Then Return 0
                     If $RestartLoop Then ExitLoop 2
                     $TimeOutRetries = 0
                     Local $LogOutTimer = TimerInit()
-                    Local $RemainingCharacters = GetValue("EndAt") - GetValue("Current")
+                    Local $RemainingCharacters = GetValue("EndAt") - GetValue("CurrentCharacter")
                     Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
                     If ImageExists("SelectionScreen") Then
                         $WaitingTimer = TimerInit()
@@ -319,10 +319,10 @@ Func Loop()
                             $RemoveKeyPressTime = $KeyDelay
                         EndIf
                         For $n = 1 To $RemainingCharacters
-                            If GetValue("Current") + $n <= Ceiling(GetValue("TotalSlots") / 2) Then
+                            If GetValue("CurrentCharacter") + $n <= Ceiling(GetValue("TotalSlots") / 2) Then
                                 $AdditionalKeyPressTime += $n * ($KeyDelay + 50) + $AddKeyPressTime
-                            ElseIf GetValue("Current") <= Floor(GetValue("TotalSlots") / 2) + 1 Then
-                                $AdditionalKeyPressTime -= (GetValue("Current") + $n - Floor(GetValue("TotalSlots") / 2) + 1) * ($KeyDelay + 50)
+                            ElseIf GetValue("CurrentCharacter") <= Floor(GetValue("TotalSlots") / 2) + 1 Then
+                                $AdditionalKeyPressTime -= (GetValue("CurrentCharacter") + $n - Floor(GetValue("TotalSlots") / 2) + 1) * ($KeyDelay + 50)
                             Else
                                 $AdditionalKeyPressTime -= $n * ($KeyDelay + 50) + $RemoveKeyPressTime
                             EndIf
@@ -333,7 +333,7 @@ Func Loop()
                         If GetAccountValue("InfiniteLoopsStarted") Then $LastTook = "LastProfessionsTook"
                         $ETAText = Localize($LastTook, "<SECONDS>", Round($LastTime / 1000, 2)) & @CRLF & Localize("ETAForCurrentLoop", "<MINUTES>", HoursAndMinutes($RemainingSeconds / 60))
                     EndIf
-                ElseIf GetValue("Current") >= GetValue("EndAt") Then
+                ElseIf GetValue("CurrentCharacter") >= GetValue("EndAt") Then
                     SetAccountValue("FinishedLoop", 1)
                 EndIf
             Next
@@ -374,15 +374,15 @@ Func CheckAccounts()
     For $i = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $i
         If GetValue("InfiniteLoops") And $EnableProfessions Then
-            Local $oldc = GetValue("Current")
+            Local $oldc = GetValue("CurrentCharacter")
             For $c = GetValue("StartAt") To GetValue("EndAt")
-                SetAccountValue("Current", $c)
+                SetAccountValue("CurrentCharacter", $c)
                 If GetValue("EnableProfessions") Then
                     SetAllAccountsValue("InfiniteLoopsFound", 1)
                     ExitLoop
                 EndIf
             Next
-            SetAccountValue("Current", $oldc)
+            SetAccountValue("CurrentCharacter", $oldc)
         EndIf
         If Not CompletedAccount() Then
             $allcomplete = 0
@@ -523,7 +523,7 @@ Func GetVIPAccountReward(); If $RestartLoop Then Return 0
     Local $tried = 0
     While 1
         While 1
-            If Not GetValue("SkipVIPAccountReward") And Not GetValue("CollectedVIPAccountReward") And GetValue("LastVIPAccountRewardTryLoop") < GetValue("CurrentLoop") And ( GetValue("VIPAccountRewardCharacter") < GetValue("StartAt") Or GetValue("VIPAccountRewardCharacter") > GetValue("EndAt") Or GetValue("VIPAccountRewardCharacter") = GetValue("Current") ) And ImageExists("VIPAccountReward") Then
+            If Not GetValue("SkipVIPAccountReward") And Not GetValue("CollectedVIPAccountReward") And GetValue("LastVIPAccountRewardTryLoop") < GetValue("CurrentLoop") And ( GetValue("VIPAccountRewardCharacter") < GetValue("StartAt") Or GetValue("VIPAccountRewardCharacter") > GetValue("EndAt") Or GetValue("VIPAccountRewardCharacter") = GetValue("CurrentCharacter") ) And ImageExists("VIPAccountReward") Then
                 If GetValue("VIPAccountRewardTries") < 3 Then
                     $tried = 1
                     AddAccountCountValue("VIPAccountRewardTries")
@@ -784,9 +784,9 @@ Func Splash($s = "", $ontop = 1)
     EndIf
     Local $Message
     If GetAccountValue("InfiniteLoopsStarted") Then
-        $Message = Localize("Professions", "<CURRENT>", GetValue("Current"), "<ENDAT>", GetValue("EndAt")) & @CRLF & $s & @CRLF & $ETAText
+        $Message = Localize("Professions", "<CURRENT>", GetValue("CurrentCharacter"), "<ENDAT>", GetValue("EndAt")) & @CRLF & $s & @CRLF & $ETAText
     Else
-        $Message = Localize("Invoking", "<CURRENT>", GetValue("Current"), "<ENDAT>", GetValue("EndAt"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & $s & @CRLF & $ETAText
+        $Message = Localize("Invoking", "<CURRENT>", GetValue("CurrentCharacter"), "<ENDAT>", GetValue("EndAt"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & $s & @CRLF & $ETAText
     EndIf
     If $SplashWindow And $ontop = $SplashWindowOnTop Then
         $Message = Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & $SplashStartText & $Message
@@ -1287,10 +1287,27 @@ Func End(); If $RestartLoop Then Return 0
     Reset()
     Splash(0)
     Local $old = $CurrentAccount
+    If Not $UnattendedMode Then
+        For $i = 1 To GetValue("TotalAccounts")
+            $CurrentAccount = $i
+            If GetValue("InfiniteLoops") And $EnableProfessions Then
+                Local $oldc = GetValue("CurrentCharacter")
+                For $c = GetValue("StartAt") To GetValue("EndAt")
+                    SetAccountValue("CurrentCharacter", $c)
+                    If GetValue("EnableProfessions") Then
+                        $UnattendedMode = 3
+                        ExitLoop
+                    EndIf
+                Next
+                SetAccountValue("CurrentCharacter", $oldc)
+                If $UnattendedMode Then ExitLoop
+            EndIf
+        Next
+    EndIf
     For $i = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $i
         If CompletedAccount() And GetValue("CurrentLoop") <= GetValue("EndAtLoop") Then
-            If GetValue("Current") = GetValue("StartAt") Then
+            If GetValue("CurrentCharacter") = GetValue("StartAt") Then
                 SetAccountValue("EndAtLoop", GetValue("CurrentLoop") - 1)
             Else
                 SetAccountValue("EndAtLoop", GetValue("CurrentLoop"))
@@ -1298,18 +1315,19 @@ Func End(); If $RestartLoop Then Return 0
         EndIf
         SendMessage(Localize("CompletedInvoking", "<STARTAT>", GetValue("StartAt"), "<ENDAT>", GetValue("EndAt"), "<STARTATLOOP>", GetValue("StartAtLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & @CRLF & Localize("InvokingTook", "<MINUTES>", $EndTime))
         If GetValue("InfiniteLoops") And $EnableProfessions Then
-            Local $oldc = GetValue("Current")
+            Local $oldc = GetValue("CurrentCharacter")
             For $c = GetValue("StartAt") To GetValue("EndAt")
-                SetAccountValue("Current", $c)
+                SetAccountValue("CurrentCharacter", $c)
                 If GetValue("EnableProfessions") Then
                     SetAccountValue("InfiniteLoopsStarted", 1)
                     ExitLoop
                 EndIf
             Next
-            SetAccountValue("Current", $oldc)
+            SetAccountValue("CurrentCharacter", $oldc)
         EndIf
     Next
     $CurrentAccount = $old
+    $UnattendedMode = GetValue("UnattendedMode")
     $check = CheckAccounts()
     If $check > 0 Then
         If $check <> $CurrentAccount Then
@@ -1467,7 +1485,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
             $etext &= @CRLF & @CRLF & Localize("GamePatched")
         EndIf
         If Not CompletedAccount() Then
-            $etext &= @CRLF & @CRLF & Localize("Invoking", "<CURRENT>", GetValue("Current"), "<ENDAT>", GetValue("EndAt"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop"))
+            $etext &= @CRLF & @CRLF & Localize("Invoking", "<CURRENT>", GetValue("CurrentCharacter"), "<ENDAT>", GetValue("EndAt"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop"))
         EndIf
         SetAccountValue("LastMsg", $etext)
         $text &= $etext
@@ -1631,17 +1649,17 @@ Func ConfigureAccount()
         EndIf
         MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
     WEnd
-    If GetValue("Current") < GetValue("StartAt") Then
-        SetAccountValue("Current", GetValue("StartAt"))
-    ElseIf GetValue("Current") > GetValue("EndAt") Then
-        SetAccountValue("Current", GetValue("EndAt"))
+    If GetValue("CurrentCharacter") < GetValue("StartAt") Then
+        SetAccountValue("CurrentCharacter", GetValue("StartAt"))
+    ElseIf GetValue("CurrentCharacter") > GetValue("EndAt") Then
+        SetAccountValue("CurrentCharacter", GetValue("EndAt"))
     EndIf
     While 1
-        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartAtCurrentLoop", "<STARTAT>", GetValue("StartAt"), "<ENDAT>", GetValue("EndAt")), GetValue("Current"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartAtCurrentLoop", "<STARTAT>", GetValue("StartAt"), "<ENDAT>", GetValue("EndAt")), GetValue("CurrentCharacter"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then Exit
         Local $number = Floor(Number($strNumber))
         If $number >= GetValue("StartAt") And $number <= GetValue("EndAt") Then
-            SetAccountValue("Current", $number)
+            SetAccountValue("CurrentCharacter", $number)
             ExitLoop
         EndIf
         MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
@@ -1658,10 +1676,10 @@ Func Start(); If $RestartLoop Then Return 0
         For $i = 1 To GetValue("TotalAccounts")
             $CurrentAccount = $i
             ConfigureAccount()
-            If GetValue("Current") < GetValue("StartAt") Then
-                SetAccountValue("Current", GetValue("StartAt"))
-            ElseIf GetValue("Current") > GetValue("EndAt") Then
-                SetAccountValue("Current", GetValue("EndAt"))
+            If GetValue("CurrentCharacter") < GetValue("StartAt") Then
+                SetAccountValue("CurrentCharacter", GetValue("StartAt"))
+            ElseIf GetValue("CurrentCharacter") > GetValue("EndAt") Then
+                SetAccountValue("CurrentCharacter", GetValue("EndAt"))
             EndIf
         Next
         $CurrentAccount = $old
@@ -1715,15 +1733,15 @@ Func Begin(); If $RestartLoop Then Return 0
             $CurrentAccount = $i
             SetAccountValue("CompletedAccountInvokes", 1)
             If GetValue("InfiniteLoops") And $EnableProfessions Then
-                Local $oldc = GetValue("Current")
+                Local $oldc = GetValue("CurrentCharacter")
                 For $c = GetValue("StartAt") To GetValue("EndAt")
-                    SetAccountValue("Current", $c)
+                    SetAccountValue("CurrentCharacter", $c)
                     If GetValue("EnableProfessions") Then
                         SetAccountValue("InfiniteLoopsStarted", 1)
                         ExitLoop
                     EndIf
                 Next
-                SetAccountValue("Current", $oldc)
+                SetAccountValue("CurrentCharacter", $oldc)
             EndIf
         Next
         $CurrentAccount = $old
@@ -1825,7 +1843,7 @@ Func Initialize()
     Local $old = $CurrentAccount
     For $i = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $i
-        SetAccountValue("Current", GetValue("StartAt"))
+        SetAccountValue("CurrentCharacter", GetValue("StartAt"))
         SetAccountValue("CurrentLoop", GetValue("StartAtLoop"))
         If Not $UnattendedMode And Not $SkipAllConfigurations Then Load()
         If Not GetValue("EndAt") Then SetAccountValue("EndAt", GetValue("TotalSlots"))
@@ -1925,17 +1943,17 @@ Func Load()
     If GetIniAccount("TotalSlots") <> GetValue("TotalSlots") Then SaveIniAccount("TotalSlots", GetValue("TotalSlots"))
 EndFunc
 
-Func SetCharacterInfo($name, $value = 0, $character = GetValue("Current"), $account = $CurrentAccount)
+Func SetCharacterInfo($name, $value = 0, $character = GetValue("CurrentCharacter"), $account = $CurrentAccount)
     If IsDeclared("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name) Then Return Assign("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name, $value)
     Return Assign("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name, $value, 2)
 EndFunc
 
-Func GetCharacterInfo($name, $character = GetValue("Current"), $account = $CurrentAccount)
+Func GetCharacterInfo($name, $character = GetValue("CurrentCharacter"), $account = $CurrentAccount)
     If IsDeclared("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name) Then Return Eval("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name)
     Return 0
 EndFunc
 
-Func AddCharacterCountInfo($name, $value = 1, $character = GetValue("Current"), $account = $CurrentAccount)
+Func AddCharacterCountInfo($name, $value = 1, $character = GetValue("CurrentCharacter"), $account = $CurrentAccount)
     If IsDeclared("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name) Then Return Assign("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name, GetCharacterInfo($name, $character, $account) + $value)
     Return Assign("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name, GetCharacterInfo($name, $character, $account) + $value, 2)
 EndFunc

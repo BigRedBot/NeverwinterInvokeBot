@@ -1,3 +1,3 @@
 #include-once
 Global $Name = "Neverwinter Invoke Bot"
-Global $Version = "8.8.4"
+Global $Version = "8.9"
