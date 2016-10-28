@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+8.10
+- Added more image detection for leadership icon.
+
 8.9
 - Will no longer show a message when completing invoking if infinite profession loops is enabled
 

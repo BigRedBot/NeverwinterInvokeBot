@@ -88,18 +88,39 @@ Func Position(); If $RestartLoop Then Return 0
         Error(Localize("NeverwinterNotFound")); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
     EndIf
-    If GetValue("GameWidth") And GetValue("GameHeight") Then
-        If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight Then
-            Error(Localize("UnMaximize")); If $RestartLoop Then Return 0
-            If $RestartLoop Then Return 0
-            Return
-        ElseIf $DeskTopWidth < ( GetValue("GameWidth") + $PaddingLeft ) Or $DeskTopHeight < ( GetValue("GameHeight") + $PaddingTop ) Then
-            Error(Localize("ResolutionHigherThan", "<RESOLUTION>", (GetValue("GameWidth") + $PaddingLeft) & "x" & (GetValue("GameHeight") + $PaddingTop))); If $RestartLoop Then Return 0
+    If Not GetValue("GameWidth") Or Not GetValue("GameHeight") Then Return
+    If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight Then
+        Error(Localize("UnMaximize")); If $RestartLoop Then Return 0
+        If $RestartLoop Then Return 0
+        Return
+    ElseIf $DeskTopWidth < (GetValue("GameWidth") + $PaddingWidth) Or $DeskTopHeight < (GetValue("GameHeight") + $PaddingHeight) Then
+        Error(Localize("ResolutionOrHigher", "<RESOLUTION>", (GetValue("GameWidth") + $PaddingWidth) & "x" & (GetValue("GameHeight") + $PaddingHeight))); If $RestartLoop Then Return 0
+        If $RestartLoop Then Return 0
+        Return
+    EndIf
+    If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
+        WinMove($WinHandle, "", $WinLeft, $WinTop, GetValue("GameWidth") + $PaddingWidth, GetValue("GameHeight") + $PaddingHeight)
+        Focus()
+        If Not $WinHandle Or Not GetPosition() Then
+            Position(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
             Return
         EndIf
-        If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
-            WinMove($WinHandle, "", $WinLeft, $WinTop, GetValue("GameWidth") + $PaddingWidth, GetValue("GameHeight") + $PaddingHeight)
+    EndIf
+    If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
+        Error(Localize("UnableToResize")); If $RestartLoop Then Return 0
+        If $RestartLoop Then Return 0
+    Else
+        If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
+            If (GetValue("GameWidth") + $PaddingLeft) <= $DeskTopWidth And (GetValue("GameHeight") + $PaddingTop) <= $DeskTopHeight Then
+                WinMove($WinHandle, "", 0, 0)
+            ElseIf GetValue("GameWidth") + $PaddingLeft > $DeskTopWidth And GetValue("GameHeight") + $PaddingTop > $DeskTopHeight Then
+                WinMove($WinHandle, "", 0 - $PaddingLeft, 0 - $PaddingTop)
+            ElseIf GetValue("GameWidth") + $PaddingLeft > $DeskTopWidth Then
+                WinMove($WinHandle, "", 0 - $PaddingLeft, 0)
+            ElseIf GetValue("GameHeight") + $PaddingTop > $DeskTopHeight Then
+                WinMove($WinHandle, "", 0, 0 - $PaddingTop)
+            EndIf
             Focus()
             If Not $WinHandle Or Not GetPosition() Then
                 Position(); If $RestartLoop Then Return 0
@@ -108,18 +129,6 @@ Func Position(); If $RestartLoop Then Return 0
             EndIf
         EndIf
         If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
-            WinMove($WinHandle, "", 0, 0)
-            Focus()
-            If Not $WinHandle Or Not GetPosition() Then
-                Position(); If $RestartLoop Then Return 0
-                If $RestartLoop Then Return 0
-                Return
-            EndIf
-        EndIf
-        If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
-            Error(Localize("UnableToResize")); If $RestartLoop Then Return 0
-            If $RestartLoop Then Return 0
-        ElseIf $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
             Error(Localize("UnableToMove")); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
         EndIf
