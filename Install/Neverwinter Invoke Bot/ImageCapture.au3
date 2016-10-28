@@ -19,8 +19,8 @@ Func Position()
     If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight Then
         MsgBox($MB_ICONWARNING, $Title, Localize("UnMaximize"))
         Exit
-    ElseIf $DeskTopWidth < (GetValue("GameWidth") + $PaddingWidth) Or $DeskTopHeight < (GetValue("GameHeight") + $PaddingHeight) Then
-        MsgBox($MB_ICONWARNING, $Title, Localize("ResolutionOrHigher", "<RESOLUTION>", (GetValue("GameWidth") + $PaddingWidth) & "x" & (GetValue("GameHeight") + $PaddingHeight)))
+    ElseIf $DeskTopWidth < GetValue("GameWidth") Or $DeskTopHeight < GetValue("GameHeight") Then
+        MsgBox($MB_ICONWARNING, $Title, Localize("ResolutionOrHigher", "<RESOLUTION>", GetValue("GameWidth") & "x" & GetValue("GameHeight")))
         Exit
     ElseIf $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
         WinMove($WinHandle, "", $WinLeft, $WinTop, GetValue("GameWidth") + $PaddingWidth, GetValue("GameHeight") + $PaddingHeight)

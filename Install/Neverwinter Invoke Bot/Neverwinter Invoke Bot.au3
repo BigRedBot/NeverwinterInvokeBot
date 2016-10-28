@@ -93,8 +93,8 @@ Func Position(); If $RestartLoop Then Return 0
         Error(Localize("UnMaximize")); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         Return
-    ElseIf $DeskTopWidth < (GetValue("GameWidth") + $PaddingWidth) Or $DeskTopHeight < (GetValue("GameHeight") + $PaddingHeight) Then
-        Error(Localize("ResolutionOrHigher", "<RESOLUTION>", (GetValue("GameWidth") + $PaddingWidth) & "x" & (GetValue("GameHeight") + $PaddingHeight))); If $RestartLoop Then Return 0
+    ElseIf $DeskTopWidth < GetValue("GameWidth") Or $DeskTopHeight < GetValue("GameHeight") Then
+        Error(Localize("ResolutionOrHigher", "<RESOLUTION>", GetValue("GameWidth") & "x" & GetValue("GameHeight"))); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         Return
     EndIf

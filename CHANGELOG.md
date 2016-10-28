@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.1
+- Removed game client window borders from screen resolution requirements
+
 9.0
 - Changed the game client size to 1024x768 ( This greatly improves image detection )
 
