@@ -193,7 +193,7 @@ Func Loop()
                     If GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
                         AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
                         If GetValue("TopScrollBarX") And GetValue("TopSelectedCharacterX") Then
-                            For $n = 1 To 3
+                            For $n = 1 To 4
                                 Send("{DOWN}")
                             Next
                             For $n = 1 To GetValue("TotalSlots")
@@ -219,7 +219,7 @@ Func Loop()
                     Else
                         AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
                         If GetValue("BottomScrollBarX") And GetValue("BottomSelectedCharacterX") Then
-                            For $n = 1 To 3
+                            For $n = 1 To 4
                                 Send("{UP}")
                             Next
                             For $n = 1 To GetValue("TotalSlots")
@@ -540,7 +540,7 @@ Func GetVIPAccountReward(); If $RestartLoop Then Return 0
                     Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
                     If ImageSearch("VIPAccountReward", -1) Then
                         Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom
-                        If ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-10) Then
+                        If ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-50) Then
                             $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonLeftOffset"), $_ImageSearchRight + GetValue("VIPAccountRewardButtonRightOffset"), 1)
                             $_ImageSearchY = Random($_ImageSearchTop + GetValue("VIPAccountRewardButtonTopOffset"), $_ImageSearchTop + GetValue("VIPAccountRewardButtonBottomOffset"), 1)
                             MouseMove($_ImageSearchX, $_ImageSearchY)
@@ -549,7 +549,7 @@ Func GetVIPAccountReward(); If $RestartLoop Then Return 0
                             If Not ImageSearch("VIPAccountReward", -1, $left, $top, $right, $bottom) Then
                                 SaveItemCount("TotalVIPAccountRewards", 1)
                                 SetAccountValue("CollectedVIPAccountReward", 1)
-                            ElseIf ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-10) Then
+                            ElseIf ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-50) Then
                                 $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonLeftOffset"), $_ImageSearchRight + GetValue("VIPAccountRewardButtonRightOffset"), 1)
                                 $_ImageSearchY = Random($_ImageSearchTop + GetValue("VIPAccountRewardButtonTopOffset"), $_ImageSearchTop + GetValue("VIPAccountRewardButtonBottomOffset"), 1)
                                 MouseMove($_ImageSearchX, $_ImageSearchY)
@@ -724,7 +724,7 @@ Func ChangeCharacter(); If $RestartLoop Then Return 0
                 Send("{ENTER}")
             EndIf
             Sleep(500)
-            If ImageExists("ChangeCharacterConfirmation") And Not ImageSearch("ChangeCharacterConfirmation") Then
+            If ImageExists("OK") And Not ImageSearch("OK") Then
                 Send("{ESC}")
                 Sleep(500)
                 Send("{ESC}")
@@ -739,7 +739,7 @@ Func ChangeCharacter(); If $RestartLoop Then Return 0
                 Send("{ENTER}")
                 Sleep(500)
             Next
-            If ImageSearch("ChangeCharacterConfirmation") Then
+            If ImageSearch("OK") Then
                 Send("{ESC}")
                 Sleep(500)
                 Send("{ESC}")
@@ -886,7 +886,7 @@ Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $Clie
 EndFunc
 
 Func SetImageSearchVariables($image, $resultPosition, $left, $top, $right, $bottom, $tolerance)
-    If $image <> "LogInScreen" And $image <> "Unavailable" And $image <> "Mismatch" And $image <> "Idle" And $image <> "OK" Then
+    If $image <> "LogInScreen" And $image <> "Unavailable" And $image <> "TryAgainLater" And $image <> "Mismatch" And $image <> "Idle" And $image <> "OK" Then
         $LoggingIn = 0
         $LogInTries = 0
         $LastLoginTry = 0
@@ -984,7 +984,7 @@ Func FindLogInScreen(); If $RestartLoop Then Return 0
                                     Sleep(500)
                                 WEnd
                                 ExitLoop
-                            ElseIf ImageSearch("Unavailable") Then
+                            ElseIf ImageSearch("Unavailable") Or ImageSearch("TryAgainLater") Then
                                 $LogInTries = 0
                                 Position(); If $RestartLoop Then Return 0
                                 If $RestartLoop Then Return 0

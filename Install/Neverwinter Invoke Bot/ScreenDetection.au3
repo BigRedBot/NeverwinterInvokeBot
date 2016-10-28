@@ -112,9 +112,6 @@ While 1
         If ScreenDetection_ImageSearch("ChangeCharacterButton") Then
             $text &= @CRLF & @CRLF & Localize("GameMenuDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         EndIf
-        If ScreenDetection_ImageSearch("ChangeCharacterConfirmation") Then
-            $text &= @CRLF & @CRLF & Localize("ChangeCharacterConfirmationDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        EndIf
         If ScreenDetection_ImageSearch("LogInScreen") Then
             $text &= @CRLF & @CRLF & Localize("LogInScreenDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         EndIf
@@ -126,12 +123,15 @@ While 1
         EndIf
         If ScreenDetection_ImageSearch("VIPAccountReward") Then
             $text &= @CRLF & @CRLF & Localize("VIPAccountRewardDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-            If ScreenDetection_ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-10) Then
+            If ScreenDetection_ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-50) Then
                 $text &= @CRLF & @CRLF & Localize("VIPAccountRewardBorderDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
             EndIf
         EndIf
         If ScreenDetection_ImageSearch("Unavailable") Then
             $text &= @CRLF & @CRLF & Localize("ServerUnavailableDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+        EndIf
+        If ScreenDetection_ImageSearch("TryAgainLater") Then
+            $text &= @CRLF & @CRLF & Localize("TryAgainLaterDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         EndIf
         If ScreenDetection_ImageSearch("Mismatch") Then
             $text &= @CRLF & @CRLF & Localize("VersionMismatchDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY

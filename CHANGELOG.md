@@ -1,8 +1,11 @@
 RELEASE NOTES
 =============
 
+9.0
+- Changed the game client size to 1024x768 ( This greatly improves image detection )
+
 8.10
-- Added more image detection for leadership icon.
+- Added more image detection for leadership icon
 
 8.9
 - Will no longer show a message when completing invoking if infinite profession loops is enabled
