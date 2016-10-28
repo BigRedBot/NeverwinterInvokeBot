@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.2
+- Will now remove the game client window borders if the resolution is too low to resize the game client
+
 9.1
 - Removed game client window borders from screen resolution requirements
 

@@ -16,14 +16,24 @@ Func Position()
         Capture()
     EndIf
     If Not GetValue("GameWidth") Or Not GetValue("GameHeight") Then Return
-    If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight Then
+    If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight And ( GetValue("GameWidth") <> $DeskTopWidth Or GetValue("GameHeight") <> $DeskTopHeight ) Then
         MsgBox($MB_ICONWARNING, $Title, Localize("UnMaximize"))
         Exit
     ElseIf $DeskTopWidth < GetValue("GameWidth") Or $DeskTopHeight < GetValue("GameHeight") Then
         MsgBox($MB_ICONWARNING, $Title, Localize("ResolutionOrHigher", "<RESOLUTION>", GetValue("GameWidth") & "x" & GetValue("GameHeight")))
         Exit
     ElseIf $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
-        WinMove($WinHandle, "", $WinLeft, $WinTop, GetValue("GameWidth") + $PaddingWidth, GetValue("GameHeight") + $PaddingHeight)
+        If $DeskTopWidth < GetValue("GameWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameHeight") + $PaddingHeight Then
+            Local $ostyle = DllCall("user32.dll", "long", "GetWindowLong", "hwnd", $WinHandle, "int", -16)
+            DllCall("user32.dll", "long", "SetWindowLong", "hwnd", $WinHandle, "int", -16, "long", BitAND($ostyle[0], BitNOT($WS_BORDER + $WS_DLGFRAME + $WS_THICKFRAME)))
+            DllCall("user32.dll", "long", "SetWindowPos", "hwnd", $WinHandle, "hwnd", $WinHandle, "int", 0, "int", 0, "int", 0, "int", 0, "long", BitOR($SWP_NOMOVE, $SWP_NOSIZE, $SWP_NOZORDER, $SWP_FRAMECHANGED))
+            Focus()
+            If Not $WinHandle Or Not GetPosition() Then
+                MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
+                Capture()
+            EndIf
+        EndIf
+        WinMove($WinHandle, "", 0, 0, GetValue("GameWidth") + $PaddingWidth, GetValue("GameHeight") + $PaddingHeight)
         Focus()
         If Not $WinHandle Or Not GetPosition() Then
             MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
@@ -36,15 +46,17 @@ Func Position()
         MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterResized"))
         Capture()
     ElseIf $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
-        If (GetValue("GameWidth") + $PaddingLeft) <= $DeskTopWidth And (GetValue("GameHeight") + $PaddingTop) <= $DeskTopHeight Then
-            WinMove($WinHandle, "", 0, 0)
-        ElseIf GetValue("GameWidth") + $PaddingLeft > $DeskTopWidth And GetValue("GameHeight") + $PaddingTop > $DeskTopHeight Then
-            WinMove($WinHandle, "", 0 - $PaddingLeft, 0 - $PaddingTop)
-        ElseIf GetValue("GameWidth") + $PaddingLeft > $DeskTopWidth Then
-            WinMove($WinHandle, "", 0 - $PaddingLeft, 0)
-        ElseIf GetValue("GameHeight") + $PaddingTop > $DeskTopHeight Then
-            WinMove($WinHandle, "", 0, 0 - $PaddingTop)
+        If $DeskTopWidth < GetValue("GameWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameHeight") + $PaddingHeight Then
+            Local $ostyle = DllCall("user32.dll", "long", "GetWindowLong", "hwnd", $WinHandle, "int", -16)
+            DllCall("user32.dll", "long", "SetWindowLong", "hwnd", $WinHandle, "int", -16, "long", BitAND($ostyle[0], BitNOT($WS_BORDER + $WS_DLGFRAME + $WS_THICKFRAME)))
+            DllCall("user32.dll", "long", "SetWindowPos", "hwnd", $WinHandle, "hwnd", $WinHandle, "int", 0, "int", 0, "int", 0, "int", 0, "long", BitOR($SWP_NOMOVE, $SWP_NOSIZE, $SWP_NOZORDER, $SWP_FRAMECHANGED))
+            Focus()
+            If Not $WinHandle Or Not GetPosition() Then
+                MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
+                Capture()
+            EndIf
         EndIf
+        WinMove($WinHandle, "", 0, 0)
         Focus()
         If Not $WinHandle Or Not GetPosition() Then
             MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
@@ -54,12 +66,12 @@ Func Position()
         MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterMoved"))
         Capture()
     EndIf
+    WinSetOnTop($WinHandle, "", 1)
 EndFunc
 
 Func Capture()
     If MsgBox($MB_OKCANCEL, $Title, Localize("ClickOKToCapture")) <> $IDOK Then Exit
     Position()
-    WinSetOnTop($WinHandle, "", 1)
     Sleep(500)
     Local $err = False, $err_txt
     Local $hHBITMAP = _ScreenCapture_Capture("", $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, False)

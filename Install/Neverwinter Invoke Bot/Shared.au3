@@ -345,10 +345,10 @@ Func GetPosition()
     $WinHeightCenter = $WinTop + Round($WinHeight / 2)
     $PaddingWidth = $WinWidth - $ClientSize[0]
     $PaddingHeight = $WinHeight - $ClientHeight
-    $PaddingLeft = $ClientLeft + 1 - $WinLeft
-    $PaddingTop = $ClientTop + 1 - $WinTop
-    $PaddingRight = $WinRight + 1 - $ClientRight
-    $PaddingBottom = $WinBottom + 1 - $ClientBottom
+    $PaddingLeft = $ClientLeft - $WinLeft
+    $PaddingTop = $ClientTop - $WinTop
+    $PaddingRight = $WinRight - $ClientRight
+    $PaddingBottom = $WinBottom - $ClientBottom
     $DeskTopWidth = @DeskTopWidth
     $DeskTopHeight = @DeskTopHeight
     If GetValue("RelativePixelLocation") Then

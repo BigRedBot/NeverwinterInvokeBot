@@ -89,7 +89,7 @@ Func Position(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
     EndIf
     If Not GetValue("GameWidth") Or Not GetValue("GameHeight") Then Return
-    If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight Then
+    If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight And ( GetValue("GameWidth") <> $DeskTopWidth Or GetValue("GameHeight") <> $DeskTopHeight ) Then
         Error(Localize("UnMaximize")); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         Return
@@ -99,40 +99,79 @@ Func Position(); If $RestartLoop Then Return 0
         Return
     EndIf
     If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
-        WinMove($WinHandle, "", $WinLeft, $WinTop, GetValue("GameWidth") + $PaddingWidth, GetValue("GameHeight") + $PaddingHeight)
-        Focus()
-        If Not $WinHandle Or Not GetPosition() Then
-            Position(); If $RestartLoop Then Return 0
-            If $RestartLoop Then Return 0
-            Return
-        EndIf
-    EndIf
-    If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
-        Error(Localize("UnableToResize")); If $RestartLoop Then Return 0
-        If $RestartLoop Then Return 0
-    Else
-        If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
-            If (GetValue("GameWidth") + $PaddingLeft) <= $DeskTopWidth And (GetValue("GameHeight") + $PaddingTop) <= $DeskTopHeight Then
-                WinMove($WinHandle, "", 0, 0)
-            ElseIf GetValue("GameWidth") + $PaddingLeft > $DeskTopWidth And GetValue("GameHeight") + $PaddingTop > $DeskTopHeight Then
-                WinMove($WinHandle, "", 0 - $PaddingLeft, 0 - $PaddingTop)
-            ElseIf GetValue("GameWidth") + $PaddingLeft > $DeskTopWidth Then
-                WinMove($WinHandle, "", 0 - $PaddingLeft, 0)
-            ElseIf GetValue("GameHeight") + $PaddingTop > $DeskTopHeight Then
-                WinMove($WinHandle, "", 0, 0 - $PaddingTop)
+        For $i = 1 To 10
+            If $DeskTopWidth < GetValue("GameWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameHeight") + $PaddingHeight Then
+                Local $ostyle = DllCall("user32.dll", "long", "GetWindowLong", "hwnd", $WinHandle, "int", -16)
+                DllCall("user32.dll", "long", "SetWindowLong", "hwnd", $WinHandle, "int", -16, "long", BitAND($ostyle[0], BitNOT($WS_BORDER + $WS_DLGFRAME + $WS_THICKFRAME)))
+                DllCall("user32.dll", "long", "SetWindowPos", "hwnd", $WinHandle, "hwnd", $WinHandle, "int", 0, "int", 0, "int", 0, "int", 0, "long", BitOR($SWP_NOMOVE, $SWP_NOSIZE, $SWP_NOZORDER, $SWP_FRAMECHANGED))
+                Focus()
+                If Not $WinHandle Or Not GetPosition() Then
+                    Position(); If $RestartLoop Then Return 0
+                    If $RestartLoop Then Return 0
+                    Return
+                EndIf
             EndIf
+            WinMove($WinHandle, "", 0, 0, GetValue("GameWidth") + $PaddingWidth, GetValue("GameHeight") + $PaddingHeight)
             Focus()
             If Not $WinHandle Or Not GetPosition() Then
                 Position(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
                 Return
             EndIf
+            If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
+                Sleep(5000)
+                Focus()
+                If Not $WinHandle Or Not GetPosition() Then
+                    Position(); If $RestartLoop Then Return 0
+                    If $RestartLoop Then Return 0
+                    Return
+                EndIf
+            Else
+                ExitLoop
+            EndIf
+        Next
+        If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
+            Error(Localize("UnableToResize")); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
         EndIf
+    ElseIf $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
+        For $i = 1 To 10
+            If $DeskTopWidth < GetValue("GameWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameHeight") + $PaddingHeight Then
+                Local $ostyle = DllCall("user32.dll", "long", "GetWindowLong", "hwnd", $WinHandle, "int", -16)
+                DllCall("user32.dll", "long", "SetWindowLong", "hwnd", $WinHandle, "int", -16, "long", BitAND($ostyle[0], BitNOT($WS_BORDER + $WS_DLGFRAME + $WS_THICKFRAME)))
+                DllCall("user32.dll", "long", "SetWindowPos", "hwnd", $WinHandle, "hwnd", $WinHandle, "int", 0, "int", 0, "int", 0, "int", 0, "long", BitOR($SWP_NOMOVE, $SWP_NOSIZE, $SWP_NOZORDER, $SWP_FRAMECHANGED))
+                Focus()
+                If Not $WinHandle Or Not GetPosition() Then
+                    Position(); If $RestartLoop Then Return 0
+                    If $RestartLoop Then Return 0
+                    Return
+                EndIf
+            EndIf
+            WinMove($WinHandle, "", 0, 0, GetValue("GameWidth") + $PaddingWidth, GetValue("GameHeight") + $PaddingHeight)
+            Focus()
+            If Not $WinHandle Or Not GetPosition() Then
+                Position(); If $RestartLoop Then Return 0
+                If $RestartLoop Then Return 0
+                Return
+            EndIf
+            If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
+                Sleep(5000)
+                Focus()
+                If Not $WinHandle Or Not GetPosition() Then
+                    Position(); If $RestartLoop Then Return 0
+                    If $RestartLoop Then Return 0
+                    Return
+                EndIf
+            Else
+                ExitLoop
+            EndIf
+        Next
         If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
             Error(Localize("UnableToMove")); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
         EndIf
     EndIf
+    WinSetOnTop($WinHandle, "", 1)
 EndFunc
 
 Func SyncValues()
