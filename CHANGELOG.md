@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.2.1
+- Small change to character selection screen scrolling
+
 9.2
 - Will now remove the game client window borders if the resolution is too low to resize the game client
 

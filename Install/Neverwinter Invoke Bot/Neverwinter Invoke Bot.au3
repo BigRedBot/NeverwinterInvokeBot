@@ -232,9 +232,7 @@ Func Loop()
                     If GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
                         AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
                         If GetValue("TopScrollBarX") And GetValue("TopSelectedCharacterX") Then
-                            For $n = 1 To 4
-                                Send("{DOWN}")
-                            Next
+                            Send("{DOWN}")
                             For $n = 1 To GetValue("TotalSlots")
                                 Send("{UP}")
                                 Position(); If $RestartLoop Then Return 0
@@ -258,9 +256,7 @@ Func Loop()
                     Else
                         AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
                         If GetValue("BottomScrollBarX") And GetValue("BottomSelectedCharacterX") Then
-                            For $n = 1 To 4
-                                Send("{UP}")
-                            Next
+                            Send("{UP}")
                             For $n = 1 To GetValue("TotalSlots")
                                 Send("{DOWN}")
                                 Position(); If $RestartLoop Then Return 0
