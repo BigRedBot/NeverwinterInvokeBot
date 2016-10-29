@@ -71,6 +71,8 @@ Func CloseClient($p = "GameClient.exe"); If $RestartLoop Then Return 0
 EndFunc
 
 Func Position(); If $RestartLoop Then Return 0
+While 1
+While 1
     Focus()
     If Not $StartingKeyboardLayout And $WinHandle Then $StartingKeyboardLayout = _WinAPI_GetKeyboardLayout($WinHandle)
     If Not $WinHandle Or Not GetPosition() Then
@@ -98,80 +100,64 @@ Func Position(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         Return
     EndIf
+    $WaitingTimer = TimerInit()
     If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
-        For $i = 1 To 10
+        While 1
             If $DeskTopWidth < GetValue("GameWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameHeight") + $PaddingHeight Then
                 Local $ostyle = DllCall("user32.dll", "long", "GetWindowLong", "hwnd", $WinHandle, "int", -16)
                 DllCall("user32.dll", "long", "SetWindowLong", "hwnd", $WinHandle, "int", -16, "long", BitAND($ostyle[0], BitNOT($WS_BORDER + $WS_DLGFRAME + $WS_THICKFRAME)))
                 DllCall("user32.dll", "long", "SetWindowPos", "hwnd", $WinHandle, "hwnd", $WinHandle, "int", 0, "int", 0, "int", 0, "int", 0, "long", BitOR($SWP_NOMOVE, $SWP_NOSIZE, $SWP_NOZORDER, $SWP_FRAMECHANGED))
                 Focus()
-                If Not $WinHandle Or Not GetPosition() Then
-                    Position(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                    Return
-                EndIf
+                If Not $WinHandle Or Not GetPosition() Then ExitLoop 2
             EndIf
             WinMove($WinHandle, "", 0, 0, GetValue("GameWidth") + $PaddingWidth, GetValue("GameHeight") + $PaddingHeight)
             Focus()
-            If Not $WinHandle Or Not GetPosition() Then
-                Position(); If $RestartLoop Then Return 0
-                If $RestartLoop Then Return 0
-                Return
-            EndIf
+            If Not $WinHandle Or Not GetPosition() Then ExitLoop 2
             If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
+                TimeOut(); If $RestartLoop Then Return 0
+                If $RestartLoop Then Return 0
                 Sleep(5000)
                 Focus()
-                If Not $WinHandle Or Not GetPosition() Then
-                    Position(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                    Return
-                EndIf
+                If Not $WinHandle Or Not GetPosition() Then ExitLoop 2
             Else
                 ExitLoop
             EndIf
-        Next
+        WEnd
         If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
             Error(Localize("UnableToResize")); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
         EndIf
     ElseIf $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
-        For $i = 1 To 10
+        While 1
             If $DeskTopWidth < GetValue("GameWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameHeight") + $PaddingHeight Then
                 Local $ostyle = DllCall("user32.dll", "long", "GetWindowLong", "hwnd", $WinHandle, "int", -16)
                 DllCall("user32.dll", "long", "SetWindowLong", "hwnd", $WinHandle, "int", -16, "long", BitAND($ostyle[0], BitNOT($WS_BORDER + $WS_DLGFRAME + $WS_THICKFRAME)))
                 DllCall("user32.dll", "long", "SetWindowPos", "hwnd", $WinHandle, "hwnd", $WinHandle, "int", 0, "int", 0, "int", 0, "int", 0, "long", BitOR($SWP_NOMOVE, $SWP_NOSIZE, $SWP_NOZORDER, $SWP_FRAMECHANGED))
                 Focus()
-                If Not $WinHandle Or Not GetPosition() Then
-                    Position(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                    Return
-                EndIf
+                If Not $WinHandle Or Not GetPosition() Then ExitLoop 2
             EndIf
             WinMove($WinHandle, "", 0, 0, GetValue("GameWidth") + $PaddingWidth, GetValue("GameHeight") + $PaddingHeight)
             Focus()
-            If Not $WinHandle Or Not GetPosition() Then
-                Position(); If $RestartLoop Then Return 0
-                If $RestartLoop Then Return 0
-                Return
-            EndIf
+            If Not $WinHandle Or Not GetPosition() Then ExitLoop 2
             If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
+                TimeOut(); If $RestartLoop Then Return 0
+                If $RestartLoop Then Return 0
                 Sleep(5000)
                 Focus()
-                If Not $WinHandle Or Not GetPosition() Then
-                    Position(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                    Return
-                EndIf
+                If Not $WinHandle Or Not GetPosition() Then ExitLoop 2
             Else
                 ExitLoop
             EndIf
-        Next
+        WEnd
         If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
             Error(Localize("UnableToMove")); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
         EndIf
     EndIf
     WinSetOnTop($WinHandle, "", 1)
+Return
+WEnd
+WEnd
 EndFunc
 
 Func SyncValues()
@@ -187,205 +173,206 @@ Func SyncValues()
 EndFunc
 
 Func Loop()
-    While 1
-        While 1
-            $LoopStarted = 1
-            $RestartLoop = 0
-            AutoItSetOption("SendKeyDownDelay", $KeyDelay)
-            If CompletedAccount() Then
-                End(); If $RestartLoop Then Return 0
-                If $RestartLoop Then ExitLoop 1
-                Exit
-            EndIf
-            Position(); If $RestartLoop Then Return 0
-            If $RestartLoop Then ExitLoop 1
-            $DisableRestartCount = 0
+While 1
+While 1
+    $LoopStarted = 1
+    $RestartLoop = 0
+    AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+    If CompletedAccount() Then
+        End(); If $RestartLoop Then Return 0
+        If $RestartLoop Then ExitLoop 1
+        Exit
+    EndIf
+    Position(); If $RestartLoop Then Return 0
+    If $RestartLoop Then ExitLoop 1
+    $DisableRestartCount = 0
+    Splash()
+    $WaitingTimer = TimerInit()
+    FindLogInScreen(); If $RestartLoop Then Return 0
+    If $RestartLoop Then ExitLoop 1
+    Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
+    If ImageExists("SelectionScreen") Then
+        $WaitingTimer = TimerInit()
+        WaitForScreen("SelectionScreen"); If $RestartLoop Then Return 0
+        If $RestartLoop Then ExitLoop 1
+    EndIf
+    Position(); If $RestartLoop Then Return 0
+    If $RestartLoop Then ExitLoop 1
+    Local $Start = GetValue("CurrentCharacter")
+    For $i = $Start To GetValue("EndAt")
+        SetAccountValue("CurrentCharacter", $i)
+        DeleteAccountValue("FinishedCharacter")
+        If EndNowTime() Then
+            SetAllAccountsValue("EndNow", 1)
+            ExitLoop
+        EndIf
+        If Not GetAccountValue("InfiniteLoopsStarted") Or GetValue("EnableProfessions") Then
+            WaitToInvoke(); If $RestartLoop Then Return 0
+            If $RestartLoop Then ExitLoop 2
             Splash()
-            $WaitingTimer = TimerInit()
-            FindLogInScreen(); If $RestartLoop Then Return 0
-            If $RestartLoop Then ExitLoop 1
+            Local $LoopTimer = TimerInit()
+            Focus()
+            MouseMove(GetValue("SelectCharacterMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SelectCharacterMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+            DoubleRightClick()
+            MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
+            If GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
+                AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
+                If GetValue("TopScrollBarX") And GetValue("TopSelectedCharacterX") Then
+                    Send("{DOWN}")
+                    For $n = 1 To GetValue("TotalSlots")
+                        Send("{UP}")
+                        Position(); If $RestartLoop Then Return 0
+                        If $RestartLoop Then ExitLoop 3
+                        If FindPixels(GetValue("TopScrollBarX"), GetValue("TopScrollBarY"), GetValue("TopScrollBarC")) And FindPixels(GetValue("TopSelectedCharacterX"), GetValue("TopSelectedCharacterY"), GetValue("TopSelectedCharacterC")) Then
+                            ExitLoop
+                        EndIf
+                    Next
+                Else
+                    For $n = 1 To GetValue("TotalSlots")
+                        Send("{UP}")
+                    Next
+                EndIf
+                AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollTowardKeyDelay)
+                Sleep($CharacterSelectionScrollTowardKeyDelay)
+                For $n = 2 To GetValue("CurrentCharacter")
+                    Send("{DOWN}")
+                    Sleep(50)
+                Next
+                AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+            Else
+                AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
+                If GetValue("BottomScrollBarX") And GetValue("BottomSelectedCharacterX") Then
+                    Send("{UP}")
+                    For $n = 1 To GetValue("TotalSlots")
+                        Send("{DOWN}")
+                        Position(); If $RestartLoop Then Return 0
+                        If $RestartLoop Then ExitLoop 3
+                        If FindPixels(GetValue("BottomScrollBarX"), GetValue("BottomScrollBarY"), GetValue("BottomScrollBarC")) And FindPixels(GetValue("BottomSelectedCharacterX"), GetValue("BottomSelectedCharacterY"), GetValue("BottomSelectedCharacterC")) Then
+                            ExitLoop
+                        EndIf
+                    Next
+                Else
+                    For $n = 1 To GetValue("TotalSlots")
+                        Send("{DOWN}")
+                    Next
+                EndIf
+                AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollTowardKeyDelay)
+                Sleep($CharacterSelectionScrollTowardKeyDelay)
+                For $n = 1 To (GetValue("TotalSlots") - GetValue("CurrentCharacter"))
+                    Send("{UP}")
+                    Sleep(50)
+                Next
+                AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+            EndIf
+            Sleep(1000)
+            Send("{ENTER}")
+            If GetValue("SafeLogInX") Then
+                MouseMove(GetValue("SafeLogInX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SafeLogInY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+                DoubleClick()
+            EndIf
+            Splash("[ " & Localize("WaitingForInGameScreen") & " ]")
+            If ImageExists("ChangeCharacterButton") Then
+                $WaitingTimer = TimerInit()
+                WaitForScreen("ChangeCharacterButton"); If $RestartLoop Then Return 0
+                If $RestartLoop Then ExitLoop 2
+                Splash()
+                Sleep(GetValue("LogInDelaySeconds") * 1000)
+            Else
+                Sleep(GetValue("LogInSeconds") * 1000)
+                Splash()
+            EndIf
+            If Not GetValue("DisableOverflowXPRewardCollection") And ImageSearch("OverflowXPReward") Then
+                Send(GetValue("CursorModeKey"))
+                Sleep(500)
+                MouseMove($_ImageSearchX, $_ImageSearchY)
+                SingleClick()
+                SaveItemCount("TotalOverflowXPRewards", 1)
+                Sleep(1000)
+                ClearWindows(); If $RestartLoop Then Return 0
+                If $RestartLoop Then ExitLoop 2
+            EndIf
+            GetVIPAccountReward(); If $RestartLoop Then Return 0
+            If $RestartLoop Then ExitLoop 2
+            If Not GetAccountValue("InfiniteLoopsStarted") Then
+                $WaitingTimer = TimerInit()
+                $CofferTries = 0
+                $FailedInvoke = 1
+                Invoke(); If $RestartLoop Then Return 0
+                If $RestartLoop Then ExitLoop 2
+                SetCharacterInfo("CharacterTime", TimerInit())
+                SetCharacterInfo("CharacterLoop", GetValue("CurrentLoop"))
+                SetAccountValue("FinishedCharacter", 1)
+                If GetValue("CurrentCharacter") >= GetValue("EndAt") Then
+                    SetAccountValue("FinishedLoop", 1)
+                    If GetValue("CurrentLoop") >= GetValue("EndAtLoop") Then SetAccountValue("CompletedAccountInvokes", 1)
+                EndIf
+                If $FailedInvoke Then
+                    AddAccountCountValue("FailedInvoke")
+                    AddCharacterCountInfo("FailedInvoke")
+                EndIf
+                If GetValue("OpenBagsOnEveryLoop") Or GetValue("CurrentLoop") = GetValue("StartAtLoop") Then
+                    OpenInventoryBags("CelestialBagOfRefining"); If $RestartLoop Then Return 0
+                    If $RestartLoop Then ExitLoop 2
+                EndIf
+            EndIf
+            RunProfessions()
+            If $RestartLoop Then ExitLoop 2
+            If GetAccountValue("InfiniteLoopsStarted") Then
+                SetCharacterInfo("CharacterTime", TimerInit())
+                SetCharacterInfo("CharacterLoop", GetValue("CurrentLoop"))
+                SetAccountValue("FinishedCharacter", 1)
+                If GetValue("CurrentCharacter") >= GetValue("EndAt") Then SetAccountValue("FinishedLoop", 1)
+            EndIf
+            ChangeCharacter(); If $RestartLoop Then Return 0
+            If $RestartLoop Then ExitLoop 2
+            $TimeOutRetries = 0
+            Local $LogOutTimer = TimerInit()
+            Local $RemainingCharacters = GetValue("EndAt") - GetValue("CurrentCharacter")
             Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
             If ImageExists("SelectionScreen") Then
                 $WaitingTimer = TimerInit()
                 WaitForScreen("SelectionScreen"); If $RestartLoop Then Return 0
-                If $RestartLoop Then ExitLoop 1
+                If $RestartLoop Then ExitLoop 2
+                Splash()
+            Else
+                Sleep(GetValue("LogOutSeconds") * 1000)
+                Splash()
             EndIf
-            Position(); If $RestartLoop Then Return 0
-            If $RestartLoop Then ExitLoop 1
-            Local $Start = GetValue("CurrentCharacter")
-            For $i = $Start To GetValue("EndAt")
-                SetAccountValue("CurrentCharacter", $i)
-                DeleteAccountValue("FinishedCharacter")
-                If EndNowTime() Then
-                    SetAllAccountsValue("EndNow", 1)
-                    ExitLoop
+            If GetValue("FinishedLoop") Or CompletedAccount() Then
+                ExitLoop
+            Else
+                Local $AdditionalKeyPressTime = 0, $AddKeyPressTime = 0, $RemoveKeyPressTime = 0
+                If GetValue("TopScrollBarX") And GetValue("TopSelectedCharacterX") Then
+                    $AddKeyPressTime = $KeyDelay
                 EndIf
-                If Not GetAccountValue("InfiniteLoopsStarted") Or GetValue("EnableProfessions") Then
-                    WaitToInvoke(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then ExitLoop 2
-                    Splash()
-                    Local $LoopTimer = TimerInit()
-                    Focus()
-                    MouseMove(GetValue("SelectCharacterMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SelectCharacterMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
-                    DoubleRightClick()
-                    MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
-                    If GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
-                        AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
-                        If GetValue("TopScrollBarX") And GetValue("TopSelectedCharacterX") Then
-                            Send("{DOWN}")
-                            For $n = 1 To GetValue("TotalSlots")
-                                Send("{UP}")
-                                Position(); If $RestartLoop Then Return 0
-                                If $RestartLoop Then ExitLoop 3
-                                If FindPixels(GetValue("TopScrollBarX"), GetValue("TopScrollBarY"), GetValue("TopScrollBarC")) And FindPixels(GetValue("TopSelectedCharacterX"), GetValue("TopSelectedCharacterY"), GetValue("TopSelectedCharacterC")) Then
-                                    ExitLoop
-                                EndIf
-                            Next
-                        Else
-                            For $n = 1 To GetValue("TotalSlots")
-                                Send("{UP}")
-                            Next
-                        EndIf
-                        AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollTowardKeyDelay)
-                        Sleep($CharacterSelectionScrollTowardKeyDelay)
-                        For $n = 2 To GetValue("CurrentCharacter")
-                            Send("{DOWN}")
-                            Sleep(50)
-                        Next
-                        AutoItSetOption("SendKeyDownDelay", $KeyDelay)
-                    Else
-                        AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
-                        If GetValue("BottomScrollBarX") And GetValue("BottomSelectedCharacterX") Then
-                            Send("{UP}")
-                            For $n = 1 To GetValue("TotalSlots")
-                                Send("{DOWN}")
-                                Position(); If $RestartLoop Then Return 0
-                                If $RestartLoop Then ExitLoop 3
-                                If FindPixels(GetValue("BottomScrollBarX"), GetValue("BottomScrollBarY"), GetValue("BottomScrollBarC")) And FindPixels(GetValue("BottomSelectedCharacterX"), GetValue("BottomSelectedCharacterY"), GetValue("BottomSelectedCharacterC")) Then
-                                    ExitLoop
-                                EndIf
-                            Next
-                        Else
-                            For $n = 1 To GetValue("TotalSlots")
-                                Send("{DOWN}")
-                            Next
-                        EndIf
-                        AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollTowardKeyDelay)
-                        Sleep($CharacterSelectionScrollTowardKeyDelay)
-                        For $n = 1 To (GetValue("TotalSlots") - GetValue("CurrentCharacter"))
-                            Send("{UP}")
-                            Sleep(50)
-                        Next
-                        AutoItSetOption("SendKeyDownDelay", $KeyDelay)
-                    EndIf
-                    Sleep(1000)
-                    Send("{ENTER}")
-                    If GetValue("SafeLogInX") Then
-                        MouseMove(GetValue("SafeLogInX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SafeLogInY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
-                        DoubleClick()
-                    EndIf
-                    Splash("[ " & Localize("WaitingForInGameScreen") & " ]")
-                    If ImageExists("ChangeCharacterButton") Then
-                        $WaitingTimer = TimerInit()
-                        WaitForScreen("ChangeCharacterButton"); If $RestartLoop Then Return 0
-                        If $RestartLoop Then ExitLoop 2
-                        Splash()
-                        Sleep(GetValue("LogInDelaySeconds") * 1000)
-                    Else
-                        Sleep(GetValue("LogInSeconds") * 1000)
-                        Splash()
-                    EndIf
-                    If Not GetValue("DisableOverflowXPRewardCollection") And ImageSearch("OverflowXPReward") Then
-                        Send(GetValue("CursorModeKey"))
-                        Sleep(500)
-                        MouseMove($_ImageSearchX, $_ImageSearchY)
-                        SingleClick()
-                        SaveItemCount("TotalOverflowXPRewards", 1)
-                        Sleep(1000)
-                        ClearWindows(); If $RestartLoop Then Return 0
-                        If $RestartLoop Then ExitLoop 2
-                    EndIf
-                    GetVIPAccountReward(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then ExitLoop 2
-                    If Not GetAccountValue("InfiniteLoopsStarted") Then
-                        $WaitingTimer = TimerInit()
-                        $CofferTries = 0
-                        $FailedInvoke = 1
-                        Invoke(); If $RestartLoop Then Return 0
-                        If $RestartLoop Then ExitLoop 2
-                        SetCharacterInfo("CharacterTime", TimerInit())
-                        SetCharacterInfo("CharacterLoop", GetValue("CurrentLoop"))
-                        SetAccountValue("FinishedCharacter", 1)
-                        If GetValue("CurrentCharacter") >= GetValue("EndAt") Then
-                            SetAccountValue("FinishedLoop", 1)
-                            If GetValue("CurrentLoop") >= GetValue("EndAtLoop") Then SetAccountValue("CompletedAccountInvokes", 1)
-                        EndIf
-                        If $FailedInvoke Then
-                            AddAccountCountValue("FailedInvoke")
-                            AddCharacterCountInfo("FailedInvoke")
-                        EndIf
-                        If GetValue("OpenBagsOnEveryLoop") Or GetValue("CurrentLoop") = GetValue("StartAtLoop") Then
-                            OpenInventoryBags("CelestialBagOfRefining"); If $RestartLoop Then Return 0
-                            If $RestartLoop Then ExitLoop 2
-                        EndIf
-                    EndIf
-                    RunProfessions()
-                    If $RestartLoop Then ExitLoop 2
-                    If GetAccountValue("InfiniteLoopsStarted") Then
-                        SetCharacterInfo("CharacterTime", TimerInit())
-                        SetCharacterInfo("CharacterLoop", GetValue("CurrentLoop"))
-                        SetAccountValue("FinishedCharacter", 1)
-                        If GetValue("CurrentCharacter") >= GetValue("EndAt") Then SetAccountValue("FinishedLoop", 1)
-                    EndIf
-                    ChangeCharacter(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then ExitLoop 2
-                    $TimeOutRetries = 0
-                    Local $LogOutTimer = TimerInit()
-                    Local $RemainingCharacters = GetValue("EndAt") - GetValue("CurrentCharacter")
-                    Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
-                    If ImageExists("SelectionScreen") Then
-                        $WaitingTimer = TimerInit()
-                        WaitForScreen("SelectionScreen"); If $RestartLoop Then Return 0
-                        If $RestartLoop Then ExitLoop 2
-                        Splash()
-                    Else
-                        Sleep(GetValue("LogOutSeconds") * 1000)
-                        Splash()
-                    EndIf
-                    If GetValue("FinishedLoop") Or CompletedAccount() Then
-                        ExitLoop
-                    Else
-                        Local $AdditionalKeyPressTime = 0, $AddKeyPressTime = 0, $RemoveKeyPressTime = 0
-                        If GetValue("TopScrollBarX") And GetValue("TopSelectedCharacterX") Then
-                            $AddKeyPressTime = $KeyDelay
-                        EndIf
-                        If GetValue("BottomScrollBarX") And GetValue("BottomSelectedCharacterX") Then
-                            $RemoveKeyPressTime = $KeyDelay
-                        EndIf
-                        For $n = 1 To $RemainingCharacters
-                            If GetValue("CurrentCharacter") + $n <= Ceiling(GetValue("TotalSlots") / 2) Then
-                                $AdditionalKeyPressTime += $n * ($KeyDelay + 50) + $AddKeyPressTime
-                            ElseIf GetValue("CurrentCharacter") <= Floor(GetValue("TotalSlots") / 2) + 1 Then
-                                $AdditionalKeyPressTime -= (GetValue("CurrentCharacter") + $n - Floor(GetValue("TotalSlots") / 2) + 1) * ($KeyDelay + 50)
-                            Else
-                                $AdditionalKeyPressTime -= $n * ($KeyDelay + 50) + $RemoveKeyPressTime
-                            EndIf
-                        Next
-                        Local $LastTime = TimerDiff($LoopTimer)
-                        Local $RemainingSeconds = ( $RemainingCharacters * $LastTime + $AdditionalKeyPressTime - TimerDiff($LogOutTimer) ) / 1000
-                        Local $LastTook = "LastInvokeTook"
-                        If GetAccountValue("InfiniteLoopsStarted") Then $LastTook = "LastProfessionsTook"
-                        $ETAText = Localize($LastTook, "<SECONDS>", Round($LastTime / 1000, 2)) & @CRLF & Localize("ETAForCurrentLoop", "<MINUTES>", HoursAndMinutes($RemainingSeconds / 60))
-                    EndIf
-                ElseIf GetValue("CurrentCharacter") >= GetValue("EndAt") Then
-                    SetAccountValue("FinishedLoop", 1)
+                If GetValue("BottomScrollBarX") And GetValue("BottomSelectedCharacterX") Then
+                    $RemoveKeyPressTime = $KeyDelay
                 EndIf
-            Next
-            End(); If $RestartLoop Then Return 0
-            If $RestartLoop Then ExitLoop 1
-            Exit
-        WEnd
-    WEnd
+                For $n = 1 To $RemainingCharacters
+                    If GetValue("CurrentCharacter") + $n <= Ceiling(GetValue("TotalSlots") / 2) Then
+                        $AdditionalKeyPressTime += $n * ($KeyDelay + 50) + $AddKeyPressTime
+                    ElseIf GetValue("CurrentCharacter") <= Floor(GetValue("TotalSlots") / 2) + 1 Then
+                        $AdditionalKeyPressTime -= (GetValue("CurrentCharacter") + $n - Floor(GetValue("TotalSlots") / 2) + 1) * ($KeyDelay + 50)
+                    Else
+                        $AdditionalKeyPressTime -= $n * ($KeyDelay + 50) + $RemoveKeyPressTime
+                    EndIf
+                Next
+                Local $LastTime = TimerDiff($LoopTimer)
+                Local $RemainingSeconds = ( $RemainingCharacters * $LastTime + $AdditionalKeyPressTime - TimerDiff($LogOutTimer) ) / 1000
+                Local $LastTook = "LastInvokeTook"
+                If GetAccountValue("InfiniteLoopsStarted") Then $LastTook = "LastProfessionsTook"
+                $ETAText = Localize($LastTook, "<SECONDS>", Round($LastTime / 1000, 2)) & @CRLF & Localize("ETAForCurrentLoop", "<MINUTES>", HoursAndMinutes($RemainingSeconds / 60))
+            EndIf
+        ElseIf GetValue("CurrentCharacter") >= GetValue("EndAt") Then
+            SetAccountValue("FinishedLoop", 1)
+        EndIf
+    Next
+    End(); If $RestartLoop Then Return 0
+    If $RestartLoop Then ExitLoop 1
+    Exit
+Return
+WEnd
+WEnd
 EndFunc
 
 Func StartLoop(); If $RestartLoop Then Return 0
@@ -565,52 +552,52 @@ EndFunc
 
 Func GetVIPAccountReward(); If $RestartLoop Then Return 0
     Local $tried = 0
-    While 1
-        While 1
-            If Not GetValue("SkipVIPAccountReward") And Not GetValue("CollectedVIPAccountReward") And GetValue("LastVIPAccountRewardTryLoop") < GetValue("CurrentLoop") And ( GetValue("VIPAccountRewardCharacter") < GetValue("StartAt") Or GetValue("VIPAccountRewardCharacter") > GetValue("EndAt") Or GetValue("VIPAccountRewardCharacter") = GetValue("CurrentCharacter") ) And ImageExists("VIPAccountReward") Then
-                If GetValue("VIPAccountRewardTries") < 3 Then
-                    $tried = 1
-                    AddAccountCountValue("VIPAccountRewardTries")
-                    Send(GetValue("InventoryKey"))
+While 1
+While 1
+    If Not GetValue("SkipVIPAccountReward") And Not GetValue("CollectedVIPAccountReward") And GetValue("LastVIPAccountRewardTryLoop") < GetValue("CurrentLoop") And ( GetValue("VIPAccountRewardCharacter") < GetValue("StartAt") Or GetValue("VIPAccountRewardCharacter") > GetValue("EndAt") Or GetValue("VIPAccountRewardCharacter") = GetValue("CurrentCharacter") ) And ImageExists("VIPAccountReward") Then
+        If GetValue("VIPAccountRewardTries") < 3 Then
+            $tried = 1
+            AddAccountCountValue("VIPAccountRewardTries")
+            Send(GetValue("InventoryKey"))
+            Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
+            If ImageSearch("VIPAccountReward", -1) Then
+                Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom
+                If ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-50) Then
+                    $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonLeftOffset"), $_ImageSearchRight + GetValue("VIPAccountRewardButtonRightOffset"), 1)
+                    $_ImageSearchY = Random($_ImageSearchTop + GetValue("VIPAccountRewardButtonTopOffset"), $_ImageSearchTop + GetValue("VIPAccountRewardButtonBottomOffset"), 1)
+                    MouseMove($_ImageSearchX, $_ImageSearchY)
+                    SingleClick()
                     Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
-                    If ImageSearch("VIPAccountReward", -1) Then
-                        Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom
-                        If ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-50) Then
-                            $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonLeftOffset"), $_ImageSearchRight + GetValue("VIPAccountRewardButtonRightOffset"), 1)
-                            $_ImageSearchY = Random($_ImageSearchTop + GetValue("VIPAccountRewardButtonTopOffset"), $_ImageSearchTop + GetValue("VIPAccountRewardButtonBottomOffset"), 1)
-                            MouseMove($_ImageSearchX, $_ImageSearchY)
-                            SingleClick()
-                            Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
-                            If Not ImageSearch("VIPAccountReward", -1, $left, $top, $right, $bottom) Then
-                                SaveItemCount("TotalVIPAccountRewards", 1)
-                                SetAccountValue("CollectedVIPAccountReward", 1)
-                            ElseIf ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-50) Then
-                                $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonLeftOffset"), $_ImageSearchRight + GetValue("VIPAccountRewardButtonRightOffset"), 1)
-                                $_ImageSearchY = Random($_ImageSearchTop + GetValue("VIPAccountRewardButtonTopOffset"), $_ImageSearchTop + GetValue("VIPAccountRewardButtonBottomOffset"), 1)
-                                MouseMove($_ImageSearchX, $_ImageSearchY)
-                                SingleClick()
-                                Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
-                                If Not ImageSearch("VIPAccountReward", -1, $left, $top, $right, $bottom) Then
-                                    SaveItemCount("TotalVIPAccountRewards", 1)
-                                    SetAccountValue("CollectedVIPAccountReward", 1)
-                                EndIf
-                            EndIf
+                    If Not ImageSearch("VIPAccountReward", -1, $left, $top, $right, $bottom) Then
+                        SaveItemCount("TotalVIPAccountRewards", 1)
+                        SetAccountValue("CollectedVIPAccountReward", 1)
+                    ElseIf ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-50) Then
+                        $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonLeftOffset"), $_ImageSearchRight + GetValue("VIPAccountRewardButtonRightOffset"), 1)
+                        $_ImageSearchY = Random($_ImageSearchTop + GetValue("VIPAccountRewardButtonTopOffset"), $_ImageSearchTop + GetValue("VIPAccountRewardButtonBottomOffset"), 1)
+                        MouseMove($_ImageSearchX, $_ImageSearchY)
+                        SingleClick()
+                        Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
+                        If Not ImageSearch("VIPAccountReward", -1, $left, $top, $right, $bottom) Then
+                            SaveItemCount("TotalVIPAccountRewards", 1)
+                            SetAccountValue("CollectedVIPAccountReward", 1)
                         EndIf
-                    Else
-                        ExitLoop
                     EndIf
                 EndIf
-                DeleteAccountValue("VIPAccountRewardTries")
-                SetAccountValue("TriedVIPAccountReward", 1)
-                SetAccountValue("LastVIPAccountRewardTryLoop", GetValue("CurrentLoop"))
+            Else
+                ExitLoop
             EndIf
-            If $tried Then
-                OpenInventoryBags("VIPAccountRewards"); If $RestartLoop Then Return 0
-                If $RestartLoop Then Return 0
-            EndIf
-            Return
-        WEnd
-    WEnd
+        EndIf
+        DeleteAccountValue("VIPAccountRewardTries")
+        SetAccountValue("TriedVIPAccountReward", 1)
+        SetAccountValue("LastVIPAccountRewardTryLoop", GetValue("CurrentLoop"))
+    EndIf
+    If $tried Then
+        OpenInventoryBags("VIPAccountRewards"); If $RestartLoop Then Return 0
+        If $RestartLoop Then Return 0
+    EndIf
+Return
+WEnd
+WEnd
 EndFunc
 
 Func OpenInventoryBags($bag); If $RestartLoop Then Return 0
@@ -743,51 +730,51 @@ Global $ChangingCharacter = 1
 Func ChangeCharacter(); If $RestartLoop Then Return 0
     $WaitingTimer = TimerInit()
     $ChangingCharacter = 1
-    While 1
-        While 1
-            WaitForChangeCharacterButton(); If $RestartLoop Then Return 0
-            If $RestartLoop Then Return 0
-            If ImageExists("ChangeCharacterButton") Then
-                MouseMove($_ImageSearchX, $_ImageSearchY)
-                DoubleClick()
-            Else
-                For $n = 1 To 3
-                    Send("{DOWN}")
-                    Sleep($KeyDelay)
-                Next
-                Sleep(500)
-                Send("{ENTER}")
-            EndIf
+While 1
+While 1
+    WaitForChangeCharacterButton(); If $RestartLoop Then Return 0
+    If $RestartLoop Then Return 0
+    If ImageExists("ChangeCharacterButton") Then
+        MouseMove($_ImageSearchX, $_ImageSearchY)
+        DoubleClick()
+    Else
+        For $n = 1 To 3
+            Send("{DOWN}")
+            Sleep($KeyDelay)
+        Next
+        Sleep(500)
+        Send("{ENTER}")
+    EndIf
+    Sleep(500)
+    If ImageExists("OK") And Not ImageSearch("OK") Then
+        Send("{ESC}")
+        Sleep(500)
+        Send("{ESC}")
+        Sleep(1500)
+        If ImageSearch("ChangeCharacterButton") Then
+            Send("{ESC}")
             Sleep(500)
-            If ImageExists("OK") And Not ImageSearch("OK") Then
-                Send("{ESC}")
-                Sleep(500)
-                Send("{ESC}")
-                Sleep(1500)
-                If ImageSearch("ChangeCharacterButton") Then
-                    Send("{ESC}")
-                    Sleep(500)
-                EndIf
-                ExitLoop
-            EndIf
-            For $n = 1 To 4
-                Send("{ENTER}")
-                Sleep(500)
-            Next
-            If ImageSearch("OK") Then
-                Send("{ESC}")
-                Sleep(500)
-                Send("{ESC}")
-                Sleep(1500)
-                If ImageSearch("ChangeCharacterButton") Then
-                    Send("{ESC}")
-                    Sleep(500)
-                EndIf
-                ExitLoop
-            EndIf
-            Return
-        WEnd
-    WEnd
+        EndIf
+        ExitLoop
+    EndIf
+    For $n = 1 To 4
+        Send("{ENTER}")
+        Sleep(500)
+    Next
+    If ImageSearch("OK") Then
+        Send("{ESC}")
+        Sleep(500)
+        Send("{ESC}")
+        Sleep(1500)
+        If ImageSearch("ChangeCharacterButton") Then
+            Send("{ESC}")
+            Sleep(500)
+        EndIf
+        ExitLoop
+    EndIf
+Return
+WEnd
+WEnd
 EndFunc
 
 Func DoubleClick()
@@ -984,65 +971,64 @@ Func FindLogInScreen(); If $RestartLoop Then Return 0
         DoubleClick()
         Sleep(1000)
     EndIf
-    If ImageSearch("LogInScreen") Then
-        While 1
-            While 1
-                $DoRelogCount = 1
-                $LoggingIn = 1
-                $DoLogInCommands = 1
-                $ChangingCharacter = 1
-                If $LastLoginTry And TimerDiff($LastLoginTry) / 1000 >= 60 Then
+    If Not ImageSearch("LogInScreen") Then Return
+While 1
+While 1
+    $DoRelogCount = 1
+    $LoggingIn = 1
+    $DoLogInCommands = 1
+    $ChangingCharacter = 1
+    If $LastLoginTry And TimerDiff($LastLoginTry) / 1000 >= 60 Then
+        $LogInTries = 0
+        $LastLoginTry = 0
+        Position(); If $RestartLoop Then Return 0
+        If $RestartLoop Then Return 0
+        WaitMinutes(15, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
+        If $RestartLoop Then Return 0
+    Else
+        Splash()
+        Sleep(1000)
+        LogIn(); If $RestartLoop Then Return 0
+        If $RestartLoop Then Return 0
+        Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
+        Sleep(1000)
+        If ImageExists("SelectionScreen") Then
+            While Not ImageSearch("SelectionScreen")
+                If ImageSearch("ChangeCharacterButton") Then
+                    Splash()
+                    ChangeCharacter(); If $RestartLoop Then Return 0
+                    If $RestartLoop Then Return 0
+                    Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
+                    While Not ImageSearch("SelectionScreen")
+                        TimeOut(); If $RestartLoop Then Return 0
+                        If $RestartLoop Then Return 0
+                        If ImageSearch("LogInScreen") Then ExitLoop 3
+                        Sleep(500)
+                    WEnd
+                    ExitLoop
+                ElseIf ImageSearch("Unavailable") Or ImageSearch("TryAgainLater") Then
                     $LogInTries = 0
-                    $LastLoginTry = 0
                     Position(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
                     WaitMinutes(15, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
-                Else
-                    Splash()
-                    Sleep(1000)
-                    LogIn(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                    Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
-                    Sleep(1000)
-                    If ImageExists("SelectionScreen") Then
-                        While Not ImageSearch("SelectionScreen")
-                            If ImageSearch("ChangeCharacterButton") Then
-                                Splash()
-                                ChangeCharacter(); If $RestartLoop Then Return 0
-                                If $RestartLoop Then Return 0
-                                Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
-                                While Not ImageSearch("SelectionScreen")
-                                    TimeOut(); If $RestartLoop Then Return 0
-                                    If $RestartLoop Then Return 0
-                                    If ImageSearch("LogInScreen") Then ExitLoop 3
-                                    Sleep(500)
-                                WEnd
-                                ExitLoop
-                            ElseIf ImageSearch("Unavailable") Or ImageSearch("TryAgainLater") Then
-                                $LogInTries = 0
-                                Position(); If $RestartLoop Then Return 0
-                                If $RestartLoop Then Return 0
-                                WaitMinutes(15, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
-                                If $RestartLoop Then Return 0
-                                ExitLoop
-                            ElseIf ImageSearch("Mismatch") And PatchClient() Then; If $RestartLoop Then Return 0
-                                ExitLoop
-                            EndIf
-                            If $RestartLoop Then Return 0
-                            TimeOut(); If $RestartLoop Then Return 0
-                            If $RestartLoop Then Return 0
-                            If ImageSearch("LogInScreen") Then ExitLoop 2
-                            If Not $DoLogInCommands Then Sleep(500)
-                        WEnd
-                    EndIf
+                    ExitLoop
+                ElseIf ImageSearch("Mismatch") And PatchClient() Then; If $RestartLoop Then Return 0
+                    ExitLoop
                 EndIf
-                StartLoop(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
+                TimeOut(); If $RestartLoop Then Return 0
+                If $RestartLoop Then Return 0
+                If ImageSearch("LogInScreen") Then ExitLoop 2
+                If Not $DoLogInCommands Then Sleep(500)
             WEnd
-        WEnd
+        EndIf
     EndIf
-    Return
+    StartLoop(); If $RestartLoop Then Return 0
+    If $RestartLoop Then Return 0
+Return
+WEnd
+WEnd
 EndFunc
 
 Func GetLogInServerAddressString()
@@ -1078,129 +1064,129 @@ Func CheckServer()
 EndFunc
 
 Func StartClient(); If $RestartLoop Then Return 0
-    While 1
-        While 1
-            CheckServer()
-            Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
-            $DisableRelogCount = 1
-            $DisableRestartCount = 1
-            $LogInTries = 0
-            $ETAText = ""
-            CloseClient(); If $RestartLoop Then Return 0
-            If $RestartLoop Then Return 0
-            If $GameClientLauncherInstallLocation And FileExists($GameClientLauncherInstallLocation & "\Neverwinter.exe") Then
-                CloseClient("Neverwinter.exe"); If $RestartLoop Then Return 0
-                If $RestartLoop Then Return 0
-                If Not Number(RegRead("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch")) Then $NoAutoLaunch = 1
-                If $NoAutoLaunch Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 1)
-                FileChangeDir($GameClientLauncherInstallLocation)
-                Run("Neverwinter.exe", $GameClientLauncherInstallLocation)
-                FileChangeDir(@ScriptDir)
-                While Not ProcessExists("Neverwinter.exe")
-                    Sleep(1000)
-                WEnd
-                $WaitingTimer = TimerInit()
-                While 1
-                    TimeOut(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                    If Focus("Neverwinter.exe", "#32770") And GetPosition() And ImageSearch("LauncherLogin") Then ExitLoop
-                    Sleep(1000)
-                WEnd
-                Splash()
-                Sleep(1000)
-                CheckServer()
-                AutoItSetOption("SendKeyDownDelay", 15)
-                Send("+{TAB}")
-                Sleep(500)
-                Send("{BS}")
-                Sleep(500)
-                AutoItSetOption("SendKeyDownDelay", 15)
-                Send(_SendUnicodeReturn(GetValue("LogInUserName")))
-                Sleep(500)
-                AutoItSetOption("SendKeyDownDelay", $KeyDelay)
-                Send("{TAB}")
-                Sleep(500)
-                AutoItSetOption("SendKeyDownDelay", 15)
-                Send(_SendUnicodeReturn(GetValue("LogInPassword")))
-                Sleep(500)
-                AutoItSetOption("SendKeyDownDelay", $KeyDelay)
-                Send("{ENTER}")
-                Focus("Neverwinter.exe", "#32770")
-                GetPosition()
-                $WaitingTimer = TimerInit()
-                While Not ImageSearch("LauncherPatching")
-                    TimeOut(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                    If ImageSearch("LauncherLogin") Then
-                        WaitMinutes(15, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
-                        If $RestartLoop Then Return 0
-                        ExitLoop 2
-                    EndIf
-                    FindWindow("Neverwinter.exe", "#32770", GetValue("VerifyFilesWindowTitle"))
-                    If $WinHandle Then
-                        If GetValue("SkipVerifyFiles") Then
-                            ControlClick($WinHandle, "", "[CLASS:Button; INSTANCE:2]")
-                        Else
-                            ControlClick($WinHandle, "", "[CLASS:Button; INSTANCE:1]")
-                        EndIf
-                    EndIf
-                    Sleep(1000)
-                    Focus("Neverwinter.exe", "#32770")
-                    If Not GetPosition() Then ExitLoop 2
-                WEnd
-                Splash("[ " & Localize("PatchingGame") & " ]", 0)
-                Focus()
-                Local $set = 1
-                While Not $WinHandle
-                    If Not ProcessExists("Neverwinter.exe") Or ( Focus("Neverwinter.exe", "#32770") And GetPosition() And Not ImageSearch("LauncherPatching") ) Then
-                        If $set Then
-                            $set = 0
-                            $WaitingTimer = TimerInit()
-                            Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
-                        EndIf
-                        TimeOut(); If $RestartLoop Then Return 0
-                        If $RestartLoop Then Return 0
-                    EndIf
-                    Focus()
-                    Sleep(1000)
-                WEnd
-                Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
-                Reset()
-                If Not $DisableRestartCount Then $Restarted += 1
-                $WaitingTimer = TimerInit()
-                While Not ( ImageSearch("SelectionScreen") Or ImageSearch("LogInScreen") )
-                    Sleep(500)
-                    TimeOut(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                    Position(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                WEnd
-            Else
-                FileChangeDir($GameClientInstallLocation & "\Neverwinter\Live")
-                Run("GameClient.exe" & GetLogInServerAddressString(), $GameClientInstallLocation & "\Neverwinter\Live")
-                FileChangeDir(@ScriptDir)
-                Sleep(1000)
-                Focus()
-                $WaitingTimer = TimerInit()
-                While Not $WinHandle
-                    TimeOut(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                    Focus()
-                    Sleep(1000)
-                WEnd
-                If Not $DisableRestartCount Then $Restarted += 1
-                $WaitingTimer = TimerInit()
-                While Not ImageSearch("LogInScreen")
-                    Sleep(500)
-                    TimeOut(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                    Position(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                WEnd
-            EndIf
-            Return
+While 1
+While 1
+    CheckServer()
+    Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
+    $DisableRelogCount = 1
+    $DisableRestartCount = 1
+    $LogInTries = 0
+    $ETAText = ""
+    CloseClient(); If $RestartLoop Then Return 0
+    If $RestartLoop Then Return 0
+    If $GameClientLauncherInstallLocation And FileExists($GameClientLauncherInstallLocation & "\Neverwinter.exe") Then
+        CloseClient("Neverwinter.exe"); If $RestartLoop Then Return 0
+        If $RestartLoop Then Return 0
+        If Not Number(RegRead("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch")) Then $NoAutoLaunch = 1
+        If $NoAutoLaunch Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 1)
+        FileChangeDir($GameClientLauncherInstallLocation)
+        Run("Neverwinter.exe", $GameClientLauncherInstallLocation)
+        FileChangeDir(@ScriptDir)
+        While Not ProcessExists("Neverwinter.exe")
+            Sleep(1000)
         WEnd
-    WEnd
+        $WaitingTimer = TimerInit()
+        While 1
+            TimeOut(); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
+            If Focus("Neverwinter.exe", "#32770") And GetPosition() And ImageSearch("LauncherLogin") Then ExitLoop
+            Sleep(1000)
+        WEnd
+        Splash()
+        Sleep(1000)
+        CheckServer()
+        AutoItSetOption("SendKeyDownDelay", 15)
+        Send("+{TAB}")
+        Sleep(500)
+        Send("{BS}")
+        Sleep(500)
+        AutoItSetOption("SendKeyDownDelay", 15)
+        Send(_SendUnicodeReturn(GetValue("LogInUserName")))
+        Sleep(500)
+        AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+        Send("{TAB}")
+        Sleep(500)
+        AutoItSetOption("SendKeyDownDelay", 15)
+        Send(_SendUnicodeReturn(GetValue("LogInPassword")))
+        Sleep(500)
+        AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+        Send("{ENTER}")
+        Focus("Neverwinter.exe", "#32770")
+        GetPosition()
+        $WaitingTimer = TimerInit()
+        While Not ImageSearch("LauncherPatching")
+            TimeOut(); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
+            If ImageSearch("LauncherLogin") Then
+                WaitMinutes(15, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
+                If $RestartLoop Then Return 0
+                ExitLoop 2
+            EndIf
+            FindWindow("Neverwinter.exe", "#32770", GetValue("VerifyFilesWindowTitle"))
+            If $WinHandle Then
+                If GetValue("SkipVerifyFiles") Then
+                    ControlClick($WinHandle, "", "[CLASS:Button; INSTANCE:2]")
+                Else
+                    ControlClick($WinHandle, "", "[CLASS:Button; INSTANCE:1]")
+                EndIf
+            EndIf
+            Sleep(1000)
+            Focus("Neverwinter.exe", "#32770")
+            If Not GetPosition() Then ExitLoop 2
+        WEnd
+        Splash("[ " & Localize("PatchingGame") & " ]", 0)
+        Focus()
+        Local $set = 1
+        While Not $WinHandle
+            If Not ProcessExists("Neverwinter.exe") Or ( Focus("Neverwinter.exe", "#32770") And GetPosition() And Not ImageSearch("LauncherPatching") ) Then
+                If $set Then
+                    $set = 0
+                    $WaitingTimer = TimerInit()
+                    Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
+                EndIf
+                TimeOut(); If $RestartLoop Then Return 0
+                If $RestartLoop Then Return 0
+            EndIf
+            Focus()
+            Sleep(1000)
+        WEnd
+        Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
+        Reset()
+        If Not $DisableRestartCount Then $Restarted += 1
+        $WaitingTimer = TimerInit()
+        While Not ( ImageSearch("SelectionScreen") Or ImageSearch("LogInScreen") )
+            Sleep(500)
+            TimeOut(); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
+            Position(); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
+        WEnd
+    Else
+        FileChangeDir($GameClientInstallLocation & "\Neverwinter\Live")
+        Run("GameClient.exe" & GetLogInServerAddressString(), $GameClientInstallLocation & "\Neverwinter\Live")
+        FileChangeDir(@ScriptDir)
+        Sleep(1000)
+        Focus()
+        $WaitingTimer = TimerInit()
+        While Not $WinHandle
+            TimeOut(); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
+            Focus()
+            Sleep(1000)
+        WEnd
+        If Not $DisableRestartCount Then $Restarted += 1
+        $WaitingTimer = TimerInit()
+        While Not ImageSearch("LogInScreen")
+            Sleep(500)
+            TimeOut(); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
+            Position(); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
+        WEnd
+    EndIf
+Return
+WEnd
+WEnd
 EndFunc
 
 Func PatchClient(); If $RestartLoop Then Return 0

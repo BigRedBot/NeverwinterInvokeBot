@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.2.2
+- Will now try to resize the game client until it times out
+
 9.2.1
 - Small change to character selection screen scrolling
 
