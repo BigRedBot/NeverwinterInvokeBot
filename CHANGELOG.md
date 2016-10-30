@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.2.4
+- Changed limit for how many times it will try to open another inventory bag per character from 40 to 10
+
 9.2.3
 - Will now limit how many times it will try to open another inventory bag per character to 40
 

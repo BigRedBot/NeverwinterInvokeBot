@@ -619,7 +619,7 @@ Func OpenInventoryBags($bag); If $RestartLoop Then Return 0
         DoubleClick()
         Sleep(GetValue("OpenInventoryBagDelay") * 1000)
         MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
-        For $i = 1 To 40
+        For $i = 1 To 10
             If Not ImageSearch("OpenAnother") Then ExitLoop
             MouseMove($_ImageSearchX, $_ImageSearchY)
             SingleClick()
