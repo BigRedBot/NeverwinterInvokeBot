@@ -17,7 +17,7 @@ Func ScreenDetection_Position()
         $text = Localize("NeverwinterNotFound")
         Return 0
     EndIf
-    $text = "GameWidth=" & $ClientWidth & " GameHeight=" & $ClientHeight
+    $text = "GameClientWidth=" & $ClientWidth & " GameClientHeight=" & $ClientHeight
     Return 1
 EndFunc
 
@@ -45,7 +45,7 @@ Func ScreenDetection_FindPixels($x, $y, $c, $t = 5)
     Return 1
 EndFunc
 
-Func ScreenDetection_ImageSearch($image, $resultPosition = -1, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("ImageSearchTolerance"))
+Func ScreenDetection_ImageSearch($image, $resultPosition = -1, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("ImageTolerance"))
     If Not FileExists("images\" & GetValue("Language") & "\" & $image & ".png") Then Return 0
     If _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return 1
     Local $i = 2

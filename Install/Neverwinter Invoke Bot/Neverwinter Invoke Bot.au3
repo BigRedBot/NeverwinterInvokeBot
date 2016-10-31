@@ -76,7 +76,7 @@ While 1
     Focus()
     If Not $StartingKeyboardLayout And $WinHandle Then $StartingKeyboardLayout = _WinAPI_GetKeyboardLayout($WinHandle)
     If Not $WinHandle Or Not GetPosition() Then
-        If GetValue("RestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And ImageExists("LogInScreen") Then
+        If Not GetValue("DisableRestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And ImageExists("LogInScreen") Then
             $LogInTries = 0
             $LastLoginTry = 0
             $DisableRelogCount = 1
@@ -90,30 +90,30 @@ While 1
         Error(Localize("NeverwinterNotFound")); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
     EndIf
-    If Not GetValue("GameWidth") Or Not GetValue("GameHeight") Then Return
-    If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight And ( GetValue("GameWidth") <> $DeskTopWidth Or GetValue("GameHeight") <> $DeskTopHeight ) Then
+    If Not GetValue("GameClientWidth") Or Not GetValue("GameClientHeight") Then Return
+    If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight And ( GetValue("GameClientWidth") <> $DeskTopWidth Or GetValue("GameClientHeight") <> $DeskTopHeight ) Then
         Error(Localize("UnMaximize")); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         Return
-    ElseIf $DeskTopWidth < GetValue("GameWidth") Or $DeskTopHeight < GetValue("GameHeight") Then
-        Error(Localize("ResolutionOrHigher", "<RESOLUTION>", GetValue("GameWidth") & "x" & GetValue("GameHeight"))); If $RestartLoop Then Return 0
+    ElseIf $DeskTopWidth < GetValue("GameClientWidth") Or $DeskTopHeight < GetValue("GameClientHeight") Then
+        Error(Localize("ResolutionOrHigher", "<RESOLUTION>", GetValue("GameClientWidth") & "x" & GetValue("GameClientHeight"))); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         Return
     EndIf
     $WaitingTimer = TimerInit()
-    If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
+    If $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
         While 1
-            If $DeskTopWidth < GetValue("GameWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameHeight") + $PaddingHeight Then
+            If $DeskTopWidth < GetValue("GameClientWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameClientHeight") + $PaddingHeight Then
                 Local $ostyle = DllCall("user32.dll", "long", "GetWindowLong", "hwnd", $WinHandle, "int", -16)
                 DllCall("user32.dll", "long", "SetWindowLong", "hwnd", $WinHandle, "int", -16, "long", BitAND($ostyle[0], BitNOT($WS_BORDER + $WS_DLGFRAME + $WS_THICKFRAME)))
                 DllCall("user32.dll", "long", "SetWindowPos", "hwnd", $WinHandle, "hwnd", $WinHandle, "int", 0, "int", 0, "int", 0, "int", 0, "long", BitOR($SWP_NOMOVE, $SWP_NOSIZE, $SWP_NOZORDER, $SWP_FRAMECHANGED))
                 Focus()
                 If Not $WinHandle Or Not GetPosition() Then ExitLoop 2
             EndIf
-            WinMove($WinHandle, "", 0, 0, GetValue("GameWidth") + $PaddingWidth, GetValue("GameHeight") + $PaddingHeight)
+            WinMove($WinHandle, "", 0, 0, GetValue("GameClientWidth") + $PaddingWidth, GetValue("GameClientHeight") + $PaddingHeight)
             Focus()
             If Not $WinHandle Or Not GetPosition() Then ExitLoop 2
-            If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
+            If $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
                 TimeOut(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
                 Sleep(5000)
@@ -123,20 +123,20 @@ While 1
                 ExitLoop
             EndIf
         WEnd
-        If $ClientWidth <> GetValue("GameWidth") Or $ClientHeight <> GetValue("GameHeight") Then
+        If $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
             Error(Localize("UnableToResize")); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
         EndIf
     ElseIf $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
         While 1
-            If $DeskTopWidth < GetValue("GameWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameHeight") + $PaddingHeight Then
+            If $DeskTopWidth < GetValue("GameClientWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameClientHeight") + $PaddingHeight Then
                 Local $ostyle = DllCall("user32.dll", "long", "GetWindowLong", "hwnd", $WinHandle, "int", -16)
                 DllCall("user32.dll", "long", "SetWindowLong", "hwnd", $WinHandle, "int", -16, "long", BitAND($ostyle[0], BitNOT($WS_BORDER + $WS_DLGFRAME + $WS_THICKFRAME)))
                 DllCall("user32.dll", "long", "SetWindowPos", "hwnd", $WinHandle, "hwnd", $WinHandle, "int", 0, "int", 0, "int", 0, "int", 0, "long", BitOR($SWP_NOMOVE, $SWP_NOSIZE, $SWP_NOZORDER, $SWP_FRAMECHANGED))
                 Focus()
                 If Not $WinHandle Or Not GetPosition() Then ExitLoop 2
             EndIf
-            WinMove($WinHandle, "", 0, 0, GetValue("GameWidth") + $PaddingWidth, GetValue("GameHeight") + $PaddingHeight)
+            WinMove($WinHandle, "", 0, 0, GetValue("GameClientWidth") + $PaddingWidth, GetValue("GameClientHeight") + $PaddingHeight)
             Focus()
             If Not $WinHandle Or Not GetPosition() Then ExitLoop 2
             If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
@@ -164,7 +164,7 @@ Func SyncValues()
     If GetValue("FinishedLoop") Then
         AddAccountCountValue("CurrentLoop", GetValue("FinishedLoop"))
         DeleteAccountValue("FinishedLoop")
-        SetAccountValue("CurrentCharacter", GetValue("StartAt"))
+        SetAccountValue("CurrentCharacter", GetValue("StartAtCharacter"))
         DeleteAccountValue("FinishedCharacter")
         $ETAText = ""
     EndIf
@@ -199,7 +199,7 @@ While 1
     Position(); If $RestartLoop Then Return 0
     If $RestartLoop Then ExitLoop 1
     Local $Start = GetValue("CurrentCharacter")
-    For $i = $Start To GetValue("EndAt")
+    For $i = $Start To GetValue("EndAtCharacter")
         SetAccountValue("CurrentCharacter", $i)
         DeleteAccountValue("FinishedCharacter")
         If EndNowTime() Then
@@ -212,7 +212,7 @@ While 1
             Splash()
             Local $LoopTimer = TimerInit()
             Focus()
-            MouseMove(GetValue("SelectCharacterMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SelectCharacterMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+            MouseMove(GetValue("CharacterSelectionMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("CharacterSelectionMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
             DoubleRightClick()
             MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
             If GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
@@ -266,8 +266,8 @@ While 1
             EndIf
             Sleep(1000)
             Send("{ENTER}")
-            If GetValue("SafeLogInX") Then
-                MouseMove(GetValue("SafeLogInX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SafeLogInY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+            If GetValue("SafeLoginX") Then
+                MouseMove(GetValue("SafeLoginX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SafeLoginY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
                 DoubleClick()
             EndIf
             Splash("[ " & Localize("WaitingForInGameScreen") & " ]")
@@ -302,7 +302,7 @@ While 1
                 SetCharacterInfo("CharacterTime", TimerInit())
                 SetCharacterInfo("CharacterLoop", GetValue("CurrentLoop"))
                 SetAccountValue("FinishedCharacter", 1)
-                If GetValue("CurrentCharacter") >= GetValue("EndAt") Then
+                If GetValue("CurrentCharacter") >= GetValue("EndAtCharacter") Then
                     SetAccountValue("FinishedLoop", 1)
                     If GetValue("CurrentLoop") >= GetValue("EndAtLoop") Then SetAccountValue("CompletedAccountInvokes", 1)
                 EndIf
@@ -321,13 +321,13 @@ While 1
                 SetCharacterInfo("CharacterTime", TimerInit())
                 SetCharacterInfo("CharacterLoop", GetValue("CurrentLoop"))
                 SetAccountValue("FinishedCharacter", 1)
-                If GetValue("CurrentCharacter") >= GetValue("EndAt") Then SetAccountValue("FinishedLoop", 1)
+                If GetValue("CurrentCharacter") >= GetValue("EndAtCharacter") Then SetAccountValue("FinishedLoop", 1)
             EndIf
             ChangeCharacter(); If $RestartLoop Then Return 0
             If $RestartLoop Then ExitLoop 2
             $TimeOutRetries = 0
             Local $LogOutTimer = TimerInit()
-            Local $RemainingCharacters = GetValue("EndAt") - GetValue("CurrentCharacter")
+            Local $RemainingCharacters = GetValue("EndAtCharacter") - GetValue("CurrentCharacter")
             Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
             If ImageExists("SelectionScreen") Then
                 $WaitingTimer = TimerInit()
@@ -363,7 +363,7 @@ While 1
                 If GetAccountValue("InfiniteLoopsStarted") Then $LastTook = "LastProfessionsTook"
                 $ETAText = Localize($LastTook, "<SECONDS>", Round($LastTime / 1000, 2)) & @CRLF & Localize("ETAForCurrentLoop", "<MINUTES>", HoursAndMinutes($RemainingSeconds / 60))
             EndIf
-        ElseIf GetValue("CurrentCharacter") >= GetValue("EndAt") Then
+        ElseIf GetValue("CurrentCharacter") >= GetValue("EndAtCharacter") Then
             SetAccountValue("FinishedLoop", 1)
         EndIf
     Next
@@ -406,7 +406,7 @@ Func CheckAccounts()
         $CurrentAccount = $i
         If GetValue("InfiniteLoops") And $EnableProfessions Then
             Local $oldc = GetValue("CurrentCharacter")
-            For $c = GetValue("StartAt") To GetValue("EndAt")
+            For $c = GetValue("StartAtCharacter") To GetValue("EndAtCharacter")
                 SetAccountValue("CurrentCharacter", $c)
                 If GetValue("EnableProfessions") Then
                     SetAllAccountsValue("InfiniteLoopsFound", 1)
@@ -554,7 +554,7 @@ Func GetVIPAccountReward(); If $RestartLoop Then Return 0
     Local $tried = 0
 While 1
 While 1
-    If Not GetValue("SkipVIPAccountReward") And Not GetValue("CollectedVIPAccountReward") And GetValue("LastVIPAccountRewardTryLoop") < GetValue("CurrentLoop") And ( GetValue("VIPAccountRewardCharacter") < GetValue("StartAt") Or GetValue("VIPAccountRewardCharacter") > GetValue("EndAt") Or GetValue("VIPAccountRewardCharacter") = GetValue("CurrentCharacter") ) And ImageExists("VIPAccountReward") Then
+    If Not GetValue("SkipVIPAccountReward") And Not GetValue("CollectedVIPAccountReward") And GetValue("LastVIPAccountRewardTryLoop") < GetValue("CurrentLoop") And ( GetValue("VIPAccountRewardCharacter") < GetValue("StartAtCharacter") Or GetValue("VIPAccountRewardCharacter") > GetValue("EndAtCharacter") Or GetValue("VIPAccountRewardCharacter") = GetValue("CurrentCharacter") ) And ImageExists("VIPAccountReward") Then
         If GetValue("VIPAccountRewardTries") < 3 Then
             $tried = 1
             AddAccountCountValue("VIPAccountRewardTries")
@@ -614,7 +614,7 @@ Func OpenInventoryBags($bag); If $RestartLoop Then Return 0
         Sleep(GetValue("OpenInventoryBagDelay") * 1000)
     EndIf
     MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
-    If ImageSearch($bag, -2, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("InventoryBagSearchTolerance")) Then
+    If ImageSearch($bag) Then
         MouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
         Sleep(GetValue("OpenInventoryBagDelay") * 1000)
@@ -816,9 +816,9 @@ Func Splash($s = "", $ontop = 1)
     EndIf
     Local $Message
     If GetAccountValue("InfiniteLoopsStarted") Then
-        $Message = Localize("Professions", "<CURRENT>", GetValue("CurrentCharacter"), "<ENDAT>", GetValue("EndAt")) & @CRLF & $s & @CRLF & $ETAText
+        $Message = Localize("Professions", "<CURRENT>", GetValue("CurrentCharacter"), "<ENDAT>", GetValue("EndAtCharacter")) & @CRLF & $s & @CRLF & $ETAText
     Else
-        $Message = Localize("Invoking", "<CURRENT>", GetValue("CurrentCharacter"), "<ENDAT>", GetValue("EndAt"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & $s & @CRLF & $ETAText
+        $Message = Localize("Invoking", "<CURRENT>", GetValue("CurrentCharacter"), "<ENDAT>", GetValue("EndAtCharacter"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & $s & @CRLF & $ETAText
     EndIf
     If $SplashWindow And $ontop = $SplashWindowOnTop Then
         $Message = Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & $SplashStartText & $Message
@@ -878,7 +878,7 @@ EndFunc
 
 Global $DoLogInCommands = 1
 
-Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("ImageSearchTolerance"), $do = 1)
+Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("ImageTolerance"), $do = 1)
     If $do And Not ImageExists($image) Then Return 0
     If $do And $DoLogInCommands And $image = "ChangeCharacterButton" Then
         If $DoLogInCommands = 2 Or GetValue("GameMenuKey") = "{ESC}" Then
@@ -1191,7 +1191,7 @@ WEnd
 EndFunc
 
 Func PatchClient(); If $RestartLoop Then Return 0
-    If GetValue("RestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And $GameClientLauncherInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And FileExists($GameClientLauncherInstallLocation & "\Neverwinter.exe") And ImageExists("LogInScreen") Then
+    If Not GetValue("DisableRestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And $GameClientLauncherInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And FileExists($GameClientLauncherInstallLocation & "\Neverwinter.exe") And ImageExists("LogInScreen") Then
         StartClient(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         Splash("", 0)
@@ -1211,7 +1211,7 @@ Func LogIn(); If $RestartLoop Then Return 0
         Position(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         Splash()
-        MouseMove(GetValue("UsernameBoxX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("UsernameBoxY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+        MouseMove(GetValue("UsernameInputX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("UsernameInputY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
         DoubleClick()
         AutoItSetOption("SendKeyDownDelay", 5)
         Send("{END}{BS 254}")
@@ -1240,7 +1240,7 @@ Func TimeOut(); If $RestartLoop Then Return 0
     AddAccountCountValue("TimedOut")
     If Not $LoggingIn Then AddCharacterCountInfo("TimedOut")
     $DisableRelogCount = 1
-    If $TimeOutRetries < GetValue("TimeOutRetries") And GetValue("RestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And $GameClientLauncherInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And FileExists($GameClientLauncherInstallLocation & "\Neverwinter.exe") And ImageExists("LogInScreen") Then
+    If $TimeOutRetries < GetValue("TimeOutRetries") And Not GetValue("DisableRestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And $GameClientLauncherInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And FileExists($GameClientLauncherInstallLocation & "\Neverwinter.exe") And ImageExists("LogInScreen") Then
         Reset()
         $TimeOutRetries += 1
         Splash("[ " & Localize("RestartingNeverwinter") & " ]")
@@ -1323,7 +1323,7 @@ Func End(); If $RestartLoop Then Return 0
             $CurrentAccount = $i
             If GetValue("InfiniteLoops") And $EnableProfessions Then
                 Local $oldc = GetValue("CurrentCharacter")
-                For $c = GetValue("StartAt") To GetValue("EndAt")
+                For $c = GetValue("StartAtCharacter") To GetValue("EndAtCharacter")
                     SetAccountValue("CurrentCharacter", $c)
                     If GetValue("EnableProfessions") Then
                         $UnattendedMode = 3
@@ -1338,16 +1338,16 @@ Func End(); If $RestartLoop Then Return 0
     For $i = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $i
         If CompletedAccount() And GetValue("CurrentLoop") <= GetValue("EndAtLoop") Then
-            If GetValue("CurrentCharacter") = GetValue("StartAt") Then
+            If GetValue("CurrentCharacter") = GetValue("StartAtCharacter") Then
                 SetAccountValue("EndAtLoop", GetValue("CurrentLoop") - 1)
             Else
                 SetAccountValue("EndAtLoop", GetValue("CurrentLoop"))
             EndIf
         EndIf
-        SendMessage(Localize("CompletedInvoking", "<STARTAT>", GetValue("StartAt"), "<ENDAT>", GetValue("EndAt"), "<STARTATLOOP>", GetValue("StartAtLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & @CRLF & Localize("InvokingTook", "<MINUTES>", $EndTime))
+        SendMessage(Localize("CompletedInvoking", "<STARTAT>", GetValue("StartAtCharacter"), "<ENDAT>", GetValue("EndAtCharacter"), "<STARTATLOOP>", GetValue("StartAtLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & @CRLF & Localize("InvokingTook", "<MINUTES>", $EndTime))
         If GetValue("InfiniteLoops") And $EnableProfessions Then
             Local $oldc = GetValue("CurrentCharacter")
-            For $c = GetValue("StartAt") To GetValue("EndAt")
+            For $c = GetValue("StartAtCharacter") To GetValue("EndAtCharacter")
                 SetAccountValue("CurrentCharacter", $c)
                 If GetValue("EnableProfessions") Then
                     SetAccountValue("InfiniteLoopsStarted", 1)
@@ -1516,7 +1516,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
             $etext &= @CRLF & @CRLF & Localize("GamePatched")
         EndIf
         If Not CompletedAccount() Then
-            $etext &= @CRLF & @CRLF & Localize("Invoking", "<CURRENT>", GetValue("CurrentCharacter"), "<ENDAT>", GetValue("EndAt"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop"))
+            $etext &= @CRLF & @CRLF & Localize("Invoking", "<CURRENT>", GetValue("CurrentCharacter"), "<ENDAT>", GetValue("EndAtCharacter"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop"))
         EndIf
         SetAccountValue("LastMsg", $etext)
         $text &= $etext
@@ -1661,35 +1661,35 @@ Func ConfigureAccount()
         WEnd
     EndIf
     While 1
-        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartAtEachLoop", "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("StartAt"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartAtEachLoop", "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("StartAtCharacter"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then Exit
         Local $number = Floor(Number($strNumber))
         If $number >= 1 And $number <= GetValue("TotalSlots") Then
-            SetAccountValue("StartAt", $number)
+            SetAccountValue("StartAtCharacter", $number)
             ExitLoop
         EndIf
         MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
     WEnd
     While 1
-        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EndAtEachLoop", "<STARTAT>", GetValue("StartAt"), "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("EndAt"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EndAtEachLoop", "<STARTAT>", GetValue("StartAtCharacter"), "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("EndAtCharacter"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then Exit
         Local $number = Floor(Number($strNumber))
-        If $number >= GetValue("StartAt") And $number <= GetValue("TotalSlots") Then
-            SetAccountValue("EndAt", $number)
+        If $number >= GetValue("StartAtCharacter") And $number <= GetValue("TotalSlots") Then
+            SetAccountValue("EndAtCharacter", $number)
             ExitLoop
         EndIf
         MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
     WEnd
-    If GetValue("CurrentCharacter") < GetValue("StartAt") Then
-        SetAccountValue("CurrentCharacter", GetValue("StartAt"))
-    ElseIf GetValue("CurrentCharacter") > GetValue("EndAt") Then
-        SetAccountValue("CurrentCharacter", GetValue("EndAt"))
+    If GetValue("CurrentCharacter") < GetValue("StartAtCharacter") Then
+        SetAccountValue("CurrentCharacter", GetValue("StartAtCharacter"))
+    ElseIf GetValue("CurrentCharacter") > GetValue("EndAtCharacter") Then
+        SetAccountValue("CurrentCharacter", GetValue("EndAtCharacter"))
     EndIf
     While 1
-        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartAtCurrentLoop", "<STARTAT>", GetValue("StartAt"), "<ENDAT>", GetValue("EndAt")), GetValue("CurrentCharacter"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartAtCurrentLoop", "<STARTAT>", GetValue("StartAtCharacter"), "<ENDAT>", GetValue("EndAtCharacter")), GetValue("CurrentCharacter"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
         If @error <> 0 Then Exit
         Local $number = Floor(Number($strNumber))
-        If $number >= GetValue("StartAt") And $number <= GetValue("EndAt") Then
+        If $number >= GetValue("StartAtCharacter") And $number <= GetValue("EndAtCharacter") Then
             SetAccountValue("CurrentCharacter", $number)
             ExitLoop
         EndIf
@@ -1707,10 +1707,10 @@ Func Start(); If $RestartLoop Then Return 0
         For $i = 1 To GetValue("TotalAccounts")
             $CurrentAccount = $i
             ConfigureAccount()
-            If GetValue("CurrentCharacter") < GetValue("StartAt") Then
-                SetAccountValue("CurrentCharacter", GetValue("StartAt"))
-            ElseIf GetValue("CurrentCharacter") > GetValue("EndAt") Then
-                SetAccountValue("CurrentCharacter", GetValue("EndAt"))
+            If GetValue("CurrentCharacter") < GetValue("StartAtCharacter") Then
+                SetAccountValue("CurrentCharacter", GetValue("StartAtCharacter"))
+            ElseIf GetValue("CurrentCharacter") > GetValue("EndAtCharacter") Then
+                SetAccountValue("CurrentCharacter", GetValue("EndAtCharacter"))
             EndIf
         Next
         $CurrentAccount = $old
@@ -1765,7 +1765,7 @@ Func Begin(); If $RestartLoop Then Return 0
             SetAccountValue("CompletedAccountInvokes", 1)
             If GetValue("InfiniteLoops") And $EnableProfessions Then
                 Local $oldc = GetValue("CurrentCharacter")
-                For $c = GetValue("StartAt") To GetValue("EndAt")
+                For $c = GetValue("StartAtCharacter") To GetValue("EndAtCharacter")
                     SetAccountValue("CurrentCharacter", $c)
                     If GetValue("EnableProfessions") Then
                         SetAccountValue("InfiniteLoopsStarted", 1)
@@ -1874,10 +1874,10 @@ Func Initialize()
     Local $old = $CurrentAccount
     For $i = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $i
-        SetAccountValue("CurrentCharacter", GetValue("StartAt"))
+        SetAccountValue("CurrentCharacter", GetValue("StartAtCharacter"))
         SetAccountValue("CurrentLoop", GetValue("StartAtLoop"))
         If Not $UnattendedMode And Not $SkipAllConfigurations Then Load()
-        If Not GetValue("EndAt") Then SetAccountValue("EndAt", GetValue("TotalSlots"))
+        If Not GetValue("EndAtCharacter") Then SetAccountValue("EndAtCharacter", GetValue("TotalSlots"))
     Next
     $CurrentAccount = $old
 EndFunc

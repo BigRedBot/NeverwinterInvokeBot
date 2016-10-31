@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.3
+- Removed some advanced settings from the example Settings.ini file and renamed some of the settings
+
 9.2.4
 - Changed limit for how many times it will try to open another inventory bag per character from 40 to 10
 
