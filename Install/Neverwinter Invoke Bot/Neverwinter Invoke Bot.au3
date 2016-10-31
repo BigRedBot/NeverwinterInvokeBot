@@ -172,6 +172,14 @@ Func SyncValues()
     DeleteAccountValue("FinishedCharacter")
 EndFunc
 
+If GetValue("TopSelectedCharacterX") And GetValue("TopScrollBarX") Then
+    Global $TopSelectedCharacterX = Array(GetValue("TopSelectedCharacterX")), $TopSelectedCharacterY = Array(GetValue("TopSelectedCharacterY")), $TopSelectedCharacterC = Array(GetValue("TopSelectedCharacterC")), $TopScrollBarX = Array(GetValue("TopScrollBarX")), $TopScrollBarY = Array(GetValue("TopScrollBarY")), $TopScrollBarC = Array(GetValue("TopScrollBarC"))
+EndIf
+
+If GetValue("BottomSelectedCharacterX") And GetValue("BottomScrollBarX") Then
+    Global $BottomSelectedCharacterX = Array(GetValue("BottomSelectedCharacterX")), $BottomSelectedCharacterY = Array(GetValue("BottomSelectedCharacterY")), $BottomSelectedCharacterC = Array(GetValue("BottomSelectedCharacterC")), $BottomScrollBarX = Array(GetValue("BottomScrollBarX")), $BottomScrollBarY = Array(GetValue("BottomScrollBarY")), $BottomScrollBarC = Array(GetValue("BottomScrollBarC"))
+EndIf
+
 Func Loop()
 While 1
 While 1
@@ -217,15 +225,15 @@ While 1
             MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
             If GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
                 AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
-                If GetValue("TopScrollBarX") And GetValue("TopSelectedCharacterX") Then
+                If GetValue("TopSelectedCharacterX") And GetValue("TopScrollBarX") Then
                     Send("{DOWN}")
                     For $n = 1 To GetValue("TotalSlots")
                         Send("{UP}")
                         Position(); If $RestartLoop Then Return 0
                         If $RestartLoop Then ExitLoop 3
-                        If FindPixels(GetValue("TopScrollBarX"), GetValue("TopScrollBarY"), GetValue("TopScrollBarC")) And FindPixels(GetValue("TopSelectedCharacterX"), GetValue("TopSelectedCharacterY"), GetValue("TopSelectedCharacterC")) Then
-                            ExitLoop
-                        EndIf
+                        For $n2 = 1 To $TopSelectedCharacterX[0]
+                            If FindPixels($TopSelectedCharacterX[$n2], $TopSelectedCharacterY[$n2], $TopSelectedCharacterC[$n2]) And FindPixels($TopScrollBarX[$n2], $TopScrollBarY[$n2], $TopScrollBarC[$n2]) Then ExitLoop 2
+                        Next
                     Next
                 Else
                     For $n = 1 To GetValue("TotalSlots")
@@ -241,15 +249,15 @@ While 1
                 AutoItSetOption("SendKeyDownDelay", $KeyDelay)
             Else
                 AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
-                If GetValue("BottomScrollBarX") And GetValue("BottomSelectedCharacterX") Then
+                If GetValue("BottomSelectedCharacterX") And GetValue("BottomScrollBarX") Then
                     Send("{UP}")
                     For $n = 1 To GetValue("TotalSlots")
                         Send("{DOWN}")
                         Position(); If $RestartLoop Then Return 0
                         If $RestartLoop Then ExitLoop 3
-                        If FindPixels(GetValue("BottomScrollBarX"), GetValue("BottomScrollBarY"), GetValue("BottomScrollBarC")) And FindPixels(GetValue("BottomSelectedCharacterX"), GetValue("BottomSelectedCharacterY"), GetValue("BottomSelectedCharacterC")) Then
-                            ExitLoop
-                        EndIf
+                        For $n2 = 1 To $BottomSelectedCharacterX[0]
+                            If FindPixels($BottomSelectedCharacterX[$n2], $BottomSelectedCharacterY[$n2], $BottomSelectedCharacterC[$n2]) And FindPixels($BottomScrollBarX[$n2], $BottomScrollBarY[$n2], $BottomScrollBarC[$n2]) Then ExitLoop 2
+                        Next
                     Next
                 Else
                     For $n = 1 To GetValue("TotalSlots")
@@ -867,7 +875,7 @@ Func WaitForScreen($image, $resultPosition = -2, $left = $ClientLeft, $top = $Cl
 EndFunc
 
 Func FindPixels($x, $y, $c, $t = 5)
-    Local $a = StringSplit(StringRegExpReplace(Hex(PixelGetColor($x + $OffsetX, $y + $OffsetY), 6), "(..)(..)(..)", "$1|$2|$3"), "|")
+    Local $a = StringSplit(StringRegExpReplace(Hex(PixelGetColor(Number($x) + $OffsetX, Number($y) + $OffsetY), 6), "(..)(..)(..)", "$1|$2|$3"), "|")
     Local $b = StringSplit(StringRegExpReplace($c, "(..)(..)(..)", "$1|$2|$3"), "|")
     For $i = 1 To 3
         Local $d = Dec($a[$i]) - Dec($b[$i])

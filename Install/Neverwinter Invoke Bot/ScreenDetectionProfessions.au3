@@ -64,30 +64,22 @@ HotKeySet("{Esc}", "ScreenDetection_End")
 ScreenDetection_Splash()
 While 1
     If ScreenDetection_Position() Then
-        If ScreenDetection_ImageSearch("Professions_Overview") Then
-            $text &= @CRLF & @CRLF & Localize("Professions_Overview") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        EndIf
-        If ScreenDetection_ImageSearch("Professions_Leadership") Then
-            $text &= @CRLF & @CRLF & Localize("Professions_Leadership") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        EndIf
-        If ScreenDetection_ImageSearch("Professions_CollectResult") Then
-            $text &= @CRLF & @CRLF & Localize("Professions_CollectResult") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        EndIf
-        If ScreenDetection_ImageSearch("Professions_TakeRewards") Then
-            $text &= @CRLF & @CRLF & Localize("Professions_TakeRewards") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        EndIf
-        If ScreenDetection_ImageSearch("Professions_EmptySlot") Then
-            $text &= @CRLF & @CRLF & Localize("Professions_EmptySlot") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        EndIf
-        If ScreenDetection_ImageSearch("Professions_Search") Then
-            $text &= @CRLF & @CRLF & Localize("Professions_Search") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        EndIf
-        If ScreenDetection_ImageSearch("Professions_Continue") Then
-            $text &= @CRLF & @CRLF & Localize("Professions_Continue") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        EndIf
-        If ScreenDetection_ImageSearch("Professions_StartTask") Then
-            $text &= @CRLF & @CRLF & Localize("Professions_StartTask") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        EndIf
+        If ScreenDetection_ImageSearch("Professions_Overview") Then $text &= @CRLF & @CRLF & _
+            Localize("Professions_Overview") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+        If ScreenDetection_ImageSearch("Professions_Leadership") Then $text &= @CRLF & @CRLF & _
+            Localize("Professions_Leadership") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+        If ScreenDetection_ImageSearch("Professions_CollectResult") Then $text &= @CRLF & @CRLF & _
+            Localize("Professions_CollectResult") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+        If ScreenDetection_ImageSearch("Professions_TakeRewards") Then $text &= @CRLF & @CRLF & _
+            Localize("Professions_TakeRewards") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+        If ScreenDetection_ImageSearch("Professions_EmptySlot") Then $text &= @CRLF & @CRLF & _
+            Localize("Professions_EmptySlot") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+        If ScreenDetection_ImageSearch("Professions_Search") Then $text &= @CRLF & @CRLF & _
+            Localize("Professions_Search") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+        If ScreenDetection_ImageSearch("Professions_Continue") Then $text &= @CRLF & @CRLF & _
+            Localize("Professions_Continue") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+        If ScreenDetection_ImageSearch("Professions_StartTask") Then $text &= @CRLF & @CRLF & _
+            Localize("Professions_StartTask") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
     EndIf
     ScreenDetection_Splash($text)
     Sleep(500)

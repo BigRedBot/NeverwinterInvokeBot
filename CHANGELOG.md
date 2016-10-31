@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.3.1
+- Will now detect the character selection screen if a gameplay proxy is enabled
+
 9.3
 - Removed some advanced settings from the example Settings.ini file and renamed some of the settings
 
