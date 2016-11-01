@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+9.4
+- Will now select the next character by using a single down arrow key press
+- Added option DisableSimpleCharacterSelection to the Settings.ini file to disable using a single down arrow key press to select the next character
+
 9.3.1
 - Will now detect the character selection screen if a gameplay proxy is enabled
 

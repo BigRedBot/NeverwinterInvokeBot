@@ -206,7 +206,7 @@ While 1
     EndIf
     Position(); If $RestartLoop Then Return 0
     If $RestartLoop Then ExitLoop 1
-    Local $Start = GetValue("CurrentCharacter")
+    Local $Start = GetValue("CurrentCharacter"), $CharacterSelectionPositioned = 0
     For $i = $Start To GetValue("EndAtCharacter")
         SetAccountValue("CurrentCharacter", $i)
         DeleteAccountValue("FinishedCharacter")
@@ -223,7 +223,9 @@ While 1
             MouseMove(GetValue("CharacterSelectionMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("CharacterSelectionMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
             DoubleRightClick()
             MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
-            If GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
+            If $CharacterSelectionPositioned And Not GetValue("DisableSimpleCharacterSelection") Then
+                Send("{DOWN}")
+            ElseIf GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
                 AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
                 If GetValue("TopSelectedCharacterX") And GetValue("TopScrollBarX") Then
                     Send("{DOWN}")
@@ -371,6 +373,7 @@ While 1
                 If GetAccountValue("InfiniteLoopsStarted") Then $LastTook = "LastProfessionsTook"
                 $ETAText = Localize($LastTook, "<SECONDS>", Round($LastTime / 1000, 2)) & @CRLF & Localize("ETAForCurrentLoop", "<MINUTES>", HoursAndMinutes($RemainingSeconds / 60))
             EndIf
+            $CharacterSelectionPositioned = 1
         ElseIf GetValue("CurrentCharacter") >= GetValue("EndAtCharacter") Then
             SetAccountValue("FinishedLoop", 1)
         EndIf
