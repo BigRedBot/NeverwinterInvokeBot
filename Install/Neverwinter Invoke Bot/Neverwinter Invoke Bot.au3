@@ -820,7 +820,7 @@ Func Splash($s = "", $ontop = 1)
         HotKeySet("{F4}")
         FindWindow()
         If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
-        BlockInput(0)
+        If Not GetValue("NoInputBlocking") Then BlockInput(0)
         SplashOff()
         $SplashWindow = 0
         Return
@@ -841,15 +841,17 @@ Func Splash($s = "", $ontop = 1)
         HotKeySet("{F4}", "Pause")
         Local $setontop = $DLG_NOTITLE + $DLG_NOTONTOP, $leftlocation = $SplashLeft, $toplocation = $SplashTop
         If $ontop Then
-            If Not GetValue("NoInputBlocking") Then BlockInput(1)
-            $SplashWindowOnTop = 1
-            $SplashStartText = Localize("ToStopPressCtrlAltDel") & @CRLF & @CRLF
+            If GetValue("NoInputBlocking") Then
+                $SplashStartText = Localize("ToStopPressF4") & @CRLF & @CRLF & @CRLF
+            Else
+                BlockInput(1)
+                $SplashStartText = Localize("ToStopPressCtrlAltDel") & @CRLF & @CRLF
+            EndIf
         Else
-            BlockInput(0)
-            $SplashWindowOnTop = 0
+            If Not GetValue("NoInputBlocking") Then BlockInput(0)
             $setontop = $DLG_MOVEABLE + $DLG_NOTONTOP
-            $SplashStartText = Localize("ToStopPressF4") & @CRLF & @CRLF & @CRLF
             $toplocation = 50
+            $SplashStartText = Localize("ToStopPressF4") & @CRLF & @CRLF & @CRLF
         EndIf
         $Message = Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & $SplashStartText & $Message
         $SplashWindow = SplashTextOn("", $Message, GetValue("SplashWidth"), GetValue("SplashHeight"), $leftlocation, $toplocation, $setontop)
@@ -861,6 +863,7 @@ Func Splash($s = "", $ontop = 1)
             FindWindow()
         EndIf
         If $WinHandle Then WinSetOnTop($WinHandle, "", $ontop)
+        $SplashWindowOnTop = $ontop
     EndIf
 EndFunc
 
