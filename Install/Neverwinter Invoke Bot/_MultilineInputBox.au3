@@ -9,7 +9,7 @@
 ; Author(s):       Oscar, Prog@ndy
 ;
 ;===============================================================================
-Func _MultilineInputBox($title, $prompt, $Default = "", $width = 0, $height = 0, $left = Default, $top = Default, $timeOut = 0, $hWnd = 0)
+Func _MultilineInputBox($title = "", $prompt = "", $Default = "", $width = 0, $height = 0, $left = Default, $top = Default, $timeOut = 0, $hWnd = 0)
     Local $OnEventMode = Opt('GUIOnEventMode', 0)
     Local $text = ""
     If $width < 400 Then $width = 400

@@ -139,7 +139,7 @@ Func ChooseProfessionsAccountOption()
     Local $Total = GetValue("TotalSlots")
     Local $Checkbox[$Total + 1]
     Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490)
-    GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 270)
+    GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
     GUICtrlCreateLabel(Localize("EnableProfessions", "<ACCOUNT>", $CurrentAccount), 150, 40, 270)
     $Checkbox[0] = GUICtrlCreateCheckbox(Localize("AllCharacters"), 40, 70, 100)
     If GetAccountValue("EnableProfessions") Then GUICtrlSetState($Checkbox[0], $GUI_CHECKED)
@@ -157,7 +157,7 @@ Func ChooseProfessionsAccountOption()
             GUICtrlSetState($Checkbox[$i], $GUI_CHECKED)
         EndIf
     Next
-    Local $ButtonOK = GUICtrlCreateButton("OK", _Max(154 + ((Ceiling($Total / 10) - 3) * 100), 154), 450, 84, -1, $BS_DEFPUSHBUTTON)
+    Local $ButtonOK = GUICtrlCreateButton("OK", _Max(163 + ((Ceiling($Total / 10) - 3) * 100), 163), 450, 75, 25, $BS_DEFPUSHBUTTON)
     Local $ButtonCancel = GUICtrlCreateButton("Cancel", _Max(250 + ((Ceiling($Total / 10) - 3) * 100), 250), 450, 75, 25)
     GUISetState()
     While 1
@@ -247,7 +247,7 @@ Func ChooseProfessionsAccountTaskOption()
     Local $Total = GetValue("TotalSlots"), $nMsg, $EnabledCharacterFound
     Local $Button[$Total + 1]
     Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490)
-    GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 270)
+    GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
     GUICtrlCreateLabel(Localize("EditProfessionTasks", "<ACCOUNT>", $CurrentAccount), 150, 40, 270)
     If GetAccountValue("LeadershipProfessionTasks") == GetDefaultValue("LeadershipProfessionTasks") Then
         $Button[0] = GUICtrlCreateButton(Localize("AllCharacters"), 30, 70, 95)
@@ -269,7 +269,7 @@ Func ChooseProfessionsAccountTaskOption()
         EndIf
     Next
     If Not $EnabledCharacterFound Then Return
-    Local $ButtonOK = GUICtrlCreateButton("OK", _Max(154 + ((Ceiling($Total / 10) - 3) * 100), 154), 450, 84, -1, $BS_DEFPUSHBUTTON)
+    Local $ButtonOK = GUICtrlCreateButton("OK", _Max(163 + ((Ceiling($Total / 10) - 3) * 100), 163), 450, 75, 25, $BS_DEFPUSHBUTTON)
     Local $ButtonCancel = GUICtrlCreateButton("Cancel", _Max(250 + ((Ceiling($Total / 10) - 3) * 100), 250), 450, 75, 25)
     GUISetState()
     While 1

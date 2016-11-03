@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.5
+- Added advanced settings button in the options
+
 9.4
 - Will now select the next character by using a single down arrow key press
 - Added option DisableSimpleCharacterSelection to the Settings.ini file to disable using a single down arrow key press to select the next character

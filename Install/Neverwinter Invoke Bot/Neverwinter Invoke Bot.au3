@@ -25,6 +25,7 @@ AutoItSetOption("SendKeyDownDelay", $KeyDelay)
 #include "_ImageSearch.au3"
 #include "_SendUnicode.au3"
 #include "_MultilineInputBox.au3"
+#include "_GUIScrollbars_Ex.au3"
 #include "Professions.au3"
 
 Func Array($x)
@@ -1581,7 +1582,95 @@ Func HoursAndMinutes($n)
     Return Localize("Minutes", "<MINUTES>", $Minutes)
 EndFunc
 
-Func ChooseOpenBagsAccountOption()
+Func AdvancedAccountSettings($hWnd = 0)
+    Local $s = ""
+    $s &= "|" & "SkipVIPAccountReward,VIPAccountRewardTitle,VIPAccountRewardDescription,ReverseBoolean"
+    $s &= "|" & "VIPAccountRewardCharacter,VIPAccountRewardCharacterTitle,VIPAccountRewardCharacterDescription,Number"
+    $s &= "|" & "DefaultStartAtLoop,DefaultStartAtLoopTitle,DefaultStartAtLoopDescription,Number"
+    $s &= "|" & "DefaultEndAtLoop,DefaultEndAtLoopTitle,DefaultEndAtLoopDescription,Number"
+    $s &= "|" & "DefaultStartAtCharacter,DefaultStartAtCharacterTitle,DefaultStartAtCharacterDescription,Number"
+    $s &= "|" & "DefaultEndAtCharacter,DefaultEndAtCharacterTitle,DefaultEndAtCharacterDescription,Number"
+    Local $a = StringSplit(StringRegExpReplace($s, "^\|+", ""), "|")
+    Local $Total = $a[0]
+    Local $c[$Total + 1]
+    Local $hGui = GUICreate($Title, 600, 400, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
+    GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
+    GUICtrlCreateLabel(Localize("AdvancedSettings"), 160, 20, 100, -1, $SS_RIGHT)
+    For $i = 1 To $Total
+        $a[$i] = StringSplit($a[$i], ",")
+        GUICtrlCreateLabel(Localize(($a[$i])[2]), 0, 23 + $i * 40, 340, -1, $SS_RIGHT)
+        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
+        Local $v = ($a[$i])[1], $gv = GetAccountValue($v), $t = ($a[$i])[4]
+        If $t = "Boolean" Or $t = "ReverseBoolean" Then
+            $c[$i] = GUICtrlCreateCheckbox(" ", 350, 20 + $i * 40)
+            If $t = "Boolean" Then
+                If $gv Then GUICtrlSetState($c[$i], $GUI_CHECKED)
+            Else
+                If Not $gv Then GUICtrlSetState($c[$i], $GUI_CHECKED)
+            EndIf
+        Else
+            $c[$i] = GUICtrlCreateInput($gv, 350, 20 + $i * 40, 155)
+        EndIf
+        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
+    Next
+    _GUIScrollbars_Generate($hGUI, 1, 100 + $Total * 40)
+    Local $ButtonDefaults = GUICtrlCreateButton("Defaults", 40, 60 + $Total * 40, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("OK", 268, 60 + $Total * 40, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 350, 60 + $Total * 40, 75, 25)
+    GUISetState(@SW_SHOW, $hGui)
+    While 1
+        Switch GUIGetMsg()
+            Case $GUI_EVENT_CLOSE
+                ExitLoop
+            Case $ButtonDefaults
+                For $i = 1 To $Total
+                    Local $v = ($a[$i])[1], $t = ($a[$i])[4]
+                    If $t = "Boolean" Or $t = "ReverseBoolean" Then
+                        GUICtrlSetState($c[$i], $GUI_UNCHECKED)
+                        If $t = "Boolean" Then
+                            If GetDefaultValue($v) Then GUICtrlSetState($c[$i], $GUI_CHECKED)
+                        Else
+                            If Not GetDefaultValue($v) Then GUICtrlSetState($c[$i], $GUI_CHECKED)
+                        EndIf
+                    Else
+                        GUICtrlSetData($c[$i], GetDefaultValue($v))
+                    EndIf
+                Next
+            Case $ButtonOK
+                For $i = 1 To $Total
+                    Local $value, $v = ($a[$i])[1], $t = ($a[$i])[4]
+                    If $t = "Boolean" Or $t = "ReverseBoolean" Then
+                        If GUICtrlRead($c[$i]) = $GUI_CHECKED Then $value = 1
+                        If $t = "Boolean" Then
+                            $value = 0
+                            If GUICtrlRead($c[$i]) = $GUI_CHECKED Then $value = 1
+                        Else
+                            $value = 1
+                            If GUICtrlRead($c[$i]) = $GUI_CHECKED Then $value = 0
+                        EndIf
+                    Else
+                        $value = GUICtrlRead($c[$i])
+                        If $t = "Number" Then
+                            $value = Number($value)
+                        EndIf
+                    EndIf
+                    If $value == GetDefaultValue($v) Or $value == "" Or $value == 0 Then
+                        DeleteAccountValue($v)
+                        SaveIniAccount($v, "")
+                    Else
+                        SetAccountValue($v, $value)
+                        SaveIniAccount($v, $value)
+                    EndIf
+                Next
+                ExitLoop
+            Case $ButtonCancel
+                ExitLoop
+        EndSwitch
+    WEnd
+    GUIDelete($hGUI)
+EndFunc
+
+Func ChooseAccountOptions()
     If GetAllAccountsValue("DisableOpeningBags") Then
         DeleteAccountValue("DisableOpeningBags")
         SaveIniAccount("DisableOpeningBags")
@@ -1589,15 +1678,16 @@ Func ChooseOpenBagsAccountOption()
         SaveIniAccount("OpenBagsOnEveryLoop")
         Return
     EndIf
-    GUICreate($Title, 320, 150)
-    GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 270)
+    Local $hGui = GUICreate($Title, 320, 150)
+    GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
     Local $OpenInventoryBagsCheckbox = GUICtrlCreateCheckbox(" " & Localize("OpenInventoryBags"), 25, 45, 270)
     If Not GetAccountValue("DisableOpeningBags") Then GUICtrlSetState($OpenInventoryBagsCheckbox, $GUI_CHECKED)
     Local $OpenInventoryBagsOnEveryLoopCheckbox = GUICtrlCreateCheckbox(" " & Localize("OpenInventoryBagsOnEveryLoop"), 25, 75, 270)
     If GetAccountValue("DisableOpeningBags") Or GetAllAccountsValue("OpenBagsOnEveryLoop") Then GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_DISABLE)
     If (Not GetAccountValue("DisableOpeningBags") And GetAccountValue("OpenBagsOnEveryLoop")) Or GetAllAccountsValue("OpenBagsOnEveryLoop") Then GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_CHECKED)
-    Local $hButton = GUICtrlCreateButton("OK", 118, 105, 84, -1, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 105, 75, 25)
+    Local $ButtonAdvanced = GUICtrlCreateButton("Advanced", 25, 110, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("OK", 127, 110, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 110, 75, 25)
     GUISetState()
     While 1
         Switch GUIGetMsg()
@@ -1615,7 +1705,9 @@ Func ChooseOpenBagsAccountOption()
                     EndIf
                     GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_DISABLE)
                 EndIf
-            Case $hButton
+            Case $ButtonAdvanced
+                AdvancedAccountSettings($hGui)
+            Case $ButtonOK
                 Local $disabled = 1
                 If GUICtrlRead($OpenInventoryBagsCheckbox) = $GUI_CHECKED Then $disabled = 0
                 If GetAccountValue("DisableOpeningBags") <> $disabled Then
@@ -1648,9 +1740,9 @@ EndFunc
 
 Func ConfigureAccount()
     If CompletedAccount() Or (MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAccountOptions", "<ACCOUNT>", $CurrentAccount)) = $IDYES) Then Return
+    ChooseAccountOptions()
     ChooseProfessionsAccountOption()
     ChooseProfessionsAccountTaskOption()
-    ChooseOpenBagsAccountOption()
     If Not GetAccountValue("InfiniteLoopsStarted") And GetValue("UnattendedMode") <> 3 Then
         While 1
             Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $MaxLoops), GetValue("CurrentLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
@@ -1888,10 +1980,14 @@ Func Initialize()
     Local $old = $CurrentAccount
     For $i = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $i
+        SetAccountValue("StartAtLoop", GetValue("DefaultStartAtLoop"))
+        SetAccountValue("EndAtLoop", GetValue("DefaultEndAtLoop"))
+        SetAccountValue("StartAtCharacter", GetValue("DefaultStartAtCharacter"))
+        SetAccountValue("EndAtCharacter", GetValue("DefaultEndAtCharacter"))
         SetAccountValue("CurrentCharacter", GetValue("StartAtCharacter"))
         SetAccountValue("CurrentLoop", GetValue("StartAtLoop"))
         If Not $UnattendedMode And Not $SkipAllConfigurations Then Load()
-        If Not GetValue("EndAtCharacter") Then SetAccountValue("EndAtCharacter", GetValue("TotalSlots"))
+        If Not GetValue("EndAtCharacter") Or GetValue("EndAtCharacter") > GetValue("TotalSlots") Then SetAccountValue("EndAtCharacter", GetValue("TotalSlots"))
     Next
     $CurrentAccount = $old
 EndFunc
@@ -2003,12 +2099,117 @@ Func AddCharacterCountInfo($name, $value = 1, $character = GetValue("CurrentChar
     Return Assign("ACCOUNT" & $account & "CHARACTER" & $character & "NAME" & $name, GetCharacterInfo($name, $character, $account) + $value, 2)
 EndFunc
 
+Func AdvancedAllAccountsSettings($hWnd = 0)
+    Local $s = ""
+    $s &= "|" & "DisableSimpleCharacterSelection,SimpleCharacterSelectionTitle,SimpleCharacterSelectionDescription,ReverseBoolean"
+    $s &= "|" & "DisableCloseClient,CloseClientTitle,CloseClientDescription,ReverseBoolean"
+    $s &= "|" & "DisableLogOut,LogOutTitle,LogOutDescription,ReverseBoolean"
+    $s &= "|" & "NoInputBlocking,InputBlockingTitle,InputBlockingDescription,ReverseBoolean"
+    $s &= "|" & "SkipVerifyFiles,SkipVerifyFilesTitle,SkipVerifyFilesDescription,Boolean"
+    $s &= "|" & "DisableDonationPrompts,DisableDonationPromptsTitle,DisableDonationPromptsDescription,Boolean"
+    $s &= "|" & "ProfessionsDelay,ProfessionsDelayTitle,ProfessionsDelayDescription,Number"
+    $s &= "|" & "ClaimCofferDelay,ClaimCofferDelayTitle,ClaimCofferDelayDescription,Number"
+    $s &= "|" & "ClaimVIPAccountRewardDelay,ClaimVIPAccountRewardDelayTitle,ClaimVIPAccountRewardDelayDescription,Number"
+    $s &= "|" & "OpenInventoryBagDelay,OpenInventoryBagDelayTitle,OpenInventoryBagDelayDescription,Number"
+    $s &= "|" & "OpenAnotherInventoryBagDelay,OpenAnotherInventoryBagDelayTitle,OpenAnotherInventoryBagDelayDescription,Number"
+    $s &= "|" & "LogInDelaySeconds,LogInDelaySecondsTitle,LogInDelaySecondsDescription,Number"
+    $s &= "|" & "KeyDelaySeconds,KeyDelaySecondsTitle,KeyDelaySecondsDescription,Number"
+    $s &= "|" & "CharacterSelectionScrollAwayKeyDelaySeconds,CharacterSelectionScrollAwayKeyDelaySecondsTitle,CharacterSelectionScrollAwayKeyDelaySecondsDescription,Number"
+    $s &= "|" & "CharacterSelectionScrollTowardKeyDelaySeconds,CharacterSelectionScrollTowardKeyDelaySecondsTitle,CharacterSelectionScrollTowardKeyDelaySecondsDescription,Number"
+    $s &= "|" & "TimeOutMinutes,TimeOutMinutesTitle,TimeOutMinutesDescription,Number"
+    $s &= "|" & "TimeOutRetries,TimeOutRetriesTitle,TimeOutRetriesDescription,Number"
+    $s &= "|" & "MaxLogInAttempts,MaxLogInAttemptsTitle,MaxLogInAttemptsDescription,Number"
+    $s &= "|" & "LogFilesToKeep,LogFilesToKeepTitle,LogFilesToKeepDescription,Number"
+    $s &= "|" & "InvokeKey,InvokeKeyTitle,InvokeKeyDescription,Text"
+    $s &= "|" & "GameMenuKey,GameMenuKeyTitle,GameMenuKeyDescription,Text"
+    $s &= "|" & "CursorModeKey,CursorModeKeyTitle,CursorModeKeyDescription,Text"
+    $s &= "|" & "InventoryKey,InventoryKeyTitle,InventoryKeyDescription,Text"
+    $s &= "|" & "ProfessionsKey,ProfessionsKeyTitle,ProfessionsKeyDescription,Text"
+    Local $a = StringSplit(StringRegExpReplace($s, "^\|+", ""), "|")
+    Local $Total = $a[0]
+    Local $c[$Total + 1]
+    Local $hGui = GUICreate($Title, 600, 400, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
+    GUICtrlCreateLabel(Localize("AdvancedSettings"), 160, 20, 100, -1, $SS_RIGHT)
+    For $i = 1 To $Total
+        $a[$i] = StringSplit($a[$i], ",")
+        GUICtrlCreateLabel(Localize(($a[$i])[2]), 0, 23 + $i * 40, 340, -1, $SS_RIGHT)
+        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
+        Local $v = ($a[$i])[1], $gv = GetAllAccountsValue($v), $t = ($a[$i])[4]
+        If $t = "Boolean" Or $t = "ReverseBoolean" Then
+            $c[$i] = GUICtrlCreateCheckbox(" ", 350, 20 + $i * 40)
+            If $t = "Boolean" Then
+                If $gv Then GUICtrlSetState($c[$i], $GUI_CHECKED)
+            Else
+                If Not $gv Then GUICtrlSetState($c[$i], $GUI_CHECKED)
+            EndIf
+        Else
+            $c[$i] = GUICtrlCreateInput($gv, 350, 20 + $i * 40, 155)
+        EndIf
+        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
+    Next
+    _GUIScrollbars_Generate($hGUI, 1, 100 + $Total * 40)
+    Local $ButtonDefaults = GUICtrlCreateButton("Defaults", 40, 60 + $Total * 40, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("OK", 268, 60 + $Total * 40, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 350, 60 + $Total * 40, 75, 25)
+    GUISetState(@SW_SHOW, $hGui)
+    While 1
+        Switch GUIGetMsg()
+            Case $GUI_EVENT_CLOSE
+                ExitLoop
+            Case $ButtonDefaults
+                For $i = 1 To $Total
+                    Local $v = ($a[$i])[1], $t = ($a[$i])[4]
+                    If $t = "Boolean" Or $t = "ReverseBoolean" Then
+                        GUICtrlSetState($c[$i], $GUI_UNCHECKED)
+                        If $t = "Boolean" Then
+                            If GetDefaultValue($v) Then GUICtrlSetState($c[$i], $GUI_CHECKED)
+                        Else
+                            If Not GetDefaultValue($v) Then GUICtrlSetState($c[$i], $GUI_CHECKED)
+                        EndIf
+                    Else
+                        GUICtrlSetData($c[$i], GetDefaultValue($v))
+                    EndIf
+                Next
+            Case $ButtonOK
+                For $i = 1 To $Total
+                    Local $value, $v = ($a[$i])[1], $t = ($a[$i])[4]
+                    If $t = "Boolean" Or $t = "ReverseBoolean" Then
+                        If GUICtrlRead($c[$i]) = $GUI_CHECKED Then $value = 1
+                        If $t = "Boolean" Then
+                            $value = 0
+                            If GUICtrlRead($c[$i]) = $GUI_CHECKED Then $value = 1
+                        Else
+                            $value = 1
+                            If GUICtrlRead($c[$i]) = $GUI_CHECKED Then $value = 0
+                        EndIf
+                    Else
+                        $value = GUICtrlRead($c[$i])
+                        If $t = "Number" Then
+                            $value = Number($value)
+                        EndIf
+                    EndIf
+                    If $value == GetDefaultValue($v) Or $value == "" Or $value == 0 Then
+                        DeleteAllAccountsValue($v)
+                        SaveIniAllAccounts($v, "")
+                    Else
+                        SetAllAccountsValue($v, $value)
+                        SaveIniAllAccounts($v, $value)
+                    EndIf
+                Next
+                ExitLoop
+            Case $ButtonCancel
+                ExitLoop
+        EndSwitch
+    WEnd
+    GUIDelete($hGUI)
+EndFunc
+
 Func ChooseOptions()
     Local $overflowxpdefault = GetValue("DisableOverflowXPRewardCollection"), $openbagsdefault = GetAllAccountsValue("DisableOpeningBags"), $openbagsoneveryloopdefault = GetAllAccountsValue("OpenBagsOnEveryLoop"), $cofferdefault = GetValue("Coffer"), $list = Localize($cofferdefault), $coffers = Array("CofferOfCelestialEnchantments, CofferOfCelestialArtifacts, CofferOfCelestialArtifactEquipment, BlessedProfessionsElementalPack, ElixirOfFate")
     For $i = 1 To $coffers[0]
         If Not ($coffers[$i] == $cofferdefault) Then $list &= "|" & Localize($coffers[$i])
     Next
-    GUICreate($Title, 320, 230)
+    Local $hGui = GUICreate($Title, 320, 230)
     GUICtrlCreateLabel(Localize("ChooseCoffer"), 25, 20, 270)
     Local $hCombo = GUICtrlCreateCombo("", 25, 50, 270)
     GUICtrlSetData(-1, $list, Localize($cofferdefault))
@@ -2022,7 +2223,8 @@ Func ChooseOptions()
     ElseIf GetAllAccountsValue("OpenBagsOnEveryLoop") Then
         GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_CHECKED)
     EndIf
-    Local $hButton = GUICtrlCreateButton("OK", 118, 195, 84, -1, $BS_DEFPUSHBUTTON)
+    Local $ButtonAdvanced = GUICtrlCreateButton("Advanced", 25, 195, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("OK", 127, 195, 75, 25, $BS_DEFPUSHBUTTON)
     Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 195, 75, 25)
     GUISetState()
     While 1
@@ -2037,7 +2239,9 @@ Func ChooseOptions()
                     GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_UNCHECKED)
                     GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_DISABLE)
                 EndIf
-            Case $hButton
+            Case $ButtonAdvanced
+                AdvancedAllAccountsSettings($hGui)
+            Case $ButtonOK
                 Local $CurrCombo = GUICtrlRead($hCombo), $overflowxpdisabled = 1, $openbagsdisabled = 1, $openbagsoneveryloopenabled = 0
                 If GUICtrlRead($CollectOverflowXPRewardsCheckbox) = $GUI_CHECKED Then $overflowxpdisabled = 0
                 If GUICtrlRead($OpenInventoryBagsCheckbox) = $GUI_CHECKED Then $openbagsdisabled = 0
