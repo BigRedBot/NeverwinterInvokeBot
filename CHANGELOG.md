@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.7
+- Will now un-maximize the window if it is maximized
+
 9.6
 - Will now press later button for friend requests and decline button for guild requests
 

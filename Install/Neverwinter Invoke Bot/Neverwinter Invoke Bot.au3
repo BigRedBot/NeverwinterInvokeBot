@@ -92,16 +92,33 @@ While 1
         If $RestartLoop Then Return 0
     EndIf
     If Not GetValue("GameClientWidth") Or Not GetValue("GameClientHeight") Then Return
+    $WaitingTimer = TimerInit()
     If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight And ( GetValue("GameClientWidth") <> $DeskTopWidth Or GetValue("GameClientHeight") <> $DeskTopHeight ) Then
-        Error(Localize("UnMaximize")); If $RestartLoop Then Return 0
-        If $RestartLoop Then Return 0
-        Return
-    ElseIf $DeskTopWidth < GetValue("GameClientWidth") Or $DeskTopHeight < GetValue("GameClientHeight") Then
+        Sleep(10000)
+        While 1
+            TimeOut(); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
+            MouseMove($DeskTopWidth - 1, 0)
+            SingleClick()
+            Sleep(10000)
+            Focus()
+            If Not $WinHandle Or Not GetPosition() Then ExitLoop 2
+            If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight And ( GetValue("GameClientWidth") <> $DeskTopWidth Or GetValue("GameClientHeight") <> $DeskTopHeight ) Then
+                Send("{ALTDOWN}{TAB}{ALTUP}")
+                Sleep(10000)
+                Focus()
+                If Not $WinHandle Or Not GetPosition() Then ExitLoop 2
+                Sleep(10000)
+            Else
+                ExitLoop
+            EndIf
+        WEnd
+    EndIf
+    If $DeskTopWidth < GetValue("GameClientWidth") Or $DeskTopHeight < GetValue("GameClientHeight") Then
         Error(Localize("ResolutionOrHigher", "<RESOLUTION>", GetValue("GameClientWidth") & "x" & GetValue("GameClientHeight"))); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         Return
     EndIf
-    $WaitingTimer = TimerInit()
     If $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
         While 1
             If $DeskTopWidth < GetValue("GameClientWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameClientHeight") + $PaddingHeight Then
