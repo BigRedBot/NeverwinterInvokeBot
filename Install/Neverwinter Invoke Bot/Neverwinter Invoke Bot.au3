@@ -891,21 +891,38 @@ Func FindPixels($x, $y, $c, $t = 5)
     Return 1
 EndFunc
 
+Func DeclinePromptImageSearch($image)
+    If Not ImageSearch($image) Then Return 0
+    MouseMove($_ImageSearchX, $_ImageSearchY)
+    SingleClick()
+    Sleep(1000)
+    If Not ImageSearch($image) Then Return 1
+    Send(GetValue("CursorModeKey"))
+    Sleep(1000)
+    MouseMove($_ImageSearchX, $_ImageSearchY)
+    SingleClick()
+    Sleep(1000)
+    Return 1
+EndFunc
+
 Global $DoLogInCommands = 1
 
 Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("ImageTolerance"), $do = 1)
     If $do And Not ImageExists($image) Then Return 0
-    If $do And $DoLogInCommands And $image = "ChangeCharacterButton" Then
-        If $DoLogInCommands = 2 Or GetValue("GameMenuKey") = "{ESC}" Then
-            Send("{ESC}")
-        Else
-            Send(GetValue("GameMenuKey"))
-        EndIf
-        Sleep(1500)
-        If $DoLogInCommands = 1 Then
-            $DoLogInCommands = 2
-        Else
-            $DoLogInCommands = 1
+    If $do And $image = "ChangeCharacterButton" Then
+        If DeclinePromptImageSearch("Later") Or DeclinePromptImageSearch("Decline") Then Return 0
+        If $DoLogInCommands Then
+            If $DoLogInCommands = 2 Or GetValue("GameMenuKey") = "{ESC}" Then
+                Send("{ESC}")
+            Else
+                Send(GetValue("GameMenuKey"))
+            EndIf
+            Sleep(1500)
+            If $DoLogInCommands = 1 Then
+                $DoLogInCommands = 2
+            Else
+                $DoLogInCommands = 1
+            EndIf
         EndIf
     EndIf
     If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then

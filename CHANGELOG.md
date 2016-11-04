@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.6
+- Will now press later button for friend requests and decline button for guild requests
+
 9.5
 - Added advanced settings button in the options
 
