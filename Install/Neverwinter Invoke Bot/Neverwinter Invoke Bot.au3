@@ -190,14 +190,6 @@ Func SyncValues()
     DeleteAccountValue("FinishedCharacter")
 EndFunc
 
-If GetValue("TopSelectedCharacterX") And GetValue("TopScrollBarX") Then
-    Global $TopSelectedCharacterX = Array(GetValue("TopSelectedCharacterX")), $TopSelectedCharacterY = Array(GetValue("TopSelectedCharacterY")), $TopSelectedCharacterC = Array(GetValue("TopSelectedCharacterC")), $TopScrollBarX = Array(GetValue("TopScrollBarX")), $TopScrollBarY = Array(GetValue("TopScrollBarY")), $TopScrollBarC = Array(GetValue("TopScrollBarC"))
-EndIf
-
-If GetValue("BottomSelectedCharacterX") And GetValue("BottomScrollBarX") Then
-    Global $BottomSelectedCharacterX = Array(GetValue("BottomSelectedCharacterX")), $BottomSelectedCharacterY = Array(GetValue("BottomSelectedCharacterY")), $BottomSelectedCharacterC = Array(GetValue("BottomSelectedCharacterC")), $BottomScrollBarX = Array(GetValue("BottomScrollBarX")), $BottomScrollBarY = Array(GetValue("BottomScrollBarY")), $BottomScrollBarC = Array(GetValue("BottomScrollBarC"))
-EndIf
-
 Func Loop()
 While 1
 While 1
@@ -245,23 +237,11 @@ While 1
                 Send("{DOWN}")
             ElseIf GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
                 AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
-                If GetValue("TopSelectedCharacterX") And GetValue("TopScrollBarX") Then
-                    Send("{DOWN}")
-                    For $n = 1 To GetValue("TotalSlots")
-                        Send("{UP}")
-                        Position(); If $RestartLoop Then Return 0
-                        If $RestartLoop Then ExitLoop 3
-                        For $n2 = 1 To $TopSelectedCharacterX[0]
-                            If FindPixels($TopSelectedCharacterX[$n2], $TopSelectedCharacterY[$n2], $TopSelectedCharacterC[$n2]) And FindPixels($TopScrollBarX[$n2], $TopScrollBarY[$n2], $TopScrollBarC[$n2]) Then ExitLoop 2
-                        Next
-                    Next
-                Else
-                    For $n = 1 To GetValue("TotalSlots")
-                        Send("{UP}")
-                    Next
-                EndIf
+                For $n = 1 To GetValue("TotalSlots")
+                    Send("{UP}")
+                Next
                 AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollTowardKeyDelay)
-                Sleep($CharacterSelectionScrollTowardKeyDelay)
+                Sleep(1000)
                 For $n = 2 To GetValue("CurrentCharacter")
                     Send("{DOWN}")
                     Sleep(50)
@@ -269,23 +249,11 @@ While 1
                 AutoItSetOption("SendKeyDownDelay", $KeyDelay)
             Else
                 AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
-                If GetValue("BottomSelectedCharacterX") And GetValue("BottomScrollBarX") Then
-                    Send("{UP}")
-                    For $n = 1 To GetValue("TotalSlots")
-                        Send("{DOWN}")
-                        Position(); If $RestartLoop Then Return 0
-                        If $RestartLoop Then ExitLoop 3
-                        For $n2 = 1 To $BottomSelectedCharacterX[0]
-                            If FindPixels($BottomSelectedCharacterX[$n2], $BottomSelectedCharacterY[$n2], $BottomSelectedCharacterC[$n2]) And FindPixels($BottomScrollBarX[$n2], $BottomScrollBarY[$n2], $BottomScrollBarC[$n2]) Then ExitLoop 2
-                        Next
-                    Next
-                Else
-                    For $n = 1 To GetValue("TotalSlots")
-                        Send("{DOWN}")
-                    Next
-                EndIf
+                For $n = 1 To GetValue("TotalSlots")
+                    Send("{DOWN}")
+                Next
                 AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollTowardKeyDelay)
-                Sleep($CharacterSelectionScrollTowardKeyDelay)
+                Sleep(1000)
                 For $n = 1 To (GetValue("TotalSlots") - GetValue("CurrentCharacter"))
                     Send("{UP}")
                     Sleep(50)
@@ -369,20 +337,14 @@ While 1
             If GetValue("FinishedLoop") Or CompletedAccount() Then
                 ExitLoop
             Else
-                Local $AdditionalKeyPressTime = 0, $AddKeyPressTime = 0, $RemoveKeyPressTime = 0
-                If GetValue("TopScrollBarX") And GetValue("TopSelectedCharacterX") Then
-                    $AddKeyPressTime = $KeyDelay
-                EndIf
-                If GetValue("BottomScrollBarX") And GetValue("BottomSelectedCharacterX") Then
-                    $RemoveKeyPressTime = $KeyDelay
-                EndIf
+                Local $AdditionalKeyPressTime = 0
                 For $n = 1 To $RemainingCharacters
                     If GetValue("CurrentCharacter") + $n <= Ceiling(GetValue("TotalSlots") / 2) Then
-                        $AdditionalKeyPressTime += $n * ($KeyDelay + 50) + $AddKeyPressTime
+                        $AdditionalKeyPressTime += $n * ($KeyDelay + 50)
                     ElseIf GetValue("CurrentCharacter") <= Floor(GetValue("TotalSlots") / 2) + 1 Then
                         $AdditionalKeyPressTime -= (GetValue("CurrentCharacter") + $n - Floor(GetValue("TotalSlots") / 2) + 1) * ($KeyDelay + 50)
                     Else
-                        $AdditionalKeyPressTime -= $n * ($KeyDelay + 50) + $RemoveKeyPressTime
+                        $AdditionalKeyPressTime -= $n * ($KeyDelay + 50)
                     EndIf
                 Next
                 Local $LastTime = TimerDiff($LoopTimer)
@@ -896,16 +858,6 @@ Func WaitForScreen($image, $resultPosition = -2, $left = $ClientLeft, $top = $Cl
         TimeOut(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
     WEnd
-EndFunc
-
-Func FindPixels($x, $y, $c, $t = 5)
-    Local $a = StringSplit(StringRegExpReplace(Hex(PixelGetColor(Number($x) + $OffsetX, Number($y) + $OffsetY), 6), "(..)(..)(..)", "$1|$2|$3"), "|")
-    Local $b = StringSplit(StringRegExpReplace($c, "(..)(..)(..)", "$1|$2|$3"), "|")
-    For $i = 1 To 3
-        Local $d = Dec($a[$i]) - Dec($b[$i])
-        If $d > $t Or $d < -$t Then Return 0
-    Next
-    Return 1
 EndFunc
 
 Func DeclinePromptImageSearch($image)
