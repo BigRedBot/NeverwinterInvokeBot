@@ -35,7 +35,7 @@ Func ScreenDetection_Splash($s = "")
     EndIf
 EndFunc
 
-Func ScreenDetection_ImageSearch($image, $resultPosition = -1, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("ImageTolerance"))
+Func ScreenDetection_ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $resultPosition = -2, $tolerance = GetValue("ImageTolerance"))
     If Not FileExists("images\" & GetValue("Language") & "\" & $image & ".png") Then Return 0
     If _ImageSearchArea("images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return 1
     Local $i = 2
@@ -79,13 +79,12 @@ While 1
         If ScreenDetection_ImageSearch("Unavailable") Then $text &= @CRLF & @CRLF & Localize("ServerUnavailableDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         If ScreenDetection_ImageSearch("TryAgainLater") Then $text &= @CRLF & @CRLF & Localize("TryAgainLaterDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         If ScreenDetection_ImageSearch("Mismatch") Then $text &= @CRLF & @CRLF & Localize("VersionMismatchDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ScreenDetection_ImageSearch("VIPInventory") Then $text &= @CRLF & @CRLF & Localize("VIPInventoryDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         If ScreenDetection_ImageSearch("OpenAnother") Then $text &= @CRLF & @CRLF & Localize("OpenAnotherButtonDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         If ScreenDetection_ImageSearch("CelestialBagOfRefining") Then $text &= @CRLF & @CRLF & Localize("CelestialBagOfRefiningDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ScreenDetection_ImageSearch("VIPAccountRewards") Then $text &= @CRLF & @CRLF & Localize("VIPAccountRewardsDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ScreenDetection_ImageSearch("VIPAccountReward") Then
-            $text &= @CRLF & @CRLF & Localize("VIPAccountRewardDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-            If ScreenDetection_ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-50) Then $text &= @CRLF & @CRLF & Localize("VIPAccountRewardBorderDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+        If ScreenDetection_ImageSearch("VIPInventory") Then $text &= @CRLF & @CRLF & Localize("VIPInventoryDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+        If ScreenDetection_ImageSearch("VIPAccountRewards") Then
+            $text &= @CRLF & @CRLF & Localize("VIPAccountRewardsDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+            If ScreenDetection_ImageSearch("VIPAccountRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $_ImageSearchRight + 200, $_ImageSearchBottom + 20) Then $text &= @CRLF & @CRLF & Localize("VIPAccountRewardBorderDetected") & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         EndIf
     EndIf
     ScreenDetection_Splash($text)

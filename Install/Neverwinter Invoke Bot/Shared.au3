@@ -42,6 +42,7 @@ Func LoadDefaults()
     SetDefault("OpenInventoryBagDelay", 1.5)
     SetDefault("OpenAnotherInventoryBagDelay", 0.5)
     SetDefault("ProfessionsDelay", 1)
+    SetDefault("OptionalAssetsDelay", 0.2)
     SetDefault("LogInSeconds", 16)
     SetDefault("LogOutSeconds", 9)
     SetDefault("LogInDelaySeconds", 3)
@@ -61,6 +62,7 @@ Func LoadDefaults()
     SetDefault("CharacterSelectionMenuY", 110)
     SetDefault("LogFilesToKeep", 30)
     SetDefault("CheckServerAddress", "patchserver.crypticstudios.com")
+    SetDefault("LeadershipOptionalAssets", "Hero|Adventurer|ManatArms|Mercenary|Guard|Footman")
 EndFunc
 
 Global $CurrentAccount = 1

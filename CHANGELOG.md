@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.8
+- Added option to unlock optional assets
+
 9.7
 - Will now un-maximize the window if it is maximized
 

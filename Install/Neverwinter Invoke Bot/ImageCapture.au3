@@ -70,29 +70,31 @@ Func Position()
 EndFunc
 
 Func Capture()
-    If MsgBox($MB_OKCANCEL, $Title, Localize("ClickOKToCapture")) <> $IDOK Then Exit
-    Position()
-    Sleep(500)
-    Local $err = False, $err_txt
-    Local $hHBITMAP = _ScreenCapture_Capture("", $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, False)
-    WinSetOnTop($WinHandle, "", 0)
-    If Not _ClipBoard_Open(0) Then
-        $err = @error
-        $err_txt = "_ClipBoard_Open"
-    EndIf
-    If Not _ClipBoard_Empty() Then
-        $err = @error
-        $err_txt = "_ClipBoard_Empty"
-    EndIf
-    If Not _ClipBoard_SetDataEx($hHBITMAP, $CF_BITMAP) Then
-        $err = @error
-        $err_txt = "_ClipBoard_SetDataEx"
-    EndIf
-    _ClipBoard_Close()
-    _WinAPI_DeleteObject($hHBITMAP)
-    If $err Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorOccuredWith", "<ERROR>", $err_txt), 10)
-    MsgBox($MB_OK, $Title, Localize("NeverwinterCaptured"))
-    Exit
+    While 1
+        If MsgBox($MB_OKCANCEL, $Title, Localize("ClickOKToCapture")) <> $IDOK Then Exit
+        Position()
+        Sleep(3000)
+        Position()
+        Local $err = False, $err_txt
+        Local $hHBITMAP = _ScreenCapture_Capture("", $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, False)
+        WinSetOnTop($WinHandle, "", 0)
+        If Not _ClipBoard_Open(0) Then
+            $err = @error
+            $err_txt = "_ClipBoard_Open"
+        EndIf
+        If Not _ClipBoard_Empty() Then
+            $err = @error
+            $err_txt = "_ClipBoard_Empty"
+        EndIf
+        If Not _ClipBoard_SetDataEx($hHBITMAP, $CF_BITMAP) Then
+            $err = @error
+            $err_txt = "_ClipBoard_SetDataEx"
+        EndIf
+        _ClipBoard_Close()
+        _WinAPI_DeleteObject($hHBITMAP)
+        If $err Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorOccuredWith", "<ERROR>", $err_txt), 10)
+        MsgBox($MB_OK, $Title, Localize("NeverwinterCaptured"))
+    WEnd
 EndFunc
 
 Capture()

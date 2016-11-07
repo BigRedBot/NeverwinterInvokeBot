@@ -12,11 +12,12 @@ If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
     Exit
 EndIf
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
-Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions
+Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions, $EnableOptionalAssets
 Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $NoAutoLaunch, $EndTime, $MinutesToEndSaved, $MinutesToEndSavedTimer, $StartingKeyboardLayout
 Global $KeyDelay = GetValue("KeyDelaySeconds") * 1000, $CharacterSelectionScrollAwayKeyDelay = GetValue("CharacterSelectionScrollAwayKeyDelaySeconds") * 1000, $CharacterSelectionScrollTowardKeyDelay = GetValue("CharacterSelectionScrollTowardKeyDelaySeconds") * 1000, $TimeOut = GetValue("TimeOutMinutes") * 60000, $MouseOffset = 5
 AutoItSetOption("SendKeyDownDelay", $KeyDelay)
 #include <StringConstants.au3>
+#include <ColorConstants.au3>
 #include <WinAPISys.au3>
 #include <Math.au3>
 #include <Crypt.au3>
@@ -26,6 +27,7 @@ AutoItSetOption("SendKeyDownDelay", $KeyDelay)
 #include "_SendUnicode.au3"
 #include "_MultilineInputBox.au3"
 #include "_GUIScrollbars_Ex.au3"
+#Include "_Icons.au3"
 #include "Professions.au3"
 
 Func Array($x)
@@ -545,42 +547,41 @@ Func GetVIPAccountReward(); If $RestartLoop Then Return 0
     Local $tried = 0
 While 1
 While 1
-    If Not GetValue("SkipVIPAccountReward") And Not GetValue("CollectedVIPAccountReward") And GetValue("LastVIPAccountRewardTryLoop") < GetValue("CurrentLoop") And ( GetValue("VIPAccountRewardCharacter") < GetValue("StartAtCharacter") Or GetValue("VIPAccountRewardCharacter") > GetValue("EndAtCharacter") Or GetValue("VIPAccountRewardCharacter") = GetValue("CurrentCharacter") ) And ImageExists("VIPAccountReward") Then
+    If Not GetValue("SkipVIPAccountReward") And Not GetValue("CollectedVIPAccountReward") And GetValue("LastVIPAccountRewardTryLoop") < GetValue("CurrentLoop") And ( GetValue("VIPAccountRewardCharacter") < GetValue("StartAtCharacter") Or GetValue("VIPAccountRewardCharacter") > GetValue("EndAtCharacter") Or GetValue("VIPAccountRewardCharacter") = GetValue("CurrentCharacter") ) Then
         If GetValue("VIPAccountRewardTries") < 3 Then
             $tried = 1
             AddAccountCountValue("VIPAccountRewardTries")
             Send(GetValue("InventoryKey"))
             Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
-            If ImageSearch("VIPAccountReward", -1) Then
+            If Not ImageSearch("VIPInventory") Then ExitLoop
+            SetAccountValue("LastVIPAccountRewardTryLoop", GetValue("CurrentLoop"))
+            If ImageSearch("VIPAccountRewards", $_ImageSearchLeft, $_ImageSearchBottom + 200, $_ImageSearchRight + 50) Then
                 Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom
-                If ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-50) Then
+                If ImageSearch("VIPAccountRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $_ImageSearchRight + 200, $_ImageSearchBottom + 20) Then
                     $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonLeftOffset"), $_ImageSearchRight + GetValue("VIPAccountRewardButtonRightOffset"), 1)
                     $_ImageSearchY = Random($_ImageSearchTop + GetValue("VIPAccountRewardButtonTopOffset"), $_ImageSearchTop + GetValue("VIPAccountRewardButtonBottomOffset"), 1)
                     MouseMove($_ImageSearchX, $_ImageSearchY)
                     SingleClick()
                     Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
-                    If Not ImageSearch("VIPAccountReward", -1, $left, $top, $right, $bottom) Then
+                    If Not ImageSearch("VIPAccountRewards", $left, $top, $right, $bottom) Then
                         SaveItemCount("TotalVIPAccountRewards", 1)
                         SetAccountValue("CollectedVIPAccountReward", 1)
-                    ElseIf ImageSearch("VIPAccountRewardBorder", -1, $_ImageSearchX, $_ImageSearchY-50) Then
+                    ElseIf ImageSearch("VIPAccountRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $_ImageSearchRight + 200, $_ImageSearchBottom + 20) Then
                         $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonLeftOffset"), $_ImageSearchRight + GetValue("VIPAccountRewardButtonRightOffset"), 1)
                         $_ImageSearchY = Random($_ImageSearchTop + GetValue("VIPAccountRewardButtonTopOffset"), $_ImageSearchTop + GetValue("VIPAccountRewardButtonBottomOffset"), 1)
                         MouseMove($_ImageSearchX, $_ImageSearchY)
                         SingleClick()
                         Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
-                        If Not ImageSearch("VIPAccountReward", -1, $left, $top, $right, $bottom) Then
+                        If Not ImageSearch("VIPAccountRewards", $left, $top, $right, $bottom) Then
                             SaveItemCount("TotalVIPAccountRewards", 1)
                             SetAccountValue("CollectedVIPAccountReward", 1)
                         EndIf
                     EndIf
                 EndIf
-            Else
-                ExitLoop
             EndIf
         EndIf
         DeleteAccountValue("VIPAccountRewardTries")
         SetAccountValue("TriedVIPAccountReward", 1)
-        SetAccountValue("LastVIPAccountRewardTryLoop", GetValue("CurrentLoop"))
     EndIf
     If $tried Then
         OpenInventoryBags("VIPAccountRewards"); If $RestartLoop Then Return 0
@@ -847,11 +848,11 @@ Func Splash($s = "", $ontop = 1)
     EndIf
 EndFunc
 
-Func WaitForScreen($image, $resultPosition = -2, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom); If $RestartLoop Then Return 0
+Func WaitForScreen($image); If $RestartLoop Then Return 0
     While 1
         Position(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
-        If ImageSearch($image, $resultPosition, $left, $top, $right, $bottom) Then Return
+        If ImageSearch($image) Then Return
         FindLogInScreen(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         If Not $DoLogInCommands Or $image <> "ChangeCharacterButton" Then Sleep(500)
@@ -876,7 +877,7 @@ EndFunc
 
 Global $DoLogInCommands = 1
 
-Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("ImageTolerance"), $do = 1)
+Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $resultPosition = -2, $tolerance = GetValue("ImageTolerance"), $do = 1)
     If $do And Not ImageExists($image) Then Return 0
     If $do And $image = "ChangeCharacterButton" Then
         If DeclinePromptImageSearch("Later") Or DeclinePromptImageSearch("Decline") Then Return 0
@@ -895,13 +896,13 @@ Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $Clie
         EndIf
     EndIf
     If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then
-        If $do And Not SetImageSearchVariables($image, $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return 0
+        If $do And Not SetImageSearchVariables($image, $left, $top, $right, $bottom, $resultPosition, $tolerance) Then Return 0
         Return 1
     EndIf
     Local $i = 2
     While ImageExists($image & $i)
         If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & $i & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then
-            If $do And Not SetImageSearchVariables($image, $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return 0
+            If $do And Not SetImageSearchVariables($image, $left, $top, $right, $bottom, $resultPosition, $tolerance) Then Return 0
             Return $i
         EndIf
         $i += 1
@@ -909,7 +910,7 @@ Func ImageSearch($image, $resultPosition = -2, $left = $ClientLeft, $top = $Clie
     Return 0
 EndFunc
 
-Func SetImageSearchVariables($image, $resultPosition, $left, $top, $right, $bottom, $tolerance)
+Func SetImageSearchVariables($image, $left, $top, $right, $bottom, $resultPosition, $tolerance)
     If $image <> "LogInScreen" And $image <> "Unavailable" And $image <> "TryAgainLater" And $image <> "Mismatch" And $image <> "Idle" And $image <> "OK" Then
         $LoggingIn = 0
         $LogInTries = 0
@@ -926,7 +927,7 @@ Func SetImageSearchVariables($image, $resultPosition, $left, $top, $right, $bott
             $DoLogInCommands = 2
             Send("{ESC}")
             Sleep(500)
-            If ImageSearch($image, $resultPosition, $left, $top, $right, $bottom, $tolerance, 0) Then Return 0
+            If ImageSearch($image, $left, $top, $right, $bottom, $resultPosition, $tolerance, 0) Then Return 0
             $DoLogInCommands = 0
         EndIf
     EndIf
@@ -1727,8 +1728,10 @@ EndFunc
 Func ConfigureAccount()
     If CompletedAccount() Or (MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAccountOptions", "<ACCOUNT>", $CurrentAccount)) = $IDYES) Then Return
     ChooseAccountOptions()
-    ChooseProfessionsAccountOption()
-    ChooseProfessionsAccountTaskOption()
+    ChooseProfessionsAccountEnableOptions()
+    ChooseProfessionsAccountSetTasksOptions()
+    ChooseProfessionsAccountEnableAssetsOptions()
+    ChooseProfessionsAccountSetAssetsOptions()
     If Not GetAccountValue("InfiniteLoopsStarted") And GetValue("UnattendedMode") <> 3 Then
         While 1
             Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $MaxLoops), GetValue("CurrentLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
@@ -2094,6 +2097,7 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
     $s &= "|" & "SkipVerifyFiles,SkipVerifyFilesTitle,SkipVerifyFilesDescription,Boolean"
     $s &= "|" & "DisableDonationPrompts,DisableDonationPromptsTitle,DisableDonationPromptsDescription,Boolean"
     $s &= "|" & "ProfessionsDelay,ProfessionsDelayTitle,ProfessionsDelayDescription,Number"
+    $s &= "|" & "OptionalAssetsDelay,OptionalAssetsDelayTitle,OptionalAssetsDelayDescription,Number"
     $s &= "|" & "ClaimCofferDelay,ClaimCofferDelayTitle,ClaimCofferDelayDescription,Number"
     $s &= "|" & "ClaimVIPAccountRewardDelay,ClaimVIPAccountRewardDelayTitle,ClaimVIPAccountRewardDelayDescription,Number"
     $s &= "|" & "OpenInventoryBagDelay,OpenInventoryBagDelayTitle,OpenInventoryBagDelayDescription,Number"
@@ -2356,6 +2360,7 @@ Func RunScript(); If $RestartLoop Then Return 0
     If $UnattendedModeCheckSettings Then Exit
     Start(); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
+    Exit
 EndFunc
 
 RunScript()
