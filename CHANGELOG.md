@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.8.1
+- Added version mismatch image
+
 9.8
 - Added option to unlock optional assets
 

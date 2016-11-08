@@ -13,7 +13,7 @@ If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
 EndIf
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
 Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions, $EnableOptionalAssets
-Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $LastLoginTry = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $NoAutoLaunch, $EndTime, $MinutesToEndSaved, $MinutesToEndSavedTimer, $StartingKeyboardLayout
+Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $NoAutoLaunch, $EndTime, $MinutesToEndSaved, $MinutesToEndSavedTimer, $StartingKeyboardLayout
 Global $KeyDelay = GetValue("KeyDelaySeconds") * 1000, $CharacterSelectionScrollAwayKeyDelay = GetValue("CharacterSelectionScrollAwayKeyDelaySeconds") * 1000, $CharacterSelectionScrollTowardKeyDelay = GetValue("CharacterSelectionScrollTowardKeyDelaySeconds") * 1000, $TimeOut = GetValue("TimeOutMinutes") * 60000, $MouseOffset = 5
 AutoItSetOption("SendKeyDownDelay", $KeyDelay)
 #include <StringConstants.au3>
@@ -81,7 +81,6 @@ While 1
     If Not $WinHandle Or Not GetPosition() Then
         If Not GetValue("DisableRestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And ImageExists("LogInScreen") Then
             $LogInTries = 0
-            $LastLoginTry = 0
             $DisableRelogCount = 1
             Splash("[ " & Localize("NeverwinterNotFound") & " ]")
             CloseClient(); If $RestartLoop Then Return 0
@@ -913,10 +912,9 @@ Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $Clien
 EndFunc
 
 Func SetImageSearchVariables($image, $left, $top, $right, $bottom, $resultPosition, $tolerance)
-    If $image <> "LogInScreen" And $image <> "Unavailable" And $image <> "TimedOutTryAgain" And $image <> "TryAgainLater" And $image <> "Mismatch" And $image <> "Idle" And $image <> "OK" Then
+    If $image <> "LogInScreen" And $image <> "InvalidUsernameOrPassword" And $image <> "Mismatch" And $image <> "Idle" And $image <> "OK" Then
         $LoggingIn = 0
         $LogInTries = 0
-        $LastLoginTry = 0
         If $DoRelogCount And Not $DisableRelogCount Then
             $DoRelogCount = 0
             $DisableRelogCount = 0
@@ -965,6 +963,8 @@ Func WaitMinutes($time, $msg); If $RestartLoop Then Return 0
     WEnd
 EndFunc
 
+Local $InvalidUsernameOrPassword = 0
+
 Func FindLogInScreen(); If $RestartLoop Then Return 0
     If ImageSearch("Idle") And ImageSearch("OK") Then
         AddAccountCountValue("IdleLogout")
@@ -983,14 +983,14 @@ While 1
     $LoggingIn = 1
     $DoLogInCommands = 1
     $ChangingCharacter = 1
-    If $LastLoginTry And TimerDiff($LastLoginTry) / 1000 >= 60 Then
+    If $LogInTries And Not $InvalidUsernameOrPassword Then
         $LogInTries = 0
-        $LastLoginTry = 0
         Position(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         WaitMinutes(15, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
     Else
+        $InvalidUsernameOrPassword = 0
         Splash()
         Sleep(1000)
         LogIn(); If $RestartLoop Then Return 0
@@ -1011,13 +1011,8 @@ While 1
                         Sleep(500)
                     WEnd
                     ExitLoop
-                ElseIf ImageSearch("Unavailable") Or ImageSearch("TimedOutTryAgain") Or ImageSearch("TryAgainLater") Then
-                    $LogInTries = 0
-                    Position(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                    WaitMinutes(15, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                    ExitLoop
+                ElseIf ImageSearch("InvalidUsernameOrPassword") Then
+                    $InvalidUsernameOrPassword = 1
                 ElseIf ImageSearch("Mismatch") And PatchClient() Then; If $RestartLoop Then Return 0
                     ExitLoop
                 EndIf
@@ -1232,7 +1227,6 @@ Func LogIn(); If $RestartLoop Then Return 0
         AutoItSetOption("SendKeyDownDelay", $KeyDelay)
         Send("{ENTER}")
         $LogInTries += 1
-        $LastLoginTry = TimerInit()
     Else
         Error(Localize("UsernameAndPasswordNotDefined")); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
