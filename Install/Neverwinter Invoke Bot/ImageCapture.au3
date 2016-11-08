@@ -73,8 +73,7 @@ Func Capture()
     While 1
         If MsgBox($MB_OKCANCEL, $Title, Localize("ClickOKToCapture")) <> $IDOK Then Exit
         Position()
-        Sleep(3000)
-        Position()
+        Sleep(500)
         Local $err = False, $err_txt
         Local $hHBITMAP = _ScreenCapture_Capture("", $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, False)
         WinSetOnTop($WinHandle, "", 0)

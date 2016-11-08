@@ -340,15 +340,17 @@ While 1
                 ExitLoop
             Else
                 Local $AdditionalKeyPressTime = 0
-                For $n = 1 To $RemainingCharacters
-                    If GetValue("CurrentCharacter") + $n <= Ceiling(GetValue("TotalSlots") / 2) Then
-                        $AdditionalKeyPressTime += $n * ($KeyDelay + 50)
-                    ElseIf GetValue("CurrentCharacter") <= Floor(GetValue("TotalSlots") / 2) + 1 Then
-                        $AdditionalKeyPressTime -= (GetValue("CurrentCharacter") + $n - Floor(GetValue("TotalSlots") / 2) + 1) * ($KeyDelay + 50)
-                    Else
-                        $AdditionalKeyPressTime -= $n * ($KeyDelay + 50)
-                    EndIf
-                Next
+                If GetValue("DisableSimpleCharacterSelection") Then
+                    For $n = 1 To $RemainingCharacters
+                        If GetValue("CurrentCharacter") + $n <= Ceiling(GetValue("TotalSlots") / 2) Then
+                            $AdditionalKeyPressTime += $n * ($KeyDelay + 50)
+                        ElseIf GetValue("CurrentCharacter") <= Floor(GetValue("TotalSlots") / 2) + 1 Then
+                            $AdditionalKeyPressTime -= (GetValue("CurrentCharacter") + $n - Floor(GetValue("TotalSlots") / 2) + 1) * ($KeyDelay + 50)
+                        Else
+                            $AdditionalKeyPressTime -= $n * ($KeyDelay + 50)
+                        EndIf
+                    Next
+                EndIf
                 Local $LastTime = TimerDiff($LoopTimer)
                 Local $RemainingSeconds = ( $RemainingCharacters * $LastTime + $AdditionalKeyPressTime - TimerDiff($LogOutTimer) ) / 1000
                 Local $LastTook = "LastInvokeTook"
@@ -895,13 +897,13 @@ Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $Clien
             EndIf
         EndIf
     EndIf
-    If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then
+    If _ImageSearchArea(@ScriptDir & "\images\" & $Language & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then
         If $do And Not SetImageSearchVariables($image, $left, $top, $right, $bottom, $resultPosition, $tolerance) Then Return 0
         Return 1
     EndIf
     Local $i = 2
     While ImageExists($image & $i)
-        If _ImageSearchArea(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & $i & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then
+        If _ImageSearchArea(@ScriptDir & "\images\" & $Language & "\" & $image & $i & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then
             If $do And Not SetImageSearchVariables($image, $left, $top, $right, $bottom, $resultPosition, $tolerance) Then Return 0
             Return $i
         EndIf
@@ -911,7 +913,7 @@ Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $Clien
 EndFunc
 
 Func SetImageSearchVariables($image, $left, $top, $right, $bottom, $resultPosition, $tolerance)
-    If $image <> "LogInScreen" And $image <> "Unavailable" And $image <> "TryAgainLater" And $image <> "Mismatch" And $image <> "Idle" And $image <> "OK" Then
+    If $image <> "LogInScreen" And $image <> "Unavailable" And $image <> "TimedOutTryAgain" And $image <> "TryAgainLater" And $image <> "Mismatch" And $image <> "Idle" And $image <> "OK" Then
         $LoggingIn = 0
         $LogInTries = 0
         $LastLoginTry = 0
@@ -935,7 +937,7 @@ Func SetImageSearchVariables($image, $left, $top, $right, $bottom, $resultPositi
 EndFunc
 
 Func ImageExists($image)
-    Return FileExists(@ScriptDir & "\images\" & GetValue("Language") & "\" & $image & ".png")
+    Return FileExists(@ScriptDir & "\images\" & $Language & "\" & $image & ".png")
 EndFunc
 
 Func WaitMinutes($time, $msg); If $RestartLoop Then Return 0
@@ -1009,7 +1011,7 @@ While 1
                         Sleep(500)
                     WEnd
                     ExitLoop
-                ElseIf ImageSearch("Unavailable") Or ImageSearch("TryAgainLater") Then
+                ElseIf ImageSearch("Unavailable") Or ImageSearch("TimedOutTryAgain") Or ImageSearch("TryAgainLater") Then
                     $LogInTries = 0
                     Position(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0

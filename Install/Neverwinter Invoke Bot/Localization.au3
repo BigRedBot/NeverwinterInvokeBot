@@ -2,7 +2,7 @@
 #include-once
 
 Func LoadLocalizationDefaults()
-    If GetValue("Language") = "Russian" Then
+    If $Language = "Russian" Then
         SetDefault("VerifyFilesWindowTitle", "Verify?")
         SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
         SetDefault("GameMenuKey", "{ESC}")

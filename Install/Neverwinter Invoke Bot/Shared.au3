@@ -71,6 +71,7 @@ Global $SettingsDir = @AppDataDir & "\Neverwinter Invoke Bot"
 Global $DeletedString = "DELETED_Gf3birAeJdpa7bJnP2TheRYGFg7MjdnmpQq4"
 
 SetAllAccountsValue("Language", LoadLocalizations())
+Global $Language = GetValue("Language")
 
 Func SetDefault($name, $value = 0)
     If Not IsDeclared("SETTINGS_Default_" & $name) Then Return Assign("SETTINGS_Default_" & $name, $value, 2)
