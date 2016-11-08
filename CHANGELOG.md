@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.8.2
+- Will try to detect asset buttons for 10 seconds if not first detected
+
 9.8.1
 - Added version mismatch image
 

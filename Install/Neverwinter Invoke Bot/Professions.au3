@@ -98,7 +98,13 @@ EndFunc
 
 Func ProfessionsChooseAssets(); If $RestartLoop Then Return 0
     If Not $EnableOptionalAssets Or Not GetValue("LeadershipOptionalAssets") Then Return
-    If Not ImageSearch("Professions_Asset") Or Not ImageSearch("Professions_Asset", $_ImageSearchLeft, $_ImageSearchBottom + 100, $_ImageSearchRight, $_ImageSearchBottom + 150) Then Return
+    Local $retry = 0
+    While 1
+        If ImageSearch("Professions_Asset") And ImageSearch("Professions_Asset", $_ImageSearchLeft, $_ImageSearchBottom + 100, $_ImageSearchRight, $_ImageSearchBottom + 150) Then ExitLoop
+        If $retry >= 10 Then Return
+        Sleep(1000)
+        $retry += 1
+    WEnd
     Local $left = $_ImageSearchX, $top = $_ImageSearchTop, $right = $_ImageSearchRight + 200, $select = 0, $workers = StringSplit(GetValue("LeadershipOptionalAssets"), "|")
     ProfessionsClickImage(); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
