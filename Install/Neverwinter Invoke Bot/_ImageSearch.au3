@@ -26,7 +26,7 @@
 ;       a desktop region to search
 ;
 ;===============================================================================
-Global $_ImageSearchLeft = 0, $_ImageSearchTop = 0, $_ImageSearchRight = 0, $_ImageSearchBottom = 0, $_ImageSearchWidth = 0, $_ImageSearchHeight = 0, $_ImageSearchX = 0, $_ImageSearchY = 0
+Global $_ImageSearchLeft = 0, $_ImageSearchTop = 0, $_ImageSearchRight = 0, $_ImageSearchBottom = 0, $_ImageSearchWidth = 0, $_ImageSearchHeight = 0, $_ImageSearchCenterWidth = 0, $_ImageSearchCenterHeight = 0, $_ImageSearchX = 0, $_ImageSearchY = 0
 
 Func _ImageSearch($findImage, $resultPosition, $tolerance, $width = @DesktopWidth, $height = @DesktopHeight)
     If $width = 0 Then $width = @DesktopWidth
@@ -39,10 +39,12 @@ Func _ImageSearchArea($findImage, $resultPosition, $left, $top, $right, $bottom,
     Local $result = DllCall("ImageSearchDLL.dll", "str", "ImageSearch", "int", $left, "int", $top, "int", $right, "int", $bottom, "str", $findImage)
     if not IsArray($result) or $result[0] = "0" then return 0
     Local $array = StringSplit($result[0], "|")
-    $_ImageSearchLeft = Int(Number($array[2]))
-    $_ImageSearchTop = Int(Number($array[3]))
-    $_ImageSearchWidth = Int(Number($array[4]))
-    $_ImageSearchHeight = Int(Number($array[5]))
+    $_ImageSearchLeft = Floor(Number($array[2]))
+    $_ImageSearchTop = Floor(Number($array[3]))
+    $_ImageSearchWidth = Floor(Number($array[4]))
+    $_ImageSearchHeight = Floor(Number($array[5]))
+    $_ImageSearchCenterWidth = Floor(($_ImageSearchWidth-1)/2)
+    $_ImageSearchCenterHeight = Floor(($_ImageSearchHeight-1)/2)
     $_ImageSearchRight = $_ImageSearchLeft + $_ImageSearchWidth-1
     $_ImageSearchBottom = $_ImageSearchTop + $_ImageSearchHeight-1
     $_ImageSearchX = $_ImageSearchLeft
@@ -52,8 +54,8 @@ Func _ImageSearchArea($findImage, $resultPosition, $left, $top, $right, $bottom,
             $_ImageSearchX += Random(-$resultPosition, $resultPosition, 1)
             $_ImageSearchY += Random(-$resultPosition, $resultPosition, 1)
         else
-            $_ImageSearchX += Int(($_ImageSearchWidth-1)/2)
-            $_ImageSearchY += Int(($_ImageSearchHeight-1)/2)
+            $_ImageSearchX += $_ImageSearchCenterWidth
+            $_ImageSearchY += $_ImageSearchCenterHeight
         endif
     elseif $resultPosition < -1 then
         $_ImageSearchX = Random($_ImageSearchLeft, $_ImageSearchRight, 1)

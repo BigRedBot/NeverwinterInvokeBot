@@ -29,12 +29,12 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                         ProfessionsClickImage(); If $RestartLoop Then Return 0
                         If $RestartLoop Then Return 0
                     EndIf
-                    MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
+                    MouseMove($ClientCenterWidth + Random(-50, 50, 1), $ClientBottom)
                     If Not $ProfessionTakeRewardsFailed Then
                         While ImageSearch("Professions_CollectResult")
                             ProfessionsClickImage(); If $RestartLoop Then Return 0
                             If $RestartLoop Then Return 0
-                            MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
+                            MouseMove($ClientCenterWidth + Random(-50, 50, 1), $ClientBottom)
                             If ImageSearch("Professions_TakeRewards") Then
                                 $lasttask = 0
                                 $task = 1
@@ -44,7 +44,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                                 $ProfessionTakeRewardsFailed = 1
                                 ExitLoop 3
                             EndIf
-                            MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
+                            MouseMove($ClientCenterWidth + Random(-50, 50, 1), $ClientBottom)
                         WEnd
                     EndIf
                     If $task > $tasklist[0] Then Return
@@ -57,7 +57,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                                 If $task <> $lasttask Then
                                     $lasttask = $task
                                     $_ImageSearchX = $_ImageSearchLeft - 100 + Random(-50, 50, 1)
-                                    $_ImageSearchY = $_ImageSearchTop + Int(($_ImageSearchHeight-1)/2) + Random(-5, 5, 1)
+                                    $_ImageSearchY = $_ImageSearchTop + Floor(($_ImageSearchHeight-1)/2) + Random(-5, 5, 1)
                                     ProfessionsClickImage(); If $RestartLoop Then Return 0
                                     If $RestartLoop Then Return 0
                                     ClipPut($tasklist[$task])
