@@ -233,7 +233,7 @@ While 1
             Focus()
             MouseMove(GetValue("CharacterSelectionMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("CharacterSelectionMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
             DoubleRightClick()
-            MouseMove($ClientCenterWidth + Random(-$MouseOffset, $MouseOffset, 1), $ClientCenterHeight + Random(-$MouseOffset, $MouseOffset, 1))
+            MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
             If $CharacterSelectionPositioned And Not GetValue("DisableSimpleCharacterSelection") Then
                 Send("{DOWN}")
             ElseIf GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
@@ -560,7 +560,7 @@ While 1
                 Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom
                 If ImageSearch("VIPAccountRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $_ImageSearchRight + 200, $_ImageSearchBottom + 20) Then
                     $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonGap") + 6, $_ImageSearchRight + GetValue("VIPAccountRewardButtonGap") + GetValue("VIPAccountRewardButtonWidth") - 5, 1)
-                    $_ImageSearchY = Random($_ImageSearchCenterHeight + 6 - Ceiling(GetValue("VIPAccountRewardButtonHeight") / 2), $_ImageSearchCenterHeight + Floor(GetValue("VIPAccountRewardButtonHeight") / 2) - 5, 1)
+                    $_ImageSearchY = Random($_ImageSearchHeightCenter + 6 - Ceiling(GetValue("VIPAccountRewardButtonHeight") / 2), $_ImageSearchHeightCenter + Floor(GetValue("VIPAccountRewardButtonHeight") / 2) - 5, 1)
                     MouseMove($_ImageSearchX, $_ImageSearchY)
                     SingleClick()
                     Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
@@ -569,7 +569,7 @@ While 1
                         SetAccountValue("CollectedVIPAccountReward", 1)
                     ElseIf ImageSearch("VIPAccountRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $_ImageSearchRight + 200, $_ImageSearchBottom + 20) Then
                         $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonGap") + 6, $_ImageSearchRight + GetValue("VIPAccountRewardButtonGap") + GetValue("VIPAccountRewardButtonWidth") - 5, 1)
-                        $_ImageSearchY = Random($_ImageSearchCenterHeight + 6 - Ceiling(GetValue("VIPAccountRewardButtonHeight") / 2), $_ImageSearchCenterHeight + Floor(GetValue("VIPAccountRewardButtonHeight") / 2) - 5, 1)
+                        $_ImageSearchY = Random($_ImageSearchHeightCenter + 6 - Ceiling(GetValue("VIPAccountRewardButtonHeight") / 2), $_ImageSearchHeightCenter + Floor(GetValue("VIPAccountRewardButtonHeight") / 2) - 5, 1)
                         MouseMove($_ImageSearchX, $_ImageSearchY)
                         SingleClick()
                         Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
@@ -606,12 +606,12 @@ Func OpenInventoryBags($bag); If $RestartLoop Then Return 0
         DoubleClick()
         Sleep(GetValue("OpenInventoryBagDelay") * 1000)
     EndIf
-    MouseMove($ClientCenterWidth + Random(-50, 50, 1), $ClientBottom)
+    MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
     If ImageSearch($bag) Then
         MouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
         Sleep(GetValue("OpenInventoryBagDelay") * 1000)
-        MouseMove($ClientCenterWidth + Random(-50, 50, 1), $ClientBottom)
+        MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
         For $i = 1 To 10
             If Not ImageSearch("OpenAnother") Then ExitLoop
             MouseMove($_ImageSearchX, $_ImageSearchY)

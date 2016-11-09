@@ -297,7 +297,7 @@ Func Focus($p = "GameClient.exe", $c = "CrypticWindowClass", $t = 0)
     Return 0
 EndFunc
 
-Global $ClientInfo, $ClientSize, $ClientWidth, $ClientHeight, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $ClientCenterWidth, $ClientCenterHeight, $WinWidth, $WinHeight, $WinLeft, $WinTop, $WinRight, $WinBottom, $WinCenterWidth, $WinCenterHeight, $PaddingWidth, $PaddingHeight, $PaddingLeft, $PaddingTop, $PaddingRight, $PaddingBottom, $DeskTopWidth, $DeskTopHeight, $OffsetX = 0, $OffsetY = 0
+Global $ClientInfo, $ClientSize, $ClientWidth, $ClientHeight, $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, $ClientWidthCenter, $ClientHeightCenter, $WinWidth, $WinHeight, $WinLeft, $WinTop, $WinRight, $WinBottom, $WinWidthCenter, $WinHeightCenter, $PaddingWidth, $PaddingHeight, $PaddingLeft, $PaddingTop, $PaddingRight, $PaddingBottom, $DeskTopWidth, $DeskTopHeight, $OffsetX = 0, $OffsetY = 0
 Func GetPosition()
     If Not $WinHandle Then Return 0
     $ClientInfo = WinGetPos($WinHandle)
@@ -315,16 +315,16 @@ Func GetPosition()
     $ClientTop = DllStructGetData($ltpoint, "Top")
     $ClientRight = $ClientLeft + $ClientWidth - 1
     $ClientBottom = $ClientTop + $ClientHeight - 1
-    $ClientCenterWidth = $ClientLeft + Round($ClientWidth / 2)
-    $ClientCenterHeight = $ClientTop + Round($ClientHeight / 2)
+    $ClientWidthCenter = $ClientLeft + Round($ClientWidth / 2)
+    $ClientHeightCenter = $ClientTop + Round($ClientHeight / 2)
     $WinWidth = $ClientInfo[2]
     $WinHeight = $ClientInfo[3]
     $WinLeft = $ClientInfo[0]
     $WinTop = $ClientInfo[1]
     $WinRight = $WinLeft + $WinWidth - 1
     $WinBottom = $WinTop + $WinHeight - 1
-    $WinCenterWidth = $WinLeft + Round($WinWidth / 2)
-    $WinCenterHeight = $WinTop + Round($WinHeight / 2)
+    $WinWidthCenter = $WinLeft + Round($WinWidth / 2)
+    $WinHeightCenter = $WinTop + Round($WinHeight / 2)
     $PaddingWidth = $WinWidth - $ClientSize[0]
     $PaddingHeight = $WinHeight - $ClientHeight
     $PaddingLeft = $ClientLeft - $WinLeft
