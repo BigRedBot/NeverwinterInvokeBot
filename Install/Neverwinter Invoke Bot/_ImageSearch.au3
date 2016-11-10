@@ -43,19 +43,19 @@ Func _ImageSearchArea($findImage, $resultPosition, $left, $top, $right, $bottom,
     $_ImageSearchTop = Floor(Number($array[3]))
     $_ImageSearchWidth = Floor(Number($array[4]))
     $_ImageSearchHeight = Floor(Number($array[5]))
-    $_ImageSearchWidthCenter = Floor(($_ImageSearchWidth-1)/2)
-    $_ImageSearchHeightCenter = Floor(($_ImageSearchHeight-1)/2)
-    $_ImageSearchRight = $_ImageSearchLeft + $_ImageSearchWidth-1
-    $_ImageSearchBottom = $_ImageSearchTop + $_ImageSearchHeight-1
+    $_ImageSearchWidthCenter = $_ImageSearchLeft + Floor(($_ImageSearchWidth - 1) / 2)
+    $_ImageSearchHeightCenter = $_ImageSearchTop + Floor(($_ImageSearchHeight - 1) / 2)
+    $_ImageSearchRight = $_ImageSearchLeft + $_ImageSearchWidth - 1
+    $_ImageSearchBottom = $_ImageSearchTop + $_ImageSearchHeight - 1
     $_ImageSearchX = $_ImageSearchLeft
     $_ImageSearchY = $_ImageSearchTop
     if $resultPosition >= 0 then
         if $resultPosition > 0 then
-            $_ImageSearchX += Random(-$resultPosition, $resultPosition, 1)
-            $_ImageSearchY += Random(-$resultPosition, $resultPosition, 1)
+            $_ImageSearchX = $_ImageSearchWidthCenter + Random(-$resultPosition, $resultPosition, 1)
+            $_ImageSearchY = $_ImageSearchHeightCenter + Random(-$resultPosition, $resultPosition, 1)
         else
-            $_ImageSearchX += $_ImageSearchWidthCenter
-            $_ImageSearchY += $_ImageSearchHeightCenter
+            $_ImageSearchX = $_ImageSearchWidthCenter
+            $_ImageSearchY = $_ImageSearchHeightCenter
         endif
     elseif $resultPosition < -1 then
         $_ImageSearchX = Random($_ImageSearchLeft, $_ImageSearchRight, 1)
