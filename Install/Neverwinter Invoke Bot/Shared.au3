@@ -68,7 +68,11 @@ EndFunc
 Global $CurrentAccount = 1
 If Not IsDeclared("LoadPrivateSettings") Then Assign("LoadPrivateSettings", 0, 2)
 Global $SettingsDir = @AppDataDir & "\Neverwinter Invoke Bot"
-Global $DeletedString = "DELETED_Gf3birAeJdpa7bJnP2TheRYGFg7MjdnmpQq4"
+
+Global $DeletedString = "DELETED_"
+For $i = 1 To 100
+    $DeletedString &= Chr(Random(0, 255, 1))
+Next
 
 SetAllAccountsValue("Language", LoadLocalizations())
 Global $Language = GetValue("Language")
@@ -164,6 +168,10 @@ Func GetIniAllAccounts($name)
     Return _UnicodeIniRead($SettingsDir & "\Settings.ini", "AllAccounts", $name, "")
 EndFunc
 
+Func DeleteIniAllAccounts($name)
+    Return _UnicodeIniDelete($SettingsDir & "\Settings.ini", "AllAccounts", $name)
+EndFunc
+
 Func SaveIniAccount($name, $value = "", $account = $CurrentAccount)
     If $value == "" Then Return _UnicodeIniDelete($SettingsDir & "\Settings.ini", "Account" & $account, $name)
     Return _UnicodeIniWrite($SettingsDir & "\Settings.ini", "Account" & $account, $name, $value)
@@ -173,6 +181,10 @@ Func GetIniAccount($name, $account = $CurrentAccount)
     Return _UnicodeIniRead($SettingsDir & "\Settings.ini", "Account" & $account, $name, "")
 EndFunc
 
+Func DeleteIniAccount($name, $account = $CurrentAccount)
+    Return _UnicodeIniDelete($SettingsDir & "\Settings.ini", "Account" & $account, $name)
+EndFunc
+
 Func SaveIniCharacter($name, $value = "", $character = GetAccountValue("CurrentCharacter", $CurrentAccount), $account = $CurrentAccount)
     If $value == "" Then Return _UnicodeIniDelete($SettingsDir & "\Settings.ini", "Account" & $account & "_Character" & $character, $name)
     Return _UnicodeIniWrite($SettingsDir & "\Settings.ini", "Account" & $account & "_Character" & $character, $name, $value)
@@ -180,6 +192,10 @@ EndFunc
 
 Func GetIniCharacter($name, $character = GetAccountValue("CurrentCharacter", $CurrentAccount), $account = $CurrentAccount)
     Return _UnicodeIniRead($SettingsDir & "\Settings.ini", "Account" & $account & "_Character" & $character, $name, "")
+EndFunc
+
+Func DeleteIniCharacter($name, $character = GetAccountValue("CurrentCharacter", $CurrentAccount), $account = $CurrentAccount)
+    Return _UnicodeIniDelete($SettingsDir & "\Settings.ini", "Account" & $account & "_Character" & $character, $name)
 EndFunc
 
 Func SavePrivateIniAllAccounts($name, $value = "")
@@ -223,6 +239,10 @@ Func Statistics_GetIniAllAccounts($name)
     Return _UnicodeIniRead($SettingsDir & "\Statistics.ini", "AllAccounts", $name, "")
 EndFunc
 
+Func Statistics_DeleteIniAllAccounts($name)
+    Return _UnicodeIniDelete($SettingsDir & "\Statistics.ini", "AllAccounts", $name)
+EndFunc
+
 Func Statistics_SaveIniAccount($name, $value = "", $account = $CurrentAccount)
     If $value == "" Then Return _UnicodeIniDelete($SettingsDir & "\Statistics.ini", "Account" & $account, $name)
     If Not GetAccountValue("StartDate", $account) Then
@@ -235,6 +255,10 @@ EndFunc
 
 Func Statistics_GetIniAccount($name, $account = $CurrentAccount)
     Return _UnicodeIniRead($SettingsDir & "\Statistics.ini", "Account" & $account, $name, "")
+EndFunc
+
+Func Statistics_DeleteIniAccount($name, $account = $CurrentAccount)
+    Return _UnicodeIniDelete($SettingsDir & "\Statistics.ini", "Account" & $account, $name)
 EndFunc
 
 Func LoadSettings($file)

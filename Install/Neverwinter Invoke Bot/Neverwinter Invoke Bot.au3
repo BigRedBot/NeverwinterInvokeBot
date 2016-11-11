@@ -13,7 +13,7 @@ If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
 EndIf
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
 Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions, $EnableOptionalAssets
-Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $NoAutoLaunch, $EndTime, $MinutesToEndSaved, $MinutesToEndSavedTimer, $StartingKeyboardLayout
+Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $EndTime, $MinutesToEndSaved, $MinutesToEndSavedTimer, $StartingKeyboardLayout
 Global $KeyDelay = GetValue("KeyDelaySeconds") * 1000, $CharacterSelectionScrollAwayKeyDelay = GetValue("CharacterSelectionScrollAwayKeyDelaySeconds") * 1000, $CharacterSelectionScrollTowardKeyDelay = GetValue("CharacterSelectionScrollTowardKeyDelaySeconds") * 1000, $TimeOut = GetValue("TimeOutMinutes") * 60000, $MouseOffset = 5
 AutoItSetOption("SendKeyDownDelay", $KeyDelay)
 #include <StringConstants.au3>
@@ -1077,8 +1077,13 @@ While 1
     If $GameClientLauncherInstallLocation And FileExists($GameClientLauncherInstallLocation & "\Neverwinter.exe") Then
         CloseClient("Neverwinter.exe"); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
-        If Not Number(RegRead("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch")) Then $NoAutoLaunch = 1
-        If $NoAutoLaunch Then RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 1)
+        If Not Number(RegRead("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch")) Then
+            RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 1)
+            If Not GetValue("NoAutoLaunch") Then
+                SetAllAccountsValue("NoAutoLaunch", 1)
+                SaveIniAllAccounts("NoAutoLaunch", 1)
+            EndIf
+        EndIf
         FileChangeDir($GameClientLauncherInstallLocation)
         Run("Neverwinter.exe", $GameClientLauncherInstallLocation)
         FileChangeDir(@ScriptDir)
@@ -1392,9 +1397,10 @@ Func Reset()
             Local $k = _WinAPI_GetKeyboardLayout($WinHandle)
             If $k And Not ($k == $StartingKeyboardLayout) Then _WinAPI_SetKeyboardLayout($WinHandle, $StartingKeyboardLayout)
         EndIf
-        If $NoAutoLaunch Then
-            $NoAutoLaunch = 0
+        If GetValue("NoAutoLaunch") Then
             RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
+            DeleteAllAccountsValue("NoAutoLaunch")
+            DeleteIniAllAccounts("NoAutoLaunch")
         EndIf
 EndFunc
 
@@ -1639,7 +1645,7 @@ Func AdvancedAccountSettings($hWnd = 0)
                     EndIf
                     If $value == GetDefaultValue($v) Or $value == "" Or $value == 0 Then
                         DeleteAccountValue($v)
-                        SaveIniAccount($v, "")
+                        DeleteIniAccount($v)
                     Else
                         SetAccountValue($v, $value)
                         SaveIniAccount($v, $value)
@@ -1656,9 +1662,9 @@ EndFunc
 Func ChooseAccountOptions()
     If GetAllAccountsValue("DisableOpeningBags") Then
         DeleteAccountValue("DisableOpeningBags")
-        SaveIniAccount("DisableOpeningBags")
+        DeleteIniAccount("DisableOpeningBags")
         DeleteAccountValue("OpenBagsOnEveryLoop")
-        SaveIniAccount("OpenBagsOnEveryLoop")
+        DeleteIniAccount("OpenBagsOnEveryLoop")
         Return
     EndIf
     Local $hGui = GUICreate($Title, 320, 150)
@@ -1696,7 +1702,7 @@ Func ChooseAccountOptions()
                 If GetAccountValue("DisableOpeningBags") <> $disabled Then
                     If $disabled == GetDefaultValue("DisableOpeningBags") Then
                         DeleteAccountValue("DisableOpeningBags")
-                        SaveIniAccount("DisableOpeningBags")
+                        DeleteIniAccount("DisableOpeningBags")
                     Else
                         SetAccountValue("DisableOpeningBags", $disabled)
                         SaveIniAccount("DisableOpeningBags", GetAccountValue("DisableOpeningBags"))
@@ -1707,7 +1713,7 @@ Func ChooseAccountOptions()
                 If GetAccountValue("OpenBagsOnEveryLoop") <> $enabled Then
                     If $enabled == GetDefaultValue("OpenBagsOnEveryLoop") Then
                         DeleteAccountValue("OpenBagsOnEveryLoop")
-                        SaveIniAccount("OpenBagsOnEveryLoop")
+                        DeleteIniAccount("OpenBagsOnEveryLoop")
                     Else
                         SetAccountValue("OpenBagsOnEveryLoop", $enabled)
                         SaveIniAccount("OpenBagsOnEveryLoop", GetAccountValue("OpenBagsOnEveryLoop"))
@@ -2177,7 +2183,7 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
                     EndIf
                     If $value == GetDefaultValue($v) Or $value == "" Or $value == 0 Then
                         DeleteAllAccountsValue($v)
-                        SaveIniAllAccounts($v, "")
+                        DeleteIniAllAccounts($v)
                     Else
                         SetAllAccountsValue($v, $value)
                         SaveIniAllAccounts($v, $value)
@@ -2238,7 +2244,7 @@ Func ChooseOptions()
                         If Not ($cofferdefault == $coffers[$i]) Then
                             If $coffers[$i] == GetDefaultValue("Coffer") Then
                                 DeleteAllAccountsValue("Coffer")
-                                SaveIniAllAccounts("Coffer")
+                                DeleteIniAllAccounts("Coffer")
                             Else
                                 SetAllAccountsValue("Coffer", $coffers[$i])
                                 SaveIniAllAccounts("Coffer", GetValue("Coffer"))
@@ -2247,7 +2253,7 @@ Func ChooseOptions()
                         If $overflowxpdefault <> $overflowxpdisabled Then
                             If $overflowxpdisabled == GetDefaultValue("DisableOverflowXPRewardCollection") Then
                                 DeleteAllAccountsValue("DisableOverflowXPRewardCollection")
-                                SaveIniAllAccounts("DisableOverflowXPRewardCollection")
+                                DeleteIniAllAccounts("DisableOverflowXPRewardCollection")
                             Else
                                 SetAllAccountsValue("DisableOverflowXPRewardCollection", $overflowxpdisabled)
                                 SaveIniAllAccounts("DisableOverflowXPRewardCollection", GetValue("DisableOverflowXPRewardCollection"))
@@ -2256,7 +2262,7 @@ Func ChooseOptions()
                         If $openbagsdefault <> $openbagsdisabled Then
                             If $openbagsdisabled == GetDefaultValue("DisableOpeningBags") Then
                                 DeleteAllAccountsValue("DisableOpeningBags")
-                                SaveIniAllAccounts("DisableOpeningBags")
+                                DeleteIniAllAccounts("DisableOpeningBags")
                             Else
                                 SetAllAccountsValue("DisableOpeningBags", $openbagsdisabled)
                                 SaveIniAllAccounts("DisableOpeningBags", GetAllAccountsValue("DisableOpeningBags"))
@@ -2265,7 +2271,7 @@ Func ChooseOptions()
                         If $openbagsoneveryloopdefault <> $openbagsoneveryloopenabled Then
                             If $openbagsoneveryloopenabled == GetDefaultValue("OpenBagsOnEveryLoop") Then
                                 DeleteAllAccountsValue("OpenBagsOnEveryLoop")
-                                SaveIniAllAccounts("OpenBagsOnEveryLoop")
+                                DeleteIniAllAccounts("OpenBagsOnEveryLoop")
                             Else
                                 SetAllAccountsValue("OpenBagsOnEveryLoop", $openbagsoneveryloopenabled)
                                 SaveIniAllAccounts("OpenBagsOnEveryLoop", GetAllAccountsValue("OpenBagsOnEveryLoop"))

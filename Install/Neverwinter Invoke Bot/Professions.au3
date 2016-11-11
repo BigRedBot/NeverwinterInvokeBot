@@ -282,7 +282,7 @@ Func ChooseProfessionsAccountEnableOptions()
                     EndIf
                     If $input == GetDefaultValue("InfiniteLoopDelayMinutes") Then
                         DeleteAccountValue("InfiniteLoopDelayMinutes")
-                        SaveIniAccount("InfiniteLoopDelayMinutes")
+                        DeleteIniAccount("InfiniteLoopDelayMinutes")
                     Else
                         SetAccountValue("InfiniteLoopDelayMinutes", $input)
                         SaveIniAccount("InfiniteLoopDelayMinutes", $input)
@@ -295,7 +295,7 @@ Func ChooseProfessionsAccountEnableOptions()
                 If GetAccountValue("EnableProfessions") <> $enabled Then
                     If $enabled == GetDefaultValue("EnableProfessions") Then
                         DeleteAccountValue("EnableProfessions")
-                        SaveIniAccount("EnableProfessions")
+                        DeleteIniAccount("EnableProfessions")
                     Else
                         SetAccountValue("EnableProfessions", $enabled)
                         SaveIniAccount("EnableProfessions", $enabled)
@@ -306,7 +306,7 @@ Func ChooseProfessionsAccountEnableOptions()
                 If GetAccountValue("InfiniteLoops") <> $enabled Then
                     If $enabled == GetDefaultValue("InfiniteLoops") Then
                         DeleteAccountValue("InfiniteLoops")
-                        SaveIniAccount("InfiniteLoops")
+                        DeleteIniAccount("InfiniteLoops")
                     Else
                         SetAccountValue("InfiniteLoops", $enabled)
                         SaveIniAccount("InfiniteLoops", $enabled)
@@ -317,7 +317,7 @@ Func ChooseProfessionsAccountEnableOptions()
                     If GetAccountValue("EnableProfessions") Or GUICtrlRead($Checkbox[$i]) = $GUI_CHECKED Then $enabled = 1
                     If GetAccountValue("EnableProfessions") Or $enabled == GetDefaultValue("EnableProfessions") Then
                         DeleteCharacterValue("EnableProfessions", $i)
-                        SaveIniCharacter("EnableProfessions", "", $i)
+                        DeleteIniCharacter("EnableProfessions", $i)
                     Else
                         SetCharacterValue("EnableProfessions", $enabled, $i)
                         SaveIniCharacter("EnableProfessions", $enabled, $i)
@@ -377,7 +377,7 @@ Func ChooseProfessionsAccountSetTasksOptions()
                     If $input == GetDefaultValue("LeadershipProfessionTasks") Then
                         DeleteAccountValue("LeadershipProfessionTasks")
                         GUICtrlSetData($Button[0], Localize("AllCharacters"))
-                        SaveIniAccount("LeadershipProfessionTasks")
+                        DeleteIniAccount("LeadershipProfessionTasks")
                     Else
                         SetAccountValue("LeadershipProfessionTasks", $input)
                         GUICtrlSetData($Button[0], "* " & Localize("AllCharacters") & " *")
@@ -385,7 +385,7 @@ Func ChooseProfessionsAccountSetTasksOptions()
                     EndIf
                     For $i = 1 To $Total
                         GUICtrlSetData($Button[$i], Localize("CharacterNumber", "<NUMBER>", $i))
-                        SaveIniCharacter("LeadershipProfessionTasks", "", $i)
+                        DeleteIniCharacter("LeadershipProfessionTasks", $i)
                         DeleteCharacterValue("LeadershipProfessionTasks", $i)
                         If $input == GetDefaultValue("LeadershipProfessionTasks") Then
                             If GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then GUICtrlSetState($Button[$i], $GUI_ENABLE)
@@ -404,7 +404,7 @@ Func ChooseProfessionsAccountSetTasksOptions()
                             If $input == GetDefaultValue("LeadershipProfessionTasks") Then
                                 DeleteCharacterValue("LeadershipProfessionTasks", $i)
                                 GUICtrlSetData($Button[$i], Localize("CharacterNumber", "<NUMBER>", $i))
-                                SaveIniCharacter("LeadershipProfessionTasks", "", $i)
+                                DeleteIniCharacter("LeadershipProfessionTasks", $i)
                             Else
                                 SetCharacterValue("LeadershipProfessionTasks", $input, $i)
                                 GUICtrlSetData($Button[$i], "* " & Localize("CharacterNumber", "<NUMBER>", $i) & " *")
@@ -477,7 +477,7 @@ Func ChooseProfessionsAccountEnableAssetsOptions()
                 If GetAccountValue("EnableOptionalAssets") <> $enabled Then
                     If $enabled == GetDefaultValue("EnableOptionalAssets") Then
                         DeleteAccountValue("EnableOptionalAssets")
-                        SaveIniAccount("EnableOptionalAssets")
+                        DeleteIniAccount("EnableOptionalAssets")
                     Else
                         SetAccountValue("EnableOptionalAssets", $enabled)
                         SaveIniAccount("EnableOptionalAssets", $enabled)
@@ -488,7 +488,7 @@ Func ChooseProfessionsAccountEnableAssetsOptions()
                     If GetAccountValue("EnableOptionalAssets") Or GUICtrlRead($Checkbox[$i]) = $GUI_CHECKED Then $enabled = 1
                     If GetAccountValue("EnableOptionalAssets") Or $enabled == GetDefaultValue("EnableOptionalAssets") Then
                         DeleteCharacterValue("EnableOptionalAssets", $i)
-                        SaveIniCharacter("EnableOptionalAssets", "", $i)
+                        DeleteIniCharacter("EnableOptionalAssets", $i)
                     Else
                         SetCharacterValue("EnableOptionalAssets", $enabled, $i)
                         SaveIniCharacter("EnableOptionalAssets", $enabled, $i)
@@ -546,7 +546,7 @@ Func ChooseProfessionsAccountSetAssetsOptions()
                     If $input == GetDefaultValue("LeadershipOptionalAssets") Then
                         DeleteAccountValue("LeadershipOptionalAssets")
                         GUICtrlSetData($Button[0], Localize("AllCharacters"))
-                        SaveIniAccount("LeadershipOptionalAssets")
+                        DeleteIniAccount("LeadershipOptionalAssets")
                     Else
                         SetAccountValue("LeadershipOptionalAssets", $input)
                         GUICtrlSetData($Button[0], "* " & Localize("AllCharacters") & " *")
@@ -554,7 +554,7 @@ Func ChooseProfessionsAccountSetAssetsOptions()
                     EndIf
                     For $i = 1 To $Total
                         GUICtrlSetData($Button[$i], Localize("CharacterNumber", "<NUMBER>", $i))
-                        SaveIniCharacter("LeadershipOptionalAssets", "", $i)
+                        DeleteIniCharacter("LeadershipOptionalAssets", $i)
                         DeleteCharacterValue("LeadershipOptionalAssets", $i)
                         If $input == GetDefaultValue("LeadershipOptionalAssets") Then
                             If GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then GUICtrlSetState($Button[$i], $GUI_ENABLE)
@@ -571,7 +571,7 @@ Func ChooseProfessionsAccountSetAssetsOptions()
                             If $input == GetDefaultValue("LeadershipOptionalAssets") Then
                                 DeleteCharacterValue("LeadershipOptionalAssets", $i)
                                 GUICtrlSetData($Button[$i], Localize("CharacterNumber", "<NUMBER>", $i))
-                                SaveIniCharacter("LeadershipOptionalAssets", "", $i)
+                                DeleteIniCharacter("LeadershipOptionalAssets", $i)
                             Else
                                 SetCharacterValue("LeadershipOptionalAssets", $input, $i)
                                 GUICtrlSetData($Button[$i], "* " & Localize("CharacterNumber", "<NUMBER>", $i) & " *")
