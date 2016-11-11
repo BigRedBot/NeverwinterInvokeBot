@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.8.4
+- Should now properly time out when taking too long to start the game client
+
 9.8.3
 - Added more addresses to check the internet connection with
 

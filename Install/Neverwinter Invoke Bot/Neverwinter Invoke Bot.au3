@@ -93,11 +93,11 @@ While 1
         If $RestartLoop Then Return 0
     EndIf
     If Not GetValue("GameClientWidth") Or Not GetValue("GameClientHeight") Then Return
-    $WaitingTimer = TimerInit()
+    Local $PositionWaitingTimer = TimerInit()
     If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight And ( GetValue("GameClientWidth") <> $DeskTopWidth Or GetValue("GameClientHeight") <> $DeskTopHeight ) Then
         Sleep(10000)
         While 1
-            TimeOut(); If $RestartLoop Then Return 0
+            TimeOut($PositionWaitingTimer); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
             MouseMove($DeskTopWidth - 1, 0)
             SingleClick()
@@ -122,6 +122,8 @@ While 1
     EndIf
     If $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
         While 1
+            TimeOut($PositionWaitingTimer); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
             If $DeskTopWidth < GetValue("GameClientWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameClientHeight") + $PaddingHeight Then
                 Local $ostyle = DllCall("user32.dll", "long", "GetWindowLong", "hwnd", $WinHandle, "int", -16)
                 DllCall("user32.dll", "long", "SetWindowLong", "hwnd", $WinHandle, "int", -16, "long", BitAND($ostyle[0], BitNOT($WS_BORDER + $WS_DLGFRAME + $WS_THICKFRAME)))
@@ -133,8 +135,6 @@ While 1
             Focus()
             If Not $WinHandle Or Not GetPosition() Then ExitLoop 2
             If $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
-                TimeOut(); If $RestartLoop Then Return 0
-                If $RestartLoop Then Return 0
                 Sleep(5000)
                 Focus()
                 If Not $WinHandle Or Not GetPosition() Then ExitLoop 2
@@ -148,6 +148,8 @@ While 1
         EndIf
     ElseIf $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
         While 1
+            TimeOut($PositionWaitingTimer); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
             If $DeskTopWidth < GetValue("GameClientWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameClientHeight") + $PaddingHeight Then
                 Local $ostyle = DllCall("user32.dll", "long", "GetWindowLong", "hwnd", $WinHandle, "int", -16)
                 DllCall("user32.dll", "long", "SetWindowLong", "hwnd", $WinHandle, "int", -16, "long", BitAND($ostyle[0], BitNOT($WS_BORDER + $WS_DLGFRAME + $WS_THICKFRAME)))
@@ -159,8 +161,6 @@ While 1
             Focus()
             If Not $WinHandle Or Not GetPosition() Then ExitLoop 2
             If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
-                TimeOut(); If $RestartLoop Then Return 0
-                If $RestartLoop Then Return 0
                 Sleep(5000)
                 Focus()
                 If Not $WinHandle Or Not GetPosition() Then ExitLoop 2
@@ -1233,8 +1233,8 @@ Func LogIn(); If $RestartLoop Then Return 0
     EndIf
 EndFunc
 
-Func TimeOut(); If $RestartLoop Then Return 0
-    If TimerDiff($WaitingTimer) < $TimeOut Then Return
+Func TimeOut($timer = $WaitingTimer); If $RestartLoop Then Return 0
+    If TimerDiff($timer) < $TimeOut Then Return
     AddAccountCountValue("TimedOut")
     If Not $LoggingIn Then AddCharacterCountInfo("TimedOut")
     $DisableRelogCount = 1
