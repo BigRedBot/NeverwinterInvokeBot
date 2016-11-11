@@ -2111,6 +2111,7 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
     $s &= "|" & "CursorModeKey,CursorModeKeyTitle,CursorModeKeyDescription,Text"
     $s &= "|" & "InventoryKey,InventoryKeyTitle,InventoryKeyDescription,Text"
     $s &= "|" & "ProfessionsKey,ProfessionsKeyTitle,ProfessionsKeyDescription,Text"
+    $s &= "|" & "CheckServerAddress,CheckServerAddressTitle,CheckServerAddressDescription,Text"
     Local $a = StringSplit(StringRegExpReplace($s, "^\|+", ""), "|")
     Local $Total = $a[0]
     Local $c[$Total + 1]

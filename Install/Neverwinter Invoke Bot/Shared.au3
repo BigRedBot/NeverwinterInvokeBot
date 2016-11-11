@@ -61,7 +61,7 @@ Func LoadDefaults()
     SetDefault("CharacterSelectionMenuX", 290)
     SetDefault("CharacterSelectionMenuY", 110)
     SetDefault("LogFilesToKeep", 30)
-    SetDefault("CheckServerAddress", "patchserver.crypticstudios.com")
+    SetDefault("CheckServerAddress", "patchserver.crypticstudios.com, us1.proxy.crypticstudios.com, eu1.proxy.crypticstudios.com, us2.proxy.crypticstudios.com, eu2.proxy.crypticstudios.com")
     SetDefault("LeadershipOptionalAssets", "Hero|Adventurer|ManatArms|Mercenary|Guard|Footman")
 EndFunc
 

@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.8.3
+- Added more addresses to check the internet connection with
+
 9.8.2
 - Will try to detect asset buttons for 10 seconds if not first detected
 
