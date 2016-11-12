@@ -9,7 +9,7 @@ Global $Title = $Name
 
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
 
-Local $text
+Local $text, $timer, $time = 0, $count = 0
 
 Func ScreenDetection_Position()
     FindWindow()
@@ -17,7 +17,7 @@ Func ScreenDetection_Position()
         $text = Localize("NeverwinterNotFound")
         Return 0
     EndIf
-    $text = "GameClientWidth=" & $ClientWidth & " GameClientHeight=" & $ClientHeight
+    $text = "GameClientWidth=" & $ClientWidth & " GameClientHeight=" & $ClientHeight & @CRLF
     Return 1
 EndFunc
 
@@ -37,13 +37,13 @@ EndFunc
 
 Local $ImageSearchImage
 
-Func ScreenDetection_ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $resultPosition = -2, $tolerance = GetValue("ImageTolerance"))
+Func ScreenDetection_ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("ImageTolerance"), $resultPosition = -2)
     $ImageSearchImage = $image
     If Not FileExists("images\" & $Language & "\" & $image & ".png") Then Return 0
     If _ImageSearchArea("images\" & $Language & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return 1
     Local $i = 2
-    While FileExists(@ScriptDir & "\images\" & $Language & "\" & $image & $i & ".png")
-        If _ImageSearchArea("images\" & $Language & "\" & $image & $i & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return $i
+    While FileExists(@ScriptDir & "\images\" & $Language & "\" & $image & "-" & $i & ".png")
+        If _ImageSearchArea("images\" & $Language & "\" & $image & "-" & $i & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return $i
         $i += 1
     WEnd
     Return 0
@@ -53,15 +53,12 @@ Func ScreenDetection_End()
     Exit
 EndFunc
 
-Func Array($x)
-    Return StringSplit(StringRegExpReplace(StringRegExpReplace(StringStripWS($x, $STR_STRIPALL), "^,", ""), ",$", ""), ",")
-EndFunc
-
 HotKeySet("{Esc}", "ScreenDetection_End")
 ScreenDetection_Splash()
-Local $n = ""
 While 1
-    If ScreenDetection_Position() Then
+    If ScreenDetection_Position() And $ClientWidth And $ClientHeight Then
+        $timer = TimerInit()
+        $count += 1
         If ScreenDetection_ImageSearch("SelectionScreen") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         If ScreenDetection_ImageSearch("Invoked") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         If ScreenDetection_ImageSearch("CongratulationsWindow") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
@@ -88,7 +85,7 @@ While 1
             $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
             If ScreenDetection_ImageSearch("VIPAccountRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $_ImageSearchRight + 200, $_ImageSearchBottom + 20) Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         EndIf
+        $time = Round(TimerDiff($timer) / 1000, 2)
     EndIf
-    ScreenDetection_Splash($text)
-    Sleep(500)
+    ScreenDetection_Splash($count & " = " & $time & "s" & @CRLF & $text)
 WEnd

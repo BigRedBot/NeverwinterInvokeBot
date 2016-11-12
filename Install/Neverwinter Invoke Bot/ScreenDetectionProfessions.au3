@@ -3,13 +3,13 @@ AutoItSetOption("TrayAutoPause", 0)
 Global $Name = "Neverwinter Invoke Bot: Screen Detection Professions"
 #include "Shared.au3"
 TraySetIcon(@ScriptDir & "\images\black.ico")
-If _Singleton("Neverwinter Invoke Bot: Screen Detection" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Name, Localize("ScreenDetectionAlreadyRunning"))
+If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Name, Localize("ScreenDetectionAlreadyRunning"))
 #include "_ImageSearch.au3"
 Global $Title = $Name
 
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
 
-Local $text
+Local $text, $timer, $time = 0, $count = 0
 
 Func ScreenDetection_Position()
     FindWindow()
@@ -17,7 +17,7 @@ Func ScreenDetection_Position()
         $text = Localize("NeverwinterNotFound")
         Return 0
     EndIf
-    $text = "GameClientWidth=" & $ClientWidth & " GameClientHeight=" & $ClientHeight
+    $text = "GameClientWidth=" & $ClientWidth & " GameClientHeight=" & $ClientHeight & @CRLF
     Return 1
 EndFunc
 
@@ -37,13 +37,13 @@ EndFunc
 
 Local $ImageSearchImage
 
-Func ScreenDetection_ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $resultPosition = -2, $tolerance = GetValue("ImageTolerance"))
+Func ScreenDetection_ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("ImageTolerance"), $resultPosition = -2)
     $ImageSearchImage = $image
     If Not FileExists("images\" & $Language & "\" & $image & ".png") Then Return 0
     If _ImageSearchArea("images\" & $Language & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return 1
     Local $i = 2
-    While FileExists(@ScriptDir & "\images\" & $Language & "\" & $image & $i & ".png")
-        If _ImageSearchArea("images\" & $Language & "\" & $image & $i & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return $i
+    While FileExists(@ScriptDir & "\images\" & $Language & "\" & $image & "-" & $i & ".png")
+        If _ImageSearchArea("images\" & $Language & "\" & $image & "-" & $i & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return $i
         $i += 1
     WEnd
     Return 0
@@ -53,12 +53,41 @@ Func ScreenDetection_End()
     Exit
 EndFunc
 
+Local $MaxProfessionLevel = 25, $ProfessionLevel, $tens, $ones, $image1, $image2, $tolerance = 100
 HotKeySet("{Esc}", "ScreenDetection_End")
 ScreenDetection_Splash()
 While 1
-    If ScreenDetection_Position() Then
+    If ScreenDetection_Position() And $ClientWidth And $ClientHeight Then
+        $timer = TimerInit()
+        $count += 1
+        If ScreenDetection_ImageSearch("Professions_Leadership") Then
+            $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+            
+            Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop - 44, $right = $_ImageSearchLeft + 100, $bottom = $_ImageSearchTop - 31
+            ;Local $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom
+            
+            $ProfessionLevel = $MaxProfessionLevel
+            While $ProfessionLevel >= 0
+                If $ProfessionLevel < 10 Then
+                    $tens = ""
+                    $ones = $ProfessionLevel
+                    $image1 = "Professions_Level_" & $ones
+                    $image2 = "Professions_Level_Blank"
+                Else
+                    $tens = Floor($ProfessionLevel / 10)
+                    $ones = $ProfessionLevel - $tens * 10
+                    $image1 = "Professions_Level_" & $tens
+                    $image2 = "Professions_Level_" & $ones
+                EndIf
+                If ScreenDetection_ImageSearch($image1, $left, $top, $right, $bottom, $tolerance) And ScreenDetection_ImageSearch("Professions_Level_Blank", $_ImageSearchLeft - 5, $_ImageSearchTop, $_ImageSearchLeft - 1, $_ImageSearchBottom, $tolerance) And ScreenDetection_ImageSearch($image2, $_ImageSearchRight + 11, $_ImageSearchTop, $_ImageSearchRight + 22, $_ImageSearchBottom, $tolerance) Then
+                    $text &= @CRLF & @CRLF & "Level " & $tens & $ones & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+                    ExitLoop
+                EndIf
+                $ProfessionLevel -= 1
+            WEnd
+        EndIf
+;#comments-start
         If ScreenDetection_ImageSearch("Professions_Overview") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ScreenDetection_ImageSearch("Professions_Leadership") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         If ScreenDetection_ImageSearch("Professions_CollectResult") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         If ScreenDetection_ImageSearch("Professions_TakeRewards") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         If ScreenDetection_ImageSearch("Professions_EmptySlot") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
@@ -76,7 +105,8 @@ While 1
         If ScreenDetection_ImageSearch("Professions_Asset_Footman") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         If ScreenDetection_ImageSearch("Professions_Asset_Guard") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         If ScreenDetection_ImageSearch("Professions_Asset_Mercenary") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+;#comments-end
+        $time = Round(TimerDiff($timer) / 1000, 2)
     EndIf
-    ScreenDetection_Splash($text)
-    Sleep(500)
+    ScreenDetection_Splash($count & " = " & $time & "s" & @CRLF & $text)
 WEnd

@@ -878,7 +878,7 @@ EndFunc
 
 Global $DoLogInCommands = 1
 
-Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $resultPosition = -2, $tolerance = GetValue("ImageTolerance"), $do = 1)
+Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("ImageTolerance"), $resultPosition = -2, $do = 1)
     If $do And Not ImageExists($image) Then Return 0
     If $do And $image = "ChangeCharacterButton" Then
         If DeclinePromptImageSearch("Later") Or DeclinePromptImageSearch("Decline") Then Return 0
@@ -897,13 +897,13 @@ Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $Clien
         EndIf
     EndIf
     If _ImageSearchArea(@ScriptDir & "\images\" & $Language & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then
-        If $do And Not SetImageSearchVariables($image, $left, $top, $right, $bottom, $resultPosition, $tolerance) Then Return 0
+        If $do And Not SetImageSearchVariables($image, $left, $top, $right, $bottom, $tolerance, $resultPosition) Then Return 0
         Return 1
     EndIf
     Local $i = 2
-    While ImageExists($image & $i)
-        If _ImageSearchArea(@ScriptDir & "\images\" & $Language & "\" & $image & $i & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then
-            If $do And Not SetImageSearchVariables($image, $left, $top, $right, $bottom, $resultPosition, $tolerance) Then Return 0
+    While ImageExists($image & "-" & $i)
+        If _ImageSearchArea(@ScriptDir & "\images\" & $Language & "\" & $image & "-" & $i & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then
+            If $do And Not SetImageSearchVariables($image, $left, $top, $right, $bottom, $tolerance, $resultPosition) Then Return 0
             Return $i
         EndIf
         $i += 1
@@ -911,7 +911,7 @@ Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $Clien
     Return 0
 EndFunc
 
-Func SetImageSearchVariables($image, $left, $top, $right, $bottom, $resultPosition, $tolerance)
+Func SetImageSearchVariables($image, $left, $top, $right, $bottom, $tolerance, $resultPosition)
     If $image <> "LogInScreen" And $image <> "InvalidUsernameOrPassword" And $image <> "Mismatch" And $image <> "Idle" And $image <> "OK" Then
         $LoggingIn = 0
         $LogInTries = 0
@@ -927,7 +927,7 @@ Func SetImageSearchVariables($image, $left, $top, $right, $bottom, $resultPositi
             $DoLogInCommands = 2
             Send("{ESC}")
             Sleep(500)
-            If ImageSearch($image, $left, $top, $right, $bottom, $resultPosition, $tolerance, 0) Then Return 0
+            If ImageSearch($image, $left, $top, $right, $bottom, $tolerance, $resultPosition, 0) Then Return 0
             $DoLogInCommands = 0
         EndIf
     EndIf
