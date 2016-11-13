@@ -1,4 +1,5 @@
 
+Local $MaxProfessionLevel = 25
 
 Func RunProfessions(); If $RestartLoop Then Return 0
     If Not $EnableProfessions Or Not GetValue("EnableProfessions") Then Return
@@ -25,7 +26,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                     If Not ImageSearch("Professions_Leadership") Then Return
                     If $ProfessionLevel = -2 Then
                         Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop - 44, $right = $_ImageSearchLeft + 100, $bottom = $_ImageSearchTop - 31, $tens, $ones, $image1, $image2, $tolerance = 100
-                        $ProfessionLevel = 25
+                        $ProfessionLevel = $MaxProfessionLevel
                         While $ProfessionLevel > -1
                             If $ProfessionLevel < 10 Then
                                 $tens = ""
@@ -41,10 +42,10 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                             If ImageSearch($image1, $left, $top, $right, $bottom, $tolerance) And ImageSearch("Professions_LevelBlank", $_ImageSearchLeft - 5, $_ImageSearchTop, $_ImageSearchLeft - 1, $_ImageSearchBottom, $tolerance) And ImageSearch($image2, $_ImageSearchRight + 11, $_ImageSearchTop, $_ImageSearchRight + 22, $_ImageSearchBottom, $tolerance) Then ExitLoop
                             $ProfessionLevel -= 1
                         WEnd
-                        If $ProfessionLevel > -1 And GetValue("LeadershipProfessionTasks_Level" & $ProfessionLevel) Then
-                            $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Level" & $ProfessionLevel), "|")
+                        If $ProfessionLevel > -1 And GetValue("LeadershipProfessionTasks_Level_" & $ProfessionLevel) Then
+                            $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Level_" & $ProfessionLevel), "|")
                         Else
-                            $tasklist = StringSplit(GetValue("LeadershipProfessionTasks"), "|")
+                            $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Level_Unknown"), "|")
                         EndIf
                     EndIf
                     If ImageSearch("Professions_Search") Then
@@ -278,6 +279,7 @@ Func ChooseProfessionsAccountEnableOptions()
             Case $GUI_EVENT_CLOSE
                 Exit
             Case $Checkbox[0]
+                GUICtrlSetState($ButtonOK, $GUI_DISABLE)
                 If GUICtrlRead($Checkbox[0]) = $GUI_CHECKED Then
                     For $i = 1 To $Total
                         GUICtrlSetState($Checkbox[$i], $GUI_CHECKED)
@@ -289,6 +291,7 @@ Func ChooseProfessionsAccountEnableOptions()
                         GUICtrlSetState($Checkbox[$i], $GUI_UNCHECKED)
                     Next
                 EndIf
+                GUICtrlSetState($ButtonOK, $GUI_ENABLE)
             Case $InfiniteLoopCheckbox
                 If GUICtrlRead($InfiniteLoopCheckbox) = $GUI_CHECKED Then
                     GUICtrlSetState($InfiniteLoopMinutesButton, $GUI_ENABLE)
@@ -298,6 +301,7 @@ Func ChooseProfessionsAccountEnableOptions()
             Case $InfiniteLoopMinutesButton
                 Local $input = InputBox($Title, @CRLF & @CRLF & @CRLF & @CRLF & Localize("InfiniteLoopMinutes", "<MINUTES>", "( 80+ )"), GetAccountValue("InfiniteLoopDelayMinutes"), "", -1, -1, Default, Default, 0, $hGUI)
                 If @error = 0 Then
+                    GUICtrlSetState($ButtonOK, $GUI_DISABLE)
                     $input = Number($input)
                     If $input <= 0 Then
                         $input = GetDefaultValue("InfiniteLoopDelayMinutes")
@@ -312,6 +316,7 @@ Func ChooseProfessionsAccountEnableOptions()
                         SaveIniAccount("InfiniteLoopDelayMinutes", $input)
                     EndIf
                     GUICtrlSetData($InfiniteLoopMinutesButton, Localize("InfiniteLoopMinutes", "<MINUTES>", GetAccountValue("InfiniteLoopDelayMinutes")))
+                    GUICtrlSetState($ButtonOK, $GUI_ENABLE)
                 EndIf
             Case $ButtonOK
                 Local $enabled = 0
@@ -361,25 +366,41 @@ Func ChooseProfessionsAccountSetTasksOptions()
     Local $Button[$Total + 1]
     Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
-    GUICtrlCreateLabel(Localize("EditProfessionTasks", "<ACCOUNT>", $CurrentAccount), 150, 40, 270)
-    If GetAccountValue("LeadershipProfessionTasks") == GetDefaultValue("LeadershipProfessionTasks") Then
+    GUICtrlCreateLabel(Localize("EditProfessionTasks"), 150, 40, 270)
+    Local $default = 1
+    For $l = 0 To $MaxProfessionLevel + 1
+        Local $level = $l
+        If $l = $MaxProfessionLevel + 1 Then $level = "Unknown"
+        If Not ( GetAccountValue("LeadershipProfessionTasks_Level_" & $level) == GetDefaultValue("LeadershipProfessionTasks_Level_" & $level) ) Then
+            $default = 0
+            ExitLoop
+        EndIf
+    Next
+    If $default Then
         $Button[0] = GUICtrlCreateButton(Localize("AllCharacters"), 30, 70, 95)
     Else
         $Button[0] = GUICtrlCreateButton("* " & Localize("AllCharacters") & " *", 30, 70, 95)
     EndIf
     For $i = 1 To $Total
         Local $Row = Ceiling($i / 10), $Column = $i - (($Row - 1) * 10)
-        If GetValue("LeadershipProfessionTasks", $CurrentAccount, $i) == GetDefaultValue("LeadershipProfessionTasks") Then
+        Local $default = 1, $disabled = 0
+        For $l = 0 To $MaxProfessionLevel + 1
+            Local $level = $l
+            If $l = $MaxProfessionLevel + 1 Then $level = "Unknown"
+            If Not ( GetValue("LeadershipProfessionTasks_Level_" & $level, $CurrentAccount, $i) == GetDefaultValue("LeadershipProfessionTasks_Level_" & $level) ) Then $default = 0
+            If GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then
+                $EnabledCharacterFound = 1
+                If Not ( GetAccountValue("LeadershipProfessionTasks_Level_" & $level) == GetDefaultValue("LeadershipProfessionTasks_Level_" & $level) ) Then $disabled = 1
+            Else
+                 $disabled = 1
+            EndIf
+        Next
+        If $default Then
             $Button[$i] = GUICtrlCreateButton(Localize("CharacterNumber", "<NUMBER>", $i), 30 + (($Row - 1) * 100), 100 + ($Column * 30), 95)
         Else
             $Button[$i] = GUICtrlCreateButton("* " & Localize("CharacterNumber", "<NUMBER>", $i) & " *", 30 + (($Row - 1) * 100), 100 + ($Column * 30), 95)
         EndIf
-        If GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then
-            $EnabledCharacterFound = 1
-            If Not ( GetAccountValue("LeadershipProfessionTasks") == GetDefaultValue("LeadershipProfessionTasks") ) Then GUICtrlSetState($Button[$i], $GUI_DISABLE)
-        Else
-            GUICtrlSetState($Button[$i], $GUI_DISABLE)
-        EndIf
+        If $disabled Then GUICtrlSetState($Button[$i], $GUI_DISABLE)
     Next
     If Not $EnabledCharacterFound Then
         GUIDelete($hGUI)
@@ -394,46 +415,79 @@ Func ChooseProfessionsAccountSetTasksOptions()
             Case $GUI_EVENT_CLOSE
                 Exit
             Case $Button[0]
-                Local $input = _MultilineInputBox($Title, @CRLF & @CRLF & @CRLF & Localize("EditProfessionTasksForAllCharacters"), StringReplace(GetAccountValue("LeadershipProfessionTasks"), "|", @CRLF), 0, 0, Default, Default, 0, $hGUI)
-                If @error = 0 And ( Not ( GetAccountValue("LeadershipProfessionTasks") == GetDefaultValue("LeadershipProfessionTasks") ) Or MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2, $Title, Localize("OverwriteProfessionTasksForAllOtherCharacters", "<ACCOUNT>", $CurrentAccount), 0, $hGUI) = $IDYES ) Then
-                    $input = StringStripWS(StringRegExpReplace(StringRegExpReplace(StringRegExpReplace($input, "(\s*\v)+", @CRLF), "\A\s*\v|\v\s*\Z", ""), "\s*" & @CRLF & "\s*", "|"), $STR_STRIPLEADING + $STR_STRIPTRAILING)
-                    If $input = "" Then $input = GetDefaultValue("LeadershipProfessionTasks")
-                    If $input == GetDefaultValue("LeadershipProfessionTasks") Then
-                        DeleteAccountValue("LeadershipProfessionTasks")
-                        GUICtrlSetData($Button[0], Localize("AllCharacters"))
-                        DeleteIniAccount("LeadershipProfessionTasks")
-                    Else
-                        SetAccountValue("LeadershipProfessionTasks", $input)
-                        GUICtrlSetData($Button[0], "* " & Localize("AllCharacters") & " *")
-                        SaveIniAccount("LeadershipProfessionTasks", $input)
-                    EndIf
-                    For $i = 1 To $Total
-                        GUICtrlSetData($Button[$i], Localize("CharacterNumber", "<NUMBER>", $i))
-                        DeleteIniCharacter("LeadershipProfessionTasks", $i)
-                        DeleteCharacterValue("LeadershipProfessionTasks", $i)
-                        If $input == GetDefaultValue("LeadershipProfessionTasks") Then
-                            If GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then GUICtrlSetState($Button[$i], $GUI_ENABLE)
+                Local $results = ChooseProfessionsAccountSetTasksOptionsLevels($hGUI, Localize("EditProfessionTasksForAllCharacters"))
+                If @error = 0 And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2, $Title, Localize("OverwriteProfessionTasksForAllOtherCharacters", "<ACCOUNT>", $CurrentAccount), 0, $hGUI) = $IDYES Then
+                    GUICtrlSetState($ButtonOK, $GUI_DISABLE)
+                    For $i = 0 To $Total
+                        GUICtrlSetData($Button[0], Localize("Working"))
+                        GUICtrlSetState($Button[$i], $GUI_DISABLE)
+                    Next
+                    Local $default = 1
+                    For $l = 0 To $MaxProfessionLevel + 1
+                        Local $level = $l
+                        If $l = $MaxProfessionLevel + 1 Then $level = "Unknown"
+                        $results[$l] = StringStripWS(StringRegExpReplace(StringRegExpReplace(StringRegExpReplace($results[$l], "(\s*\v)+", @CRLF), "\A\s*\v|\v\s*\Z", ""), "\s*" & @CRLF & "\s*", "|"), $STR_STRIPLEADING + $STR_STRIPTRAILING)
+                        If $results[$l] = "" Then $results[$l] = GetDefaultValue("LeadershipProfessionTasks_Level_" & $level)
+                        If $results[$l] == GetDefaultValue("LeadershipProfessionTasks_Level_" & $level) Then
+                            DeleteAccountValue("LeadershipProfessionTasks_Level_" & $level)
+                            DeleteIniAccount("LeadershipProfessionTasks_Level_" & $level)
                         Else
-                            GUICtrlSetState($Button[$i], $GUI_DISABLE)
+                            $default = 0
+                            SetAccountValue("LeadershipProfessionTasks_Level_" & $level, $results[$l])
+                            SaveIniAccount("LeadershipProfessionTasks_Level_" & $level, $results[$l])
                         EndIf
                     Next
+                    For $i = 1 To $Total
+                        GUICtrlSetData($Button[$i], Localize("CharacterNumber", "<NUMBER>", $i))
+                        Local $disabled = 0
+                        For $l = 0 To $MaxProfessionLevel + 1
+                            Local $level = $l
+                            If $l = $MaxProfessionLevel + 1 Then $level = "Unknown"
+                            DeleteIniCharacter("LeadershipProfessionTasks_Level_" & $level, $i)
+                            DeleteCharacterValue("LeadershipProfessionTasks_Level_" & $level, $i)
+                            If Not ( GetAccountValue("LeadershipProfessionTasks_Level_" & $level) == GetDefaultValue("LeadershipProfessionTasks_Level_" & $level) ) Then $disabled = 1
+                        Next
+                        If $disabled Then
+                            GUICtrlSetState($Button[$i], $GUI_DISABLE)
+                        ElseIf GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then
+                            GUICtrlSetState($Button[$i], $GUI_ENABLE)
+                        EndIf
+                    Next
+                    GUICtrlSetState($Button[0], $GUI_ENABLE)
+                    If $default Then
+                        GUICtrlSetData($Button[0], Localize("AllCharacters"))
+                    Else
+                        GUICtrlSetData($Button[0], "* " & Localize("AllCharacters") & " *")
+                    EndIf
+                    GUICtrlSetState($ButtonOK, $GUI_ENABLE)
                 EndIf
             Case $Button[1] To $Button[$Total]
                 For $i = 1 To $Total
                     If $Button[$i] = $nMsg Then
-                        Local $input = _MultilineInputBox($Title, @CRLF & @CRLF & @CRLF & Localize("EditProfessionTasksForCharacter", "<NUMBER>", $i), StringReplace(GetCharacterValue("LeadershipProfessionTasks", $i), "|", @CRLF), 0, 0, Default, Default, 0, $hGUI)
+                        Local $results = ChooseProfessionsAccountSetTasksOptionsLevels($hGUI, Localize("EditProfessionTasksForCharacter", "<NUMBER>", $i), $CurrentAccount, $i)
                         If @error = 0 Then
-                            $input = StringStripWS(StringRegExpReplace(StringRegExpReplace(StringRegExpReplace($input, "(\s*\v)+", @CRLF), "\A\s*\v|\v\s*\Z", ""), "\s*" & @CRLF & "\s*", "|"), $STR_STRIPLEADING + $STR_STRIPTRAILING)
-                            If $input = "" Then $input = GetDefaultValue("LeadershipProfessionTasks")
-                            If $input == GetDefaultValue("LeadershipProfessionTasks") Then
-                                DeleteCharacterValue("LeadershipProfessionTasks", $i)
+                            GUICtrlSetState($ButtonOK, $GUI_DISABLE)
+                            Local $default = 1
+                            For $l = 0 To $MaxProfessionLevel + 1
+                                Local $level = $l
+                                If $l = $MaxProfessionLevel + 1 Then $level = "Unknown"
+                                $results[$l] = StringStripWS(StringRegExpReplace(StringRegExpReplace(StringRegExpReplace($results[$l], "(\s*\v)+", @CRLF), "\A\s*\v|\v\s*\Z", ""), "\s*" & @CRLF & "\s*", "|"), $STR_STRIPLEADING + $STR_STRIPTRAILING)
+                                If $results[$l] = "" Then $results[$l] = GetDefaultValue("LeadershipProfessionTasks_Level_" & $level)
+                                If $results[$l] == GetDefaultValue("LeadershipProfessionTasks_Level_" & $level) Then
+                                    DeleteCharacterValue("LeadershipProfessionTasks_Level_" & $level, $i)
+                                    DeleteIniCharacter("LeadershipProfessionTasks_Level_" & $level, $i)
+                                Else
+                                    $default = 0
+                                    SetCharacterValue("LeadershipProfessionTasks_Level_" & $level, $results[$l], $i)
+                                    SaveIniCharacter("LeadershipProfessionTasks_Level_" & $level, $results[$l], $i)
+                                EndIf
+                            Next
+                            If $default Then
                                 GUICtrlSetData($Button[$i], Localize("CharacterNumber", "<NUMBER>", $i))
-                                DeleteIniCharacter("LeadershipProfessionTasks", $i)
                             Else
-                                SetCharacterValue("LeadershipProfessionTasks", $input, $i)
                                 GUICtrlSetData($Button[$i], "* " & Localize("CharacterNumber", "<NUMBER>", $i) & " *")
-                                SaveIniCharacter("LeadershipProfessionTasks", $input, $i)
                             EndIf
+                            GUICtrlSetState($ButtonOK, $GUI_ENABLE)
                         EndIf
                         ExitLoop
                     EndIf
@@ -445,6 +499,66 @@ Func ChooseProfessionsAccountSetTasksOptions()
                 Exit
         EndSwitch
     WEnd
+EndFunc
+
+Func ChooseProfessionsAccountSetTasksOptionsLevels($hWnd = 0, $label = 0, $account = $CurrentAccount, $character = 0)
+    If Not $EnableProfessions Or $UnattendedMode Or $UnattendedModeCheckSettings Then Return
+    Local $Total = $MaxProfessionLevel + 1, $nMsg
+    Local $Button[$Total + 1]
+    Local $results[$Total + 1]
+    Local $hGUI = GUICreate($Title, 360, 440, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
+    GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
+    GUICtrlCreateLabel($label, 100, 40, 270)
+    For $l = 0 To $Total
+        Local $Row = Ceiling(($l + 1) / 10), $Column = ($l + 1) - (($Row - 1) * 10), $level = $l
+        If $l = $Total Then $level = "Unknown"
+        $results[$l] = GetValue("LeadershipProfessionTasks_Level_" & $level, $account, $character)
+        If $results[$l] == GetDefaultValue("LeadershipProfessionTasks_Level_" & $level) Then
+            $Button[$l] = GUICtrlCreateButton(Localize("LevelNumber", "<LEVEL>", Localize($level)), 30 + (($Row - 1) * 100), 50 + ($Column * 30), 95)
+        Else
+            $Button[$l] = GUICtrlCreateButton("* " & Localize("LevelNumber", "<LEVEL>", Localize($level)) & " *", 30 + (($Row - 1) * 100), 50 + ($Column * 30), 95)
+        EndIf
+    Next
+    Local $ButtonOK = GUICtrlCreateButton("OK", 163, 400, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 250, 400, 75, 25)
+    GUISetState()
+    While 1
+        $nMsg = GUIGetMsg()
+        Switch $nMsg
+            Case $GUI_EVENT_CLOSE
+                ExitLoop
+            Case $Button[0] To $Button[$Total]
+                For $l = 0 To $Total
+                    If $Button[$l] = $nMsg Then
+                        Local $level = $l
+                        If $l = $Total Then $level = "Unknown"
+                        Local $txt = Localize("EditProfessionLevelTasksForAllCharacters", "<LEVEL>", Localize($level))
+                        If $character Then $txt = Localize("EditProfessionLevelTasksForCharacter", "<LEVEL>", Localize($level), "<NUMBER>", $character)
+                        Local $input = _MultilineInputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & @CRLF & $txt, StringReplace($results[$l], "|", @CRLF), 0, 0, Default, Default, 0, $hGUI)
+                        If @error = 0 Then
+                            GUICtrlSetState($ButtonOK, $GUI_DISABLE)
+                            $input = StringStripWS(StringRegExpReplace(StringRegExpReplace(StringRegExpReplace($input, "(\s*\v)+", @CRLF), "\A\s*\v|\v\s*\Z", ""), "\s*" & @CRLF & "\s*", "|"), $STR_STRIPLEADING + $STR_STRIPTRAILING)
+                            If $input = "" Then $input = GetDefaultValue("LeadershipProfessionTasks_Level_" & $level)
+                            $results[$l] = $input
+                            If $results[$l] == GetDefaultValue("LeadershipProfessionTasks_Level_" & $level) Then
+                                GUICtrlSetData($Button[$l], Localize("LevelNumber", "<LEVEL>", Localize($level)))
+                            Else
+                                GUICtrlSetData($Button[$l], "* " & Localize("LevelNumber", "<LEVEL>", Localize($level)) & " *")
+                            EndIf
+                            GUICtrlSetState($ButtonOK, $GUI_ENABLE)
+                        EndIf
+                        ExitLoop
+                    EndIf
+                Next
+            Case $ButtonOK
+                GUIDelete($hGUI)
+                Return SetError(0, 0, $results)
+            Case $ButtonCancel
+                ExitLoop
+        EndSwitch
+    WEnd
+    GUIDelete($hGUI)
+    Return SetError(1, 0, 0)
 EndFunc
 
 Func ChooseProfessionsAccountEnableAssetsOptions()
@@ -484,6 +598,7 @@ Func ChooseProfessionsAccountEnableAssetsOptions()
             Case $GUI_EVENT_CLOSE
                 Exit
             Case $Checkbox[0]
+                GUICtrlSetState($ButtonOK, $GUI_DISABLE)
                 If GUICtrlRead($Checkbox[0]) = $GUI_CHECKED Then
                     For $i = 1 To $Total
                         If GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then GUICtrlSetState($Checkbox[$i], $GUI_CHECKED)
@@ -495,6 +610,7 @@ Func ChooseProfessionsAccountEnableAssetsOptions()
                         GUICtrlSetState($Checkbox[$i], $GUI_UNCHECKED)
                     Next
                 EndIf
+                GUICtrlSetState($ButtonOK, $GUI_ENABLE)
             Case $ButtonOK
                 Local $enabled = 0
                 If GUICtrlRead($Checkbox[0]) = $GUI_CHECKED Then $enabled = 1
@@ -567,6 +683,7 @@ Func ChooseProfessionsAccountSetAssetsOptions()
             Case $Button[0]
                 Local $input = SetProfessionsAccountAssets(Localize("EditOptionalAssetsForAllCharacters"), GetAccountValue("LeadershipOptionalAssets"), $hGUI)
                 If @error = 0 And ( Not ( GetAccountValue("LeadershipOptionalAssets") == GetDefaultValue("LeadershipOptionalAssets") ) Or MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2, $Title, Localize("OverwriteOptionalAssetsForAllOtherCharacters", "<ACCOUNT>", $CurrentAccount), 0, $hGUI) = $IDYES ) Then
+                    GUICtrlSetState($ButtonOK, $GUI_DISABLE)
                     If $input == GetDefaultValue("LeadershipOptionalAssets") Then
                         DeleteAccountValue("LeadershipOptionalAssets")
                         GUICtrlSetData($Button[0], Localize("AllCharacters"))
@@ -586,12 +703,14 @@ Func ChooseProfessionsAccountSetAssetsOptions()
                             GUICtrlSetState($Button[$i], $GUI_DISABLE)
                         EndIf
                     Next
+                    GUICtrlSetState($ButtonOK, $GUI_ENABLE)
                 EndIf
             Case $Button[1] To $Button[$Total]
                 For $i = 1 To $Total
                     If $Button[$i] = $nMsg Then
                         Local $input = SetProfessionsAccountAssets(Localize("EditOptionalAssetsForCharacter", "<NUMBER>", $i), GetCharacterValue("LeadershipOptionalAssets", $i), $hGUI)
                         If @error = 0 Then
+                            GUICtrlSetState($ButtonOK, $GUI_DISABLE)
                             If $input == GetDefaultValue("LeadershipOptionalAssets") Then
                                 DeleteCharacterValue("LeadershipOptionalAssets", $i)
                                 GUICtrlSetData($Button[$i], Localize("CharacterNumber", "<NUMBER>", $i))
@@ -601,6 +720,7 @@ Func ChooseProfessionsAccountSetAssetsOptions()
                                 GUICtrlSetData($Button[$i], "* " & Localize("CharacterNumber", "<NUMBER>", $i) & " *")
                                 SaveIniCharacter("LeadershipOptionalAssets", $input, $i)
                             EndIf
+                            GUICtrlSetState($ButtonOK, $GUI_ENABLE)
                         EndIf
                         ExitLoop
                     EndIf
@@ -661,6 +781,7 @@ Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
             Case $ButtonUp[1] To $ButtonUp[$Total]
                 For $i = 1 To $Total
                     If $ButtonUp[$i] = $nMsg Then
+                        GUICtrlSetState($ButtonOK, $GUI_DISABLE)
                         Local $i2 = $i - 1
                         If $i = 1 Then $i2 = $Total
                         Local $first = $Workers[$i], $second = $Workers[$i2]
@@ -673,12 +794,14 @@ Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
                             GUICtrlSetBkColor($Border[$i], $color)
                             _SetImage($Image[$i], @ScriptDir & "\images\" & $Language & "\Professions_Asset_" & $Workers[$i] & ".png")
                         Next
+                        GUICtrlSetState($ButtonOK, $GUI_ENABLE)
                         ExitLoop
                     EndIf
                 Next
             Case $ButtonDown[1] To $ButtonDown[$Total]
                 For $i = 1 To $Total
                     If $ButtonDown[$i] = $nMsg Then
+                        GUICtrlSetState($ButtonOK, $GUI_DISABLE)
                         Local $i2 = $i + 1
                         If $i = $Total Then $i2 = 1
                         Local $first = $Workers[$i], $second = $Workers[$i2]
@@ -691,10 +814,12 @@ Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
                             GUICtrlSetBkColor($Border[$i], $color)
                             _SetImage($Image[$i], @ScriptDir & "\images\" & $Language & "\Professions_Asset_" & $Workers[$i] & ".png")
                         Next
+                        GUICtrlSetState($ButtonOK, $GUI_ENABLE)
                         ExitLoop
                     EndIf
                 Next
             Case $ButtonDefaults
+                GUICtrlSetState($ButtonOK, $GUI_DISABLE)
                 For $i = 1 To $Total
                     $Workers[$i] = $DefaultWorkers[$i]
                     GUICtrlSetData($Label[$i], Localize($Workers[$i]))
@@ -703,6 +828,7 @@ Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
                     GUICtrlSetBkColor($Border[$i], $color)
                     _SetImage($Image[$i], @ScriptDir & "\images\" & $Language & "\Professions_Asset_" & $Workers[$i] & ".png")
                 Next
+                GUICtrlSetState($ButtonOK, $GUI_ENABLE)
             Case $ButtonOK
                 GUIDelete($hGUI)
                 Return SetError(0, 0, _ArrayToString($Workers , "|", 1))
