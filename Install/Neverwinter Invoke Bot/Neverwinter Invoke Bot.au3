@@ -1033,7 +1033,7 @@ EndFunc
 
 Func GetLogInServerAddressString()
     Local $r = "", $a = Array(GetValue("LogInServerAddress"))
-    If $a[1] And IsString($a[1]) And $a[1] <> "" Then
+    If Not $a[1] Or Not IsString($a[1]) Or $a[1] = "" Then Return
         TCPStartup()
         For $i = 1 to $a[0]
             Local $ip = TCPNameToIP($a[$i])
@@ -1047,20 +1047,18 @@ Func GetLogInServerAddressString()
 EndFunc
 
 Func CheckServer()
-    Local $ip = Array(GetValue("CheckServerAddress")), $set = 1
-    If $ip[1] And IsString($ip[1]) And $ip[1] <> "" Then
-        While 1
-            For $i = 1 to $ip[0]
-                Ping($ip[$i])
-                If @error = 0 Then Return
-            Next
-            If $set Then
-                $set = 0
-                Splash("[ " & Localize("WaitingForGameServer") & " ]", 0)
-            EndIf
-            Sleep(10000)
-        WEnd
-    EndIf
+    Local $a = Array(GetValue("CheckServerAddress"))
+    If Not $a[1] Or Not IsString($a[1]) Or $a[1] = "" Then Return
+    Ping($a[1])
+    If @error = 0 Then Return
+    Splash("[ " & Localize("WaitingForGameServer") & " ]", 0)
+    While 1
+        For $i = 1 to $a[0]
+            Ping($a[$i], 10000)
+            If @error = 0 Then Return
+        Next
+        Sleep(10000)
+    WEnd
 EndFunc
 
 Func StartClient(); If $RestartLoop Then Return 0

@@ -6,7 +6,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
         Local $k = _WinAPI_GetKeyboardLayout($WinHandle)
         If $k And Not (Hex($k, 4) == "0409") Then _WinAPI_SetKeyboardLayout($WinHandle, 0x0409)
     EndIf
-    Local $ProfessionLoops = 0, $ProfessionTakeRewardsFailed = 0, $OverviewX, $OverviewY, $task = 1, $lasttask = 0, $tasklist = StringSplit(GetValue("LeadershipProfessionTasks"), "|")
+    Local $ProfessionLevel = -2, $ProfessionLoops = 0, $ProfessionTakeRewardsFailed = 0, $OverviewX, $OverviewY, $task = 1, $lasttask = 0, $tasklist
     While 1
         If $ProfessionLoops >= 10 Then Return
         ClearWindows(); If $RestartLoop Then Return 0
@@ -23,6 +23,30 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                     $OverviewX = $_ImageSearchX
                     $OverviewY = $_ImageSearchY
                     If Not ImageSearch("Professions_Leadership") Then Return
+                    If $ProfessionLevel = -2 Then
+                        Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop - 44, $right = $_ImageSearchLeft + 100, $bottom = $_ImageSearchTop - 31, $tens, $ones, $image1, $image2, $tolerance = 100
+                        $ProfessionLevel = 25
+                        While $ProfessionLevel > -1
+                            If $ProfessionLevel < 10 Then
+                                $tens = ""
+                                $ones = $ProfessionLevel
+                                $image1 = "Professions_Level" & $ones
+                                $image2 = "Professions_LevelBlank"
+                            Else
+                                $tens = Floor($ProfessionLevel / 10)
+                                $ones = $ProfessionLevel - $tens * 10
+                                $image1 = "Professions_Level" & $tens
+                                $image2 = "Professions_Level" & $ones
+                            EndIf
+                            If ImageSearch($image1, $left, $top, $right, $bottom, $tolerance) And ImageSearch("Professions_LevelBlank", $_ImageSearchLeft - 5, $_ImageSearchTop, $_ImageSearchLeft - 1, $_ImageSearchBottom, $tolerance) And ImageSearch($image2, $_ImageSearchRight + 11, $_ImageSearchTop, $_ImageSearchRight + 22, $_ImageSearchBottom, $tolerance) Then ExitLoop
+                            $ProfessionLevel -= 1
+                        WEnd
+                        If $ProfessionLevel > -1 And GetValue("LeadershipProfessionTasks_Level" & $ProfessionLevel) Then
+                            $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Level" & $ProfessionLevel), "|")
+                        Else
+                            $tasklist = StringSplit(GetValue("LeadershipProfessionTasks"), "|")
+                        EndIf
+                    EndIf
                     If ImageSearch("Professions_Search") Then
                         $_ImageSearchX = $OverviewX
                         $_ImageSearchY = $OverviewY

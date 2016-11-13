@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.8.5
+- Increased time to check the internet connection to 10 seconds per address
+
 9.8.4
 - Should now properly time out when taking too long to start the game client
 
