@@ -73,7 +73,10 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                         WEnd
                     EndIf
                     If $task > $tasklist[0] Then Return
-                    If Not ImageSearch("Professions_EmptySlot") Then Return
+                    If Not ImageSearch("Professions_EmptySlot") Then
+                        If Not DeclinePromptImageSearch("Later") And Not DeclinePromptImageSearch("Decline") Then Return
+                        If Not ImageSearch("Professions_EmptySlot") Then Return
+                    EndIf
                     If ImageSearch("Professions_Leadership") Then
                         ProfessionsClickImage(); If $RestartLoop Then Return 0
                         If $RestartLoop Then Return 0
@@ -127,7 +130,7 @@ Func ProfessionsChooseAssets(); If $RestartLoop Then Return 0
     While 1
         If ImageSearch("Professions_Asset") And ImageSearch("Professions_Asset", $_ImageSearchLeft, $_ImageSearchBottom + 100, $_ImageSearchRight, $_ImageSearchBottom + 150) Then ExitLoop
         If $retry >= 10 Then Return
-        Sleep(1000)
+        If Not DeclinePromptImageSearch("Later") And Not DeclinePromptImageSearch("Decline") Then Sleep(1000)
         $retry += 1
     WEnd
     Local $left = $_ImageSearchX, $top = $_ImageSearchTop, $right = $_ImageSearchRight + 200, $select = 0, $workers = StringSplit(GetValue("LeadershipOptionalAssets"), "|")
