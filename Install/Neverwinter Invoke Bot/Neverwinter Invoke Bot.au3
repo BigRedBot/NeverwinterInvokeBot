@@ -1033,16 +1033,15 @@ EndFunc
 
 Func GetLogInServerAddressString()
     Local $r = "", $a = Array(GetValue("LogInServerAddress"))
-    If Not $a[1] Or Not IsString($a[1]) Or $a[1] = "" Then Return
-        TCPStartup()
-        For $i = 1 to $a[0]
-            Local $ip = TCPNameToIP($a[$i])
-            If $ip And $ip <> "" Then
-                $r &= " -server " & $ip
-            EndIf
-        Next
-        TCPShutdown()
-    EndIf
+    If Not $a[1] Or Not IsString($a[1]) Or $a[1] = "" Then Return $r
+    TCPStartup()
+    For $i = 1 to $a[0]
+        Local $ip = TCPNameToIP($a[$i])
+        If $ip And $ip <> "" Then
+            $r &= " -server " & $ip
+        EndIf
+    Next
+    TCPShutdown()
     Return $r
 EndFunc
 

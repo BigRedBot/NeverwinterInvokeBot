@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.8.6
+- Fixed error
+
 9.8.5
 - Increased time to check the internet connection to 10 seconds per address
 
