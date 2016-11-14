@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.9
+- Added level specific leadership task lists
+
 9.8.6
 - Fixed error
 
