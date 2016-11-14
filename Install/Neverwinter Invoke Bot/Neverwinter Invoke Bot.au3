@@ -555,32 +555,30 @@ While 1
             Send(GetValue("InventoryKey"))
             Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
             If Not ImageSearch("VIPInventory") Then ExitLoop
-            SetAccountValue("LastVIPAccountRewardTryLoop", GetValue("CurrentLoop"))
-            If ImageSearch("VIPAccountRewards", $_ImageSearchLeft, $_ImageSearchBottom + 200, $_ImageSearchRight + 50) Then
-                Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom
-                If ImageSearch("VIPAccountRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $_ImageSearchRight + 200, $_ImageSearchBottom + 20) Then
-                    $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonGap") + 6, $_ImageSearchRight + GetValue("VIPAccountRewardButtonGap") + GetValue("VIPAccountRewardButtonWidth") - 5, 1)
-                    $_ImageSearchY = Random($_ImageSearchHeightCenter + 6 - Ceiling(GetValue("VIPAccountRewardButtonHeight") / 2), $_ImageSearchHeightCenter + Floor(GetValue("VIPAccountRewardButtonHeight") / 2) - 5, 1)
-                    MouseMove($_ImageSearchX, $_ImageSearchY)
-                    SingleClick()
-                    Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
-                    If Not ImageSearch("VIPAccountRewards", $left, $top, $right, $bottom) Then
-                        SaveItemCount("TotalVIPAccountRewards", 1)
-                        SetAccountValue("CollectedVIPAccountReward", 1)
-                    ElseIf ImageSearch("VIPAccountRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $_ImageSearchRight + 200, $_ImageSearchBottom + 20) Then
-                        $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonGap") + 6, $_ImageSearchRight + GetValue("VIPAccountRewardButtonGap") + GetValue("VIPAccountRewardButtonWidth") - 5, 1)
-                        $_ImageSearchY = Random($_ImageSearchHeightCenter + 6 - Ceiling(GetValue("VIPAccountRewardButtonHeight") / 2), $_ImageSearchHeightCenter + Floor(GetValue("VIPAccountRewardButtonHeight") / 2) - 5, 1)
-                        MouseMove($_ImageSearchX, $_ImageSearchY)
-                        SingleClick()
-                        Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
-                        If Not ImageSearch("VIPAccountRewards", $left, $top, $right, $bottom) Then
-                            SaveItemCount("TotalVIPAccountRewards", 1)
-                            SetAccountValue("CollectedVIPAccountReward", 1)
-                        EndIf
-                    EndIf
+            If Not ImageSearch("VIPAccountRewards", $_ImageSearchLeft, $_ImageSearchBottom + 200, $_ImageSearchRight + 50) Then ExitLoop
+            Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom
+            If Not ImageSearch("VIPAccountRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $_ImageSearchRight + 200, $_ImageSearchBottom + 20) Then ExitLoop
+            $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonGap") + 6, $_ImageSearchRight + GetValue("VIPAccountRewardButtonGap") + GetValue("VIPAccountRewardButtonWidth") - 5, 1)
+            $_ImageSearchY = Random($_ImageSearchHeightCenter + 6 - Ceiling(GetValue("VIPAccountRewardButtonHeight") / 2), $_ImageSearchHeightCenter + Floor(GetValue("VIPAccountRewardButtonHeight") / 2) - 5, 1)
+            MouseMove($_ImageSearchX, $_ImageSearchY)
+            SingleClick()
+            Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
+            If Not ImageSearch("VIPAccountRewards", $left, $top, $right, $bottom) Then
+                SaveItemCount("TotalVIPAccountRewards", 1)
+                SetAccountValue("CollectedVIPAccountReward", 1)
+            ElseIf ImageSearch("VIPAccountRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $_ImageSearchRight + 200, $_ImageSearchBottom + 20) Then
+                $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonGap") + 6, $_ImageSearchRight + GetValue("VIPAccountRewardButtonGap") + GetValue("VIPAccountRewardButtonWidth") - 5, 1)
+                $_ImageSearchY = Random($_ImageSearchHeightCenter + 6 - Ceiling(GetValue("VIPAccountRewardButtonHeight") / 2), $_ImageSearchHeightCenter + Floor(GetValue("VIPAccountRewardButtonHeight") / 2) - 5, 1)
+                MouseMove($_ImageSearchX, $_ImageSearchY)
+                SingleClick()
+                Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
+                If Not ImageSearch("VIPAccountRewards", $left, $top, $right, $bottom) Then
+                    SaveItemCount("TotalVIPAccountRewards", 1)
+                    SetAccountValue("CollectedVIPAccountReward", 1)
                 EndIf
             EndIf
         EndIf
+        SetAccountValue("LastVIPAccountRewardTryLoop", GetValue("CurrentLoop"))
         DeleteAccountValue("VIPAccountRewardTries")
         SetAccountValue("TriedVIPAccountReward", 1)
     EndIf

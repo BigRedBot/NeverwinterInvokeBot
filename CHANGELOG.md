@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.9.1
+- Will now no longer try to collect VIP account reward on every character if it has already been collected
+
 9.9
 - Added level specific leadership task lists
 
