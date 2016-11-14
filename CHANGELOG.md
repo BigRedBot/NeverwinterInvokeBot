@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+9.9.2
+- Using different image for login screen detection
+- Will now restart the game when it times out
+
 9.9.1
 - Will now no longer try to collect VIP account reward on every character if it has already been collected
 

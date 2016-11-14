@@ -58,13 +58,13 @@ EndFunc
 Global $GameClientLauncherInstallLocation = GetClientLauncherPath()
 
 Func CloseClient($p = "GameClient.exe"); If $RestartLoop Then Return 0
-    $WaitingTimer = TimerInit()
     Local $list = ProcessList($p)
     If @error <> 0 Then Return 0
+    Local $CloseClientWaitingTimer = TimerInit()
     For $i = 1 To $list[0][0]
         Local $PID = $list[$i][1]
         While ProcessExists($PID)
-            TimeOut(); If $RestartLoop Then Return 0
+            TimeOut($CloseClientWaitingTimer); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
             ProcessClose($PID)
             Sleep(100)
@@ -206,12 +206,10 @@ While 1
     If $RestartLoop Then ExitLoop 1
     $DisableRestartCount = 0
     Splash()
-    $WaitingTimer = TimerInit()
     FindLogInScreen(); If $RestartLoop Then Return 0
     If $RestartLoop Then ExitLoop 1
     Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
     If ImageExists("SelectionScreen") Then
-        $WaitingTimer = TimerInit()
         WaitForScreen("SelectionScreen"); If $RestartLoop Then Return 0
         If $RestartLoop Then ExitLoop 1
     EndIf
@@ -269,7 +267,6 @@ While 1
             EndIf
             Splash("[ " & Localize("WaitingForInGameScreen") & " ]")
             If ImageExists("ChangeCharacterButton") Then
-                $WaitingTimer = TimerInit()
                 WaitForScreen("ChangeCharacterButton"); If $RestartLoop Then Return 0
                 If $RestartLoop Then ExitLoop 2
                 Splash()
@@ -327,7 +324,6 @@ While 1
             Local $RemainingCharacters = GetValue("EndAtCharacter") - GetValue("CurrentCharacter")
             Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
             If ImageExists("SelectionScreen") Then
-                $WaitingTimer = TimerInit()
                 WaitForScreen("SelectionScreen"); If $RestartLoop Then Return 0
                 If $RestartLoop Then ExitLoop 2
                 Splash()
@@ -453,7 +449,6 @@ Func WaitToInvoke(); If $RestartLoop Then Return 0
                 Position(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
                 Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
-                $WaitingTimer = TimerInit()
                 WaitForScreen("SelectionScreen"); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
                 Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
@@ -848,6 +843,7 @@ Func Splash($s = "", $ontop = 1)
 EndFunc
 
 Func WaitForScreen($image); If $RestartLoop Then Return 0
+    Local $WaitForScreenWaitingTimer = TimerInit()
     While 1
         Position(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
@@ -855,7 +851,7 @@ Func WaitForScreen($image); If $RestartLoop Then Return 0
         FindLogInScreen(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         If Not $DoLogInCommands Or $image <> "ChangeCharacterButton" Then Sleep(500)
-        TimeOut(); If $RestartLoop Then Return 0
+        TimeOut($WaitForScreenWaitingTimer); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
     WEnd
 EndFunc
@@ -975,6 +971,7 @@ Func FindLogInScreen(); If $RestartLoop Then Return 0
         Sleep(1000)
     EndIf
     If Not ImageSearch("LogInScreen") Then Return
+    Local $FindLogInScreenWaitingTimer = TimerInit()
 While 1
 While 1
     $DoRelogCount = 1
@@ -1003,7 +1000,7 @@ While 1
                     If $RestartLoop Then Return 0
                     Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
                     While Not ImageSearch("SelectionScreen")
-                        TimeOut(); If $RestartLoop Then Return 0
+                        TimeOut($FindLogInScreenWaitingTimer); If $RestartLoop Then Return 0
                         If $RestartLoop Then Return 0
                         If ImageSearch("LogInScreen") Then ExitLoop 3
                         Sleep(500)
@@ -1015,7 +1012,7 @@ While 1
                     ExitLoop
                 EndIf
                 If $RestartLoop Then Return 0
-                TimeOut(); If $RestartLoop Then Return 0
+                TimeOut($FindLogInScreenWaitingTimer); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
                 If ImageSearch("LogInScreen") Then ExitLoop 2
                 If Not $DoLogInCommands Then Sleep(500)
@@ -1082,7 +1079,10 @@ While 1
         FileChangeDir($GameClientLauncherInstallLocation)
         Run("Neverwinter.exe", $GameClientLauncherInstallLocation)
         FileChangeDir(@ScriptDir)
+        $WaitingTimer = TimerInit()
         While Not ProcessExists("Neverwinter.exe")
+            TimeOut(); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
             Sleep(1000)
         WEnd
         $WaitingTimer = TimerInit()
