@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+9.9.3
+- Fixed detection of the Change Character button when it is highlighted
+
 9.9.2
 - Using different image for login screen detection
 - Will now restart the game when it times out
