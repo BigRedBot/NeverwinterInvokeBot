@@ -1,6 +1,6 @@
 # Neverwinter Invoke and Professions Bot
 
-The latest version has included Russian client support.
+The latest version has a fishing bot included.
 
 **You can download the installer here:**  
 https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe
