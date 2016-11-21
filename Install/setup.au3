@@ -56,13 +56,10 @@ Func GetInstallLocation($dir = $InstallDir)
     WEnd
 EndFunc
 
-If _Singleton($Name & " Installer" & "Jp4g9QRntjYP", 1) = 0 Then
-    Exit MsgBox($MB_ICONWARNING, $Title, Localize("InstallerAlreadyRunning"))
-ElseIf _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
-    Exit MsgBox($MB_ICONWARNING, $Title, Localize("CloseBeforeInstall"))
-ElseIf _Singleton($Name & ": Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then
-    Exit MsgBox($MB_ICONWARNING, $Title, Localize("CloseUnattendedBeforeInstall"))
-EndIf
+If _Singleton($Name & " Installer" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("InstallerAlreadyRunning"))
+If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("CloseBeforeInstall"))
+If _Singleton($Name & ": Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("CloseUnattendedBeforeInstall"))
+If _Singleton("Neverwinter Fishing Bot" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("CloseFishingBeforeInstall"))
 If $InstallLocation <> "" And StringRegExp($InstallLocation, "\\" & $Name & "$") And FileExists($InstallLocation) Then
     $InstallDir = $InstallLocation
 Else
@@ -77,10 +74,7 @@ EndIf
 If FileExists($InstallDir & "\images") And Not DirRemove($InstallDir & "\images", 1) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCleaningUpExistingInstallation"))
 If Not DirCopy($Name, $InstallDir, 1) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCopyingFilesToProgramsFolder"))
 If Not RegWrite($RegLocation, "DisplayName", "REG_SZ", $Name) Or Not RegWrite($RegLocation, "DisplayVersion", "REG_SZ", $Version) Or Not RegWrite($RegLocation, "Publisher", "REG_SZ", "BigRedBot") Or Not RegWrite($RegLocation, "DisplayIcon", "REG_SZ", $InstallDir & "\" & $Name & ".exe") Or Not RegWrite($RegLocation, "UninstallString", "REG_SZ", '"' & $InstallDir & '\Uninstall.exe"') Or Not RegWrite($RegLocation, "InstallLocation", "REG_SZ", $InstallDir) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingUninstallerRegistry"))
-FileDelete(@DesktopDir & "\" & $Name & ".lnk")
-If Not FileCreateShortcut($InstallDir & "\" & $Name & ".exe", @DesktopCommonDir & "\" & $Name & ".lnk", $InstallDir) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingShortcut"))
-FileDelete(@DesktopDir & "\" & $Name & " Donation.lnk")
-If Not FileCreateShortcut($InstallDir & "\Donation.html", @DesktopCommonDir & "\" & $Name & " Donation.lnk", $InstallDir) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingShortcut"))
+If Not FileCreateShortcut($InstallDir & "\" & $Name & ".exe", @DesktopCommonDir & "\" & $Name & ".lnk", $InstallDir) Or Not FileCreateShortcut($InstallDir & "\Neverwinter Fishing Bot.exe", @DesktopCommonDir & "\Neverwinter Fishing Bot.lnk", $InstallDir) Or Not FileCreateShortcut($InstallDir & "\Donation.html", @DesktopCommonDir & "\" & $Name & " Donation.lnk", $InstallDir) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingShortcut"))
 Local $RunUnattendedOnStartup
 If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("RunUnattendedOnStartup")) = $IDYES Then
     If Not FileCreateShortcut($InstallDir & "\Unattended.exe", @StartupCommonDir & "\" & $Name & " Unattended Launcher.lnk", $InstallDir) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingShortcut"))

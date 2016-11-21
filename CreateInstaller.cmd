@@ -1,5 +1,5 @@
 @ECHO OFF
-SET VERSION=9.9.3
+SET VERSION=10.0
 SET NAME=Neverwinter Invoke Bot
 SET INSTALLER=NeverwinterInvokeBot
 ECHO %NAME% v%VERSION%
@@ -19,6 +19,8 @@ ECHO %NAME% v%VERSION%
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Unattended.au3" /out ".\Install\%NAME%\Unattended.exe" /icon ".\Install\%NAME%\images\blue.ico" /comp 0 /nopack /x86
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\ScreenDetection.au3" /out ".\Install\%NAME%\ScreenDetection.exe" /icon ".\Install\%NAME%\images\black.ico" /comp 0 /nopack /x86
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\ScreenDetectionProfessions.au3" /out ".\Install\%NAME%\ScreenDetectionProfessions.exe" /icon ".\Install\%NAME%\images\black.ico" /comp 0 /nopack /x86
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\ScreenDetectionFishing.au3" /out ".\Install\%NAME%\ScreenDetectionFishing.exe" /icon ".\Install\%NAME%\images\black.ico" /comp 0 /nopack /x86
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Neverwinter Fishing Bot.au3" /out ".\Install\%NAME%\Neverwinter Fishing Bot.exe" /icon ".\Install\%NAME%\images\green.ico" /comp 0 /nopack /x86
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\ImageCapture.au3" /out ".\Install\%NAME%\ImageCapture.exe" /icon ".\Install\%NAME%\images\purple.ico" /comp 0 /nopack /x86
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Uninstall.au3" /out ".\Install\%NAME%\Uninstall.exe" /icon ".\Install\%NAME%\images\yellow.ico" /comp 0 /nopack /x86
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\DonationPrompt.au3" /out ".\Install\%NAME%\DonationPrompt.exe" /comp 0 /nopack /x86

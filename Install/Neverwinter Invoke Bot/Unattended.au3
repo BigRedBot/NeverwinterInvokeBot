@@ -115,14 +115,16 @@ While 1
         TraySetIcon(@ScriptDir & "\images\blue.ico")
         WaitMinutes($min, "WaitingForServerReset")
         If $Ran Then ExitLoop
-        Local $process = "Neverwinter Invoke Bot.exe"
-        If Not @Compiled Then $process = StringRegExpReplace(@AutoItExe, ".*\\", "")
-        Local $list = ProcessList($process)
-        If @error = 0 Then
-            For $i = 1 To $list[0][0]
-                If $list[$i][1] <> @AutoItPID Then ProcessClose($list[$i][1])
-            Next
+        If Not @Compiled Then
+            Local $list = ProcessList(StringRegExpReplace(@AutoItExe, ".*\\", ""))
+            If @error = 0 Then
+                For $i = 1 To $list[0][0]
+                    If $list[$i][1] <> @AutoItPID Then ProcessClose($list[$i][1])
+                Next
+            EndIf
         EndIf
+        ProcessClose("Neverwinter Invoke Bot.exe")
+        ProcessClose("Neverwinter Fishing Bot.exe")
         RunInvokeBot(1)
     WEnd
 WEnd

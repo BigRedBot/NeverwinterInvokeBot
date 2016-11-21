@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.0
+- Added a fishing bot ( PLEASE DONATE! )
+
 9.9.3
 - Fixed detection of the Change Character button when it is highlighted
 
