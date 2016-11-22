@@ -1598,15 +1598,15 @@ Func AdvancedAccountSettings($hWnd = 0)
         GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
     Next
     _GUIScrollbars_Generate($hGUI, 1, 100 + $Total * 40)
-    Local $ButtonDefaults = GUICtrlCreateButton("Defaults", 40, 60 + $Total * 40, 75, 25)
-    Local $ButtonOK = GUICtrlCreateButton("OK", 268, 60 + $Total * 40, 75, 25, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 350, 60 + $Total * 40, 75, 25)
+    Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 40, 60 + $Total * 40, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("&OK", 268, 60 + $Total * 40, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 350, 60 + $Total * 40, 75, 25)
     GUISetState(@SW_SHOW, $hGui)
     While 1
         Switch GUIGetMsg()
             Case $GUI_EVENT_CLOSE
                 ExitLoop
-            Case $ButtonDefaults
+            Case $ButtonDefault
                 For $i = 1 To $Total
                     Local $v = ($a[$i])[1], $t = ($a[$i])[4]
                     If $t = "Boolean" Or $t = "ReverseBoolean" Then
@@ -1669,9 +1669,9 @@ Func ChooseAccountOptions()
     Local $OpenInventoryBagsOnEveryLoopCheckbox = GUICtrlCreateCheckbox(" " & Localize("OpenInventoryBagsOnEveryLoop"), 25, 75, 270)
     If GetAccountValue("DisableOpeningBags") Or GetAllAccountsValue("OpenBagsOnEveryLoop") Then GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_DISABLE)
     If (Not GetAccountValue("DisableOpeningBags") And GetAccountValue("OpenBagsOnEveryLoop")) Or GetAllAccountsValue("OpenBagsOnEveryLoop") Then GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_CHECKED)
-    Local $ButtonAdvanced = GUICtrlCreateButton("Advanced", 25, 110, 75, 25)
-    Local $ButtonOK = GUICtrlCreateButton("OK", 127, 110, 75, 25, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 110, 75, 25)
+    Local $ButtonAdvanced = GUICtrlCreateButton(Localize("Advanced"), 25, 110, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("&OK", 127, 110, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 214, 110, 75, 25)
     GUISetState()
     While 1
         Switch GUIGetMsg()
@@ -2136,15 +2136,15 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
         GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
     Next
     _GUIScrollbars_Generate($hGUI, 1, 100 + $Total * 40)
-    Local $ButtonDefaults = GUICtrlCreateButton("Defaults", 40, 60 + $Total * 40, 75, 25)
-    Local $ButtonOK = GUICtrlCreateButton("OK", 268, 60 + $Total * 40, 75, 25, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 350, 60 + $Total * 40, 75, 25)
+    Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 40, 60 + $Total * 40, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("&OK", 268, 60 + $Total * 40, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 350, 60 + $Total * 40, 75, 25)
     GUISetState(@SW_SHOW, $hGui)
     While 1
         Switch GUIGetMsg()
             Case $GUI_EVENT_CLOSE
                 ExitLoop
-            Case $ButtonDefaults
+            Case $ButtonDefault
                 For $i = 1 To $Total
                     Local $v = ($a[$i])[1], $t = ($a[$i])[4]
                     If $t = "Boolean" Or $t = "ReverseBoolean" Then
@@ -2211,9 +2211,9 @@ Func ChooseOptions()
     ElseIf GetAllAccountsValue("OpenBagsOnEveryLoop") Then
         GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_CHECKED)
     EndIf
-    Local $ButtonAdvanced = GUICtrlCreateButton("Advanced", 25, 195, 75, 25)
-    Local $ButtonOK = GUICtrlCreateButton("OK", 127, 195, 75, 25, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 214, 195, 75, 25)
+    Local $ButtonAdvanced = GUICtrlCreateButton(Localize("Advanced"), 25, 195, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("&OK", 127, 195, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 214, 195, 75, 25)
     GUISetState()
     While 1
         Switch GUIGetMsg()

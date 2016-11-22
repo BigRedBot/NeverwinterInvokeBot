@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.1
+- Added option to change the cursor mode key command for the fishing bot ( this option is independent from the invoke bot )
+
 10.0
 - Added a fishing bot ( PLEASE DONATE! )
 

@@ -274,8 +274,8 @@ Func ChooseProfessionsAccountEnableOptions()
             GUICtrlSetState($Checkbox[$i], $GUI_CHECKED)
         EndIf
     Next
-    Local $ButtonOK = GUICtrlCreateButton("OK", _Max(163 + ((Ceiling($Total / 10) - 3) * 100), 163), 450, 75, 25, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", _Max(250 + ((Ceiling($Total / 10) - 3) * 100), 250), 450, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("&OK", _Max(163 + ((Ceiling($Total / 10) - 3) * 100), 163), 450, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", _Max(250 + ((Ceiling($Total / 10) - 3) * 100), 250), 450, 75, 25)
     GUISetState()
     While 1
         Switch GUIGetMsg()
@@ -409,8 +409,8 @@ Func ChooseProfessionsAccountSetTasksOptions()
         GUIDelete($hGUI)
         Return
     EndIf
-    Local $ButtonOK = GUICtrlCreateButton("OK", _Max(163 + ((Ceiling($Total / 10) - 3) * 100), 163), 450, 75, 25, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", _Max(250 + ((Ceiling($Total / 10) - 3) * 100), 250), 450, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("&OK", _Max(163 + ((Ceiling($Total / 10) - 3) * 100), 163), 450, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", _Max(250 + ((Ceiling($Total / 10) - 3) * 100), 250), 450, 75, 25)
     GUISetState()
     While 1
         $nMsg = GUIGetMsg()
@@ -522,8 +522,8 @@ Func ChooseProfessionsAccountSetTasksOptionsLevels($hWnd = 0, $label = 0, $accou
             $Button[$l] = GUICtrlCreateButton("* " & Localize("LevelNumber", "<LEVEL>", Localize($level)) & " *", 30 + (($Row - 1) * 100), 50 + ($Column * 30), 95)
         EndIf
     Next
-    Local $ButtonOK = GUICtrlCreateButton("OK", 163, 400, 75, 25, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 250, 400, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("&OK", 163, 400, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 250, 400, 75, 25)
     GUISetState()
     While 1
         $nMsg = GUIGetMsg()
@@ -593,8 +593,8 @@ Func ChooseProfessionsAccountEnableAssetsOptions()
         GUIDelete($hGUI)
         Return
     EndIf
-    Local $ButtonOK = GUICtrlCreateButton("OK", _Max(163 + ((Ceiling($Total / 10) - 3) * 100), 163), 450, 75, 25, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", _Max(250 + ((Ceiling($Total / 10) - 3) * 100), 250), 450, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("&OK", _Max(163 + ((Ceiling($Total / 10) - 3) * 100), 163), 450, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", _Max(250 + ((Ceiling($Total / 10) - 3) * 100), 250), 450, 75, 25)
     GUISetState()
     While 1
         Switch GUIGetMsg()
@@ -675,8 +675,8 @@ Func ChooseProfessionsAccountSetAssetsOptions()
         GUIDelete($hGUI)
         Return
     EndIf
-    Local $ButtonOK = GUICtrlCreateButton("OK", _Max(163 + ((Ceiling($Total / 10) - 3) * 100), 163), 450, 75, 25, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", _Max(250 + ((Ceiling($Total / 10) - 3) * 100), 250), 450, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("&OK", _Max(163 + ((Ceiling($Total / 10) - 3) * 100), 163), 450, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", _Max(250 + ((Ceiling($Total / 10) - 3) * 100), 250), 450, 75, 25)
     GUISetState()
     While 1
         $nMsg = GUIGetMsg()
@@ -772,9 +772,9 @@ Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
     For $i = 1 To $Total
         $ButtonDown[$i] = GUICtrlCreateButton(ChrW(9660), 200, 55 * $i + 22, 20, 20)
     Next
-    Local $ButtonDefaults = GUICtrlCreateButton("Defaults", 40, 400, 75, 25)
-    Local $ButtonOK = GUICtrlCreateButton("OK", 168, 400, 75, 25, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("Cancel", 250, 400, 75, 25)
+    Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 40, 400, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("&OK", 168, 400, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 250, 400, 75, 25)
     GUISetState(@SW_SHOW, $hGui)
     While 1
         $nMsg = GUIGetMsg()
@@ -821,7 +821,7 @@ Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
                         ExitLoop
                     EndIf
                 Next
-            Case $ButtonDefaults
+            Case $ButtonDefault
                 GUICtrlSetState($ButtonOK, $GUI_DISABLE)
                 For $i = 1 To $Total
                     $Workers[$i] = $DefaultWorkers[$i]
