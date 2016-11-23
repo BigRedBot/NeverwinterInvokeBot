@@ -1,6 +1,5 @@
 #NoTrayIcon
 #RequireAdmin
-AutoItSetOption("TrayAutoPause", 0)
 #include "..\variables.au3"
 #include <Misc.au3>
 #include <MsgBoxConstants.au3>
@@ -9,21 +8,22 @@ AutoItSetOption("TrayAutoPause", 0)
 #include "_UnicodeIni.au3"
 #include "Localization.au3"
 Global $Title = $Name & " " & $Version & ": Unattended Launcher"
-TraySetToolTip($Title)
 LoadLocalizations()
 If _Singleton($Name & ": Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("UnattendedAlreadyRunning"))
 Local $CanRun = 1, $Ran
-Opt("TrayMenuMode", 3)
-Opt("TrayOnEventMode", 1)
+AutoItSetOption("TrayAutoPause", 0)
+AutoItSetOption("TrayMenuMode", 3)
+AutoItSetOption("TrayOnEventMode", 1)
 Local $RunNowItem = TrayCreateItem(Localize("RunNow"))
 TrayItemSetOnEvent($RunNowItem, "RunNow")
 TrayCreateItem("")
 Local $DoProfessionsItem = TrayCreateItem(Localize("DoProfessions"))
 TrayItemSetOnEvent($DoProfessionsItem, "DoProfessions")
 TrayCreateItem("")
-TrayItemSetOnEvent(TrayCreateItem(Localize("Exit")), "ExitScript")
+TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitScript")
 TraySetOnEvent($TRAY_EVENT_PRIMARYDOUBLE, "RunNow")
 TraySetState($TRAY_ICONSTATE_SHOW)
+TraySetToolTip($Title)
 
 Func ExitScript()
     Exit

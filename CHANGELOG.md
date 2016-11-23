@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.1.1
+- Added an icon to the system tray for the fishing bot with an exit option from the right click menu
+
 10.1
 - Added option to change the cursor mode key command for the fishing bot ( this option is independent from the invoke bot )
 

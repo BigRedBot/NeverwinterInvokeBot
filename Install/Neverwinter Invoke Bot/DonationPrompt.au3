@@ -1,9 +1,8 @@
 #NoTrayIcon
 #include "..\variables.au3"
+Global $Title = $Name & " v" & $Version
 #include "Shared.au3"
 _Singleton($Name & "Donation Prompt" & "Jp4g9QRntjYP")
-TraySetState($TRAY_ICONSTATE_HIDE)
-Global $Title = $Name & " v" & $Version
 #include "_AddCommaToNumber.au3"
 While 1
     Local $text = Localize("InvokedTotalTimes", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalInvoked")))

@@ -14,11 +14,14 @@
 #include "_UnicodeIni.au3"
 #include "Localization.au3"
 AutoItSetOption("WinTitleMatchMode", 3)
-Opt("TrayMenuMode", 3)
-Opt("TrayOnEventMode", 1)
-TrayCreateItem(Localize("Exit"))
-TrayItemSetOnEvent(-1, "ExitScript")
+AutoItSetOption("TrayAutoPause", 0)
+AutoItSetOption("TrayMenuMode", 3)
+AutoItSetOption("TrayOnEventMode", 1)
+Global $TrayExitItem = TrayCreateItem("&Exit")
+TrayItemSetOnEvent($TrayExitItem, "ExitScript")
 TraySetState($TRAY_ICONSTATE_SHOW)
+TraySetToolTip($Title)
+AutoItSetOption("TrayIconHide", 1)
 
 Func ExitScript()
     Exit

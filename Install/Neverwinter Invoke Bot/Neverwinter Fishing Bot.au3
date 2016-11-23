@@ -1,13 +1,14 @@
 #NoTrayIcon
 #RequireAdmin
 Global $Name = "Neverwinter Fishing Bot"
-#include "Shared.au3"
-AutoItSetOption("TrayIconHide", 1)
-If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Name, Localize("FishingBotAlreadyRunning"))
-#include "_ImageSearch.au3"
 Global $Title = $Name
-
+#include "Shared.au3"
+If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Name, Localize("FishingBotAlreadyRunning"))
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
+TraySetIcon(@ScriptDir & "\images\green.ico")
+TrayItemSetOnEvent($TrayExitItem, "End")
+AutoItSetOption("TrayIconHide", 0)
+#include "_ImageSearch.au3"
 
 Func Position()
     Focus()
