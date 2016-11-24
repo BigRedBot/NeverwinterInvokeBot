@@ -9,6 +9,7 @@ If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
     Exit
 EndIf
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
+TraySetToolTip($Title)
 TraySetIcon(@ScriptDir & "\images\red.ico")
 AutoItSetOption("TrayIconHide", 0)
 Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions, $EnableOptionalAssets
@@ -260,6 +261,7 @@ While 1
             EndIf
             Sleep(1000)
             Send("{ENTER}")
+            Sleep(1000)
             If GetValue("SafeLoginX") Then
                 MouseMove(GetValue("SafeLoginX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SafeLoginY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
                 DoubleClick()

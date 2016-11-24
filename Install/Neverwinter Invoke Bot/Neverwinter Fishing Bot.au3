@@ -5,16 +5,19 @@ Global $Title = $Name
 #include "Shared.au3"
 If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Name, Localize("FishingBotAlreadyRunning"))
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
+TraySetToolTip($Title)
 TraySetIcon(@ScriptDir & "\images\green.ico")
 TrayItemSetOnEvent($TrayExitItem, "End")
 AutoItSetOption("TrayIconHide", 0)
 #include "_ImageSearch.au3"
 
+Local $Bait[4], $Catch[4], $Left[4], $Back[4], $Right[4], $Cast[4], $Hook[4], $LeftPressed, $BackPressed, $RightPressed, $MouseLeftPressed, $MouseRightPressed, $Caught, $EndTimer, $EndTime, $FishingTimer, $FishingTimeOut = GetValue("FishingTimeOutMinutes") * 60000, $MouseOffset = 5, $KeyDelay = GetValue("KeyDelaySeconds") * 1000
+
 Func Position()
     Focus()
     If Not $WinHandle Or Not GetPosition() Then
         MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
-        Fish()
+        Return 0
     EndIf
     If Not GetValue("GameClientWidth") Or Not GetValue("GameClientHeight") Then Return
     If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight And ( GetValue("GameClientWidth") <> $DeskTopWidth Or GetValue("GameClientHeight") <> $DeskTopHeight ) Then
@@ -31,21 +34,21 @@ Func Position()
             Focus()
             If Not $WinHandle Or Not GetPosition() Then
                 MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
-                Fish()
+                Return 0
             EndIf
         EndIf
         WinMove($WinHandle, "", 0, 0, GetValue("GameClientWidth") + $PaddingWidth, GetValue("GameClientHeight") + $PaddingHeight)
         Focus()
         If Not $WinHandle Or Not GetPosition() Then
             MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
-            Fish()
+            Return 0
         EndIf
         If $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
             MsgBox($MB_ICONWARNING, $Title, Localize("UnableToResize"))
             End()
         EndIf
         MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterResized"))
-        Fish()
+        Return 0
     ElseIf $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
         If $DeskTopWidth < GetValue("GameClientWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameClientHeight") + $PaddingHeight Then
             Local $ostyle = DllCall("user32.dll", "long", "GetWindowLong", "hwnd", $WinHandle, "int", -16)
@@ -54,23 +57,24 @@ Func Position()
             Focus()
             If Not $WinHandle Or Not GetPosition() Then
                 MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
-                Fish()
+                Return 0
             EndIf
         EndIf
         WinMove($WinHandle, "", 0, 0)
         Focus()
         If Not $WinHandle Or Not GetPosition() Then
             MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
-            Fish()
+            Return 0
         EndIf
         If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
             MsgBox($MB_ICONWARNING, $Title, Localize("UnableToMove"))
             End()
         EndIf
         MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterMoved"))
-        Fish()
+        Return 0
     EndIf
     WinSetOnTop($WinHandle, "", 1)
+    Return 1
 EndFunc
 
 Local $SplashWindow, $LastSplashText = "", $SplashLeft = @DesktopWidth - GetValue("FishingSplashWidth") - 70 - 1, $SplashTop = @DesktopHeight - GetValue("FishingSplashHeight") - 50 - 1
@@ -78,20 +82,17 @@ Local $SplashWindow, $LastSplashText = "", $SplashLeft = @DesktopWidth - GetValu
 Func Splash($s = "")
     If $SplashWindow Then
         If Not ($LastSplashText == $s) Then
-            ControlSetText($SplashWindow, "", "Static1", Localize("ToStopPressEsc") & @CRLF & @CRLF & $s)
+            ControlSetText($SplashWindow, "", "Static1", Localize("ToStopPressF4") & @CRLF & @CRLF & $s)
             $LastSplashText = $s
         EndIf
     Else
-        $SplashWindow = SplashTextOn($Title, Localize("ToStopPressEsc") & @CRLF & @CRLF & $s, GetValue("FishingSplashWidth"), GetValue("FishingSplashHeight"), $SplashLeft, $SplashTop - 50, $DLG_MOVEABLE + $DLG_NOTONTOP)
+        $SplashWindow = SplashTextOn($Title, Localize("ToStopPressF4") & @CRLF & @CRLF & $s, GetValue("FishingSplashWidth"), GetValue("FishingSplashHeight"), $SplashLeft, $SplashTop - 50, $DLG_MOVEABLE + $DLG_NOTONTOP)
         $LastSplashText = $s
         WinSetOnTop($SplashWindow, "", 0)
     EndIf
 EndFunc
 
-Local $ImageSearchImage
-
 Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("FishingImageTolerance"), $resultPosition = -2)
-    $ImageSearchImage = $image
     If Not FileExists("images\" & $Language & "\" & $image & ".png") Then Return 0
     If _ImageSearchArea("images\" & $Language & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return 1
     Local $i = 2
@@ -101,8 +102,6 @@ Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $Clien
     WEnd
     Return 0
 EndFunc
-
-Local $Catch[4], $Left[4], $Back[4], $Right[4], $Cast[4], $Hook[4], $LeftPressed, $BackPressed, $RightPressed, $MouseLeftPressed, $MouseRightPressed, $Caught, $EndTimer, $EndTime
 
 Func ReleaseKeys()
     If $LeftPressed Then Send(GetValue("FishingLeftKeyUp"))
@@ -126,7 +125,7 @@ EndFunc
 Func Fish()
 While 1
 While 1
-    HotKeySet("{Esc}")
+    HotKeySet("{F4}")
     If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
     SplashOff()
     $SplashWindow = 0
@@ -150,44 +149,60 @@ While 1
     WEnd
     While 1
     While 1
-        HotKeySet("{Esc}", "Fish")
-        Position()
-        Sleep(2000)
-        If ImageSearch("Fishing_Catch") Then
+        HotKeySet("{F4}", "Fish")
+        Splash()
+        If Not Position() Then ExitLoop 3
+        Sleep(GetValue("FishingDelaySeconds") * 1000)
+        If ImageSearch("Fishing_Cast") And ImageSearch("Fishing_Catch") Then
             Send(GetValue("FishingCursorModeKey"))
-            Sleep(2000)
+            Sleep(GetValue("FishingDelaySeconds") * 1000)
+            If ImageSearch("Fishing_Cast") And ImageSearch("Fishing_Catch") Then ExitLoop 3
         EndIf
-        If Not ImageSearch("Fishing_Catch_Dimmed") Then ExitLoop 3
+        If ImageSearch("Fishing_Bait") Or ImageSearch("Fishing_Bait_Lugworm") Or ImageSearch("Fishing_Bait_Lugworm_Dimmed") Or ImageSearch("Fishing_Bait_Krill") Or ImageSearch("Fishing_Bait_Krill_Dimmed") Then
+            $Bait[0] = $_ImageSearchLeft
+            $Bait[1] = $_ImageSearchTop
+            $Bait[2] = $_ImageSearchRight
+            $Bait[3] = $_ImageSearchBottom
+            If ImageSearch("Fishing_Bait", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then
+                Send(GetValue("FishingBaitKey"))
+                Sleep(GetValue("FishingDelaySeconds") * 1000)
+                If Not ImageSearch("Fishing_Bait_Lugworm") And Not ImageSearch("Fishing_Bait_Lugworm_Dimmed") And Not ImageSearch("Fishing_Bait_Krill") And Not ImageSearch("Fishing_Bait_Krill_Dimmed") Then ExitLoop 3
+            EndIf
+        Else
+            Send(GetValue("FishingBaitKey"))
+            Sleep(GetValue("FishingDelaySeconds") * 1000)
+            If Not ImageSearch("Fishing_Bait_Lugworm") And Not ImageSearch("Fishing_Bait_Lugworm_Dimmed") And Not ImageSearch("Fishing_Bait_Krill") And Not ImageSearch("Fishing_Bait_Krill_Dimmed") Then ExitLoop 3
+            $Bait[0] = $_ImageSearchLeft
+            $Bait[1] = $_ImageSearchTop
+            $Bait[2] = $_ImageSearchRight
+            $Bait[3] = $_ImageSearchBottom
+        EndIf
+        If Not ImageSearch("Fishing_Catch_Dimmed") And Not ImageSearch("Fishing_Catch") Then ExitLoop 3
         $Catch[0] = $_ImageSearchLeft
         $Catch[1] = $_ImageSearchTop
         $Catch[2] = $_ImageSearchRight
         $Catch[3] = $_ImageSearchBottom
-        If ImageSearch("Fishing_Bait") Then
-            Send(GetValue("FishingBaitKey"))
-            Sleep(2000)
-            If ImageSearch("Fishing_Bait") Then ExitLoop 3
-        EndIf
-        If Not ImageSearch("Fishing_Left_Dimmed") Then ExitLoop 3
+        If Not ImageSearch("Fishing_Left_Dimmed") And Not ImageSearch("Fishing_Left") Then ExitLoop 3
         $Left[0] = $_ImageSearchLeft
         $Left[1] = $_ImageSearchTop
         $Left[2] = $_ImageSearchRight
         $Left[3] = $_ImageSearchBottom
-        If Not ImageSearch("Fishing_Back_Dimmed") Then ExitLoop 3
+        If Not ImageSearch("Fishing_Back_Dimmed") And Not ImageSearch("Fishing_Back") Then ExitLoop 3
         $Back[0] = $_ImageSearchLeft
         $Back[1] = $_ImageSearchTop
         $Back[2] = $_ImageSearchRight
         $Back[3] = $_ImageSearchBottom
-        If Not ImageSearch("Fishing_Right_Dimmed") Then ExitLoop 3
+        If Not ImageSearch("Fishing_Right_Dimmed") And Not ImageSearch("Fishing_Right") Then ExitLoop 3
         $Right[0] = $_ImageSearchLeft
         $Right[1] = $_ImageSearchTop
         $Right[2] = $_ImageSearchRight
         $Right[3] = $_ImageSearchBottom
-        If Not ImageSearch("Fishing_Cast") Then ExitLoop 3
+        If Not ImageSearch("Fishing_Cast_Dimmed") And Not ImageSearch("Fishing_Cast") Then ExitLoop 3
         $Cast[0] = $_ImageSearchLeft
         $Cast[1] = $_ImageSearchTop
         $Cast[2] = $_ImageSearchRight
         $Cast[3] = $_ImageSearchBottom
-        If Not ImageSearch("Fishing_Hook_Dimmed") Then ExitLoop 3
+        If Not ImageSearch("Fishing_Hook_Dimmed") And Not ImageSearch("Fishing_Hook") Then ExitLoop 3
         $Hook[0] = $_ImageSearchLeft
         $Hook[1] = $_ImageSearchTop
         $Hook[2] = $_ImageSearchRight
@@ -197,41 +212,57 @@ While 1
         While 1
             ReleaseKeys()
             If $EndTime - TimerDiff($EndTimer) <= 0 Then End()
+            If ImageSearch("Fishing_Bait_Blank", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Or ImageSearch("Fishing_Bait", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then ExitLoop 3
             Splash(Localize("Waiting"))
+            $FishingTimer = TimerInit()
             While Not ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3])
+                If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then
+                    If Not ReLog() Then ExitLoop 6
+                    ExitLoop 4
+                EndIf
                 Sleep(Random(100, 500, 1))
             WEnd
+            If ImageSearch("Fishing_Bait_Lugworm", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then
+                Send(GetValue("FishingBaitKey"))
+                Sleep(GetValue("FishingDelaySeconds") * 1000)
+            EndIf
             Splash(Localize("Casting"))
             If Not $MouseLeftPressed Then MouseDown("left")
             $MouseLeftPressed = 1
             Sleep(Random(100, 500, 1))
+            $FishingTimer = TimerInit()
             While ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3])
-                If ImageSearch("Fishing_Catch", $Catch[0], $Catch[1], $Catch[2], $Catch[3]) Then ExitLoop 4
+                If ImageSearch("Fishing_Catch", $Catch[0], $Catch[1], $Catch[2], $Catch[3]) Then ExitLoop 6
+                If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then ExitLoop 4
                 Sleep(Random(100, 500, 1))
             WEnd
             If $MouseLeftPressed Then MouseUp("left")
             $MouseLeftPressed = 0
             Splash(Localize("Fishing"))
+            $FishingTimer = TimerInit()
             While Not ImageSearch("Fishing_Hook", $Hook[0], $Hook[1], $Hook[2], $Hook[3])
+                If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then ExitLoop 4
                 Sleep(Random(100, 500, 1))
                 If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) Then ExitLoop 2
             WEnd
+            $FishingTimer = TimerInit()
             While ImageSearch("Fishing_Hook", $Hook[0], $Hook[1], $Hook[2], $Hook[3])
+                If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) Then ExitLoop 6
+                If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then ExitLoop 4
                 Splash(Localize("Hooking"))
                 If Not $MouseRightPressed Then MouseDown("right")
                 $MouseRightPressed = 1
                 Sleep(Random(100, 500, 1))
-                If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) Then
-                    If $MouseRightPressed Then MouseUp("right")
-                    $MouseRightPressed = 0
-                    ExitLoop 2
-                EndIf
             WEnd
             If $MouseRightPressed Then MouseUp("right")
             $MouseRightPressed = 0
             $Caught = 0
+            $FishingTimer = TimerInit()
             While Not ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3])
+                If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then ExitLoop 4
                 While ImageSearch("Fishing_Catch", $Catch[0], $Catch[1], $Catch[2], $Catch[3])
+                    If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) Then ExitLoop 7
+                    If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then ExitLoop 5
                     Splash(Localize("Catching"))
                     Send(GetValue("FishingCatchKey"))
                     $Caught = 1
@@ -258,7 +289,6 @@ While 1
                         $RightPressed = 1
                     EndIf
                     Sleep(Random(500, 1000, 1))
-                    If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) Then ExitLoop 2
                 WEnd
                 If ImageSearch("Fishing_Left", $Left[0], $Left[1], $Left[2], $Left[3]) Then
                     Splash(Localize("ReelingLeft"))
@@ -284,8 +314,9 @@ While 1
                     $BackPressed = 0
                     If Not $RightPressed Then Send(GetValue("FishingRightKeyDown"))
                     $RightPressed = 1
-                ElseIf $Caught And ImageSearch("Fishing_Left_Dimmed", $Left[0], $Left[1], $Left[2], $Left[3]) And ImageSearch("Fishing_Back_Dimmed", $Back[0], $Back[1], $Back[2], $Back[3]) And ImageSearch("Fishing_Right_Dimmed", $Right[0], $Right[1], $Right[2], $Right[3]) Then
-                    Splash(Localize("Waiting"))
+                ElseIf $Caught Then
+                    If ImageSearch("Fishing_Bait_Blank", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Or ImageSearch("Fishing_Bait", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then ExitLoop 4
+                    If ImageSearch("Fishing_Left_Dimmed", $Left[0], $Left[1], $Left[2], $Left[3]) And ImageSearch("Fishing_Back_Dimmed", $Back[0], $Back[1], $Back[2], $Back[3]) And ImageSearch("Fishing_Right_Dimmed", $Right[0], $Right[1], $Right[2], $Right[3]) Then Splash(Localize("Waiting"))
                 EndIf
                 Sleep(Random(100, 500, 1))
             WEnd
@@ -308,6 +339,8 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
     $s &= "|" & "FishingRightKeyDown,FishingRightKeyDownTitle,FishingRightKeyDownDescription,Text"
     $s &= "|" & "FishingRightKeyUp,FishingRightKeyUpTitle,FishingRightKeyUpDescription,Text"
     $s &= "|" & "FishingCursorModeKey,CursorModeKeyTitle,CursorModeKeyDescription,Text"
+    $s &= "|" & "FishingTimeOutMinutes,TimeOutMinutesTitle,TimeOutMinutesDescription,Number"
+    $s &= "|" & "FishingDelaySeconds,FishingDelaySecondsTitle,FishingDelaySecondsDescription,Number"
     Local $a = StringSplit(StringRegExpReplace($s, "^\|+", ""), "|")
     Local $Total = $a[0]
     Local $c[$Total + 1]
@@ -384,6 +417,130 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
         EndSwitch
     WEnd
     GUIDelete($hGUI)
+EndFunc
+
+Func ReLog()
+    If Not ChangeCharacter() Then Return 0
+    Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
+    $FishingTimeOut = TimerInit()
+    While 1
+        If Not Position() Then Return 0
+        If ImageSearch("SelectionScreen", $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("ImageTolerance")) Then ExitLoop
+        ;FindLogInScreen()
+        Sleep(500)
+        If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then Return 0
+    WEnd
+    MouseMove(GetValue("CharacterSelectionMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("CharacterSelectionMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+    DoubleRightClick()
+    Sleep(1000)
+    Send("{ENTER}")
+    Sleep(1000)
+    If GetValue("SafeLoginX") Then
+        MouseMove(GetValue("SafeLoginX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SafeLoginY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+        DoubleClick()
+    EndIf
+    Splash("[ " & Localize("WaitingForInGameScreen") & " ]")
+    $FishingTimeOut = TimerInit()
+    While 1
+        If Not Position() Then Return 0
+        If ImageSearch("Fishing_Catch_Dimmed", $Catch[0], $Catch[1], $Catch[2], $Catch[3], GetValue("ImageTolerance")) Or ImageSearch("Fishing_Catch", $Catch[0], $Catch[1], $Catch[2], $Catch[3], GetValue("ImageTolerance")) Then ExitLoop
+        ;FindLogInScreen()
+        Sleep(500)
+        If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then Return 0
+    WEnd
+    Sleep(GetValue("LogInDelaySeconds") * 1000)
+    Return 1
+EndFunc
+
+Global $AlternateLogInCommands = 1
+
+Func SearchForChangeCharacterButton()
+    If ImageSearch("ChangeCharacterButton", $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("ImageTolerance")) Then Return 1
+    If $AlternateLogInCommands = 2 Or GetValue("GameMenuKey") = "{ESC}" Then
+        Send("{ESC}")
+    Else
+        Send(GetValue("GameMenuKey"))
+    EndIf
+    Sleep(1500)
+    If $AlternateLogInCommands = 1 Then
+        $AlternateLogInCommands = 2
+    Else
+        $AlternateLogInCommands = 1
+    EndIf
+    If ImageSearch("ChangeCharacterButton", $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("ImageTolerance")) Then Return 1
+    Return 0
+EndFunc
+
+Func WaitForChangeCharacterButton()
+    $AlternateLogInCommands = 1
+    While Not SearchForChangeCharacterButton()
+        If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then Return 0
+        ;FindLogInScreen()
+    WEnd
+    Return 1
+EndFunc
+
+Func ChangeCharacter()
+    $FishingTimer = TimerInit()
+While 1
+While 1
+    If Not WaitForChangeCharacterButton() Then Return 0
+    MouseMove($_ImageSearchX, $_ImageSearchY)
+    DoubleClick()
+    Sleep(500)
+    If Not ImageSearch("OK", $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("ImageTolerance")) Then
+        Send("{ESC}")
+        Sleep(500)
+        Send("{ESC}")
+        Sleep(1500)
+        If ImageSearch("ChangeCharacterButton", $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("ImageTolerance")) Then
+            Send("{ESC}")
+            Sleep(500)
+        EndIf
+        ExitLoop
+    EndIf
+    For $n = 1 To 4
+        Send("{ENTER}")
+        Sleep(500)
+    Next
+    If ImageSearch("OK", $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("ImageTolerance")) Then
+        Send("{ESC}")
+        Sleep(500)
+        Send("{ESC}")
+        Sleep(1500)
+        If ImageSearch("ChangeCharacterButton", $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("ImageTolerance")) Then
+            Send("{ESC}")
+            Sleep(500)
+        EndIf
+        ExitLoop
+    EndIf
+Return 1
+WEnd
+WEnd
+EndFunc
+
+Func DoubleClick()
+    SingleClick()
+    SingleClick()
+EndFunc
+
+Func SingleClick()
+    Sleep($KeyDelay)
+    MouseDown("primary")
+    Sleep($KeyDelay)
+    MouseUp("primary")
+EndFunc
+
+Func DoubleRightClick()
+    SingleRightClick()
+    SingleRightClick()
+EndFunc
+
+Func SingleRightClick()
+    Sleep($KeyDelay)
+    MouseDown("right")
+    Sleep($KeyDelay)
+    MouseUp("right")
 EndFunc
 
 AdvancedAllAccountsSettings()

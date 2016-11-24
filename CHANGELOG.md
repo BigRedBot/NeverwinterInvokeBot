@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+10.2
+- The fishing bot will now automatically use krill bait
+- The key to stop fishing has been changed to F4
+
 10.1.1
 - Added an icon to the system tray for the fishing bot with an exit option from the right click menu
 

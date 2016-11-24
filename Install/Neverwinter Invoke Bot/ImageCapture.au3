@@ -4,6 +4,7 @@ Global $Name = "Neverwinter Client Image Capture"
 Global $Title = $Name
 #include "Shared.au3"
 If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ImageCaptureAlreadyRunning"))
+TraySetToolTip($Title)
 TraySetIcon(@ScriptDir & "\images\purple.ico")
 AutoItSetOption("TrayIconHide", 0)
 #include <ScreenCapture.au3>
