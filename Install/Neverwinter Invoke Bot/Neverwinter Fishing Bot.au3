@@ -11,7 +11,7 @@ TrayItemSetOnEvent($TrayExitItem, "End")
 AutoItSetOption("TrayIconHide", 0)
 #include "_ImageSearch.au3"
 
-Local $Bait[4], $Catch[4], $Left[4], $Back[4], $Right[4], $Cast[4], $Hook[4], $LeftPressed, $BackPressed, $RightPressed, $MouseLeftPressed, $MouseRightPressed, $Caught, $EndTimer, $EndTime, $FishingTimer, $FishingTimeOut = GetValue("FishingTimeOutMinutes") * 60000, $MouseOffset = 5, $KeyDelay = GetValue("KeyDelaySeconds") * 1000
+Local $Bait[4], $Catch[4], $Left[4], $Back[4], $Right[4], $Cast[4], $Hook[4], $LeftPressed, $BackPressed, $RightPressed, $MouseLeftPressed, $MouseRightPressed, $Caught, $EndTimer, $EndTime, $FishingTimer, $MouseOffset = 5, $KeyDelay = GetValue("KeyDelaySeconds") * 1000
 
 Func Position()
     Focus()
@@ -216,7 +216,7 @@ While 1
             Splash(Localize("Waiting"))
             $FishingTimer = TimerInit()
             While Not ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3])
-                If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then
+                If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then
                     If Not ReLog() Then ExitLoop 6
                     ExitLoop 4
                 EndIf
@@ -233,7 +233,7 @@ While 1
             $FishingTimer = TimerInit()
             While ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3])
                 If ImageSearch("Fishing_Catch", $Catch[0], $Catch[1], $Catch[2], $Catch[3]) Then ExitLoop 6
-                If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then ExitLoop 4
+                If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then ExitLoop 4
                 Sleep(Random(100, 500, 1))
             WEnd
             If $MouseLeftPressed Then MouseUp("left")
@@ -241,14 +241,14 @@ While 1
             Splash(Localize("Fishing"))
             $FishingTimer = TimerInit()
             While Not ImageSearch("Fishing_Hook", $Hook[0], $Hook[1], $Hook[2], $Hook[3])
-                If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then ExitLoop 4
+                If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then ExitLoop 4
                 Sleep(Random(100, 500, 1))
                 If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) Then ExitLoop 2
             WEnd
             $FishingTimer = TimerInit()
             While ImageSearch("Fishing_Hook", $Hook[0], $Hook[1], $Hook[2], $Hook[3])
                 If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) Then ExitLoop 6
-                If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then ExitLoop 4
+                If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then ExitLoop 4
                 Splash(Localize("Hooking"))
                 If Not $MouseRightPressed Then MouseDown("right")
                 $MouseRightPressed = 1
@@ -259,10 +259,10 @@ While 1
             $Caught = 0
             $FishingTimer = TimerInit()
             While Not ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3])
-                If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then ExitLoop 4
+                If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then ExitLoop 4
                 While ImageSearch("Fishing_Catch", $Catch[0], $Catch[1], $Catch[2], $Catch[3])
                     If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) Then ExitLoop 7
-                    If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then ExitLoop 5
+                    If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then ExitLoop 5
                     Splash(Localize("Catching"))
                     Send(GetValue("FishingCatchKey"))
                     $Caught = 1
@@ -422,13 +422,13 @@ EndFunc
 Func ReLog()
     If Not ChangeCharacter() Then Return 0
     Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
-    $FishingTimeOut = TimerInit()
+    $FishingTimer = TimerInit()
     While 1
         If Not Position() Then Return 0
         If ImageSearch("SelectionScreen", $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("ImageTolerance")) Then ExitLoop
         ;FindLogInScreen()
         Sleep(500)
-        If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then Return 0
+        If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then Return 0
     WEnd
     MouseMove(GetValue("CharacterSelectionMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("CharacterSelectionMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
     DoubleRightClick()
@@ -440,13 +440,13 @@ Func ReLog()
         DoubleClick()
     EndIf
     Splash("[ " & Localize("WaitingForInGameScreen") & " ]")
-    $FishingTimeOut = TimerInit()
+    $FishingTimer = TimerInit()
     While 1
         If Not Position() Then Return 0
         If ImageSearch("Fishing_Catch_Dimmed", $Catch[0], $Catch[1], $Catch[2], $Catch[3], GetValue("ImageTolerance")) Or ImageSearch("Fishing_Catch", $Catch[0], $Catch[1], $Catch[2], $Catch[3], GetValue("ImageTolerance")) Then ExitLoop
         ;FindLogInScreen()
         Sleep(500)
-        If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then Return 0
+        If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then Return 0
     WEnd
     Sleep(GetValue("LogInDelaySeconds") * 1000)
     Return 1
@@ -474,7 +474,7 @@ EndFunc
 Func WaitForChangeCharacterButton()
     $AlternateLogInCommands = 1
     While Not SearchForChangeCharacterButton()
-        If $FishingTimeOut - TimerDiff($FishingTimer) <= 0 Then Return 0
+        If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then Return 0
         ;FindLogInScreen()
     WEnd
     Return 1

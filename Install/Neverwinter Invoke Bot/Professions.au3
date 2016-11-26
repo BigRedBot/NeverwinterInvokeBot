@@ -125,7 +125,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
 EndFunc
 
 Func ProfessionsChooseAssets(); If $RestartLoop Then Return 0
-    If Not $EnableOptionalAssets Or Not GetValue("LeadershipOptionalAssets") Then Return
+    If Not $EnableOptionalAssets Or Not GetValue("EnableOptionalAssets") Then Return
     Local $retry = 0
     While 1
         If ImageSearch("Professions_Asset") And ImageSearch("Professions_Asset", $_ImageSearchLeft, $_ImageSearchBottom + 100, $_ImageSearchRight, $_ImageSearchBottom + 150) Then ExitLoop
@@ -390,8 +390,8 @@ Func ChooseProfessionsAccountSetTasksOptions()
         For $l = 0 To $MaxProfessionLevel + 1
             Local $level = $l
             If $l = $MaxProfessionLevel + 1 Then $level = "Unknown"
-            If Not ( GetValue("LeadershipProfessionTasks_Level_" & $level, $CurrentAccount, $i) == GetDefaultValue("LeadershipProfessionTasks_Level_" & $level) ) Then $default = 0
-            If GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then
+            If Not ( GetCharacterValue("LeadershipProfessionTasks_Level_" & $level, $i) == GetDefaultValue("LeadershipProfessionTasks_Level_" & $level) ) Then $default = 0
+            If GetAccountValue("EnableProfessions") Or GetCharacterValue("EnableProfessions", $i) Then
                 $EnabledCharacterFound = 1
                 If Not ( GetAccountValue("LeadershipProfessionTasks_Level_" & $level) == GetDefaultValue("LeadershipProfessionTasks_Level_" & $level) ) Then $disabled = 1
             Else
@@ -452,7 +452,7 @@ Func ChooseProfessionsAccountSetTasksOptions()
                         Next
                         If $disabled Then
                             GUICtrlSetState($Button[$i], $GUI_DISABLE)
-                        ElseIf GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then
+                        ElseIf GetAccountValue("EnableProfessions") Or GetCharacterValue("EnableProfessions", $i) Then
                             GUICtrlSetState($Button[$i], $GUI_ENABLE)
                         EndIf
                     Next
@@ -467,7 +467,7 @@ Func ChooseProfessionsAccountSetTasksOptions()
             Case $Button[1] To $Button[$Total]
                 For $i = 1 To $Total
                     If $Button[$i] = $nMsg Then
-                        Local $results = ChooseProfessionsAccountSetTasksOptionsLevels($hGUI, Localize("EditProfessionTasksForCharacter", "<NUMBER>", $i), $CurrentAccount, $i)
+                        Local $results = ChooseProfessionsAccountSetTasksOptionsLevels($hGUI, Localize("EditProfessionTasksForCharacter", "<NUMBER>", $i), $i)
                         If @error = 0 Then
                             GUICtrlSetState($ButtonOK, $GUI_DISABLE)
                             Local $default = 1
@@ -504,7 +504,7 @@ Func ChooseProfessionsAccountSetTasksOptions()
     WEnd
 EndFunc
 
-Func ChooseProfessionsAccountSetTasksOptionsLevels($hWnd = 0, $label = 0, $account = $CurrentAccount, $character = 0)
+Func ChooseProfessionsAccountSetTasksOptionsLevels($hWnd = 0, $label = 0, $character = 0)
     If Not $EnableProfessions Or $UnattendedMode Or $UnattendedModeCheckSettings Then Return
     Local $Total = $MaxProfessionLevel + 1, $nMsg
     Local $Button[$Total + 1]
@@ -515,7 +515,11 @@ Func ChooseProfessionsAccountSetTasksOptionsLevels($hWnd = 0, $label = 0, $accou
     For $l = 0 To $Total
         Local $Row = Ceiling(($l + 1) / 10), $Column = ($l + 1) - (($Row - 1) * 10), $level = $l
         If $l = $Total Then $level = "Unknown"
-        $results[$l] = GetValue("LeadershipProfessionTasks_Level_" & $level, $account, $character)
+        If $character Then
+            $results[$l] = GetCharacterValue("LeadershipProfessionTasks_Level_" & $level, $character)
+        Else
+            $results[$l] = GetAccountValue("LeadershipProfessionTasks_Level_" & $level)
+        EndIf
         If $results[$l] == GetDefaultValue("LeadershipProfessionTasks_Level_" & $level) Then
             $Button[$l] = GUICtrlCreateButton(Localize("LevelNumber", "<LEVEL>", Localize($level)), 30 + (($Row - 1) * 100), 50 + ($Column * 30), 95)
         Else
@@ -577,12 +581,12 @@ Func ChooseProfessionsAccountEnableAssetsOptions()
         Local $Row = Ceiling($i / 10), $Column = $i - (($Row - 1) * 10)
         $Checkbox[$i] = GUICtrlCreateCheckbox(Localize("CharacterNumber", "<NUMBER>", $i), 40 + (($Row - 1) * 100), 100 + ($Column * 30), 100)
         If GetAccountValue("EnableOptionalAssets") Then
-            If GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then GUICtrlSetState($Checkbox[$i], $GUI_CHECKED)
+            If GetAccountValue("EnableProfessions") Or GetCharacterValue("EnableProfessions", $i) Then GUICtrlSetState($Checkbox[$i], $GUI_CHECKED)
             GUICtrlSetState($Checkbox[$i], $GUI_DISABLE)
         ElseIf GetCharacterValue("EnableOptionalAssets", $i) Then
-            If GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then GUICtrlSetState($Checkbox[$i], $GUI_CHECKED)
+            If GetAccountValue("EnableProfessions") Or GetCharacterValue("EnableProfessions", $i) Then GUICtrlSetState($Checkbox[$i], $GUI_CHECKED)
         EndIf
-        If GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then
+        If GetAccountValue("EnableProfessions") Or GetCharacterValue("EnableProfessions", $i) Then
             $EnabledCharacterFound = 1
             If Not ( GetAccountValue("EnableOptionalAssets") == GetDefaultValue("EnableOptionalAssets") ) Then GUICtrlSetState($Checkbox[$i], $GUI_DISABLE)
         Else
@@ -604,12 +608,12 @@ Func ChooseProfessionsAccountEnableAssetsOptions()
                 GUICtrlSetState($ButtonOK, $GUI_DISABLE)
                 If GUICtrlRead($Checkbox[0]) = $GUI_CHECKED Then
                     For $i = 1 To $Total
-                        If GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then GUICtrlSetState($Checkbox[$i], $GUI_CHECKED)
+                        If GetAccountValue("EnableProfessions") Or GetCharacterValue("EnableProfessions", $i) Then GUICtrlSetState($Checkbox[$i], $GUI_CHECKED)
                         GUICtrlSetState($Checkbox[$i], $GUI_DISABLE)
                     Next
                 Else
                     For $i = 1 To $Total
-                        If GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then GUICtrlSetState($Checkbox[$i], $GUI_ENABLE)
+                        If GetAccountValue("EnableProfessions") Or GetCharacterValue("EnableProfessions", $i) Then GUICtrlSetState($Checkbox[$i], $GUI_ENABLE)
                         GUICtrlSetState($Checkbox[$i], $GUI_UNCHECKED)
                     Next
                 EndIf
@@ -659,12 +663,12 @@ Func ChooseProfessionsAccountSetAssetsOptions()
     EndIf
     For $i = 1 To $Total
         Local $Row = Ceiling($i / 10), $Column = $i - (($Row - 1) * 10)
-        If GetValue("LeadershipOptionalAssets", $CurrentAccount, $i) == GetDefaultValue("LeadershipOptionalAssets") Then
+        If GetCharacterValue("LeadershipOptionalAssets", $i) == GetDefaultValue("LeadershipOptionalAssets") Then
             $Button[$i] = GUICtrlCreateButton(Localize("CharacterNumber", "<NUMBER>", $i), 30 + (($Row - 1) * 100), 100 + ($Column * 30), 95)
         Else
             $Button[$i] = GUICtrlCreateButton("* " & Localize("CharacterNumber", "<NUMBER>", $i) & " *", 30 + (($Row - 1) * 100), 100 + ($Column * 30), 95)
         EndIf
-        If ( GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) ) And ( GetAccountValue("EnableOptionalAssets") Or GetValue("EnableOptionalAssets", $CurrentAccount, $i) ) Then
+        If ( GetAccountValue("EnableProfessions") Or GetCharacterValue("EnableProfessions", $i) ) And ( GetAccountValue("EnableOptionalAssets") Or GetCharacterValue("EnableOptionalAssets", $i) ) Then
             $EnabledCharacterFound = 1
             If Not ( GetAccountValue("LeadershipOptionalAssets") == GetDefaultValue("LeadershipOptionalAssets") ) Then GUICtrlSetState($Button[$i], $GUI_DISABLE)
         Else
@@ -701,7 +705,7 @@ Func ChooseProfessionsAccountSetAssetsOptions()
                         DeleteIniCharacter("LeadershipOptionalAssets", $i)
                         DeleteCharacterValue("LeadershipOptionalAssets", $i)
                         If $input == GetDefaultValue("LeadershipOptionalAssets") Then
-                            If GetAccountValue("EnableProfessions") Or GetValue("EnableProfessions", $CurrentAccount, $i) Then GUICtrlSetState($Button[$i], $GUI_ENABLE)
+                            If GetAccountValue("EnableProfessions") Or GetCharacterValue("EnableProfessions", $i) Then GUICtrlSetState($Button[$i], $GUI_ENABLE)
                         Else
                             GUICtrlSetState($Button[$i], $GUI_DISABLE)
                         EndIf

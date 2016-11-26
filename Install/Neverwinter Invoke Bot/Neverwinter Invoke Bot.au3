@@ -12,10 +12,8 @@ If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
 TraySetToolTip($Title)
 TraySetIcon(@ScriptDir & "\images\red.ico")
 AutoItSetOption("TrayIconHide", 0)
-Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions, $EnableOptionalAssets
-Global $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $EndTime, $MinutesToEndSaved, $MinutesToEndSavedTimer, $StartingKeyboardLayout
-Global $KeyDelay = GetValue("KeyDelaySeconds") * 1000, $CharacterSelectionScrollAwayKeyDelay = GetValue("CharacterSelectionScrollAwayKeyDelaySeconds") * 1000, $CharacterSelectionScrollTowardKeyDelay = GetValue("CharacterSelectionScrollTowardKeyDelaySeconds") * 1000, $TimeOut = GetValue("TimeOutMinutes") * 60000, $MouseOffset = 5
-AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions, $EnableOptionalAssets, $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $EndTime, $MinutesToEndSaved, $MinutesToEndSavedTimer, $StartingKeyboardLayout, $MouseOffset = 5
+AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
 #include <StringConstants.au3>
 #include <ColorConstants.au3>
 #include <WinAPISys.au3>
@@ -196,7 +194,7 @@ While 1
 While 1
     $LoopStarted = 1
     $RestartLoop = 0
-    AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+    AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
     If CompletedAccount() Then
         End(); If $RestartLoop Then Return 0
         If $RestartLoop Then ExitLoop 1
@@ -235,29 +233,29 @@ While 1
             If $CharacterSelectionPositioned And Not GetValue("DisableSimpleCharacterSelection") Then
                 Send("{DOWN}")
             ElseIf GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
-                AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
+                AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollAwayKeyDelaySeconds") * 1000)
                 For $n = 1 To GetValue("TotalSlots")
                     Send("{UP}")
                 Next
-                AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollTowardKeyDelay)
+                AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollTowardKeyDelaySeconds") * 1000)
                 Sleep(1000)
                 For $n = 2 To GetValue("CurrentCharacter")
                     Send("{DOWN}")
                     Sleep(50)
                 Next
-                AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+                AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
             Else
-                AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollAwayKeyDelay)
+                AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollAwayKeyDelaySeconds") * 1000)
                 For $n = 1 To GetValue("TotalSlots")
                     Send("{DOWN}")
                 Next
-                AutoItSetOption("SendKeyDownDelay", $CharacterSelectionScrollTowardKeyDelay)
+                AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollTowardKeyDelaySeconds") * 1000)
                 Sleep(1000)
                 For $n = 1 To (GetValue("TotalSlots") - GetValue("CurrentCharacter"))
                     Send("{UP}")
                     Sleep(50)
                 Next
-                AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+                AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
             EndIf
             Sleep(1000)
             Send("{ENTER}")
@@ -339,11 +337,11 @@ While 1
                 If GetValue("DisableSimpleCharacterSelection") Then
                     For $n = 1 To $RemainingCharacters
                         If GetValue("CurrentCharacter") + $n <= Ceiling(GetValue("TotalSlots") / 2) Then
-                            $AdditionalKeyPressTime += $n * ($KeyDelay + 50)
+                            $AdditionalKeyPressTime += $n * (GetValue("KeyDelaySeconds") * 1000 + 50)
                         ElseIf GetValue("CurrentCharacter") <= Floor(GetValue("TotalSlots") / 2) + 1 Then
-                            $AdditionalKeyPressTime -= (GetValue("CurrentCharacter") + $n - Floor(GetValue("TotalSlots") / 2) + 1) * ($KeyDelay + 50)
+                            $AdditionalKeyPressTime -= (GetValue("CurrentCharacter") + $n - Floor(GetValue("TotalSlots") / 2) + 1) * (GetValue("KeyDelaySeconds") * 1000 + 50)
                         Else
-                            $AdditionalKeyPressTime -= $n * ($KeyDelay + 50)
+                            $AdditionalKeyPressTime -= $n * (GetValue("KeyDelaySeconds") * 1000 + 50)
                         EndIf
                     Next
                 EndIf
@@ -728,7 +726,7 @@ While 1
     Else
         For $n = 1 To 3
             Send("{DOWN}")
-            Sleep($KeyDelay)
+            Sleep(GetValue("KeyDelaySeconds") * 1000)
         Next
         Sleep(500)
         Send("{ENTER}")
@@ -771,9 +769,9 @@ Func DoubleClick()
 EndFunc
 
 Func SingleClick()
-    Sleep($KeyDelay)
+    Sleep(GetValue("KeyDelaySeconds") * 1000)
     MouseDown("primary")
-    Sleep($KeyDelay)
+    Sleep(GetValue("KeyDelaySeconds") * 1000)
     MouseUp("primary")
 EndFunc
 
@@ -783,9 +781,9 @@ Func DoubleRightClick()
 EndFunc
 
 Func SingleRightClick()
-    Sleep($KeyDelay)
+    Sleep(GetValue("KeyDelaySeconds") * 1000)
     MouseDown("right")
-    Sleep($KeyDelay)
+    Sleep(GetValue("KeyDelaySeconds") * 1000)
     MouseUp("right")
 EndFunc
 
@@ -1104,13 +1102,13 @@ While 1
         AutoItSetOption("SendKeyDownDelay", 15)
         Send(_SendUnicodeReturn(GetValue("LogInUserName")))
         Sleep(500)
-        AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+        AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
         Send("{TAB}")
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", 15)
         Send(_SendUnicodeReturn(GetValue("LogInPassword")))
         Sleep(500)
-        AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+        AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
         Send("{ENTER}")
         Focus("Neverwinter.exe", "#32770")
         GetPosition()
@@ -1219,13 +1217,13 @@ Func LogIn(); If $RestartLoop Then Return 0
         AutoItSetOption("SendKeyDownDelay", 15)
         Send(_SendUnicodeReturn(GetValue("LogInUserName")))
         Sleep(500)
-        AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+        AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
         Send("{TAB}")
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", 15)
         Send(_SendUnicodeReturn(GetValue("LogInPassword")))
         Sleep(500)
-        AutoItSetOption("SendKeyDownDelay", $KeyDelay)
+        AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
         Send("{ENTER}")
         $LogInTries += 1
     Else
@@ -1235,7 +1233,7 @@ Func LogIn(); If $RestartLoop Then Return 0
 EndFunc
 
 Func TimeOut($timer = $WaitingTimer); If $RestartLoop Then Return 0
-    If TimerDiff($timer) < $TimeOut Then Return
+    If TimerDiff($timer) < GetValue("TimeOutMinutes") * 60000 Then Return
     AddAccountCountValue("TimedOut")
     If Not $LoggingIn Then AddCharacterCountInfo("TimedOut")
     $DisableRelogCount = 1

@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+10.3
+- Optional assets are now able to be correctly disabled
+- Advanced timing settings will now take effect immediately when changed
+
 10.2
 - The fishing bot will now automatically use krill bait
 - The key to stop fishing has been changed to F4
