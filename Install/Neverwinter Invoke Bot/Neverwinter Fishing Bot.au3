@@ -5,10 +5,10 @@ Global $Title = $Name
 #include "Shared.au3"
 If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Name, Localize("FishingBotAlreadyRunning"))
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
-TraySetToolTip($Title)
 TraySetIcon(@ScriptDir & "\images\green.ico")
 TrayItemSetOnEvent($TrayExitItem, "End")
 AutoItSetOption("TrayIconHide", 0)
+TraySetToolTip($Title)
 #include "_ImageSearch.au3"
 
 Local $Bait[4], $Catch[4], $Left[4], $Back[4], $Right[4], $Cast[4], $Hook[4], $LeftPressed, $BackPressed, $RightPressed, $MouseLeftPressed, $MouseRightPressed, $Caught, $EndTimer, $EndTime, $FishingTimer, $MouseOffset = 5, $KeyDelay = GetValue("KeyDelaySeconds") * 1000
