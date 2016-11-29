@@ -153,60 +153,52 @@ While 1
         Splash()
         If Not Position() Then ExitLoop 3
         Sleep(GetValue("FishingDelaySeconds") * 1000)
-        If ImageSearch("Fishing_Cast") And ImageSearch("Fishing_Catch") Then
-            Send(GetValue("FishingCursorModeKey"))
-            Sleep(GetValue("FishingDelaySeconds") * 1000)
-            If ImageSearch("Fishing_Cast") And ImageSearch("Fishing_Catch") Then ExitLoop 3
-        EndIf
-        If ImageSearch("Fishing_Bait") Or ImageSearch("Fishing_Bait_Lugworm") Or ImageSearch("Fishing_Bait_Lugworm_Dimmed") Or ImageSearch("Fishing_Bait_Krill") Or ImageSearch("Fishing_Bait_Krill_Dimmed") Then
-            $Bait[0] = $_ImageSearchLeft
-            $Bait[1] = $_ImageSearchTop
-            $Bait[2] = $_ImageSearchRight
-            $Bait[3] = $_ImageSearchBottom
-            If ImageSearch("Fishing_Bait", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then
-                Send(GetValue("FishingBaitKey"))
-                Sleep(GetValue("FishingDelaySeconds") * 1000)
-                If Not ImageSearch("Fishing_Bait_Lugworm") And Not ImageSearch("Fishing_Bait_Lugworm_Dimmed") And Not ImageSearch("Fishing_Bait_Krill") And Not ImageSearch("Fishing_Bait_Krill_Dimmed") Then ExitLoop 3
-            EndIf
-        Else
-            Send(GetValue("FishingBaitKey"))
-            Sleep(GetValue("FishingDelaySeconds") * 1000)
-            If Not ImageSearch("Fishing_Bait_Lugworm") And Not ImageSearch("Fishing_Bait_Lugworm_Dimmed") And Not ImageSearch("Fishing_Bait_Krill") And Not ImageSearch("Fishing_Bait_Krill_Dimmed") Then ExitLoop 3
-            $Bait[0] = $_ImageSearchLeft
-            $Bait[1] = $_ImageSearchTop
-            $Bait[2] = $_ImageSearchRight
-            $Bait[3] = $_ImageSearchBottom
-        EndIf
-        If Not ImageSearch("Fishing_Catch_Dimmed") And Not ImageSearch("Fishing_Catch") Then ExitLoop 3
+        If Not ImageSearch("Fishing_Catch") And Not ImageSearch("Fishing_Catch_Dimmed") Then ExitLoop 3
         $Catch[0] = $_ImageSearchLeft
         $Catch[1] = $_ImageSearchTop
         $Catch[2] = $_ImageSearchRight
         $Catch[3] = $_ImageSearchBottom
-        If Not ImageSearch("Fishing_Left_Dimmed") And Not ImageSearch("Fishing_Left") Then ExitLoop 3
+        If Not ImageSearch("Fishing_Left") And Not ImageSearch("Fishing_Left_Dimmed") Then ExitLoop 3
         $Left[0] = $_ImageSearchLeft
         $Left[1] = $_ImageSearchTop
         $Left[2] = $_ImageSearchRight
         $Left[3] = $_ImageSearchBottom
-        If Not ImageSearch("Fishing_Back_Dimmed") And Not ImageSearch("Fishing_Back") Then ExitLoop 3
+        If Not ImageSearch("Fishing_Back") And Not ImageSearch("Fishing_Back_Dimmed") Then ExitLoop 3
         $Back[0] = $_ImageSearchLeft
         $Back[1] = $_ImageSearchTop
         $Back[2] = $_ImageSearchRight
         $Back[3] = $_ImageSearchBottom
-        If Not ImageSearch("Fishing_Right_Dimmed") And Not ImageSearch("Fishing_Right") Then ExitLoop 3
+        If Not ImageSearch("Fishing_Right") And Not ImageSearch("Fishing_Right_Dimmed") Then ExitLoop 3
         $Right[0] = $_ImageSearchLeft
         $Right[1] = $_ImageSearchTop
         $Right[2] = $_ImageSearchRight
         $Right[3] = $_ImageSearchBottom
-        If Not ImageSearch("Fishing_Cast_Dimmed") And Not ImageSearch("Fishing_Cast") Then ExitLoop 3
+        If Not ImageSearch("Fishing_Cast") And Not ImageSearch("Fishing_Cast_Dimmed") Then ExitLoop 3
         $Cast[0] = $_ImageSearchLeft
         $Cast[1] = $_ImageSearchTop
         $Cast[2] = $_ImageSearchRight
         $Cast[3] = $_ImageSearchBottom
-        If Not ImageSearch("Fishing_Hook_Dimmed") And Not ImageSearch("Fishing_Hook") Then ExitLoop 3
+        If Not ImageSearch("Fishing_Hook") And Not ImageSearch("Fishing_Hook_Dimmed") Then ExitLoop 3
         $Hook[0] = $_ImageSearchLeft
         $Hook[1] = $_ImageSearchTop
         $Hook[2] = $_ImageSearchRight
         $Hook[3] = $_ImageSearchBottom
+        If Not ImageSearch("Fishing_Bait") And Not ImageSearch("Fishing_Bait_Lugworm") And Not ImageSearch("Fishing_Bait_Lugworm_Dimmed") And Not ImageSearch("Fishing_Bait_Krill") And Not ImageSearch("Fishing_Bait_Krill_Dimmed") Then ExitLoop 3
+        $Bait[0] = $_ImageSearchLeft
+        $Bait[1] = $_ImageSearchTop
+        $Bait[2] = $_ImageSearchRight
+        $Bait[3] = $_ImageSearchBottom
+        If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) And ImageSearch("Fishing_Catch", $Catch[0], $Catch[1], $Catch[2], $Catch[3]) Then
+            Send(GetValue("FishingCursorModeKey"))
+            Sleep(GetValue("FishingDelaySeconds") * 1000)
+            If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) And ImageSearch("Fishing_Catch", $Catch[0], $Catch[1], $Catch[2], $Catch[3]) Then ExitLoop 3
+        EndIf
+        If ImageSearch("Fishing_Bait", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then
+            Splash(Localize("Baiting"))
+            Send(GetValue("FishingBaitKey"))
+            Sleep(GetValue("FishingDelaySeconds") * 1000)
+            If Not ImageSearch("Fishing_Bait_Lugworm", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) And Not ImageSearch("Fishing_Bait_Lugworm_Dimmed", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) And Not ImageSearch("Fishing_Bait_Krill", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) And Not ImageSearch("Fishing_Bait_Krill_Dimmed", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then ExitLoop 3
+        EndIf
         If Not $EndTimer Then $EndTimer = TimerInit()
         While 1
         While 1
@@ -216,13 +208,14 @@ While 1
             Splash(Localize("Waiting"))
             $FishingTimer = TimerInit()
             While Not ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3])
-                If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then
+                If 30000 - TimerDiff($FishingTimer) <= 0 Then
                     If Not ReLog() Then ExitLoop 6
                     ExitLoop 4
                 EndIf
                 Sleep(Random(100, 500, 1))
             WEnd
             If ImageSearch("Fishing_Bait_Lugworm", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then
+                Splash(Localize("BaitingKrill"))
                 Send(GetValue("FishingBaitKey"))
                 Sleep(GetValue("FishingDelaySeconds") * 1000)
             EndIf
@@ -266,20 +259,20 @@ While 1
                     Splash(Localize("Catching"))
                     Send(GetValue("FishingCatchKey"))
                     $Caught = 1
-                    If ImageSearch("Fishing_Left", $Left[0], $Left[1], $Left[2], $Left[3]) Then
-                        If $BackPressed Then Send(GetValue("FishingBackKeyUp"))
-                        $BackPressed = 0
-                        If $RightPressed Then Send(GetValue("FishingRightKeyUp"))
-                        $RightPressed = 0
-                        If Not $LeftPressed Then Send(GetValue("FishingLeftKeyDown"))
-                        $LeftPressed = 1
-                    ElseIf ImageSearch("Fishing_Back", $Back[0], $Back[1], $Back[2], $Back[3]) Then
+                    If ImageSearch("Fishing_Back", $Back[0], $Back[1], $Back[2], $Back[3]) Then
                         If $LeftPressed Then Send(GetValue("FishingLeftKeyUp"))
                         $LeftPressed = 0
                         If $RightPressed Then Send(GetValue("FishingRightKeyUp"))
                         $RightPressed = 0
                         If Not $BackPressed Then Send(GetValue("FishingBackKeyDown"))
                         $BackPressed = 1
+                    ElseIf ImageSearch("Fishing_Left", $Left[0], $Left[1], $Left[2], $Left[3]) Then
+                        If $BackPressed Then Send(GetValue("FishingBackKeyUp"))
+                        $BackPressed = 0
+                        If $RightPressed Then Send(GetValue("FishingRightKeyUp"))
+                        $RightPressed = 0
+                        If Not $LeftPressed Then Send(GetValue("FishingLeftKeyDown"))
+                        $LeftPressed = 1
                     ElseIf ImageSearch("Fishing_Right", $Right[0], $Right[1], $Right[2], $Right[3]) Then
                         If $LeftPressed Then Send(GetValue("FishingLeftKeyUp"))
                         $LeftPressed = 0
@@ -290,15 +283,7 @@ While 1
                     EndIf
                     Sleep(Random(500, 1000, 1))
                 WEnd
-                If ImageSearch("Fishing_Left", $Left[0], $Left[1], $Left[2], $Left[3]) Then
-                    Splash(Localize("ReelingLeft"))
-                    If $BackPressed Then Send(GetValue("FishingBackKeyUp"))
-                    $BackPressed = 0
-                    If $RightPressed Then Send(GetValue("FishingRightKeyUp"))
-                    $RightPressed = 0
-                    If Not $LeftPressed Then Send(GetValue("FishingLeftKeyDown"))
-                    $LeftPressed = 1
-                ElseIf ImageSearch("Fishing_Back", $Back[0], $Back[1], $Back[2], $Back[3]) Then
+                If ImageSearch("Fishing_Back", $Back[0], $Back[1], $Back[2], $Back[3]) Then
                     Splash(Localize("ReelingBack"))
                     If $LeftPressed Then Send(GetValue("FishingLeftKeyUp"))
                     $LeftPressed = 0
@@ -306,6 +291,14 @@ While 1
                     $RightPressed = 0
                     If Not $BackPressed Then Send(GetValue("FishingBackKeyDown"))
                     $BackPressed = 1
+                ElseIf ImageSearch("Fishing_Left", $Left[0], $Left[1], $Left[2], $Left[3]) Then
+                    Splash(Localize("ReelingLeft"))
+                    If $BackPressed Then Send(GetValue("FishingBackKeyUp"))
+                    $BackPressed = 0
+                    If $RightPressed Then Send(GetValue("FishingRightKeyUp"))
+                    $RightPressed = 0
+                    If Not $LeftPressed Then Send(GetValue("FishingLeftKeyDown"))
+                    $LeftPressed = 1
                 ElseIf ImageSearch("Fishing_Right", $Right[0], $Right[1], $Right[2], $Right[3]) Then
                     Splash(Localize("ReelingRight"))
                     If $LeftPressed Then Send(GetValue("FishingLeftKeyUp"))

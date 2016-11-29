@@ -4,6 +4,7 @@
 Func LoadLocalizationDefaults()
     If $Language = "Russian" Then
         SetDefault("VerifyFilesWindowTitle", "Verify?")
+        SetDefault("ConnectionProblemWindowTitle", "Connection problem")
         SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
         SetDefault("GameMenuKey", "{ESC}")
         SetDefault("CursorModeKey", "{F2}")
@@ -61,6 +62,7 @@ Func LoadLocalizationDefaults()
         SetDefault("LeadershipProfessionTasks_Level_25", "Capture Bandit Leader|Escort a Wizard's Seneschal|Protect Magical Goods Market|Guard Clerics of Ilmater|Train a Footman|Train a Guard|Hire a Mercenary|Emergency Hire")
     Else
         SetDefault("VerifyFilesWindowTitle", "Verify?")
+        SetDefault("ConnectionProblemWindowTitle", "Connection problem")
         SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
         SetDefault("GameMenuKey", "{ESC}")
         SetDefault("CursorModeKey", "{ALT}")

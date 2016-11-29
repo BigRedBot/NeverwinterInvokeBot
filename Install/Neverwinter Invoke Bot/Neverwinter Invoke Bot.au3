@@ -1088,6 +1088,13 @@ While 1
         While 1
             TimeOut(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
+            FindWindow("Neverwinter.exe", "#32770", GetValue("ConnectionProblemWindowTitle"))
+            If $WinHandle Then
+                ControlClick($WinHandle, "", "[CLASS:Button; INSTANCE:1]")
+                WaitMinutes(15, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
+                If $RestartLoop Then Return 0
+                ExitLoop 2
+            EndIf
             If Focus("Neverwinter.exe", "#32770") And GetPosition() And ImageSearch("LauncherLogin") Then ExitLoop
             Sleep(1000)
         WEnd
