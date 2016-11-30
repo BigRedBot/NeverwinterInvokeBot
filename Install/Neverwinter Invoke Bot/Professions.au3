@@ -3,10 +3,6 @@ Local $MaxProfessionLevel = 25
 
 Func RunProfessions(); If $RestartLoop Then Return 0
     If Not $EnableProfessions Or Not GetValue("EnableProfessions") Then Return
-    If $StartingKeyboardLayout And Not (Hex($StartingKeyboardLayout, 4) == "0409") And $WinHandle And $ProcessName = "GameClient.exe" And WinExists($WinHandle) Then
-        Local $k = _WinAPI_GetKeyboardLayout($WinHandle)
-        If $k And Not (Hex($k, 4) == "0409") Then _WinAPI_SetKeyboardLayout($WinHandle, 0x0409)
-    EndIf
     Local $ProfessionLevel = -2, $ProfessionLoops = 0, $ProfessionTakeRewardsFailed = 0, $OverviewX, $OverviewY, $task = 1, $lasttask = 0, $tasklist
     While 1
         If $ProfessionLoops >= 10 Then Return
@@ -88,8 +84,14 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                                     $_ImageSearchY = $_ImageSearchTop + Floor(($_ImageSearchHeight-1)/2) + Random(-5, 5, 1)
                                     ProfessionsClickImage(); If $RestartLoop Then Return 0
                                     If $RestartLoop Then Return 0
-                                    ClipPut($tasklist[$task])
-                                    Send("{CTRLDOWN}a{CTRLUP}{CTRLDOWN}v{CTRLUP}{ENTER}")
+                                    AutoItSetOption("SendKeyDownDelay", 5)
+                                    Send("{END}{BS 50}")
+                                    Sleep(100)
+                                    AutoItSetOption("SendKeyDownDelay", 15)
+                                    Send(StringLeft($tasklist[$task], 50), $SEND_RAW)
+                                    Sleep(100)
+                                    AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
+                                    Send("{ENTER}")
                                     ProfessionsSleep(); If $RestartLoop Then Return 0
                                     If $RestartLoop Then Return 0
                                 EndIf

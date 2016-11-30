@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.5
+- Profession task selection no longer uses the clipboard
+
 10.4
 - The fishing bot will now only wait to cast for 30 seconds instead of 5 minutes before re-logging
 - Will no longer time out when the launcher can not connect to the update servers

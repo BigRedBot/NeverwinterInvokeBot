@@ -12,17 +12,15 @@ If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\red.ico")
 AutoItSetOption("TrayIconHide", 0)
 TraySetToolTip($Title)
-Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions, $EnableOptionalAssets, $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $EndTime, $MinutesToEndSaved, $MinutesToEndSavedTimer, $StartingKeyboardLayout, $MouseOffset = 5
+Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions, $EnableOptionalAssets, $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $EndTime, $MinutesToEndSaved, $MinutesToEndSavedTimer, $MouseOffset = 5
 AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
 #include <StringConstants.au3>
 #include <ColorConstants.au3>
-#include <WinAPISys.au3>
 #include <Math.au3>
 #include <Crypt.au3>
 #include "_DownloadFile.au3"
 #include "_GetUTCMinutes.au3"
 #include "_ImageSearch.au3"
-#include "_SendUnicode.au3"
 #include "_MultilineInputBox.au3"
 #include "_GUIScrollbars_Ex.au3"
 #Include "_Icons.au3"
@@ -75,7 +73,6 @@ Func Position(); If $RestartLoop Then Return 0
 While 1
 While 1
     Focus()
-    If Not $StartingKeyboardLayout And $WinHandle Then $StartingKeyboardLayout = _WinAPI_GetKeyboardLayout($WinHandle)
     If Not $WinHandle Or Not GetPosition() Then
         If Not GetValue("DisableRestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And ImageExists("LogInScreen") Then
             $LogInTries = 0
@@ -1101,19 +1098,19 @@ While 1
         Splash()
         Sleep(1000)
         CheckServer()
-        AutoItSetOption("SendKeyDownDelay", 15)
+        AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
         Send("+{TAB}")
         Sleep(500)
         Send("{BS}")
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", 15)
-        Send(_SendUnicodeReturn(GetValue("LogInUserName")))
+        Send(GetValue("LogInUserName"), $SEND_RAW)
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
         Send("{TAB}")
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", 15)
-        Send(_SendUnicodeReturn(GetValue("LogInPassword")))
+        Send(GetValue("LogInPassword"), $SEND_RAW)
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
         Send("{ENTER}")
@@ -1222,13 +1219,13 @@ Func LogIn(); If $RestartLoop Then Return 0
         Send("{END}{BS 254}")
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", 15)
-        Send(_SendUnicodeReturn(GetValue("LogInUserName")))
+        Send(GetValue("LogInUserName"), $SEND_RAW)
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
         Send("{TAB}")
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", 15)
-        Send(_SendUnicodeReturn(GetValue("LogInPassword")))
+        Send(GetValue("LogInPassword"), $SEND_RAW)
         Sleep(500)
         AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
         Send("{ENTER}")
@@ -1394,10 +1391,6 @@ Func End(); If $RestartLoop Then Return 0
 EndFunc
 
 Func Reset()
-        If $StartingKeyboardLayout And Not (Hex($StartingKeyboardLayout, 4) == "0409") And $WinHandle And $ProcessName = "GameClient.exe" And WinExists($WinHandle) Then
-            Local $k = _WinAPI_GetKeyboardLayout($WinHandle)
-            If $k And Not ($k == $StartingKeyboardLayout) Then _WinAPI_SetKeyboardLayout($WinHandle, $StartingKeyboardLayout)
-        EndIf
         If GetValue("NoAutoLaunch") Then
             RegWrite("HKEY_CURRENT_USER\SOFTWARE\Cryptic\Neverwinter", "AutoLaunch", "REG_DWORD", 0)
             DeleteAllAccountsValue("NoAutoLaunch")
