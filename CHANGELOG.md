@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.6
+- The fishing bot is now able to release specified ranks of fish
+
 10.5
 - Profession task selection no longer uses the clipboard
 

@@ -35,10 +35,7 @@ Func Splash($s = "")
     EndIf
 EndFunc
 
-Local $ImageSearchImage
-
 Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("FishingImageTolerance"))
-    $ImageSearchImage = $image
     If Not FileExists("images\" & $Language & "\" & $image & ".png") Then Return 0
     If _ImageSearch("images\" & $Language & "\" & $image & ".png", $left, $top, $right, $bottom, $tolerance) Then Return 1
     Local $i = 2
@@ -53,29 +50,41 @@ Func End()
     Exit
 EndFunc
 
+Func CheckImage($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $intro = @CRLF & @CRLF, $ext = ".png")
+    If Not ImageSearch($image, $left, $top, $right, $bottom) Then Return 0
+    $text &= $intro & $image & $ext & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+    Return 1
+EndFunc
+
 HotKeySet("{Esc}", "End")
 Splash()
 While 1
     If Position() And $ClientWidth And $ClientHeight Then
         $timer = TimerInit()
         $count += 1
-        If ImageSearch("Fishing_Bait") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Fishing_Bait_Lugworm") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Fishing_Bait_Lugworm_Dimmed") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Fishing_Bait_Krill") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Fishing_Bait_Krill_Dimmed") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Fishing_Catch") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Fishing_Catch_Dimmed") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Fishing_Left") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Fishing_Left_Dimmed") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Fishing_Right") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Fishing_Right_Dimmed") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Fishing_Back") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Fishing_Back_Dimmed") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Fishing_Cast") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Fishing_Cast_Dimmed") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Fishing_Hook") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Fishing_Hook_Dimmed") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+        CheckImage("Fishing_Rank_0")
+        CheckImage("Fishing_Rank_1")
+        CheckImage("Fishing_Rank_2")
+        CheckImage("Fishing_Rank_3")
+        CheckImage("Fishing_Rank_4")
+        CheckImage("Fishing_Rank_5")
+        CheckImage("Fishing_Catch")
+        CheckImage("Fishing_Catch_Dimmed")
+        CheckImage("Fishing_Bait")
+        CheckImage("Fishing_Bait_Lugworm")
+        CheckImage("Fishing_Bait_Lugworm_Dimmed")
+        CheckImage("Fishing_Bait_Krill")
+        CheckImage("Fishing_Bait_Krill_Dimmed")
+        CheckImage("Fishing_Left")
+        CheckImage("Fishing_Left_Dimmed")
+        CheckImage("Fishing_Back")
+        CheckImage("Fishing_Back_Dimmed")
+        CheckImage("Fishing_Right")
+        CheckImage("Fishing_Right_Dimmed")
+        CheckImage("Fishing_Cast")
+        CheckImage("Fishing_Cast_Dimmed")
+        CheckImage("Fishing_Hook")
+        CheckImage("Fishing_Hook_Dimmed")
         $time = Round(TimerDiff($timer) / 1000, 2)
     EndIf
     Splash($count & "x " & $time & "s" & @CRLF & $text)

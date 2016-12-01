@@ -35,10 +35,7 @@ Func Splash($s = "")
     EndIf
 EndFunc
 
-Local $ImageSearchImage
-
 Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("ImageTolerance"))
-    $ImageSearchImage = $image
     If Not FileExists("images\" & $Language & "\" & $image & ".png") Then Return 0
     If _ImageSearch("images\" & $Language & "\" & $image & ".png", $left, $top, $right, $bottom, $tolerance) Then Return 1
     Local $i = 2
@@ -53,6 +50,12 @@ Func End()
     Exit
 EndFunc
 
+Func CheckImage($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $intro = @CRLF & @CRLF, $ext = ".png")
+    If Not ImageSearch($image, $left, $top, $right, $bottom) Then Return 0
+    $text &= $intro & $image & $ext & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+    Return 1
+EndFunc
+
 Local $MaxProfessionLevel = 25
 
 HotKeySet("{Esc}", "End")
@@ -62,7 +65,7 @@ While 1
         $timer = TimerInit()
         $count += 1
         If ImageSearch("Professions_Leadership") Then
-            $text &= @CRLF & @CRLF & $ImageSearchImage & ".png"
+            $text &= @CRLF & @CRLF & "Professions_Leadership.png"
             Local $text2 = @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
             Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop - 44, $right = $_ImageSearchLeft + 100, $bottom = $_ImageSearchTop - 31, $tens, $ones, $image1, $image2, $tolerance = GetValue("ProfessionLevelImageTolerance"), $ProfessionLevel = $MaxProfessionLevel
             While $ProfessionLevel >= 0
@@ -85,24 +88,23 @@ While 1
             WEnd
             $text &= $text2
         EndIf
-        If ImageSearch("Professions_Overview") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Professions_CollectResult") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Professions_TakeRewards") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Professions_EmptySlot") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Professions_Search") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Professions_Continue") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Professions_StartTask") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Professions_Asset") Then
-            $text &= @CRLF & @CRLF & $ImageSearchImage & ".png 1" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-            If ImageSearch("Professions_Asset", $_ImageSearchLeft, $_ImageSearchBottom + 100, $_ImageSearchRight, $_ImageSearchBottom + 150) Then $text &= @CRLF & $ImageSearchImage & ".png 2" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+        CheckImage("Professions_Overview")
+        CheckImage("Professions_CollectResult")
+        CheckImage("Professions_TakeRewards")
+        CheckImage("Professions_EmptySlot")
+        CheckImage("Professions_Search")
+        CheckImage("Professions_Continue")
+        CheckImage("Professions_StartTask")
+        If CheckImage("Professions_Asset", $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, @CRLF & @CRLF, ".png 1") Then
+            CheckImage("Professions_Asset", $_ImageSearchLeft, $_ImageSearchBottom + 100, $_ImageSearchRight, $_ImageSearchBottom + 150, @CRLF, ".png 2")
+            CheckImage("Professions_AssetBorder", $_ImageSearchLeft, $_ImageSearchTop, $_ImageSearchRight + 200, $ClientBottom, @CRLF)
         EndIf
-        If ImageSearch("Professions_AssetBorder", $_ImageSearchLeft, $_ImageSearchTop, $_ImageSearchRight + 200) Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Professions_Asset_Hero") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Professions_Asset_Adventurer") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Professions_Asset_ManatArms") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Professions_Asset_Footman") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Professions_Asset_Guard") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-        If ImageSearch("Professions_Asset_Mercenary") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+        CheckImage("Professions_Asset_Hero")
+        CheckImage("Professions_Asset_Adventurer")
+        CheckImage("Professions_Asset_ManatArms")
+        CheckImage("Professions_Asset_Footman")
+        CheckImage("Professions_Asset_Guard")
+        CheckImage("Professions_Asset_Mercenary")
         $time = Round(TimerDiff($timer) / 1000, 2)
     EndIf
     Splash($count & "x " & $time & "s" & @CRLF & $text)
