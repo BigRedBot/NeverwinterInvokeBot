@@ -17,7 +17,7 @@ Func Position()
         $text = Localize("NeverwinterNotFound")
         Return 0
     EndIf
-    $text = "GameClientWidth=" & $ClientWidth & " GameClientHeight=" & $ClientHeight
+    $text = "Width=" & $ClientWidth & " Height=" & $ClientHeight
     Return 1
 EndFunc
 
@@ -37,13 +37,13 @@ EndFunc
 
 Local $ImageSearchImage
 
-Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("FishingImageTolerance"), $resultPosition = -2)
+Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("FishingImageTolerance"))
     $ImageSearchImage = $image
     If Not FileExists("images\" & $Language & "\" & $image & ".png") Then Return 0
-    If _ImageSearchArea("images\" & $Language & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return 1
+    If _ImageSearch("images\" & $Language & "\" & $image & ".png", $left, $top, $right, $bottom, $tolerance) Then Return 1
     Local $i = 2
     While FileExists(@ScriptDir & "\images\" & $Language & "\" & $image & "-" & $i & ".png")
-        If _ImageSearchArea("images\" & $Language & "\" & $image & "-" & $i & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return $i
+        If _ImageSearch("images\" & $Language & "\" & $image & "-" & $i & ".png", $left, $top, $right, $bottom, $tolerance) Then Return $i
         $i += 1
     WEnd
     Return 0
@@ -78,5 +78,5 @@ While 1
         If ImageSearch("Fishing_Hook_Dimmed") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         $time = Round(TimerDiff($timer) / 1000, 2)
     EndIf
-    Splash($count & " = " & $time & "s" & @CRLF & $text)
+    Splash($count & "x " & $time & "s" & @CRLF & $text)
 WEnd

@@ -17,7 +17,7 @@ Func Position()
         $text = Localize("NeverwinterNotFound")
         Return 0
     EndIf
-    $text = "GameClientWidth=" & $ClientWidth & " GameClientHeight=" & $ClientHeight
+    $text = "Width=" & $ClientWidth & " Height=" & $ClientHeight
     Return 1
 EndFunc
 
@@ -37,13 +37,13 @@ EndFunc
 
 Local $ImageSearchImage
 
-Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("ImageTolerance"), $resultPosition = -2)
+Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("ImageTolerance"))
     $ImageSearchImage = $image
     If Not FileExists("images\" & $Language & "\" & $image & ".png") Then Return 0
-    If _ImageSearchArea("images\" & $Language & "\" & $image & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return 1
+    If _ImageSearch("images\" & $Language & "\" & $image & ".png", $left, $top, $right, $bottom, $tolerance) Then Return 1
     Local $i = 2
     While FileExists(@ScriptDir & "\images\" & $Language & "\" & $image & "-" & $i & ".png")
-        If _ImageSearchArea("images\" & $Language & "\" & $image & "-" & $i & ".png", $resultPosition, $left, $top, $right, $bottom, $tolerance) Then Return $i
+        If _ImageSearch("images\" & $Language & "\" & $image & "-" & $i & ".png", $left, $top, $right, $bottom, $tolerance) Then Return $i
         $i += 1
     WEnd
     Return 0
@@ -52,6 +52,8 @@ EndFunc
 Func End()
     Exit
 EndFunc
+
+Local $MaxProfessionLevel = 25
 
 HotKeySet("{Esc}", "End")
 Splash()
@@ -62,7 +64,7 @@ While 1
         If ImageSearch("Professions_Leadership") Then
             $text &= @CRLF & @CRLF & $ImageSearchImage & ".png"
             Local $text2 = @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-            Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop - 44, $right = $_ImageSearchLeft + 100, $bottom = $_ImageSearchTop - 31, $tens, $ones, $image1, $image2, $tolerance = 100,$ProfessionLevel = 25
+            Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop - 44, $right = $_ImageSearchLeft + 100, $bottom = $_ImageSearchTop - 31, $tens, $ones, $image1, $image2, $tolerance = GetValue("ProfessionLevelImageTolerance"), $ProfessionLevel = $MaxProfessionLevel
             While $ProfessionLevel >= 0
                 If $ProfessionLevel < 10 Then
                     $tens = ""
@@ -103,5 +105,5 @@ While 1
         If ImageSearch("Professions_Asset_Mercenary") Then $text &= @CRLF & @CRLF & $ImageSearchImage & ".png" & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
         $time = Round(TimerDiff($timer) / 1000, 2)
     EndIf
-    Splash($count & " = " & $time & "s" & @CRLF & $text)
+    Splash($count & "x " & $time & "s" & @CRLF & $text)
 WEnd

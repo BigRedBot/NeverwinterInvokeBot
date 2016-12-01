@@ -21,7 +21,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                     $OverviewY = $_ImageSearchY
                     If Not ImageSearch("Professions_Leadership") Then Return
                     If $ProfessionLevel = -2 Then
-                        Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop - 44, $right = $_ImageSearchLeft + 100, $bottom = $_ImageSearchTop - 31, $tens, $ones, $image1, $image2, $tolerance = 100
+                        Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop - 44, $right = $_ImageSearchLeft + 100, $bottom = $_ImageSearchTop - 31, $tens, $ones, $image1, $image2, $tolerance = GetValue("ProfessionLevelImageTolerance")
                         $ProfessionLevel = $MaxProfessionLevel
                         While $ProfessionLevel > -1
                             If $ProfessionLevel < 10 Then
