@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.6.1
+- The fishing bot will now try to continue if the cursor mode key is pressed
+
 10.6
 - The fishing bot is now able to release specified ranks of fish
 

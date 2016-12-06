@@ -281,7 +281,7 @@ While 1
             If $ReleaseFishEnabled And ReleaseFish() Then ExitLoop 1
             $FishingTimer = TimerInit()
             While ImageSearch("Fishing_Hook", $Hook[0], $Hook[1], $Hook[2], $Hook[3])
-                If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) Then ExitLoop 6
+                If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) Then ExitLoop 4
                 If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then ExitLoop 4
                 Splash(Localize("Hooking"))
                 If Not $MouseRightPressed Then MouseDown("right")
@@ -295,7 +295,7 @@ While 1
             While Not ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3])
                 If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then ExitLoop 4
                 While ImageSearch("Fishing_Catch", $Catch[0], $Catch[1], $Catch[2], $Catch[3])
-                    If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) Then ExitLoop 7
+                    If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) Then ExitLoop 5
                     If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then ExitLoop 5
                     Splash(Localize("Catching"))
                     Send(GetValue("FishingCatchKey"))
