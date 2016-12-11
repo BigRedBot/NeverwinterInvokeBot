@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.6.2
+- Fixed fishing bot for Map in a Bottle
+
 10.6.1
 - The fishing bot will now try to continue if the cursor mode key is pressed
 
