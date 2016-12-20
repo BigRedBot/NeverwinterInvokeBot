@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.7
+- Added options to change the fishing bot's cast and hook key commands
+
 10.6.2
 - Fixed fishing bot for Map in a Bottle
 

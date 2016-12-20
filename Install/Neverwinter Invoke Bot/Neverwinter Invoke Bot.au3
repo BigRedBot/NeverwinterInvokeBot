@@ -272,7 +272,7 @@ While 1
                 Splash()
             EndIf
             If Not GetValue("DisableOverflowXPRewardCollection") And ImageSearch("OverflowXPReward") Then
-                Send(GetValue("CursorModeKey"))
+                MySend(GetValue("CursorModeKey"))
                 Sleep(500)
                 MouseMove($_ImageSearchX, $_ImageSearchY)
                 SingleClick()
@@ -491,7 +491,7 @@ Func Invoke(); If $RestartLoop Then Return 0
         For $n = 1 To 5
             FindLogInScreen(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
-            Send(GetValue("InvokeKey"))
+            MySend(GetValue("InvokeKey"))
             Sleep(500)
             If ImageSearch("Invoked") Then
                 If GetValue("CurrentLoop") > $MaxLoops Then
@@ -523,7 +523,7 @@ Func Invoke(); If $RestartLoop Then Return 0
         Next
     Else
         For $n = 1 To 3
-            Send(GetValue("InvokeKey"))
+            MySend(GetValue("InvokeKey"))
             Sleep(5000)
         Next
         If ImageSearch("VaultOfPietyButton") Then
@@ -543,7 +543,7 @@ While 1
         If GetValue("VIPAccountRewardTries") < 3 Then
             $tried = 1
             AddAccountCountValue("VIPAccountRewardTries")
-            Send(GetValue("InventoryKey"))
+            MySend(GetValue("InventoryKey"))
             Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
             If Not ImageSearch("VIPInventory") Then ExitLoop
             If Not ImageSearch("VIPAccountRewards", $_ImageSearchLeft, $_ImageSearchBottom + 200, $_ImageSearchRight + 50) Then ExitLoop
@@ -586,7 +586,7 @@ Func OpenInventoryBags($bag); If $RestartLoop Then Return 0
     If GetValue("DisableOpeningBags") Then Return
     ClearWindows(); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
-    Send(GetValue("InventoryKey"))
+    MySend(GetValue("InventoryKey"))
     Sleep(GetValue("OpenInventoryBagDelay") * 1000)
     If ImageSearch("VIPInventory") Then
         $_ImageSearchX = Random($_ImageSearchLeft + GetValue("InventoryBagTabLeftOffset"), $_ImageSearchLeft + GetValue("InventoryBagTabRightOffset"), 1)
@@ -674,7 +674,7 @@ Func SearchForChangeCharacterButton()
     If $AlternateLogInCommands = 2 Or GetValue("GameMenuKey") = "{ESC}" Then
         Send("{ESC}")
     Else
-        Send(GetValue("GameMenuKey"))
+        MySend(GetValue("GameMenuKey"))
     EndIf
     Sleep(1500)
     If $AlternateLogInCommands = 1 Then
@@ -858,7 +858,7 @@ Func DeclinePromptImageSearch($image)
     SingleClick()
     Sleep(1000)
     If Not ImageSearch($image) Then Return 1
-    Send(GetValue("CursorModeKey"))
+    MySend(GetValue("CursorModeKey"))
     Sleep(1000)
     MouseMove($_ImageSearchX, $_ImageSearchY)
     SingleClick()
@@ -876,7 +876,7 @@ Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $Clien
             If $DoLogInCommands = 2 Or GetValue("GameMenuKey") = "{ESC}" Then
                 Send("{ESC}")
             Else
-                Send(GetValue("GameMenuKey"))
+                MySend(GetValue("GameMenuKey"))
             EndIf
             Sleep(1500)
             If $DoLogInCommands = 1 Then
@@ -1581,25 +1581,25 @@ Func AdvancedAccountSettings($hWnd = 0)
     GUICtrlCreateLabel(Localize("AdvancedSettings"), 160, 20, 100, -1, $SS_RIGHT)
     For $i = 1 To $Total
         $a[$i] = StringSplit($a[$i], ",")
-        GUICtrlCreateLabel(Localize(($a[$i])[2]), 0, 23 + $i * 40, 340, -1, $SS_RIGHT)
+        GUICtrlCreateLabel(Localize(($a[$i])[2]), 0, 23 + $i * 36, 340, -1, $SS_RIGHT)
         GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
         Local $v = ($a[$i])[1], $gv = GetAccountValue($v), $t = ($a[$i])[4]
         If $t = "Boolean" Or $t = "ReverseBoolean" Then
-            $c[$i] = GUICtrlCreateCheckbox(" ", 350, 20 + $i * 40)
+            $c[$i] = GUICtrlCreateCheckbox(" ", 350, 20 + $i * 36)
             If $t = "Boolean" Then
                 If $gv Then GUICtrlSetState($c[$i], $GUI_CHECKED)
             Else
                 If Not $gv Then GUICtrlSetState($c[$i], $GUI_CHECKED)
             EndIf
         Else
-            $c[$i] = GUICtrlCreateInput($gv, 350, 20 + $i * 40, 155)
+            $c[$i] = GUICtrlCreateInput($gv, 350, 20 + $i * 36, 155)
         EndIf
         GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
     Next
-    _GUIScrollbars_Generate($hGUI, 1, 100 + $Total * 40)
-    Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 40, 60 + $Total * 40, 75, 25)
-    Local $ButtonOK = GUICtrlCreateButton("&OK", 268, 60 + $Total * 40, 75, 25, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 350, 60 + $Total * 40, 75, 25)
+    _GUIScrollbars_Generate($hGUI, 1, 100 + $Total * 36)
+    Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 40, 60 + $Total * 36, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("&OK", 268, 60 + $Total * 36, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 350, 60 + $Total * 36, 75, 25)
     GUISetState(@SW_SHOW, $hGui)
     While 1
         Switch GUIGetMsg()
@@ -2119,25 +2119,25 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
     GUICtrlCreateLabel(Localize("AdvancedSettings"), 160, 20, 100, -1, $SS_RIGHT)
     For $i = 1 To $Total
         $a[$i] = StringSplit($a[$i], ",")
-        GUICtrlCreateLabel(Localize(($a[$i])[2]), 0, 23 + $i * 40, 340, -1, $SS_RIGHT)
+        GUICtrlCreateLabel(Localize(($a[$i])[2]), 0, 23 + $i * 36, 340, -1, $SS_RIGHT)
         GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
         Local $v = ($a[$i])[1], $gv = GetAllAccountsValue($v), $t = ($a[$i])[4]
         If $t = "Boolean" Or $t = "ReverseBoolean" Then
-            $c[$i] = GUICtrlCreateCheckbox(" ", 350, 20 + $i * 40)
+            $c[$i] = GUICtrlCreateCheckbox(" ", 350, 20 + $i * 36)
             If $t = "Boolean" Then
                 If $gv Then GUICtrlSetState($c[$i], $GUI_CHECKED)
             Else
                 If Not $gv Then GUICtrlSetState($c[$i], $GUI_CHECKED)
             EndIf
         Else
-            $c[$i] = GUICtrlCreateInput($gv, 350, 20 + $i * 40, 155)
+            $c[$i] = GUICtrlCreateInput($gv, 350, 20 + $i * 36, 155)
         EndIf
         GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
     Next
-    _GUIScrollbars_Generate($hGUI, 1, 100 + $Total * 40)
-    Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 40, 60 + $Total * 40, 75, 25)
-    Local $ButtonOK = GUICtrlCreateButton("&OK", 268, 60 + $Total * 40, 75, 25, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 350, 60 + $Total * 40, 75, 25)
+    _GUIScrollbars_Generate($hGUI, 1, 100 + $Total * 36)
+    Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 40, 60 + $Total * 36, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("&OK", 268, 60 + $Total * 36, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 350, 60 + $Total * 36, 75, 25)
     GUISetState(@SW_SHOW, $hGui)
     While 1
         Switch GUIGetMsg()

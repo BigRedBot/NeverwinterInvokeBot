@@ -11,7 +11,7 @@ AutoItSetOption("TrayIconHide", 0)
 TraySetToolTip($Title)
 #include "_ImageSearch.au3"
 
-Local $Rank[4], $Bait[4], $Catch[4], $Left[4], $Back[4], $Right[4], $Cast[4], $Hook[4], $LeftPressed, $BackPressed, $RightPressed, $MovePressed, $MouseLeftPressed, $MouseRightPressed, $Caught, $EndTimer, $EndTime, $FishingTimer, $MouseOffset = 5, $KeyDelay = GetValue("KeyDelaySeconds") * 1000
+Local $Rank[4], $Bait[4], $Catch[4], $Left[4], $Back[4], $Right[4], $Cast[4], $Hook[4], $LeftPressed, $BackPressed, $RightPressed, $MovePressed, $CastPressed, $HookPressed, $Caught, $EndTimer, $EndTime, $FishingTimer, $MouseOffset = 5, $KeyDelay = GetValue("KeyDelaySeconds") * 1000
 
 Func Position()
     Focus()
@@ -104,18 +104,18 @@ Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $Clien
 EndFunc
 
 Func ReleaseKeys()
-    If $LeftPressed Then Send(GetValue("FishingLeftKeyUp"))
+    If $LeftPressed Then MySend(GetValue("FishingLeftKeyUp"))
     $LeftPressed = 0
-    If $BackPressed Then Send(GetValue("FishingBackKeyUp"))
+    If $BackPressed Then MySend(GetValue("FishingBackKeyUp"))
     $BackPressed = 0
-    If $RightPressed Then Send(GetValue("FishingRightKeyUp"))
+    If $RightPressed Then MySend(GetValue("FishingRightKeyUp"))
     $RightPressed = 0
-    If $MovePressed Then Send(GetValue("FishingMoveKeyUp"))
+    If $MovePressed Then MySend(GetValue("FishingMoveKeyUp"))
     $MovePressed = 0
-    If $MouseLeftPressed Then MouseUp("left")
-    $MouseLeftPressed = 0
-    If $MouseRightPressed Then MouseUp("right")
-    $MouseRightPressed = 0
+    If $CastPressed Then MySend(GetValue("FishingCastKeyUp"))
+    $CastPressed = 0
+    If $HookPressed Then MySend(GetValue("FishingHookKeyUp"))
+    $HookPressed = 0
 EndFunc
 
 Func ReleaseFish()
@@ -127,10 +127,10 @@ Func ReleaseFish()
         EndIf
     Next
     If Not GetValue("FishingReleaseRank" & $RankFound) Then Return 0
-    If Not $MovePressed Then Send(GetValue("FishingMoveKeyDown"))
+    If Not $MovePressed Then MySend(GetValue("FishingMoveKeyDown"))
     $MovePressed = 1
     Sleep(Random(400, 500, 1))
-    If $MovePressed Then Send(GetValue("FishingMoveKeyUp"))
+    If $MovePressed Then MySend(GetValue("FishingMoveKeyUp"))
     $MovePressed = 0
     Return 1
 EndFunc
@@ -229,13 +229,13 @@ While 1
             $Rank[3] = $_ImageSearchBottom
         EndIf
         If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) And ImageSearch("Fishing_Catch", $Catch[0], $Catch[1], $Catch[2], $Catch[3]) Then
-            Send(GetValue("FishingCursorModeKey"))
+            MySend(GetValue("FishingCursorModeKey"))
             Sleep(GetValue("FishingDelaySeconds") * 1000)
             If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) And ImageSearch("Fishing_Catch", $Catch[0], $Catch[1], $Catch[2], $Catch[3]) Then ExitLoop 3
         EndIf
         If ImageSearch("Fishing_Bait", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then
             Splash(Localize("Baiting"))
-            Send(GetValue("FishingBaitKey"))
+            MySend(GetValue("FishingBaitKey"))
             Sleep(GetValue("FishingDelaySeconds") * 1000)
             If Not ImageSearch("Fishing_Bait_Lugworm", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) And Not ImageSearch("Fishing_Bait_Lugworm_Dimmed", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) And Not ImageSearch("Fishing_Bait_Krill", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) And Not ImageSearch("Fishing_Bait_Krill_Dimmed", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then ExitLoop 3
         EndIf
@@ -256,12 +256,12 @@ While 1
             WEnd
             If ImageSearch("Fishing_Bait_Lugworm", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then
                 Splash(Localize("BaitingKrill"))
-                Send(GetValue("FishingBaitKey"))
+                MySend(GetValue("FishingBaitKey"))
                 Sleep(GetValue("FishingDelaySeconds") * 1000)
             EndIf
             Splash(Localize("Casting"))
-            If Not $MouseLeftPressed Then MouseDown("left")
-            $MouseLeftPressed = 1
+            If Not $CastPressed Then MySend(GetValue("FishingCastKeyDown"))
+            $CastPressed = 1
             Sleep(Random(100, 500, 1))
             $FishingTimer = TimerInit()
             While ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3])
@@ -269,8 +269,8 @@ While 1
                 If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then ExitLoop 4
                 Sleep(Random(100, 500, 1))
             WEnd
-            If $MouseLeftPressed Then MouseUp("left")
-            $MouseLeftPressed = 0
+            If $CastPressed Then MySend(GetValue("FishingCastKeyUp"))
+            $CastPressed = 0
             Splash(Localize("Fishing"))
             $FishingTimer = TimerInit()
             While Not ImageSearch("Fishing_Hook", $Hook[0], $Hook[1], $Hook[2], $Hook[3])
@@ -284,12 +284,12 @@ While 1
                 If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) Then ExitLoop 4
                 If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then ExitLoop 4
                 Splash(Localize("Hooking"))
-                If Not $MouseRightPressed Then MouseDown("right")
-                $MouseRightPressed = 1
+                If Not $HookPressed Then MySend(GetValue("FishingHookKeyDown"))
+                $HookPressed = 1
                 Sleep(Random(100, 500, 1))
             WEnd
-            If $MouseRightPressed Then MouseUp("right")
-            $MouseRightPressed = 0
+            If $HookPressed Then MySend(GetValue("FishingHookKeyUp"))
+            $HookPressed = 0
             $Caught = 0
             $FishingTimer = TimerInit()
             While Not ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3])
@@ -298,55 +298,55 @@ While 1
                     If ImageSearch("Fishing_Cast", $Cast[0], $Cast[1], $Cast[2], $Cast[3]) Then ExitLoop 5
                     If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then ExitLoop 5
                     Splash(Localize("Catching"))
-                    Send(GetValue("FishingCatchKey"))
+                    MySend(GetValue("FishingCatchKey"))
                     $Caught = 1
                     If ImageSearch("Fishing_Back", $Back[0], $Back[1], $Back[2], $Back[3]) Then
-                        If $LeftPressed Then Send(GetValue("FishingLeftKeyUp"))
+                        If $LeftPressed Then MySend(GetValue("FishingLeftKeyUp"))
                         $LeftPressed = 0
-                        If $RightPressed Then Send(GetValue("FishingRightKeyUp"))
+                        If $RightPressed Then MySend(GetValue("FishingRightKeyUp"))
                         $RightPressed = 0
-                        If Not $BackPressed Then Send(GetValue("FishingBackKeyDown"))
+                        If Not $BackPressed Then MySend(GetValue("FishingBackKeyDown"))
                         $BackPressed = 1
                     ElseIf ImageSearch("Fishing_Left", $Left[0], $Left[1], $Left[2], $Left[3]) Then
-                        If $BackPressed Then Send(GetValue("FishingBackKeyUp"))
+                        If $BackPressed Then MySend(GetValue("FishingBackKeyUp"))
                         $BackPressed = 0
-                        If $RightPressed Then Send(GetValue("FishingRightKeyUp"))
+                        If $RightPressed Then MySend(GetValue("FishingRightKeyUp"))
                         $RightPressed = 0
-                        If Not $LeftPressed Then Send(GetValue("FishingLeftKeyDown"))
+                        If Not $LeftPressed Then MySend(GetValue("FishingLeftKeyDown"))
                         $LeftPressed = 1
                     ElseIf ImageSearch("Fishing_Right", $Right[0], $Right[1], $Right[2], $Right[3]) Then
-                        If $LeftPressed Then Send(GetValue("FishingLeftKeyUp"))
+                        If $LeftPressed Then MySend(GetValue("FishingLeftKeyUp"))
                         $LeftPressed = 0
-                        If $BackPressed Then Send(GetValue("FishingBackKeyUp"))
+                        If $BackPressed Then MySend(GetValue("FishingBackKeyUp"))
                         $BackPressed = 0
-                        If Not $RightPressed Then Send(GetValue("FishingRightKeyDown"))
+                        If Not $RightPressed Then MySend(GetValue("FishingRightKeyDown"))
                         $RightPressed = 1
                     EndIf
                     Sleep(Random(500, 1000, 1))
                 WEnd
                 If ImageSearch("Fishing_Back", $Back[0], $Back[1], $Back[2], $Back[3]) Then
                     Splash(Localize("ReelingBack"))
-                    If $LeftPressed Then Send(GetValue("FishingLeftKeyUp"))
+                    If $LeftPressed Then MySend(GetValue("FishingLeftKeyUp"))
                     $LeftPressed = 0
-                    If $RightPressed Then Send(GetValue("FishingRightKeyUp"))
+                    If $RightPressed Then MySend(GetValue("FishingRightKeyUp"))
                     $RightPressed = 0
-                    If Not $BackPressed Then Send(GetValue("FishingBackKeyDown"))
+                    If Not $BackPressed Then MySend(GetValue("FishingBackKeyDown"))
                     $BackPressed = 1
                 ElseIf ImageSearch("Fishing_Left", $Left[0], $Left[1], $Left[2], $Left[3]) Then
                     Splash(Localize("ReelingLeft"))
-                    If $BackPressed Then Send(GetValue("FishingBackKeyUp"))
+                    If $BackPressed Then MySend(GetValue("FishingBackKeyUp"))
                     $BackPressed = 0
-                    If $RightPressed Then Send(GetValue("FishingRightKeyUp"))
+                    If $RightPressed Then MySend(GetValue("FishingRightKeyUp"))
                     $RightPressed = 0
-                    If Not $LeftPressed Then Send(GetValue("FishingLeftKeyDown"))
+                    If Not $LeftPressed Then MySend(GetValue("FishingLeftKeyDown"))
                     $LeftPressed = 1
                 ElseIf ImageSearch("Fishing_Right", $Right[0], $Right[1], $Right[2], $Right[3]) Then
                     Splash(Localize("ReelingRight"))
-                    If $LeftPressed Then Send(GetValue("FishingLeftKeyUp"))
+                    If $LeftPressed Then MySend(GetValue("FishingLeftKeyUp"))
                     $LeftPressed = 0
-                    If $BackPressed Then Send(GetValue("FishingBackKeyUp"))
+                    If $BackPressed Then MySend(GetValue("FishingBackKeyUp"))
                     $BackPressed = 0
-                    If Not $RightPressed Then Send(GetValue("FishingRightKeyDown"))
+                    If Not $RightPressed Then MySend(GetValue("FishingRightKeyDown"))
                     $RightPressed = 1
                 ElseIf $Caught Then
                     If ImageSearch("Fishing_Bait_Blank", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Or ImageSearch("Fishing_Bait", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then ExitLoop 4
@@ -373,29 +373,29 @@ Func Settings($hWnd = 0)
     Local $a = StringSplit(StringRegExpReplace($s, "^\|+", ""), "|")
     Local $Total = $a[0]
     Local $c[$Total + 1]
-    Local $hGui = GUICreate($Title, 400, 100 + $Total * 40, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
+    Local $hGui = GUICreate($Title, 400, 100 + $Total * 36, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
     GUICtrlCreateLabel(Localize("Settings"), 20, 20, 100, -1, $SS_RIGHT)
     For $i = 1 To $Total
         $a[$i] = StringSplit($a[$i], ",")
-        GUICtrlCreateLabel(Localize(($a[$i])[2]), 0, 23 + $i * 40, 200, -1, $SS_RIGHT)
+        GUICtrlCreateLabel(Localize(($a[$i])[2]), 0, 23 + $i * 36, 200, -1, $SS_RIGHT)
         GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
         Local $v = ($a[$i])[1], $gv = GetAllAccountsValue($v), $t = ($a[$i])[4]
         If $t = "Boolean" Or $t = "ReverseBoolean" Then
-            $c[$i] = GUICtrlCreateCheckbox(" ", 210, 20 + $i * 40)
+            $c[$i] = GUICtrlCreateCheckbox(" ", 210, 20 + $i * 36)
             If $t = "Boolean" Then
                 If $gv Then GUICtrlSetState($c[$i], $GUI_CHECKED)
             Else
                 If Not $gv Then GUICtrlSetState($c[$i], $GUI_CHECKED)
             EndIf
         Else
-            $c[$i] = GUICtrlCreateInput($gv, 210, 20 + $i * 40, 155)
+            $c[$i] = GUICtrlCreateInput($gv, 210, 20 + $i * 36, 155)
         EndIf
         GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
     Next
-    Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 20, 64 + $Total * 40, 75, 25)
-    Local $ButtonOK = GUICtrlCreateButton("&OK", 128, 64 + $Total * 40, 75, 25, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 210, 64 + $Total * 40, 75, 25)
-    Local $ButtonAdvanced = GUICtrlCreateButton(Localize("Advanced"), 310, 64 + $Total * 40, 75, 25)
+    Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 20, 64 + $Total * 36, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("&OK", 128, 64 + $Total * 36, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 210, 64 + $Total * 36, 75, 25)
+    Local $ButtonAdvanced = GUICtrlCreateButton(Localize("Advanced"), 310, 64 + $Total * 36, 75, 25)
     GUISetState(@SW_SHOW, $hGui)
     While 1
         Switch GUIGetMsg()
@@ -455,6 +455,10 @@ Func AdvancedSettings($hWnd = 0)
     Local $s = ""
     $s &= "|" & "FishingBaitKey,FishingBaitKeyTitle,FishingBaitKeyDescription,Text"
     $s &= "|" & "FishingCatchKey,FishingCatchKeyTitle,FishingCatchKeyDescription,Text"
+    $s &= "|" & "FishingCastKeyDown,FishingCastKeyDownTitle,FishingCastKeyDownDescription,Text"
+    $s &= "|" & "FishingCastKeyUp,FishingCastKeyUpTitle,FishingCastKeyUpDescription,Text"
+    $s &= "|" & "FishingHookKeyDown,FishingHookKeyDownTitle,FishingHookKeyDownDescription,Text"
+    $s &= "|" & "FishingHookKeyUp,FishingHookKeyUpTitle,FishingHookKeyUpDescription,Text"
     $s &= "|" & "FishingLeftKeyDown,FishingLeftKeyDownTitle,FishingLeftKeyDownDescription,Text"
     $s &= "|" & "FishingLeftKeyUp,FishingLeftKeyUpTitle,FishingLeftKeyUpDescription,Text"
     $s &= "|" & "FishingBackKeyDown,FishingBackKeyDownTitle,FishingBackKeyDownDescription,Text"
@@ -469,33 +473,33 @@ Func AdvancedSettings($hWnd = 0)
     Local $a = StringSplit(StringRegExpReplace($s, "^\|+", ""), "|")
     Local $Total = $a[0]
     Local $c[$Total + 1]
-    Local $hGui = GUICreate($Title, 600, 100 + $Total * 40, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
+    Local $hGui = GUICreate($Title, 600, 100 + $Total * 36, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
     GUICtrlCreateLabel(Localize("AdvancedSettings"), 160, 20, 100, -1, $SS_RIGHT)
     For $i = 1 To $Total
         $a[$i] = StringSplit($a[$i], ",")
-        GUICtrlCreateLabel(Localize(($a[$i])[2]), 0, 23 + $i * 40, 340, -1, $SS_RIGHT)
+        GUICtrlCreateLabel(Localize(($a[$i])[2]), 0, 23 + $i * 36, 340, -1, $SS_RIGHT)
         GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
         Local $v = ($a[$i])[1], $gv = GetAllAccountsValue($v), $t = ($a[$i])[4]
         If $t = "Boolean" Or $t = "ReverseBoolean" Then
-            $c[$i] = GUICtrlCreateCheckbox(" ", 350, 20 + $i * 40)
+            $c[$i] = GUICtrlCreateCheckbox(" ", 350, 20 + $i * 36)
             If $t = "Boolean" Then
                 If $gv Then GUICtrlSetState($c[$i], $GUI_CHECKED)
             Else
                 If Not $gv Then GUICtrlSetState($c[$i], $GUI_CHECKED)
             EndIf
         Else
-            $c[$i] = GUICtrlCreateInput($gv, 350, 20 + $i * 40, 155)
+            $c[$i] = GUICtrlCreateInput($gv, 350, 20 + $i * 36, 155)
         EndIf
         GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
     Next
-    Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 40, 64 + $Total * 40, 75, 25)
-    Local $ButtonOK = GUICtrlCreateButton("&OK", 268, 64 + $Total * 40, 75, 25, $BS_DEFPUSHBUTTON)
-    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 350, 64 + $Total * 40, 75, 25)
+    Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 40, 64 + $Total * 36, 75, 25)
+    Local $ButtonOK = GUICtrlCreateButton("&OK", 268, 64 + $Total * 36, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 350, 64 + $Total * 36, 75, 25)
     GUISetState(@SW_SHOW, $hGui)
     While 1
         Switch GUIGetMsg()
             Case $GUI_EVENT_CLOSE
-                End()
+                ExitLoop
             Case $ButtonDefault
                 For $i = 1 To $Total
                     Local $v = ($a[$i])[1], $t = ($a[$i])[4]
@@ -538,7 +542,7 @@ Func AdvancedSettings($hWnd = 0)
                 Next
                 ExitLoop
             Case $ButtonCancel
-                End()
+                ExitLoop
         EndSwitch
     WEnd
     GUIDelete($hGUI)
@@ -584,7 +588,7 @@ Func SearchForChangeCharacterButton()
     If $AlternateLogInCommands = 2 Or GetValue("GameMenuKey") = "{ESC}" Then
         Send("{ESC}")
     Else
-        Send(GetValue("GameMenuKey"))
+        MySend(GetValue("GameMenuKey"))
     EndIf
     Sleep(1500)
     If $AlternateLogInCommands = 1 Then

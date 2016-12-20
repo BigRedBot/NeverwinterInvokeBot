@@ -9,7 +9,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
         ClearWindows(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         $lasttask = 0
-        Send(GetValue("ProfessionsKey"))
+        MySend(GetValue("ProfessionsKey"))
         ProfessionsSleep(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         While 1
