@@ -3,7 +3,7 @@ Local $MaxProfessionLevel = 25
 
 Func RunProfessions(); If $RestartLoop Then Return 0
     If Not $EnableProfessions Or Not GetValue("EnableProfessions") Then Return
-    Local $ProfessionLevel = -2, $ProfessionLoops = 0, $ProfessionTakeRewardsFailed = 0, $OverviewX, $OverviewY, $task = 1, $lasttask = 0, $tasklist
+    Local $ProfessionLevel = -2, $ProfessionLoops = 0, $ProfessionTakeRewardsFailed = 0, $OverviewX, $OverviewY, $task = 1, $make_workers = 0, $lasttask = 0, $tasklist
     While 1
         If $ProfessionLoops >= 10 Then Return
         ClearWindows(); If $RestartLoop Then Return 0
@@ -98,7 +98,14 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                                 If ImageSearch("Professions_Continue") Then
                                     ProfessionsClickImage(); If $RestartLoop Then Return 0
                                     If $RestartLoop Then Return 0
-                                    ProfessionsChooseAssets(); If $RestartLoop Then Return 0
+                                    If Not $make_workers And ProfessionsChooseAssets($tasklist[$task]) Then; If $RestartLoop Then Return 0
+                                        $make_workers = 1
+                                        $task = 1
+                                        $lasttask = 0
+                                        $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Mercenary"), "|")
+                                        $ProfessionLoops -= 1
+                                        ExitLoop 3
+                                    EndIf
                                     If $RestartLoop Then Return 0
                                     If ImageSearch("Professions_StartTask") Then
                                         ProfessionsClickImage(); If $RestartLoop Then Return 0
@@ -107,6 +114,11 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                                     Else
                                         ExitLoop 3
                                     EndIf
+                                ElseIf Not $make_workers And $ProfessionLevel > 1 And ImageSearch("Professions_Details") Then
+                                    $make_workers = 1
+                                    $task = 1
+                                    $lasttask = 0
+                                    $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Workers"), "|")
                                 Else
                                     $task += 1
                                     If $task > $tasklist[0] Then ExitLoop 2
@@ -126,12 +138,16 @@ Func RunProfessions(); If $RestartLoop Then Return 0
     WEnd
 EndFunc
 
-Func ProfessionsChooseAssets(); If $RestartLoop Then Return 0
-    If Not $EnableOptionalAssets Or Not GetValue("EnableOptionalAssets") Then Return
+Func ProfessionsChooseAssets($task); If $RestartLoop Then Return 0
+    If Not $EnableOptionalAssets Or Not GetValue("EnableOptionalAssets") Then Return 0
+    Local $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Workers"), "|")
+    For $i = 1 To $tasklist[0]
+        If $task == $tasklist[$i] Then Return 0
+    Next
     Local $retry = 0
     While 1
         If ImageSearch("Professions_Asset") And ImageSearch("Professions_Asset", $_ImageSearchLeft, $_ImageSearchBottom + 100, $_ImageSearchRight, $_ImageSearchBottom + 150) Then ExitLoop
-        If $retry >= 10 Then Return
+        If $retry >= 10 Then Return 0
         If Not DeclinePromptImageSearch("Later") And Not DeclinePromptImageSearch("Decline") Then Sleep(1000)
         $retry += 1
     WEnd
@@ -140,21 +156,21 @@ Func ProfessionsChooseAssets(); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
     If ImageSearch("Professions_Asset_" & $workers[1], $left, $top, $left + 50) Then
         ProfessionsClickImage()
-        Return
+        Return 0
     EndIf
-    If Not ImageSearch("Professions_AssetBorder", $left + 180, $top, $right, $top + 100) Then Return
+    If Not ImageSearch("Professions_AssetBorder", $left + 180, $top, $right, $top + 100) Then Return 0
     Local $borderleft = $_ImageSearchLeft, $borderright = $_ImageSearchRight
     MouseMove(Random($left + 20, $borderright - 10, 1), Random($_ImageSearchTop + 5, $_ImageSearchBottom - 5, 1))
     MouseWheel($MOUSE_WHEEL_UP)
     Sleep(GetValue("OptionalAssetsDelay") * 1000)
     Local $page = 1
     While Not ImageSearch("Professions_AssetBorder", $_ImageSearchLeft, $_ImageSearchTop, $_ImageSearchRight, $_ImageSearchBottom)
-        If $page >= 60 Then Return
+        If $page >= 60 Then Return 0
         MouseWheel($MOUSE_WHEEL_UP, 17)
         Sleep(GetValue("OptionalAssetsDelay") * 1000)
         If ImageSearch("Professions_Asset_" & $workers[1], $left, $top, $left + 50) Then
             ProfessionsClickImage()
-            Return
+            Return 0
         EndIf
         ImageSearch("Professions_AssetBorder", $borderleft, $top, $borderright, $top + 100)
         MouseWheel($MOUSE_WHEEL_UP)
@@ -169,12 +185,12 @@ Func ProfessionsChooseAssets(); If $RestartLoop Then Return 0
     Sleep(GetValue("OptionalAssetsDelay") * 1000)
     $page = 1
     While Not ImageSearch("Professions_AssetBorder", $_ImageSearchLeft, $_ImageSearchTop, $_ImageSearchRight, $_ImageSearchBottom)
-        If $page >= 60 Then Return
+        If $page >= 60 Then Return 0
         MouseWheel($MOUSE_WHEEL_DOWN, 17)
         Sleep(GetValue("OptionalAssetsDelay") * 1000)
         If ImageSearch("Professions_Asset_" & $workers[1], $left, $top, $left + 50) Then
             ProfessionsClickImage()
-            Return
+            Return 0
         EndIf
         For $i = 2 To $workers[0]
             If ( Not $select Or $select > $i ) And ImageSearch("Professions_Asset_" & $workers[$i], $left, $top, $left + 50) Then $select = $i
@@ -184,28 +200,29 @@ Func ProfessionsChooseAssets(); If $RestartLoop Then Return 0
         Sleep(GetValue("OptionalAssetsDelay") * 1000)
         $page += 1
     WEnd
-    If Not $select Then Return
+    If Not $select Then Return 1
     If ImageSearch("Professions_Asset_" & $workers[$select], $left, $top, $left + 50) Then
         ProfessionsClickImage()
-        Return
+        Return 0
     EndIf
     ImageSearch("Professions_AssetBorder", $borderleft, $top, $borderright, $top + 100)
     MouseWheel($MOUSE_WHEEL_UP)
     Sleep(GetValue("OptionalAssetsDelay") * 1000)
     $page = 1
     While Not ImageSearch("Professions_AssetBorder", $_ImageSearchLeft, $_ImageSearchTop, $_ImageSearchRight, $_ImageSearchBottom)
-        If $page >= 60 Then Return
+        If $page >= 60 Then Return 0
         MouseWheel($MOUSE_WHEEL_UP, 17)
         Sleep(GetValue("OptionalAssetsDelay") * 1000)
         If ImageSearch("Professions_Asset_" & $workers[$select], $left, $top, $left + 50) Then
             ProfessionsClickImage()
-            Return
+            Return 0
         EndIf
         ImageSearch("Professions_AssetBorder", $borderleft, $top, $borderright, $top + 100)
         MouseWheel($MOUSE_WHEEL_UP)
         Sleep(GetValue("OptionalAssetsDelay") * 1000)
         $page += 1
     WEnd
+    Return 0
 EndFunc
 
 Func ProfessionsClickImage($sleeptime = GetValue("ProfessionsDelay") * 1000); If $RestartLoop Then Return 0

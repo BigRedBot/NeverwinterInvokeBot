@@ -94,6 +94,7 @@ While 1
         CheckImage("Professions_EmptySlot")
         CheckImage("Professions_Search")
         CheckImage("Professions_Continue")
+        CheckImage("Professions_Details")
         CheckImage("Professions_StartTask")
         If CheckImage("Professions_Asset", $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, @CRLF & @CRLF, ".png 1") Then
             CheckImage("Professions_Asset", $_ImageSearchLeft, $_ImageSearchBottom + 100, $_ImageSearchRight, $_ImageSearchBottom + 150, @CRLF, ".png 2")
