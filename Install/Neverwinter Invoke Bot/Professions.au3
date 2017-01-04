@@ -3,7 +3,7 @@ Local $MaxProfessionLevel = 25
 
 Func RunProfessions(); If $RestartLoop Then Return 0
     If Not $EnableProfessions Or Not GetValue("EnableProfessions") Then Return
-    Local $ProfessionLevel = -2, $ProfessionLoops = 0, $ProfessionTakeRewardsFailed = 0, $OverviewX, $OverviewY, $task = 1, $make_workers = 0, $lasttask = 0, $tasklist, $require_ingredients
+    Local $ProfessionLevel = -2, $ProfessionLoops = 0, $ProfessionTakeRewardsFailed = 0, $OverviewX, $OverviewY, $task = 1, $make_workers = 0, $lasttask = 0, $tasklist, $require_ingredients, $no_optional_assets
     While 1
         If $ProfessionLoops >= 10 Then Return
         ClearWindows(); If $RestartLoop Then Return 0
@@ -44,6 +44,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                             $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Level_Unknown"), "|")
                         EndIf
                         $require_ingredients = StringSplit(GetValue("LeadershipProfessionTasks_RequireIngredients"), "|")
+                        $no_optional_assets = StringSplit(GetValue("LeadershipProfessionTasks_NoOptionalAssets"), "|")
                     EndIf
                     If ImageSearch("Professions_Search") Then
                         $_ImageSearchX = $OverviewX
@@ -99,11 +100,11 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                                 If ImageSearch("Professions_Continue") Then
                                     ProfessionsClickImage(); If $RestartLoop Then Return 0
                                     If $RestartLoop Then Return 0
-                                    If Not $make_workers And ProfessionsChooseAssets($tasklist[$task]) Then; If $RestartLoop Then Return 0
+                                    If _ArraySearch($no_optional_assets, $tasklist[$task], 1) = -1 And ProfessionsChooseAssets() Then; If $RestartLoop Then Return 0
                                         $make_workers = 1
                                         $task = 1
                                         $lasttask = 0
-                                        $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Mercenary"), "|")
+                                        $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Workers"), "|")
                                         $ProfessionLoops -= 1
                                         ExitLoop 3
                                     EndIf
@@ -139,12 +140,8 @@ Func RunProfessions(); If $RestartLoop Then Return 0
     WEnd
 EndFunc
 
-Func ProfessionsChooseAssets($task); If $RestartLoop Then Return 0
+Func ProfessionsChooseAssets(); If $RestartLoop Then Return 0
     If Not $EnableOptionalAssets Or Not GetValue("EnableOptionalAssets") Then Return 0
-    Local $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Workers"), "|")
-    For $i = 1 To $tasklist[0]
-        If $task == $tasklist[$i] Then Return 0
-    Next
     Local $retry = 0
     While 1
         If ImageSearch("Professions_Asset") And ImageSearch("Professions_Asset", $_ImageSearchLeft, $_ImageSearchBottom + 100, $_ImageSearchRight, $_ImageSearchBottom + 150) Then ExitLoop
