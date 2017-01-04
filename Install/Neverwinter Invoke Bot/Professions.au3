@@ -116,7 +116,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                                     Else
                                         ExitLoop 3
                                     EndIf
-                                ElseIf Not $make_workers And _ArraySearch($require_ingredients, $tasklist[$task], 1) = -1 And ImageSearch("Professions_Details") Then
+                                ElseIf Not $make_workers And $ProfessionLevel > -1 And _ArraySearch($require_ingredients, $tasklist[$task], 1) = -1 And ImageSearch("Professions_Details") Then
                                     $make_workers = 1
                                     $task = 1
                                     $lasttask = 0
