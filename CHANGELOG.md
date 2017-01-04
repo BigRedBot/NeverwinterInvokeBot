@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.9
+- Fixed leadership worker creation
+
 10.8
 - Leadership worker creation improved
 
