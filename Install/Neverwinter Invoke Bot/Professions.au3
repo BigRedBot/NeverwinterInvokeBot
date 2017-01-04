@@ -13,129 +13,129 @@ Func RunProfessions(); If $RestartLoop Then Return 0
         ProfessionsSleep(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         While 1
-            While 1
-                $ProfessionLoops += 1
-                If $ProfessionLoops > 10 Then Return
-                If ImageSearch("Professions_Overview") Then
-                    $OverviewX = $_ImageSearchX
-                    $OverviewY = $_ImageSearchY
-                    If Not ImageSearch("Professions_Leadership") Then Return
-                    If $ProfessionLevel = -2 Then
-                        Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop - 44, $right = $_ImageSearchLeft + 100, $bottom = $_ImageSearchTop - 31, $tens, $ones, $image1, $image2, $tolerance = GetValue("ProfessionLevelImageTolerance")
-                        $ProfessionLevel = $MaxProfessionLevel
-                        While $ProfessionLevel > -1
-                            If $ProfessionLevel < 10 Then
-                                $tens = ""
-                                $ones = $ProfessionLevel
-                                $image1 = "Professions_Level" & $ones
-                                $image2 = "Professions_LevelBlank"
-                            Else
-                                $tens = Floor($ProfessionLevel / 10)
-                                $ones = $ProfessionLevel - $tens * 10
-                                $image1 = "Professions_Level" & $tens
-                                $image2 = "Professions_Level" & $ones
-                            EndIf
-                            If ImageSearch($image1, $left, $top, $right, $bottom, $tolerance) And ImageSearch("Professions_LevelBlank", $_ImageSearchLeft - 5, $_ImageSearchTop, $_ImageSearchLeft - 1, $_ImageSearchBottom, $tolerance) And ImageSearch($image2, $_ImageSearchRight + 11, $_ImageSearchTop, $_ImageSearchRight + 22, $_ImageSearchBottom, $tolerance) Then ExitLoop
-                            $ProfessionLevel -= 1
-                        WEnd
-                        If $ProfessionLevel > -1 And GetValue("LeadershipProfessionTasks_Level_" & $ProfessionLevel) Then
-                            $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Level_" & $ProfessionLevel), "|")
+        While 1
+            $ProfessionLoops += 1
+            If $ProfessionLoops > 10 Then Return
+            If ImageSearch("Professions_Overview") Then
+                $OverviewX = $_ImageSearchX
+                $OverviewY = $_ImageSearchY
+                If Not ImageSearch("Professions_Leadership") Then Return
+                If $ProfessionLevel = -2 Then
+                    Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop - 44, $right = $_ImageSearchLeft + 100, $bottom = $_ImageSearchTop - 31, $tens, $ones, $image1, $image2, $tolerance = GetValue("ProfessionLevelImageTolerance")
+                    $ProfessionLevel = $MaxProfessionLevel
+                    While $ProfessionLevel > -1
+                        If $ProfessionLevel < 10 Then
+                            $tens = ""
+                            $ones = $ProfessionLevel
+                            $image1 = "Professions_Level" & $ones
+                            $image2 = "Professions_LevelBlank"
                         Else
-                            $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Level_Unknown"), "|")
+                            $tens = Floor($ProfessionLevel / 10)
+                            $ones = $ProfessionLevel - $tens * 10
+                            $image1 = "Professions_Level" & $tens
+                            $image2 = "Professions_Level" & $ones
                         EndIf
-                        $require_ingredients = StringSplit(GetValue("LeadershipProfessionTasks_RequireIngredients"), "|")
-                        $no_optional_assets = StringSplit(GetValue("LeadershipProfessionTasks_NoOptionalAssets"), "|")
+                        If ImageSearch($image1, $left, $top, $right, $bottom, $tolerance) And ImageSearch("Professions_LevelBlank", $_ImageSearchLeft - 5, $_ImageSearchTop, $_ImageSearchLeft - 1, $_ImageSearchBottom, $tolerance) And ImageSearch($image2, $_ImageSearchRight + 11, $_ImageSearchTop, $_ImageSearchRight + 22, $_ImageSearchBottom, $tolerance) Then ExitLoop
+                        $ProfessionLevel -= 1
+                    WEnd
+                    If $ProfessionLevel > -1 And GetValue("LeadershipProfessionTasks_Level_" & $ProfessionLevel) Then
+                        $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Level_" & $ProfessionLevel), "|")
+                    Else
+                        $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Level_Unknown"), "|")
                     EndIf
-                    If ImageSearch("Professions_Search") Then
-                        $_ImageSearchX = $OverviewX
-                        $_ImageSearchY = $OverviewY
+                    $require_ingredients = StringSplit(GetValue("LeadershipProfessionTasks_RequireIngredients"), "|")
+                    $no_optional_assets = StringSplit(GetValue("LeadershipProfessionTasks_NoOptionalAssets"), "|")
+                EndIf
+                If ImageSearch("Professions_Search") Then
+                    $_ImageSearchX = $OverviewX
+                    $_ImageSearchY = $OverviewY
+                    ProfessionsClickImage(); If $RestartLoop Then Return 0
+                    If $RestartLoop Then Return 0
+                EndIf
+                MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
+                If Not $ProfessionTakeRewardsFailed Then
+                    While ImageSearch("Professions_CollectResult")
                         ProfessionsClickImage(); If $RestartLoop Then Return 0
                         If $RestartLoop Then Return 0
-                    EndIf
-                    MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
-                    If Not $ProfessionTakeRewardsFailed Then
-                        While ImageSearch("Professions_CollectResult")
+                        MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
+                        If ImageSearch("Professions_TakeRewards") Then
+                            $lasttask = 0
+                            $task = 1
                             ProfessionsClickImage(); If $RestartLoop Then Return 0
                             If $RestartLoop Then Return 0
-                            MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
-                            If ImageSearch("Professions_TakeRewards") Then
-                                $lasttask = 0
-                                $task = 1
+                        Else
+                            $ProfessionTakeRewardsFailed = 1
+                            ExitLoop 3
+                        EndIf
+                        MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
+                    WEnd
+                EndIf
+                If $task > $tasklist[0] Then Return
+                If Not ImageSearch("Professions_EmptySlot") Then
+                    If Not DeclinePromptImageSearch("Later") And Not DeclinePromptImageSearch("Decline") Then Return
+                    If Not ImageSearch("Professions_EmptySlot") Then Return
+                EndIf
+                If ImageSearch("Professions_Leadership") Then
+                    ProfessionsClickImage(); If $RestartLoop Then Return 0
+                    If $RestartLoop Then Return 0
+                    While 1
+                        If ImageSearch("Professions_Search") Then
+                            If $task <> $lasttask Then
+                                $lasttask = $task
+                                $_ImageSearchX = $_ImageSearchLeft - 100 + Random(-50, 50, 1)
+                                $_ImageSearchY = $_ImageSearchTop + Floor(($_ImageSearchHeight-1)/2) + Random(-5, 5, 1)
                                 ProfessionsClickImage(); If $RestartLoop Then Return 0
                                 If $RestartLoop Then Return 0
-                            Else
-                                $ProfessionTakeRewardsFailed = 1
-                                ExitLoop 3
+                                AutoItSetOption("SendKeyDownDelay", 5)
+                                Send("{END}{BS 50}")
+                                Sleep(100)
+                                AutoItSetOption("SendKeyDownDelay", 15)
+                                Send(StringLeft($tasklist[$task], 50), $SEND_RAW)
+                                Sleep(100)
+                                AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
+                                Send("{ENTER}")
+                                ProfessionsSleep(); If $RestartLoop Then Return 0
+                                If $RestartLoop Then Return 0
                             EndIf
-                            MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
-                        WEnd
-                    EndIf
-                    If $task > $tasklist[0] Then Return
-                    If Not ImageSearch("Professions_EmptySlot") Then
-                        If Not DeclinePromptImageSearch("Later") And Not DeclinePromptImageSearch("Decline") Then Return
-                        If Not ImageSearch("Professions_EmptySlot") Then Return
-                    EndIf
-                    If ImageSearch("Professions_Leadership") Then
-                        ProfessionsClickImage(); If $RestartLoop Then Return 0
-                        If $RestartLoop Then Return 0
-                        While 1
-                            If ImageSearch("Professions_Search") Then
-                                If $task <> $lasttask Then
-                                    $lasttask = $task
-                                    $_ImageSearchX = $_ImageSearchLeft - 100 + Random(-50, 50, 1)
-                                    $_ImageSearchY = $_ImageSearchTop + Floor(($_ImageSearchHeight-1)/2) + Random(-5, 5, 1)
-                                    ProfessionsClickImage(); If $RestartLoop Then Return 0
-                                    If $RestartLoop Then Return 0
-                                    AutoItSetOption("SendKeyDownDelay", 5)
-                                    Send("{END}{BS 50}")
-                                    Sleep(100)
-                                    AutoItSetOption("SendKeyDownDelay", 15)
-                                    Send(StringLeft($tasklist[$task], 50), $SEND_RAW)
-                                    Sleep(100)
-                                    AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
-                                    Send("{ENTER}")
-                                    ProfessionsSleep(); If $RestartLoop Then Return 0
-                                    If $RestartLoop Then Return 0
-                                EndIf
-                                If ImageSearch("Professions_Continue") Then
-                                    ProfessionsClickImage(); If $RestartLoop Then Return 0
-                                    If $RestartLoop Then Return 0
-                                    If _ArraySearch($no_optional_assets, $tasklist[$task], 1) = -1 And ProfessionsChooseAssets() Then; If $RestartLoop Then Return 0
-                                        $make_workers = 1
-                                        $task = 1
-                                        $lasttask = 0
-                                        $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Workers"), "|")
-                                        $ProfessionLoops -= 1
-                                        ExitLoop 3
-                                    EndIf
-                                    If $RestartLoop Then Return 0
-                                    If ImageSearch("Professions_StartTask") Then
-                                        ProfessionsClickImage(); If $RestartLoop Then Return 0
-                                        If $RestartLoop Then Return 0
-                                        ExitLoop 2
-                                    Else
-                                        ExitLoop 3
-                                    EndIf
-                                ElseIf Not $make_workers And $ProfessionLevel > -1 And _ArraySearch($require_ingredients, $tasklist[$task], 1) = -1 And ImageSearch("Professions_Details") Then
+                            If ImageSearch("Professions_Continue") Then
+                                ProfessionsClickImage(); If $RestartLoop Then Return 0
+                                If $RestartLoop Then Return 0
+                                If _ArraySearch($no_optional_assets, $tasklist[$task], 1) = -1 And ProfessionsChooseAssets() Then; If $RestartLoop Then Return 0
                                     $make_workers = 1
                                     $task = 1
                                     $lasttask = 0
                                     $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Workers"), "|")
-                                Else
-                                    $task += 1
-                                    If $task > $tasklist[0] Then ExitLoop 2
+                                    $ProfessionLoops -= 1
+                                    ExitLoop 3
                                 EndIf
+                                If $RestartLoop Then Return 0
+                                If ImageSearch("Professions_StartTask") Then
+                                    ProfessionsClickImage(); If $RestartLoop Then Return 0
+                                    If $RestartLoop Then Return 0
+                                    ExitLoop 2
+                                Else
+                                    ExitLoop 3
+                                EndIf
+                            ElseIf Not $make_workers And $ProfessionLevel > -1 And _ArraySearch($require_ingredients, $tasklist[$task], 1) = -1 And ImageSearch("Professions_Details") Then
+                                $make_workers = 1
+                                $task = 1
+                                $lasttask = 0
+                                $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Workers"), "|")
                             Else
-                                ExitLoop 3
+                                $task += 1
+                                If $task > $tasklist[0] Then ExitLoop 2
                             EndIf
-                        WEnd
-                    Else
-                        ExitLoop 2
-                    EndIf
+                        Else
+                            ExitLoop 3
+                        EndIf
+                    WEnd
                 Else
                     ExitLoop 2
                 EndIf
-            WEnd
+            Else
+                ExitLoop 2
+            EndIf
+        WEnd
         WEnd
     WEnd
 EndFunc
