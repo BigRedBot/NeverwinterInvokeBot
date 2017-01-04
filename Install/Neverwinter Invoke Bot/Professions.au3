@@ -3,7 +3,7 @@ Local $MaxProfessionLevel = 25
 
 Func RunProfessions(); If $RestartLoop Then Return 0
     If Not $EnableProfessions Or Not GetValue("EnableProfessions") Then Return
-    Local $ProfessionLevel = -2, $ProfessionLoops = 0, $ProfessionTakeRewardsFailed = 0, $OverviewX, $OverviewY, $task = 1, $make_workers = 0, $lasttask = 0, $tasklist
+    Local $ProfessionLevel = -2, $ProfessionLoops = 0, $ProfessionTakeRewardsFailed = 0, $OverviewX, $OverviewY, $task = 1, $make_workers = 0, $lasttask = 0, $tasklist, $require_ingredients
     While 1
         If $ProfessionLoops >= 10 Then Return
         ClearWindows(); If $RestartLoop Then Return 0
@@ -43,6 +43,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                         Else
                             $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Level_Unknown"), "|")
                         EndIf
+                        $require_ingredients = StringSplit(GetValue("LeadershipProfessionTasks_RequireIngredients"), "|")
                     EndIf
                     If ImageSearch("Professions_Search") Then
                         $_ImageSearchX = $OverviewX
@@ -114,7 +115,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                                     Else
                                         ExitLoop 3
                                     EndIf
-                                ElseIf Not $make_workers And $ProfessionLevel > 1 And ImageSearch("Professions_Details") Then
+                                ElseIf Not $make_workers And _ArraySearch($require_ingredients, $tasklist[$task], 1) = -1 And ImageSearch("Professions_Details") Then
                                     $make_workers = 1
                                     $task = 1
                                     $lasttask = 0
@@ -783,7 +784,7 @@ Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
     For $i = 1 To $Total
         $Label[$i] = GUICtrlCreateLabel(Localize($Workers[$i]), 0, 55 * $i + 14, 150, -1, $SS_RIGHT)
         $Border[$i] = GUICtrlCreateGraphic(158, 55 * $i + 4, 34, 34)
-        Local $color = $COLOR_WHITE, $c = _ArraySearch($DefaultWorkers, $Workers[$i])
+        Local $color = $COLOR_WHITE, $c = _ArraySearch($DefaultWorkers, $Workers[$i], 1)
         If $c > 0 Then $color = $Colors[$c]
         GUICtrlSetBkColor($Border[$i], $color)
         $Image[$i] = GUICtrlCreatePic("", 160, 55 * $i + 6, 30, 30)
@@ -815,7 +816,7 @@ Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
                         $Workers[$i] = $second
                         For $i = 1 To $Total
                             GUICtrlSetData($Label[$i], Localize($Workers[$i]))
-                            Local $color = $COLOR_WHITE, $c = _ArraySearch($DefaultWorkers, $Workers[$i])
+                            Local $color = $COLOR_WHITE, $c = _ArraySearch($DefaultWorkers, $Workers[$i], 1)
                             If $c > 0 Then $color = $Colors[$c]
                             GUICtrlSetBkColor($Border[$i], $color)
                             _SetImage($Image[$i], @ScriptDir & "\images\" & $Language & "\Professions_Asset_" & $Workers[$i] & ".png")
@@ -835,7 +836,7 @@ Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
                         $Workers[$i] = $second
                         For $i = 1 To $Total
                             GUICtrlSetData($Label[$i], Localize($Workers[$i]))
-                            Local $color = $COLOR_WHITE, $c = _ArraySearch($DefaultWorkers, $Workers[$i])
+                            Local $color = $COLOR_WHITE, $c = _ArraySearch($DefaultWorkers, $Workers[$i], 1)
                             If $c > 0 Then $color = $Colors[$c]
                             GUICtrlSetBkColor($Border[$i], $color)
                             _SetImage($Image[$i], @ScriptDir & "\images\" & $Language & "\Professions_Asset_" & $Workers[$i] & ".png")
@@ -849,7 +850,7 @@ Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
                 For $i = 1 To $Total
                     $Workers[$i] = $DefaultWorkers[$i]
                     GUICtrlSetData($Label[$i], Localize($Workers[$i]))
-                    Local $color = $COLOR_WHITE, $c = _ArraySearch($DefaultWorkers, $Workers[$i])
+                    Local $color = $COLOR_WHITE, $c = _ArraySearch($DefaultWorkers, $Workers[$i], 1)
                     If $c > 0 Then $color = $Colors[$c]
                     GUICtrlSetBkColor($Border[$i], $color)
                     _SetImage($Image[$i], @ScriptDir & "\images\" & $Language & "\Professions_Asset_" & $Workers[$i] & ".png")
