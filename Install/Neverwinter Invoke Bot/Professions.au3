@@ -14,13 +14,13 @@ Func RunProfessions(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         While 1
         While 1
+            If $ProfessionLoops >= 10 Then Return
             $ProfessionLoops += 1
-            If $ProfessionLoops > 10 Then Return
             If ImageSearch("Professions_Overview") Then
                 $OverviewX = $_ImageSearchX
                 $OverviewY = $_ImageSearchY
-                If Not ImageSearch("Professions_Leadership") Then Return
                 If $ProfessionLevel = -2 Then
+                    If Not ImageSearch("Professions_Leadership") Then Return
                     Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop - 44, $right = $_ImageSearchLeft + 100, $bottom = $_ImageSearchTop - 31, $tens, $ones, $image1, $image2, $tolerance = GetValue("ProfessionLevelImageTolerance")
                     $ProfessionLevel = $MaxProfessionLevel
                     While $ProfessionLevel > -1
@@ -64,6 +64,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                             ProfessionsClickImage(); If $RestartLoop Then Return 0
                             If $RestartLoop Then Return 0
                         Else
+                            $ProfessionLoops -= 1
                             $ProfessionTakeRewardsFailed = 1
                             ExitLoop 3
                         EndIf
