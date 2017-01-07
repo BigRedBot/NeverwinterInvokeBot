@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.9.1
+- Will now always re-check profession level after collecting task results
+
 10.9
 - Fixed leadership worker creation
 

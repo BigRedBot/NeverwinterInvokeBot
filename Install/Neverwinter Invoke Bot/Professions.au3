@@ -19,7 +19,35 @@ Func RunProfessions(); If $RestartLoop Then Return 0
             If ImageSearch("Professions_Overview") Then
                 $OverviewX = $_ImageSearchX
                 $OverviewY = $_ImageSearchY
+                If ImageSearch("Professions_Search") Then
+                    $_ImageSearchX = $OverviewX
+                    $_ImageSearchY = $OverviewY
+                    ProfessionsClickImage(); If $RestartLoop Then Return 0
+                    If $RestartLoop Then Return 0
+                EndIf
+                MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
+                If Not $ProfessionTakeRewardsFailed Then
+                    While ImageSearch("Professions_CollectResult")
+                        ProfessionsClickImage(); If $RestartLoop Then Return 0
+                        If $RestartLoop Then Return 0
+                        MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
+                        If ImageSearch("Professions_TakeRewards") Then
+                            $lasttask = 0
+                            $task = 1
+                            $ProfessionLevel = -2
+                            ProfessionsClickImage(); If $RestartLoop Then Return 0
+                            If $RestartLoop Then Return 0
+                        Else
+                            $ProfessionLoops -= 1
+                            $ProfessionTakeRewardsFailed = 1
+                            ExitLoop 3
+                        EndIf
+                        MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
+                    WEnd
+                EndIf
                 If $ProfessionLevel = -2 Then
+                    ProfessionsSleep(); If $RestartLoop Then Return 0
+                    If $RestartLoop Then Return 0
                     If Not ImageSearch("Professions_Leadership") Then Return
                     Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop - 44, $right = $_ImageSearchLeft + 100, $bottom = $_ImageSearchTop - 31, $tens, $ones, $image1, $image2, $tolerance = GetValue("ProfessionLevelImageTolerance")
                     $ProfessionLevel = $MaxProfessionLevel
@@ -45,31 +73,6 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                     EndIf
                     $require_ingredients = StringSplit(GetValue("LeadershipProfessionTasks_RequireIngredients"), "|")
                     $no_optional_assets = StringSplit(GetValue("LeadershipProfessionTasks_NoOptionalAssets"), "|")
-                EndIf
-                If ImageSearch("Professions_Search") Then
-                    $_ImageSearchX = $OverviewX
-                    $_ImageSearchY = $OverviewY
-                    ProfessionsClickImage(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                EndIf
-                MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
-                If Not $ProfessionTakeRewardsFailed Then
-                    While ImageSearch("Professions_CollectResult")
-                        ProfessionsClickImage(); If $RestartLoop Then Return 0
-                        If $RestartLoop Then Return 0
-                        MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
-                        If ImageSearch("Professions_TakeRewards") Then
-                            $lasttask = 0
-                            $task = 1
-                            ProfessionsClickImage(); If $RestartLoop Then Return 0
-                            If $RestartLoop Then Return 0
-                        Else
-                            $ProfessionLoops -= 1
-                            $ProfessionTakeRewardsFailed = 1
-                            ExitLoop 3
-                        EndIf
-                        MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
-                    WEnd
                 EndIf
                 If $task > $tasklist[0] Then Return
                 If Not ImageSearch("Professions_EmptySlot") Then
