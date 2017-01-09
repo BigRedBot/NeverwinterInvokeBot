@@ -68,8 +68,10 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                     WEnd
                     If $ProfessionLevel > -1 And GetValue("LeadershipProfessionTasks_Level_" & $ProfessionLevel) Then
                         $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Level_" & $ProfessionLevel), "|")
+                        Splash("[ " & Localize("LeadershipLevel", "<LEVEL>", $ProfessionLevel) & " ]")
                     Else
                         $tasklist = StringSplit(GetValue("LeadershipProfessionTasks_Level_Unknown"), "|")
+                        Splash("[ " & Localize("LeadershipLevel", "<LEVEL>", Localize("Unknown")) & " ]")
                     EndIf
                     $require_ingredients = StringSplit(GetValue("LeadershipProfessionTasks_RequireIngredients"), "|")
                     $no_optional_assets = StringSplit(GetValue("LeadershipProfessionTasks_NoOptionalAssets"), "|")

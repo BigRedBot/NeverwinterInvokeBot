@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.9.2
+- Will now display the leadership level when starting leadership tasks
+
 10.9.1
 - Will now always re-check profession level after collecting task results
 

@@ -305,8 +305,9 @@ While 1
                     If $RestartLoop Then ExitLoop 2
                 EndIf
             EndIf
-            RunProfessions()
+            RunProfessions(); If $RestartLoop Then Return 0
             If $RestartLoop Then ExitLoop 2
+            Splash()
             If GetAccountValue("InfiniteLoopsStarted") Then
                 SetCharacterInfo("CharacterTime", TimerInit())
                 SetCharacterInfo("CharacterLoop", GetValue("CurrentLoop"))
