@@ -3,7 +3,7 @@ Local $MaxProfessionLevel = 25
 
 Func RunProfessions(); If $RestartLoop Then Return 0
     If Not $EnableProfessions Or Not GetValue("EnableProfessions") Then Return
-    Local $ProfessionLevel = -2, $ProfessionLoops = 0, $ProfessionTakeRewardsFailed = 0, $OverviewX, $OverviewY, $task = 1, $make_workers = 0, $lasttask = 0, $tasklist, $require_ingredients, $no_optional_assets
+    Local $ProfessionLevel = -2, $ProfessionLoops = 0, $ProfessionTakeRewardsFailed = 0, $OverviewX, $OverviewY, $task = 1, $make_workers = 0, $lasttask = 0, $tasklist, $require_ingredients, $no_optional_assets, $leadership_found
     While 1
         If $ProfessionLoops >= 10 Then Return
         ClearWindows(); If $RestartLoop Then Return 0
@@ -45,10 +45,18 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                         MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
                     WEnd
                 EndIf
+                If Not ImageSearch("Professions_EmptySlot") Then
+                    If Not DeclinePromptImageSearch("Later") And Not DeclinePromptImageSearch("Decline") Then Return
+                    If Not ImageSearch("Professions_EmptySlot") Then Return
+                EndIf
                 If $ProfessionLevel = -2 Then
                     ProfessionsSleep(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
-                    If Not ImageSearch("Professions_Leadership") Then Return
+                    If Not ImageSearch("Professions_Leadership") Then
+                        If $leadership_found Then ExitLoop 2
+                        Return
+                    EndIf
+                    $leadership_found = 1
                     Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop - 44, $right = $_ImageSearchLeft + 100, $bottom = $_ImageSearchTop - 31, $tens, $ones, $image1, $image2, $tolerance = GetValue("ProfessionLevelImageTolerance")
                     $ProfessionLevel = $MaxProfessionLevel
                     While $ProfessionLevel > -1
@@ -77,10 +85,6 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                     $no_optional_assets = StringSplit(GetValue("LeadershipProfessionTasks_NoOptionalAssets"), "|")
                 EndIf
                 If $task > $tasklist[0] Then Return
-                If Not ImageSearch("Professions_EmptySlot") Then
-                    If Not DeclinePromptImageSearch("Later") And Not DeclinePromptImageSearch("Decline") Then Return
-                    If Not ImageSearch("Professions_EmptySlot") Then Return
-                EndIf
                 If ImageSearch("Professions_Leadership") Then
                     ProfessionsClickImage(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0

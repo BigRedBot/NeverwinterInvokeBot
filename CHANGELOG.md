@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.9.3
+- Will now check for empty profession slots before checking leadership level
+
 10.9.2
 - Will now display the leadership level when starting leadership tasks
 
