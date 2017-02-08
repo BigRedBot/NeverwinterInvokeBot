@@ -10,6 +10,7 @@ While 1
     If GetAllAccountsValue("TotalProfessionPacks") Then $text &= @CRLF & @CRLF & Localize("TotalProfessionPacksCollected", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalProfessionPacks")))
     If GetAllAccountsValue("TotalElixirsOfFate") Then $text &= @CRLF & @CRLF & Localize("TotalElixirsOfFateCollected", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalElixirsOfFate")))
     If GetAllAccountsValue("TotalOverflowXPRewards") Then $text &= @CRLF & @CRLF & Localize("TotalOverflowXPRewardsCollected", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalOverflowXPRewards")))
+    If GetAllAccountsValue("TotalVIPCharacterRewards") Then $text &= @CRLF & @CRLF & Localize("TotalVIPCharacterRewardsCollected", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalVIPCharacterRewards")))
     If GetAllAccountsValue("TotalVIPAccountRewards") Then $text &= @CRLF & @CRLF & Localize("TotalVIPAccountRewardsCollected", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalVIPAccountRewards")))
     Local $msg = MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $text & @CRLF & @CRLF & @CRLF & Localize("DonateNow"), 900)
     If $msg = $IDYES Then Exit ShellExecute(@ScriptDir & "\Donation.html")

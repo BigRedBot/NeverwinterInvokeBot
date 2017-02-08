@@ -83,8 +83,12 @@ While 1
         CheckImage("Mismatch")
         CheckImage("OpenAnother")
         CheckImage("CelestialBagOfRefining")
+        CheckImage("InventoryTab")
+        CheckImage("VIPInventoryTab")
+        CheckImage("Inventory")
         CheckImage("VIPInventory")
-        If CheckImage("VIPAccountRewards") Then CheckImage("VIPAccountRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $_ImageSearchRight + 200, $_ImageSearchBottom + 20, @CRLF)
+        If CheckImage("VIPCharacterRewards") Then CheckImage("VIPRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $ClientRight, $_ImageSearchBottom + 20, @CRLF)
+        If CheckImage("VIPAccountRewards") Then CheckImage("VIPRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $ClientRight, $_ImageSearchBottom + 20, @CRLF)
         $time = Round(TimerDiff($timer) / 1000, 2)
     EndIf
     Splash($count & "x " & $time & "s" & @CRLF & $text)

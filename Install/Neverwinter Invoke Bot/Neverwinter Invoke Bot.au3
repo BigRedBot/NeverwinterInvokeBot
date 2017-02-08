@@ -281,8 +281,6 @@ While 1
                 ClearWindows(); If $RestartLoop Then Return 0
                 If $RestartLoop Then ExitLoop 2
             EndIf
-            GetVIPAccountReward(); If $RestartLoop Then Return 0
-            If $RestartLoop Then ExitLoop 2
             If Not GetAccountValue("InfiniteLoopsStarted") Then
                 $WaitingTimer = TimerInit()
                 $CofferTries = 0
@@ -305,6 +303,10 @@ While 1
                     If $RestartLoop Then ExitLoop 2
                 EndIf
             EndIf
+            GetVIPAccountReward(); If $RestartLoop Then Return 0
+            If $RestartLoop Then ExitLoop 2
+            GetVIPCharacterReward(); If $RestartLoop Then Return 0
+            If $RestartLoop Then ExitLoop 2
             RunProfessions(); If $RestartLoop Then Return 0
             If $RestartLoop Then ExitLoop 2
             Splash()
@@ -542,25 +544,31 @@ While 1
 While 1
     If Not GetValue("SkipVIPAccountReward") And Not GetValue("CollectedVIPAccountReward") And GetValue("LastVIPAccountRewardTryLoop") < GetValue("CurrentLoop") And ( GetValue("VIPAccountRewardCharacter") < GetValue("StartAtCharacter") Or GetValue("VIPAccountRewardCharacter") > GetValue("EndAtCharacter") Or GetValue("VIPAccountRewardCharacter") = GetValue("CurrentCharacter") ) Then
         If GetValue("VIPAccountRewardTries") < 3 Then
+            ClearWindows(); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
             $tried = 1
             AddAccountCountValue("VIPAccountRewardTries")
             MySend(GetValue("InventoryKey"))
             Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
-            If Not ImageSearch("VIPInventory") Then ExitLoop
-            If Not ImageSearch("VIPAccountRewards", $_ImageSearchLeft, $_ImageSearchBottom + 200, $_ImageSearchRight + 50) Then ExitLoop
+            If Not ImageSearch("VIPInventory") And ImageSearch("VIPInventoryTab") Then
+                MouseMove($_ImageSearchX, $_ImageSearchY)
+                DoubleClick()
+                Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
+            EndIf
+            If Not ImageSearch("VIPInventory") Or Not ImageSearch("VIPAccountRewards", $_ImageSearchLeft, $_ImageSearchBottom, $_ImageSearchRight + 50) Then ExitLoop
             Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom
-            If Not ImageSearch("VIPAccountRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $_ImageSearchRight + 200, $_ImageSearchBottom + 20) Then ExitLoop
-            $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonGap") + 6, $_ImageSearchRight + GetValue("VIPAccountRewardButtonGap") + GetValue("VIPAccountRewardButtonWidth") - 5, 1)
-            $_ImageSearchY = Random($_ImageSearchHeightCenter + 6 - Ceiling(GetValue("VIPAccountRewardButtonHeight") / 2), $_ImageSearchHeightCenter + Floor(GetValue("VIPAccountRewardButtonHeight") / 2) - 5, 1)
+            If Not ImageSearch("VIPRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $ClientRight, $_ImageSearchBottom + 20) Then ExitLoop
+            $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPRewardButtonGap") + 6, $_ImageSearchRight + GetValue("VIPRewardButtonGap") + GetValue("VIPRewardButtonWidth") - 5, 1)
+            $_ImageSearchY = Random($_ImageSearchHeightCenter + 6 - Ceiling(GetValue("VIPRewardButtonHeight") / 2), $_ImageSearchHeightCenter + Floor(GetValue("VIPRewardButtonHeight") / 2) - 5, 1)
             MouseMove($_ImageSearchX, $_ImageSearchY)
             SingleClick()
             Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
             If Not ImageSearch("VIPAccountRewards", $left, $top, $right, $bottom) Then
                 SaveItemCount("TotalVIPAccountRewards", 1)
                 SetAccountValue("CollectedVIPAccountReward", 1)
-            ElseIf ImageSearch("VIPAccountRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $_ImageSearchRight + 200, $_ImageSearchBottom + 20) Then
-                $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPAccountRewardButtonGap") + 6, $_ImageSearchRight + GetValue("VIPAccountRewardButtonGap") + GetValue("VIPAccountRewardButtonWidth") - 5, 1)
-                $_ImageSearchY = Random($_ImageSearchHeightCenter + 6 - Ceiling(GetValue("VIPAccountRewardButtonHeight") / 2), $_ImageSearchHeightCenter + Floor(GetValue("VIPAccountRewardButtonHeight") / 2) - 5, 1)
+            ElseIf ImageSearch("VIPRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $ClientRight, $_ImageSearchBottom + 20) Then
+                $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPRewardButtonGap") + 6, $_ImageSearchRight + GetValue("VIPRewardButtonGap") + GetValue("VIPRewardButtonWidth") - 5, 1)
+                $_ImageSearchY = Random($_ImageSearchHeightCenter + 6 - Ceiling(GetValue("VIPRewardButtonHeight") / 2), $_ImageSearchHeightCenter + Floor(GetValue("VIPRewardButtonHeight") / 2) - 5, 1)
                 MouseMove($_ImageSearchX, $_ImageSearchY)
                 SingleClick()
                 Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
@@ -583,15 +591,53 @@ WEnd
 WEnd
 EndFunc
 
+Func GetVIPCharacterReward(); If $RestartLoop Then Return 0
+    If Not GetValue("ClaimVIPCharacterReward") Or GetValue("CollectedVIPCharacterReward") Then Return
+    ClearWindows(); If $RestartLoop Then Return 0
+    If $RestartLoop Then Return 0
+    MySend(GetValue("InventoryKey"))
+    Sleep(GetValue("ClaimVIPCharacterRewardDelay") * 1000)
+    If Not ImageSearch("VIPInventory") And ImageSearch("VIPInventoryTab") Then
+        MouseMove($_ImageSearchX, $_ImageSearchY)
+        DoubleClick()
+        Sleep(GetValue("ClaimVIPCharacterRewardDelay") * 1000)
+    EndIf
+    SetCharacterInfo("FailedVIPCharacterReward", 1)
+    If Not ImageSearch("VIPInventory") Or Not ImageSearch("VIPCharacterRewards", $_ImageSearchLeft, $_ImageSearchBottom, $_ImageSearchRight + 50) Then Return
+    Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom
+    If Not ImageSearch("VIPRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $ClientRight, $_ImageSearchBottom + 20) Then Return
+    $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPRewardButtonGap") + 6, $_ImageSearchRight + GetValue("VIPRewardButtonGap") + GetValue("VIPRewardButtonWidth") - 5, 1)
+    $_ImageSearchY = Random($_ImageSearchHeightCenter + 6 - Ceiling(GetValue("VIPRewardButtonHeight") / 2), $_ImageSearchHeightCenter + Floor(GetValue("VIPRewardButtonHeight") / 2) - 5, 1)
+    MouseMove($_ImageSearchX, $_ImageSearchY)
+    SingleClick()
+    Sleep(GetValue("ClaimVIPCharacterRewardDelay") * 1000)
+    If Not ImageSearch("VIPCharacterRewards", $left, $top, $right, $bottom) Then
+        SaveItemCount("TotalVIPCharacterRewards", 1)
+        SetCharacterInfo("FailedVIPCharacterReward", 0)
+        SetCharacterValue("CollectedVIPCharacterReward", 1)
+    ElseIf ImageSearch("VIPRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $ClientRight, $_ImageSearchBottom + 20) Then
+        $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPRewardButtonGap") + 6, $_ImageSearchRight + GetValue("VIPRewardButtonGap") + GetValue("VIPRewardButtonWidth") - 5, 1)
+        $_ImageSearchY = Random($_ImageSearchHeightCenter + 6 - Ceiling(GetValue("VIPRewardButtonHeight") / 2), $_ImageSearchHeightCenter + Floor(GetValue("VIPRewardButtonHeight") / 2) - 5, 1)
+        MouseMove($_ImageSearchX, $_ImageSearchY)
+        SingleClick()
+        Sleep(GetValue("ClaimVIPCharacterRewardDelay") * 1000)
+        If Not ImageSearch("VIPCharacterRewards", $left, $top, $right, $bottom) Then
+            SaveItemCount("TotalVIPCharacterRewards", 1)
+            SetCharacterInfo("FailedVIPCharacterReward", 0)
+            SetCharacterValue("CollectedVIPCharacterReward", 1)
+        EndIf
+    EndIf
+    OpenInventoryBags("VIPCharacterRewards"); If $RestartLoop Then Return 0
+    If $RestartLoop Then Return 0
+EndFunc
+
 Func OpenInventoryBags($bag); If $RestartLoop Then Return 0
     If GetValue("DisableOpeningBags") Then Return
     ClearWindows(); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
     MySend(GetValue("InventoryKey"))
     Sleep(GetValue("OpenInventoryBagDelay") * 1000)
-    If ImageSearch("VIPInventory") Then
-        $_ImageSearchX = Random($_ImageSearchLeft + GetValue("InventoryBagTabLeftOffset"), $_ImageSearchLeft + GetValue("InventoryBagTabRightOffset"), 1)
-        $_ImageSearchY = Random($_ImageSearchTop + GetValue("InventoryBagTabTopOffset"), $_ImageSearchTop + GetValue("InventoryBagTabBottomOffset"), 1)
+    If Not ImageSearch("Inventory") And ImageSearch("InventoryTab") Then
         MouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
         Sleep(GetValue("OpenInventoryBagDelay") * 1000)
@@ -1435,7 +1481,7 @@ EndFunc
 Func SendMessage($s, $n = $MB_OK, $ontop = 0)
     $ETAText = ""
     Local $text = "    " & Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & $s
-    Local $CofferCount = 0, $ProfessionPackCount = 0, $ElixirOfFateCount = 0, $OverflowXPRewardCount = 0, $VIPAccountRewardCount = 0, $IdleLogoutText = "", $TimedOutText = "", $FailedInvokeText = "", $etext = ""
+    Local $CofferCount = 0, $ProfessionPackCount = 0, $ElixirOfFateCount = 0, $OverflowXPRewardCount = 0, $VIPCharacterRewardCount = 0, $FailedVIPCharacterRewardCount = 0, $FailedVIPCharacterRewardText = "", $VIPAccountRewardCount = 0, $IdleLogoutText = "", $TimedOutText = "", $FailedInvokeText = "", $etext = ""
     If GetAccountValue("InfiniteLoopsStarted") And GetAccountValue("LastMsg") Then
         $text &= GetAccountValue("LastMsg")
     ElseIf GetValue("UnattendedMode") <> 3 Then
@@ -1444,6 +1490,8 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
             $ProfessionPackCount += GetCharacterInfo("TotalProfessionPacks", $i)
             $ElixirOfFateCount += GetCharacterInfo("TotalElixirsOfFate", $i)
             $OverflowXPRewardCount += GetCharacterInfo("TotalOverflowXPRewards", $i)
+            $VIPCharacterRewardCount += GetCharacterInfo("TotalVIPCharacterRewards", $i)
+            $FailedVIPCharacterRewardCount += GetCharacterInfo("FailedVIPCharacterReward", $i)
             $VIPAccountRewardCount += GetCharacterInfo("TotalVIPAccountRewards", $i)
             If GetCharacterInfo("IdleLogout", $i) Then
                 Local $times = ""
@@ -1472,7 +1520,17 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
                     $FailedInvokeText = $times & "#" & $i
                 EndIf
             EndIf
+            If GetCharacterInfo("FailedVIPCharacterReward", $i) Then
+                Local $times = ""
+                If GetCharacterInfo("FailedVIPCharacterReward", $i) > 1 Then $times = GetCharacterInfo("FailedVIPCharacterReward", $i) & "x"
+                If $FailedVIPCharacterRewardText <> "" Then
+                    $FailedVIPCharacterRewardText &= ", " & $times & "#" & $i
+                Else
+                    $FailedVIPCharacterRewardText = $times & "#" & $i
+                EndIf
+            EndIf
         Next
+        If $FailedVIPCharacterRewardText <> "" Then $FailedVIPCharacterRewardText = " ( " & $FailedVIPCharacterRewardText & " )"
         If $IdleLogoutText <> "" Then $IdleLogoutText = " ( " & $IdleLogoutText & " )"
         If $TimedOutText <> "" Then $TimedOutText = " ( " & $TimedOutText & " )"
         If $FailedInvokeText <> "" Then $FailedInvokeText = " ( " & $FailedInvokeText & " )"
@@ -1490,6 +1548,12 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
         EndIf
         If $OverflowXPRewardCount Then
             $etext &= @CRLF & @CRLF & Localize("OverflowXPRewardCount", "<COUNT>", $OverflowXPRewardCount)
+        EndIf
+        If $VIPCharacterRewardCount Then
+            $etext &= @CRLF & @CRLF & Localize("VIPCharacterRewardCount", "<COUNT>", $VIPCharacterRewardCount)
+        EndIf
+        If $FailedVIPCharacterRewardCount Then
+            $etext &= @CRLF & @CRLF & Localize("FailedVIPCharacterRewardCount", "<COUNT>", $FailedVIPCharacterRewardCount) & $FailedVIPCharacterRewardText
         EndIf
         If $VIPAccountRewardCount Then
             $etext &= @CRLF & @CRLF & Localize("VIPAccountRewardCount")
@@ -1722,9 +1786,82 @@ Func ChooseAccountOptions()
     WEnd
 EndFunc
 
+Func ChooseAccountEnableClaimVIPCharacterRewardOptions()
+    If $UnattendedMode Or $UnattendedModeCheckSettings Then Return
+    Local $Total = GetValue("TotalSlots")
+    Local $Checkbox[$Total + 1]
+    Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490)
+    GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
+    GUICtrlCreateLabel(Localize("ClaimVIPCharacterReward", "<ACCOUNT>", $CurrentAccount), 150, 40, 270)
+    $Checkbox[0] = GUICtrlCreateCheckbox(Localize("AllCharacters"), 40, 70, 100)
+    If GetAccountValue("ClaimVIPCharacterReward") Then GUICtrlSetState($Checkbox[0], $GUI_CHECKED)
+    For $i = 1 To $Total
+        Local $Row = Ceiling($i / 10), $Column = $i - (($Row - 1) * 10)
+        $Checkbox[$i] = GUICtrlCreateCheckbox(Localize("CharacterNumber", "<NUMBER>", $i), 40 + (($Row - 1) * 100), 100 + ($Column * 30), 100)
+        If GetAccountValue("ClaimVIPCharacterReward") Then
+            GUICtrlSetState($Checkbox[$i], $GUI_CHECKED)
+            GUICtrlSetState($Checkbox[$i], $GUI_DISABLE)
+        ElseIf GetCharacterValue("ClaimVIPCharacterReward", $i) Then
+            GUICtrlSetState($Checkbox[$i], $GUI_CHECKED)
+        EndIf
+        If Not ( GetAccountValue("ClaimVIPCharacterReward") == GetDefaultValue("ClaimVIPCharacterReward") ) Then GUICtrlSetState($Checkbox[$i], $GUI_DISABLE)
+    Next
+    Local $ButtonOK = GUICtrlCreateButton("&OK", _Max(163 + ((Ceiling($Total / 10) - 3) * 100), 163), 450, 75, 25, $BS_DEFPUSHBUTTON)
+    Local $ButtonCancel = GUICtrlCreateButton("&Cancel", _Max(250 + ((Ceiling($Total / 10) - 3) * 100), 250), 450, 75, 25)
+    GUISetState()
+    While 1
+        Switch GUIGetMsg()
+            Case $GUI_EVENT_CLOSE
+                Exit
+            Case $Checkbox[0]
+                GUICtrlSetState($ButtonOK, $GUI_DISABLE)
+                If GUICtrlRead($Checkbox[0]) = $GUI_CHECKED Then
+                    For $i = 1 To $Total
+                        GUICtrlSetState($Checkbox[$i], $GUI_CHECKED)
+                        GUICtrlSetState($Checkbox[$i], $GUI_DISABLE)
+                    Next
+                Else
+                    For $i = 1 To $Total
+                        GUICtrlSetState($Checkbox[$i], $GUI_ENABLE)
+                        GUICtrlSetState($Checkbox[$i], $GUI_UNCHECKED)
+                    Next
+                EndIf
+                GUICtrlSetState($ButtonOK, $GUI_ENABLE)
+            Case $ButtonOK
+                Local $enabled = 0
+                If GUICtrlRead($Checkbox[0]) = $GUI_CHECKED Then $enabled = 1
+                If GetAccountValue("ClaimVIPCharacterReward") <> $enabled Then
+                    If $enabled == GetDefaultValue("ClaimVIPCharacterReward") Then
+                        DeleteAccountValue("ClaimVIPCharacterReward")
+                        DeleteIniAccount("ClaimVIPCharacterReward")
+                    Else
+                        SetAccountValue("ClaimVIPCharacterReward", $enabled)
+                        SaveIniAccount("ClaimVIPCharacterReward", $enabled)
+                    EndIf
+                EndIf
+                For $i = 1 To $Total
+                    $enabled = 0
+                    If GetAccountValue("ClaimVIPCharacterReward") Or GUICtrlRead($Checkbox[$i]) = $GUI_CHECKED Then $enabled = 1
+                    If GetAccountValue("ClaimVIPCharacterReward") Or $enabled == GetDefaultValue("ClaimVIPCharacterReward") Then
+                        DeleteCharacterValue("ClaimVIPCharacterReward", $i)
+                        DeleteIniCharacter("ClaimVIPCharacterReward", $i)
+                    Else
+                        SetCharacterValue("ClaimVIPCharacterReward", $enabled, $i)
+                        SaveIniCharacter("ClaimVIPCharacterReward", $enabled, $i)
+                    EndIf
+                Next
+                GUIDelete($hGUI)
+                Return
+            Case $ButtonCancel
+                Exit
+        EndSwitch
+    WEnd
+EndFunc
+
 Func ConfigureAccount()
     If CompletedAccount() Or (MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAccountOptions", "<ACCOUNT>", $CurrentAccount)) = $IDYES) Then Return
     ChooseAccountOptions()
+    ChooseAccountEnableClaimVIPCharacterRewardOptions()
     ChooseProfessionsAccountEnableOptions()
     ChooseProfessionsAccountSetTasksOptions()
     ChooseProfessionsAccountEnableAssetsOptions()
@@ -2096,6 +2233,7 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
     $s &= "|" & "ProfessionsDelay,ProfessionsDelayTitle,ProfessionsDelayDescription,Number"
     $s &= "|" & "OptionalAssetsDelay,OptionalAssetsDelayTitle,OptionalAssetsDelayDescription,Number"
     $s &= "|" & "ClaimCofferDelay,ClaimCofferDelayTitle,ClaimCofferDelayDescription,Number"
+    $s &= "|" & "ClaimVIPCharacterRewardDelay,ClaimVIPCharacterRewardDelayTitle,ClaimVIPCharacterRewardDelayDescription,Number"
     $s &= "|" & "ClaimVIPAccountRewardDelay,ClaimVIPAccountRewardDelayTitle,ClaimVIPAccountRewardDelayDescription,Number"
     $s &= "|" & "OpenInventoryBagDelay,OpenInventoryBagDelayTitle,OpenInventoryBagDelayDescription,Number"
     $s &= "|" & "OpenAnotherInventoryBagDelay,OpenAnotherInventoryBagDelayTitle,OpenAnotherInventoryBagDelayDescription,Number"

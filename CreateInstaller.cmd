@@ -1,5 +1,5 @@
 @ECHO OFF
-SET VERSION=10.9.3
+SET VERSION=10.10
 SET NAME=Neverwinter Invoke Bot
 SET INSTALLER=NeverwinterInvokeBot
 ECHO %NAME% v%VERSION%

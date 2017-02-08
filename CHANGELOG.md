@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.10
+- Now able to collect VIP character rewards
+
 10.9.3
 - Will now check for empty profession slots before checking leadership level
 
