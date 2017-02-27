@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.10.1
+- Added a shortcut in the install directory to the settings directory
+
 10.10
 - Now able to collect VIP character rewards
 
