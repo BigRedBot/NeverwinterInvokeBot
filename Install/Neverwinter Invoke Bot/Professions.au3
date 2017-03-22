@@ -151,7 +151,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
 EndFunc
 
 Func ProfessionsChooseAssets(); If $RestartLoop Then Return 0
-    If Not $EnableOptionalAssets Or Not GetValue("EnableOptionalAssets") Then Return 0
+    If Not $EnableProfessions Or Not GetValue("EnableOptionalAssets") Then Return 0
     Local $retry = 0
     While 1
         If ImageSearch("Professions_Asset") And ImageSearch("Professions_Asset", $_ImageSearchLeft, $_ImageSearchBottom + 100, $_ImageSearchRight, $_ImageSearchBottom + 150) Then ExitLoop
@@ -247,10 +247,10 @@ Func ProfessionsSleep($sleeptime = GetValue("ProfessionsDelay") * 1000); If $Res
 EndFunc
 
 Func CheckProfessionsUnlockCode()
-    If ( $EnableProfessions And $EnableOptionalAssets ) Or $UnattendedModeCheckSettings Then Return
+    If $EnableProfessions Or $UnattendedModeCheckSettings Then Return
     _Crypt_Startup()
-    If Not $EnableProfessions Then $EnableProfessions = CheckProfessionsUnlockCodeData("225BA7083CE6B485BE95CBDAF18CF6D025C4D7F3", "ProfessionsUnlockCode", "UnlockProfessions", "EnterProfessionsUnlockCode", "BuyProfessionsUnlockCode", "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=HBA5U7LQQ33BA")
-    If $EnableProfessions And Not $EnableOptionalAssets Then $EnableOptionalAssets = CheckProfessionsUnlockCodeData("07016EDD9A3CB06164336D062698BFF2566696CF", "OptionalAssetsUnlockCode", "UnlockOptionalAssets", "EnterOptionalAssetsUnlockCode", "BuyOptionalAssetsUnlockCode", "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LWTPB6AEB4V86")
+    If Not $EnableProfessions Then $EnableProfessions = CheckProfessionsUnlockCodeData("225BA7083CE6B485BE95CBDAF18CF6D025C4D7F3", "ProfessionsUnlockCode", "UnlockProfessions", "EnterProfessionsUnlockCode", "BuyProfessionsUnlockCode", "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UQRNUA698EUTC")
+    ;If $EnableProfessions And Not $EnableOptionalAssets Then $EnableOptionalAssets = CheckProfessionsUnlockCodeData("07016EDD9A3CB06164336D062698BFF2566696CF", "OptionalAssetsUnlockCode", "UnlockOptionalAssets", "EnterOptionalAssetsUnlockCode", "BuyOptionalAssetsUnlockCode", "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LWTPB6AEB4V86")
     _Crypt_Shutdown()
 EndFunc
 
@@ -596,7 +596,7 @@ Func ChooseProfessionsAccountSetTasksOptionsLevels($hWnd = 0, $label = 0, $chara
 EndFunc
 
 Func ChooseProfessionsAccountEnableAssetsOptions()
-    If Not $EnableOptionalAssets Or Not $EnableProfessions Or $UnattendedMode Or $UnattendedModeCheckSettings Then Return
+    If Not $EnableProfessions Or $UnattendedMode Or $UnattendedModeCheckSettings Then Return
     Local $Total = GetValue("TotalSlots"), $EnabledCharacterFound
     Local $Checkbox[$Total + 1]
     Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490)
@@ -677,7 +677,7 @@ Func ChooseProfessionsAccountEnableAssetsOptions()
 EndFunc
 
 Func ChooseProfessionsAccountSetAssetsOptions()
-    If Not $EnableOptionalAssets Or Not $EnableProfessions Or $UnattendedMode Or $UnattendedModeCheckSettings Then Return
+    If Not $EnableProfessions Or $UnattendedMode Or $UnattendedModeCheckSettings Then Return
     Local $Total = GetValue("TotalSlots"), $nMsg, $EnabledCharacterFound
     Local $Button[$Total + 1]
     Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490)

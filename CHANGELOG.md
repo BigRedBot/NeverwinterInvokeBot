@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.11
+- Increased the price for unlock code, but now only requires first unlock code
+
 10.10.1
 - Added a shortcut in the install directory to the settings directory
 
