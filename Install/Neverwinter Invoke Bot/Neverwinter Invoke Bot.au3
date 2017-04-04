@@ -74,7 +74,7 @@ While 1
 While 1
     Focus()
     If Not $WinHandle Or Not GetPosition() Then
-        If Not GetValue("DisableRestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And ImageExists("LogInScreen") Then
+        If Not GetValue("DisableRestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And ( ( $GameClientLauncherInstallLocation And FileExists($GameClientLauncherInstallLocation & "\Neverwinter.exe") ) Or ( $GameClientInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") ) ) And ImageExists("LogInScreen") Then
             $LogInTries = 0
             $DisableRelogCount = 1
             Splash("[ " & Localize("NeverwinterNotFound") & " ]")
@@ -1240,7 +1240,7 @@ WEnd
 EndFunc
 
 Func PatchClient(); If $RestartLoop Then Return 0
-    If Not GetValue("DisableRestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And $GameClientLauncherInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And FileExists($GameClientLauncherInstallLocation & "\Neverwinter.exe") And ImageExists("LogInScreen") Then
+    If Not GetValue("DisableRestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And ( ( $GameClientLauncherInstallLocation And FileExists($GameClientLauncherInstallLocation & "\Neverwinter.exe") ) Or ( $GameClientInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") ) ) And ImageExists("LogInScreen") Then
         StartClient(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         Splash("", 0)
@@ -1288,7 +1288,7 @@ Func TimeOut($timer = $WaitingTimer); If $RestartLoop Then Return 0
     AddAccountCountValue("TimedOut")
     If Not $LoggingIn Then AddCharacterCountInfo("TimedOut")
     $DisableRelogCount = 1
-    If $TimeOutRetries < GetValue("TimeOutRetries") And Not GetValue("DisableRestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And $GameClientInstallLocation And $GameClientLauncherInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") And FileExists($GameClientLauncherInstallLocation & "\Neverwinter.exe") And ImageExists("LogInScreen") Then
+    If $TimeOutRetries < GetValue("TimeOutRetries") And Not GetValue("DisableRestartGameClient") And GetValue("LogInUserName") And GetValue("LogInPassword") And ( ( $GameClientLauncherInstallLocation And FileExists($GameClientLauncherInstallLocation & "\Neverwinter.exe") ) Or ( $GameClientInstallLocation And FileExists($GameClientInstallLocation & "\Neverwinter\Live\GameClient.exe") ) ) And ImageExists("LogInScreen") Then
         Reset()
         $TimeOutRetries += 1
         Splash("[ " & Localize("RestartingNeverwinter") & " ]")

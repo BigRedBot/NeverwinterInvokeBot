@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.11.1
+- Small change to launcher location detection
+
 10.11
 - Increased the price for unlock code, but now only requires first unlock code
 
