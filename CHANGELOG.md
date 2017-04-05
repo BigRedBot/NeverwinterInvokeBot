@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.12
+- Small change to launcher login detection
+
 10.11.1
 - Small change to launcher location detection
 
