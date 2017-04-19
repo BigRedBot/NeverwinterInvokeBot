@@ -264,6 +264,16 @@ Func Statistics_DeleteIniAccount($name, $account = $CurrentAccount)
     Return _UnicodeIniDelete($SettingsDir & "\Statistics.ini", "Account" & $account, $name)
 EndFunc
 
+Func MyMouseMove($x, $y, $speed = 10, $retry = 10)
+    For $i = 1 To $retry
+        MouseMove($x, $y, $speed)
+        Local $a = MouseGetPos()
+        If $a[0] = $x And $a[1] = $y Then Return 1
+        Sleep(1000)
+    Next
+    Return 0
+EndFunc
+
 Func MySend($keys, $flag = $SEND_DEFAULT)
     If $flag <> $SEND_DEFAULT Then Return Send($keys, $flag)
     If $keys = "{MouseLeft down}" Then Return MouseDown($MOUSE_CLICK_LEFT)

@@ -559,13 +559,13 @@ Func ReLog()
         Sleep(500)
         If GetValue("FishingTimeOutMinutes") * 60000 - TimerDiff($FishingTimer) <= 0 Then Return 0
     WEnd
-    MouseMove(GetValue("CharacterSelectionMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("CharacterSelectionMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+    MyMouseMove(GetValue("CharacterSelectionMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("CharacterSelectionMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
     DoubleRightClick()
     Sleep(1000)
     Send("{ENTER}")
     Sleep(1000)
     If GetValue("SafeLoginX") Then
-        MouseMove(GetValue("SafeLoginX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SafeLoginY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+        MyMouseMove(GetValue("SafeLoginX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SafeLoginY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
         DoubleClick()
     EndIf
     Splash("[ " & Localize("WaitingForInGameScreen") & " ]")
@@ -614,7 +614,7 @@ Func ChangeCharacter()
 While 1
 While 1
     If Not WaitForChangeCharacterButton() Then Return 0
-    MouseMove($_ImageSearchX, $_ImageSearchY)
+    MyMouseMove($_ImageSearchX, $_ImageSearchY)
     DoubleClick()
     Sleep(500)
     If Not ImageSearch("OK", $ClientLeft, $ClientTop, $ClientRight, $ClientBottom, GetValue("ImageTolerance")) Then

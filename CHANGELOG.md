@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+10.13
+- Mouse move now double checks to make sure that the cursor has reached the desired position
+- Now double checks to make sure some of the profession buttons have been clicked
+
 10.12
 - Small change to launcher login detection
 

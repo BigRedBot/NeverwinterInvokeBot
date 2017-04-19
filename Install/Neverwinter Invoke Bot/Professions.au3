@@ -25,24 +25,29 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                     ProfessionsClickImage(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
                 EndIf
-                MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
-                If Not $ProfessionTakeRewardsFailed Then
+                MyMouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
+                If $ProfessionTakeRewardsFailed < 10 Then
                     While ImageSearch("Professions_CollectResult")
                         ProfessionsClickImage(); If $RestartLoop Then Return 0
                         If $RestartLoop Then Return 0
-                        MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
+                        MyMouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
                         If ImageSearch("Professions_TakeRewards") Then
                             $lasttask = 0
                             $task = 1
                             $ProfessionLevel = -2
                             ProfessionsClickImage(); If $RestartLoop Then Return 0
                             If $RestartLoop Then Return 0
+                            If ImageSearch("Professions_TakeRewards") Then
+                                $ProfessionLoops -= 1
+                                $ProfessionTakeRewardsFailed += 1
+                                ExitLoop 3
+                            EndIf
                         Else
                             $ProfessionLoops -= 1
-                            $ProfessionTakeRewardsFailed = 1
+                            $ProfessionTakeRewardsFailed += 1
                             ExitLoop 3
                         EndIf
-                        MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
+                        MyMouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
                     WEnd
                 EndIf
                 If Not ImageSearch("Professions_EmptySlot") Then
@@ -110,7 +115,15 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                             If ImageSearch("Professions_Continue") Then
                                 ProfessionsClickImage(); If $RestartLoop Then Return 0
                                 If $RestartLoop Then Return 0
-                                If _ArraySearch($no_optional_assets, $tasklist[$task], 1) = -1 And ProfessionsChooseAssets() Then; If $RestartLoop Then Return 0
+                                For $i = 1 To 3
+                                    If ImageSearch("Professions_Continue") Then
+                                        ProfessionsClickImage(); If $RestartLoop Then Return 0
+                                        If $RestartLoop Then Return 0
+                                    Else
+                                        ExitLoop
+                                    EndIf
+                                Next
+                                If _ArraySearch($no_optional_assets, $tasklist[$task], 1) = -1 And ProfessionsChooseAssets() = -1 Then; If $RestartLoop Then Return 0
                                     $make_workers = 1
                                     $task = 1
                                     $lasttask = 0
@@ -122,10 +135,16 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                                 If ImageSearch("Professions_StartTask") Then
                                     ProfessionsClickImage(); If $RestartLoop Then Return 0
                                     If $RestartLoop Then Return 0
-                                    ExitLoop 2
-                                Else
-                                    ExitLoop 3
+                                    For $i = 1 To 3
+                                        If ImageSearch("Professions_StartTask") Then
+                                            ProfessionsClickImage(); If $RestartLoop Then Return 0
+                                            If $RestartLoop Then Return 0
+                                        Else
+                                            ExitLoop 3
+                                        EndIf
+                                    Next
                                 EndIf
+                                ExitLoop 3
                             ElseIf Not $make_workers And $ProfessionLevel > -1 And _ArraySearch($require_ingredients, $tasklist[$task], 1) = -1 And ImageSearch("Professions_Details") Then
                                 $make_workers = 1
                                 $task = 1
@@ -163,12 +182,43 @@ Func ProfessionsChooseAssets(); If $RestartLoop Then Return 0
     ProfessionsClickImage(); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
     If ImageSearch("Professions_Asset_" & $workers[1], $left, $top, $left + 50) Then
-        ProfessionsClickImage()
+        ProfessionsClickImage(); If $RestartLoop Then Return 0
+        If $RestartLoop Then Return 0
+        For $i = 1 To 3
+            If ImageSearch("Professions_Asset_" & $workers[1], $left, $top, $left + 50) Then
+                ProfessionsClickImage(); If $RestartLoop Then Return 0
+                If $RestartLoop Then Return 0
+            Else
+                ExitLoop
+            EndIf
+        Next
         Return 0
     EndIf
-    If Not ImageSearch("Professions_AssetBorder", $left + 180, $top, $right, $top + 100) Then Return 0
+    While 1
+        If Not ImageSearch("Professions_AssetBorder", $left + 180, $top, $right, $top + 100) Then
+            For $i = 1 To 3
+                $retry = 0
+                While 1
+                    If ImageSearch("Professions_Asset") And ImageSearch("Professions_Asset", $_ImageSearchLeft, $_ImageSearchBottom + 100, $_ImageSearchRight, $_ImageSearchBottom + 150) Then ExitLoop
+                    If $retry >= 10 Then Return 0
+                    If Not DeclinePromptImageSearch("Later") And Not DeclinePromptImageSearch("Decline") Then Sleep(1000)
+                    $retry += 1
+                WEnd
+                $left = $_ImageSearchX
+                $top = $_ImageSearchTop
+                $right = $_ImageSearchRight + 200
+                ProfessionsClickImage(); If $RestartLoop Then Return 0
+                If $RestartLoop Then Return 0
+                If ImageSearch("Professions_AssetBorder", $left + 180, $top, $right, $top + 100) Then
+                    ExitLoop 2
+                EndIf
+            Next
+            Return 0
+        EndIf
+        ExitLoop
+    WEnd
     Local $borderleft = $_ImageSearchLeft, $borderright = $_ImageSearchRight
-    MouseMove(Random($left + 20, $borderright - 10, 1), Random($_ImageSearchTop + 5, $_ImageSearchBottom - 5, 1))
+    MyMouseMove(Random($left + 20, $borderright - 10, 1), Random($_ImageSearchTop + 5, $_ImageSearchBottom - 5, 1))
     MouseWheel($MOUSE_WHEEL_UP)
     Sleep(GetValue("OptionalAssetsDelay") * 1000)
     Local $page = 1
@@ -177,7 +227,16 @@ Func ProfessionsChooseAssets(); If $RestartLoop Then Return 0
         MouseWheel($MOUSE_WHEEL_UP, 17)
         Sleep(GetValue("OptionalAssetsDelay") * 1000)
         If ImageSearch("Professions_Asset_" & $workers[1], $left, $top, $left + 50) Then
-            ProfessionsClickImage()
+            ProfessionsClickImage(); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
+            For $i = 1 To 3
+                If ImageSearch("Professions_Asset_" & $workers[1], $left, $top, $left + 50) Then
+                    ProfessionsClickImage(); If $RestartLoop Then Return 0
+                    If $RestartLoop Then Return 0
+                Else
+                    ExitLoop
+                EndIf
+            Next
             Return 0
         EndIf
         ImageSearch("Professions_AssetBorder", $borderleft, $top, $borderright, $top + 100)
@@ -197,7 +256,16 @@ Func ProfessionsChooseAssets(); If $RestartLoop Then Return 0
         MouseWheel($MOUSE_WHEEL_DOWN, 17)
         Sleep(GetValue("OptionalAssetsDelay") * 1000)
         If ImageSearch("Professions_Asset_" & $workers[1], $left, $top, $left + 50) Then
-            ProfessionsClickImage()
+            ProfessionsClickImage(); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
+            For $i = 1 To 3
+                If ImageSearch("Professions_Asset_" & $workers[1], $left, $top, $left + 50) Then
+                    ProfessionsClickImage(); If $RestartLoop Then Return 0
+                    If $RestartLoop Then Return 0
+                Else
+                    ExitLoop
+                EndIf
+            Next
             Return 0
         EndIf
         For $i = 2 To $workers[0]
@@ -208,9 +276,18 @@ Func ProfessionsChooseAssets(); If $RestartLoop Then Return 0
         Sleep(GetValue("OptionalAssetsDelay") * 1000)
         $page += 1
     WEnd
-    If Not $select Then Return 1
+    If Not $select Then Return -1
     If ImageSearch("Professions_Asset_" & $workers[$select], $left, $top, $left + 50) Then
-        ProfessionsClickImage()
+        ProfessionsClickImage(); If $RestartLoop Then Return 0
+        If $RestartLoop Then Return 0
+        For $i = 1 To 3
+            If ImageSearch("Professions_Asset_" & $workers[$select], $left, $top, $left + 50) Then
+                ProfessionsClickImage(); If $RestartLoop Then Return 0
+                If $RestartLoop Then Return 0
+            Else
+                ExitLoop
+            EndIf
+        Next
         Return 0
     EndIf
     ImageSearch("Professions_AssetBorder", $borderleft, $top, $borderright, $top + 100)
@@ -222,7 +299,16 @@ Func ProfessionsChooseAssets(); If $RestartLoop Then Return 0
         MouseWheel($MOUSE_WHEEL_UP, 17)
         Sleep(GetValue("OptionalAssetsDelay") * 1000)
         If ImageSearch("Professions_Asset_" & $workers[$select], $left, $top, $left + 50) Then
-            ProfessionsClickImage()
+            ProfessionsClickImage(); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
+            For $i = 1 To 3
+                If ImageSearch("Professions_Asset_" & $workers[$select], $left, $top, $left + 50) Then
+                    ProfessionsClickImage(); If $RestartLoop Then Return 0
+                    If $RestartLoop Then Return 0
+                Else
+                    ExitLoop
+                EndIf
+            Next
             Return 0
         EndIf
         ImageSearch("Professions_AssetBorder", $borderleft, $top, $borderright, $top + 100)
@@ -234,10 +320,13 @@ Func ProfessionsChooseAssets(); If $RestartLoop Then Return 0
 EndFunc
 
 Func ProfessionsClickImage($sleeptime = GetValue("ProfessionsDelay") * 1000); If $RestartLoop Then Return 0
-    MouseMove($_ImageSearchX, $_ImageSearchY)
-    SingleClick()
-    ProfessionsSleep($sleeptime); If $RestartLoop Then Return 0
-    If $RestartLoop Then Return 0
+    If MyMouseMove($_ImageSearchX, $_ImageSearchY) Then
+        SingleClick()
+        ProfessionsSleep($sleeptime); If $RestartLoop Then Return 0
+        If $RestartLoop Then Return 0
+        Return 1
+    EndIf
+    Return 0
 EndFunc
 
 Func ProfessionsSleep($sleeptime = GetValue("ProfessionsDelay") * 1000); If $RestartLoop Then Return 0

@@ -94,7 +94,7 @@ While 1
         While 1
             TimeOut($PositionWaitingTimer); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
-            MouseMove($DeskTopWidth - 1, 0)
+            MyMouseMove($DeskTopWidth - 1, 0)
             SingleClick()
             Sleep(10000)
             Focus()
@@ -224,9 +224,9 @@ While 1
             Splash()
             Local $LoopTimer = TimerInit()
             Focus()
-            MouseMove(GetValue("CharacterSelectionMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("CharacterSelectionMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+            MyMouseMove(GetValue("CharacterSelectionMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("CharacterSelectionMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
             DoubleRightClick()
-            MouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
+            MyMouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
             If $CharacterSelectionPositioned And Not GetValue("DisableSimpleCharacterSelection") Then
                 Send("{DOWN}")
             ElseIf GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
@@ -258,7 +258,7 @@ While 1
             Send("{ENTER}")
             Sleep(1000)
             If GetValue("SafeLoginX") Then
-                MouseMove(GetValue("SafeLoginX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SafeLoginY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+                MyMouseMove(GetValue("SafeLoginX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SafeLoginY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
                 DoubleClick()
             EndIf
             Splash("[ " & Localize("WaitingForInGameScreen") & " ]")
@@ -274,7 +274,7 @@ While 1
             If Not GetValue("DisableOverflowXPRewardCollection") And ImageSearch("OverflowXPReward") Then
                 MySend(GetValue("CursorModeKey"))
                 Sleep(500)
-                MouseMove($_ImageSearchX, $_ImageSearchY)
+                MyMouseMove($_ImageSearchX, $_ImageSearchY)
                 SingleClick()
                 SaveItemCount("TotalOverflowXPRewards", 1)
                 Sleep(1000)
@@ -452,7 +452,7 @@ Func WaitToInvoke(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
                 Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
                 If ImageSearch("SelectionScreen") Then
-                    MouseMove($_ImageSearchX, $_ImageSearchY)
+                    MyMouseMove($_ImageSearchX, $_ImageSearchY)
                     SingleClick()
                     Sleep(1000)
                     $DisableRelogCount = 1
@@ -504,7 +504,7 @@ Func Invoke(); If $RestartLoop Then Return 0
             EndIf
             For $k = 1 To 10
                 If ImageSearch("VaultOfPietyButton") Then
-                    MouseMove($_ImageSearchX, $_ImageSearchY)
+                    MyMouseMove($_ImageSearchX, $_ImageSearchY)
                     SingleClick()
                     GetCoffer(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
@@ -530,7 +530,7 @@ Func Invoke(); If $RestartLoop Then Return 0
             Sleep(5000)
         Next
         If ImageSearch("VaultOfPietyButton") Then
-            MouseMove($_ImageSearchX, $_ImageSearchY)
+            MyMouseMove($_ImageSearchX, $_ImageSearchY)
             SingleClick()
             GetCoffer(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
@@ -551,7 +551,7 @@ While 1
             MySend(GetValue("InventoryKey"))
             Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
             If Not ImageSearch("VIPInventory") And ImageSearch("VIPInventoryTab") Then
-                MouseMove($_ImageSearchX, $_ImageSearchY)
+                MyMouseMove($_ImageSearchX, $_ImageSearchY)
                 DoubleClick()
                 Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
             EndIf
@@ -560,7 +560,7 @@ While 1
             If Not ImageSearch("VIPRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $ClientRight, $_ImageSearchBottom + 20) Then ExitLoop
             $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPRewardButtonGap") + 6, $_ImageSearchRight + GetValue("VIPRewardButtonGap") + GetValue("VIPRewardButtonWidth") - 5, 1)
             $_ImageSearchY = Random($_ImageSearchHeightCenter + 6 - Ceiling(GetValue("VIPRewardButtonHeight") / 2), $_ImageSearchHeightCenter + Floor(GetValue("VIPRewardButtonHeight") / 2) - 5, 1)
-            MouseMove($_ImageSearchX, $_ImageSearchY)
+            MyMouseMove($_ImageSearchX, $_ImageSearchY)
             SingleClick()
             Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
             If Not ImageSearch("VIPAccountRewards", $left, $top, $right, $bottom) Then
@@ -569,7 +569,7 @@ While 1
             ElseIf ImageSearch("VIPRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $ClientRight, $_ImageSearchBottom + 20) Then
                 $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPRewardButtonGap") + 6, $_ImageSearchRight + GetValue("VIPRewardButtonGap") + GetValue("VIPRewardButtonWidth") - 5, 1)
                 $_ImageSearchY = Random($_ImageSearchHeightCenter + 6 - Ceiling(GetValue("VIPRewardButtonHeight") / 2), $_ImageSearchHeightCenter + Floor(GetValue("VIPRewardButtonHeight") / 2) - 5, 1)
-                MouseMove($_ImageSearchX, $_ImageSearchY)
+                MyMouseMove($_ImageSearchX, $_ImageSearchY)
                 SingleClick()
                 Sleep(GetValue("ClaimVIPAccountRewardDelay") * 1000)
                 If Not ImageSearch("VIPAccountRewards", $left, $top, $right, $bottom) Then
@@ -598,7 +598,7 @@ Func GetVIPCharacterReward(); If $RestartLoop Then Return 0
     MySend(GetValue("InventoryKey"))
     Sleep(GetValue("ClaimVIPCharacterRewardDelay") * 1000)
     If Not ImageSearch("VIPInventory") And ImageSearch("VIPInventoryTab") Then
-        MouseMove($_ImageSearchX, $_ImageSearchY)
+        MyMouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
         Sleep(GetValue("ClaimVIPCharacterRewardDelay") * 1000)
     EndIf
@@ -608,7 +608,7 @@ Func GetVIPCharacterReward(); If $RestartLoop Then Return 0
     If Not ImageSearch("VIPRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $ClientRight, $_ImageSearchBottom + 20) Then Return
     $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPRewardButtonGap") + 6, $_ImageSearchRight + GetValue("VIPRewardButtonGap") + GetValue("VIPRewardButtonWidth") - 5, 1)
     $_ImageSearchY = Random($_ImageSearchHeightCenter + 6 - Ceiling(GetValue("VIPRewardButtonHeight") / 2), $_ImageSearchHeightCenter + Floor(GetValue("VIPRewardButtonHeight") / 2) - 5, 1)
-    MouseMove($_ImageSearchX, $_ImageSearchY)
+    MyMouseMove($_ImageSearchX, $_ImageSearchY)
     SingleClick()
     Sleep(GetValue("ClaimVIPCharacterRewardDelay") * 1000)
     If Not ImageSearch("VIPCharacterRewards", $left, $top, $right, $bottom) Then
@@ -618,7 +618,7 @@ Func GetVIPCharacterReward(); If $RestartLoop Then Return 0
     ElseIf ImageSearch("VIPRewardBorder", $_ImageSearchRight + 100, $_ImageSearchTop - 20, $ClientRight, $_ImageSearchBottom + 20) Then
         $_ImageSearchX = Random($_ImageSearchRight + GetValue("VIPRewardButtonGap") + 6, $_ImageSearchRight + GetValue("VIPRewardButtonGap") + GetValue("VIPRewardButtonWidth") - 5, 1)
         $_ImageSearchY = Random($_ImageSearchHeightCenter + 6 - Ceiling(GetValue("VIPRewardButtonHeight") / 2), $_ImageSearchHeightCenter + Floor(GetValue("VIPRewardButtonHeight") / 2) - 5, 1)
-        MouseMove($_ImageSearchX, $_ImageSearchY)
+        MyMouseMove($_ImageSearchX, $_ImageSearchY)
         SingleClick()
         Sleep(GetValue("ClaimVIPCharacterRewardDelay") * 1000)
         If Not ImageSearch("VIPCharacterRewards", $left, $top, $right, $bottom) Then
@@ -638,19 +638,19 @@ Func OpenInventoryBags($bag); If $RestartLoop Then Return 0
     MySend(GetValue("InventoryKey"))
     Sleep(GetValue("OpenInventoryBagDelay") * 1000)
     If Not ImageSearch("Inventory") And ImageSearch("InventoryTab") Then
-        MouseMove($_ImageSearchX, $_ImageSearchY)
+        MyMouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
         Sleep(GetValue("OpenInventoryBagDelay") * 1000)
     EndIf
-    MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
+    MyMouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
     If ImageSearch($bag) Then
-        MouseMove($_ImageSearchX, $_ImageSearchY)
+        MyMouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
         Sleep(GetValue("OpenInventoryBagDelay") * 1000)
-        MouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
+        MyMouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
         For $i = 1 To 10
             If Not ImageSearch("OpenAnother") Then ExitLoop
-            MouseMove($_ImageSearchX, $_ImageSearchY)
+            MyMouseMove($_ImageSearchX, $_ImageSearchY)
             SingleClick()
             Sleep(GetValue("OpenAnotherInventoryBagDelay") * 1000)
         Next
@@ -661,12 +661,12 @@ Func GetCoffer(); If $RestartLoop Then Return 0
     If $CofferTries >= 5 Then Return
     Sleep(GetValue("ClaimCofferDelay") * 1000)
     If ImageSearch("CelestialSynergyTab") Then
-        MouseMove($_ImageSearchX, $_ImageSearchY)
+        MyMouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
         Sleep(GetValue("ClaimCofferDelay") * 1000)
     EndIf
     If ImageSearch(GetValue("Coffer")) Then
-        MouseMove($_ImageSearchX, $_ImageSearchY)
+        MyMouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
         Sleep(GetValue("ClaimCofferDelay") * 1000)
         If GetValue("Coffer") = "ElixirOfFate" Then
@@ -674,7 +674,7 @@ Func GetCoffer(); If $RestartLoop Then Return 0
                 Send("{BS 2}4")
                 Sleep(500)
                 If ImageSearch("OK") Then
-                    MouseMove($_ImageSearchX, $_ImageSearchY)
+                    MyMouseMove($_ImageSearchX, $_ImageSearchY)
                     DoubleClick()
                     SaveItemCount("TotalElixirsOfFate", 4)
                 EndIf
@@ -686,7 +686,7 @@ Func GetCoffer(); If $RestartLoop Then Return 0
             Sleep(500)
             Sleep(GetValue("ClaimCofferDelay") * 1000)
             If ImageSearch(GetValue("Coffer")) Then
-                MouseMove($_ImageSearchX, $_ImageSearchY)
+                MyMouseMove($_ImageSearchX, $_ImageSearchY)
                 DoubleClick()
                 Sleep(GetValue("ClaimCofferDelay") * 1000)
                 Send("{ENTER}")
@@ -765,7 +765,7 @@ While 1
     WaitForChangeCharacterButton(); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
     If ImageExists("ChangeCharacterButton") Then
-        MouseMove($_ImageSearchX, $_ImageSearchY)
+        MyMouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
     Else
         For $n = 1 To 3
@@ -901,13 +901,13 @@ EndFunc
 
 Func DeclinePromptImageSearch($image)
     If Not ImageSearch($image) Then Return 0
-    MouseMove($_ImageSearchX, $_ImageSearchY)
+    MyMouseMove($_ImageSearchX, $_ImageSearchY)
     SingleClick()
     Sleep(1000)
     If Not ImageSearch($image) Then Return 1
     MySend(GetValue("CursorModeKey"))
     Sleep(1000)
-    MouseMove($_ImageSearchX, $_ImageSearchY)
+    MyMouseMove($_ImageSearchX, $_ImageSearchY)
     SingleClick()
     Sleep(1000)
     Return 1
@@ -1009,7 +1009,7 @@ Func FindLogInScreen(); If $RestartLoop Then Return 0
         SetAccountValue("FinishedCharacter", 1)
         $FailedInvoke = 0
         Splash()
-        MouseMove($_ImageSearchX, $_ImageSearchY)
+        MyMouseMove($_ImageSearchX, $_ImageSearchY)
         DoubleClick()
         Sleep(1000)
     EndIf
@@ -1260,7 +1260,7 @@ Func LogIn(); If $RestartLoop Then Return 0
         Position(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         Splash()
-        MouseMove(GetValue("UsernameInputX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("UsernameInputY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+        MyMouseMove(GetValue("UsernameInputX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("UsernameInputY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
         DoubleClick()
         AutoItSetOption("SendKeyDownDelay", 5)
         Send("{END}{BS 254}")
@@ -1331,7 +1331,7 @@ Func End(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
             Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
             If ImageSearch("SelectionScreen") Then
-                MouseMove($_ImageSearchX, $_ImageSearchY)
+                MyMouseMove($_ImageSearchX, $_ImageSearchY)
                 SingleClick()
                 Sleep(1000)
                 $DisableRelogCount = 1
@@ -1355,7 +1355,7 @@ Func End(); If $RestartLoop Then Return 0
         Position(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         If ImageSearch("SelectionScreen") Then
-            MouseMove($_ImageSearchX, $_ImageSearchY)
+            MyMouseMove($_ImageSearchX, $_ImageSearchY)
             SingleClick()
             Sleep(1000)
             $DisableRelogCount = 1
@@ -1415,7 +1415,7 @@ Func End(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
             Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
             If ImageSearch("SelectionScreen") Then
-                MouseMove($_ImageSearchX, $_ImageSearchY)
+                MyMouseMove($_ImageSearchX, $_ImageSearchY)
                 SingleClick()
                 Sleep(1000)
                 $DisableRelogCount = 1
@@ -2068,7 +2068,7 @@ Func Go(); If $RestartLoop Then Return 0
             If $check <> $CurrentAccount Then
                 Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
                 If ImageSearch("SelectionScreen") Then
-                    MouseMove($_ImageSearchX, $_ImageSearchY)
+                    MyMouseMove($_ImageSearchX, $_ImageSearchY)
                     SingleClick()
                     Sleep(1000)
                     $DisableRelogCount = 1
