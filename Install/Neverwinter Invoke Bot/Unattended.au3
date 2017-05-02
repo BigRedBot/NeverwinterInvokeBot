@@ -106,7 +106,7 @@ While 1
         TraySetIcon(@ScriptDir & "\images\teal.ico")
         Local $min = 0
         While 1
-            $min = _GetUTCMinutes(10, 2, True, False, True, $Title & @CRLF & Localize("GettingTimeUntilServerReset"))
+            $min = _GetUTCMinutes(10, Random(120, 900, 1) / 60, True, False, True, $Title & @CRLF & Localize("GettingTimeUntilServerReset"))
             If $Ran Then ExitLoop 2
             If $min >= 0 Then ExitLoop
             WaitMinutes(10, "WaitingToRetryGettingTimeUntilServerReset")

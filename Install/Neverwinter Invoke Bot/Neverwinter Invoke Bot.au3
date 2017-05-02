@@ -1025,7 +1025,7 @@ While 1
         $LogInTries = 0
         Position(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
-        WaitMinutes(15, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
+        WaitMinutes(Random(20 * 60000, 60 * 60000, 1) / 60000, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
     Else
         $InvalidUsernameOrPassword = 0
@@ -1135,7 +1135,7 @@ While 1
             FindWindow("Neverwinter.exe", "#32770", GetValue("ConnectionProblemWindowTitle"))
             If $WinHandle Then
                 ControlClick($WinHandle, "", "[CLASS:Button; INSTANCE:1]")
-                WaitMinutes(15, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
+                WaitMinutes(Random(20 * 60000, 60 * 60000, 1) / 60000, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
                 ExitLoop 2
             EndIf
@@ -1168,7 +1168,7 @@ While 1
             TimeOut(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
             If ImageSearch("LauncherLogin") Then
-                WaitMinutes(15, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
+                WaitMinutes(Random(20 * 60000, 60 * 60000, 1) / 60000, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
                 ExitLoop 2
             EndIf
@@ -1964,7 +1964,7 @@ Func Begin(); If $RestartLoop Then Return 0
                         EndIf
                     EndIf
                     $MinutesToStartSavedTimer = 0
-                    $MinutesToStartSaved = _GetUTCMinutes(10, 2, True, True, False, $Title)
+                    $MinutesToStartSaved = _GetUTCMinutes(10, Random(120, 900, 1) / 60, True, True, False, $Title)
                     If $MinutesToStartSaved >= 0 Then
                         $MinutesToStartSavedTimer = TimerInit()
                         $MinutesToStart = Round($MinutesToStartSaved)

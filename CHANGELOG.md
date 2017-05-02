@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.14
+- Added a random login time buffer
+
 10.13
 - Mouse move now double checks to make sure that the cursor has reached the desired position
 - Now double checks to make sure some of the profession buttons have been clicked
