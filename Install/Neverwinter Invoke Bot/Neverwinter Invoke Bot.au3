@@ -365,13 +365,14 @@ WEnd
 EndFunc
 
 Func StartLoop(); If $RestartLoop Then Return 0
+    WaitToInvoke(); If $RestartLoop Then Return 0
+    If $RestartLoop Then Return 0
     If $LoopStarted Then
         $RestartLoop = 1
         Return 0
-    Else
-        Loop()
-        Exit
     EndIf
+    Loop()
+    Exit
 EndFunc
 
 Func EndNowTime($waiting = 0)
@@ -441,34 +442,30 @@ EndFunc
 Func WaitToInvoke(); If $RestartLoop Then Return 0
     Local $Minutes = GetTimeToInvoke()
     If $Minutes > 1 Then
+        $ETAText = ""
         Local $check = CheckAccounts()
         If $check > 0 Then
-            If $check <> $CurrentAccount Then
-                $ETAText = ""
+            Position(); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
+            Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
+            WaitForScreen("SelectionScreen"); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
+            Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
+            If ImageSearch("SelectionScreen") Then
+                MyMouseMove($_ImageSearchX, $_ImageSearchY)
+                SingleClick()
+                Sleep(1000)
+                $DisableRelogCount = 1
+            EndIf
+            $CurrentAccount = $check
+            $WaitingTimer = TimerInit()
+            While Not ImageSearch("LogInScreen")
+                Sleep(500)
+                TimeOut(); If $RestartLoop Then Return 0
+                If $RestartLoop Then Return 0
                 Position(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
-                Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
-                WaitForScreen("SelectionScreen"); If $RestartLoop Then Return 0
-                If $RestartLoop Then Return 0
-                Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
-                If ImageSearch("SelectionScreen") Then
-                    MyMouseMove($_ImageSearchX, $_ImageSearchY)
-                    SingleClick()
-                    Sleep(1000)
-                    $DisableRelogCount = 1
-                EndIf
-                $CurrentAccount = $check
-                $WaitingTimer = TimerInit()
-                While Not ImageSearch("LogInScreen")
-                    Sleep(500)
-                    TimeOut(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                    Position(); If $RestartLoop Then Return 0
-                    If $RestartLoop Then Return 0
-                WEnd
-                StartLoop(); If $RestartLoop Then Return 0
-                If $RestartLoop Then Return 0
-            EndIf
+            WEnd
         Else
             End(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
@@ -477,8 +474,6 @@ Func WaitToInvoke(); If $RestartLoop Then Return 0
     EndIf
     If $Minutes > 0 Then
         $ETAText = ""
-        Position(); If $RestartLoop Then Return 0
-        If $RestartLoop Then Return 0
         Local $WaitingForDelay = "WaitingForInvokeDelay"
         If GetAccountValue("InfiniteLoopsStarted") Then $WaitingForDelay = "WaitingForProfessionsDelay"
         WaitMinutes($Minutes, $WaitingForDelay); If $RestartLoop Then Return 0
@@ -1351,7 +1346,7 @@ Func End(); If $RestartLoop Then Return 0
     EndIf
     If Not $EndTime Then $EndTime = HoursAndMinutes(TimerDiff($StartTimer) / 60000)
     Splash()
-    If ( Not GetValue("InfiniteLoopsFound") Or GetValue("EndNow") ) And ( GetValue("TotalAccounts") > 1 Or Not GetValue("DisableCloseClient") Or Not GetValue("DisableLogOut") ) Then
+    If Not GetValue("InfiniteLoopsFound") Or GetValue("EndNow") Then
         Position(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         If ImageSearch("SelectionScreen") Then
@@ -1698,7 +1693,7 @@ Func AdvancedAccountSettings($hWnd = 0)
                         EndIf
                     Else
                         $value = GUICtrlRead($c[$i])
-                        If $t = "Number" Then
+                        If $t = "Number" Or String(Number($value)) = String($value) Then
                             $value = Number($value)
                         EndIf
                     EndIf
@@ -2226,7 +2221,6 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
     Local $s = ""
     $s &= "|" & "DisableSimpleCharacterSelection,SimpleCharacterSelectionTitle,SimpleCharacterSelectionDescription,ReverseBoolean"
     $s &= "|" & "DisableCloseClient,CloseClientTitle,CloseClientDescription,ReverseBoolean"
-    $s &= "|" & "DisableLogOut,LogOutTitle,LogOutDescription,ReverseBoolean"
     $s &= "|" & "NoInputBlocking,InputBlockingTitle,InputBlockingDescription,ReverseBoolean"
     $s &= "|" & "SkipVerifyFiles,SkipVerifyFilesTitle,SkipVerifyFilesDescription,Boolean"
     $s &= "|" & "DisableDonationPrompts,DisableDonationPromptsTitle,DisableDonationPromptsDescription,Boolean"
@@ -2310,7 +2304,7 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
                         EndIf
                     Else
                         $value = GUICtrlRead($c[$i])
-                        If $t = "Number" Then
+                        If $t = "Number" Or String(Number($value)) = String($value) Then
                             $value = Number($value)
                         EndIf
                     EndIf

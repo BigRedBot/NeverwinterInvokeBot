@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.15
+- Will now log out during invoke delays
+
 10.14
 - Added a random login time buffer
 
