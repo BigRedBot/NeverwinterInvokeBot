@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.17
+- Modified code for logging out during invoke delays
+
 10.16
 - Modified code for logging out during invoke delays
 

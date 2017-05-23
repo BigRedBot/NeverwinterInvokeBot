@@ -470,6 +470,12 @@ Func WaitToInvoke(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
                 Position(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
+                If ImageSearch("SelectionScreen") Then
+                    MyMouseMove($_ImageSearchX, $_ImageSearchY)
+                    SingleClick()
+                    Sleep(1000)
+                    $DisableRelogCount = 1
+                EndIf
             WEnd
             $CurrentAccount = $check
             $Minutes = GetTimeToInvoke()
@@ -1239,6 +1245,12 @@ While 1
             If $RestartLoop Then Return 0
             Position(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
+            If ImageSearch("SelectionScreen") Then
+                MyMouseMove($_ImageSearchX, $_ImageSearchY)
+                SingleClick()
+                Sleep(1000)
+                $DisableRelogCount = 1
+            EndIf
         WEnd
     EndIf
 Return
@@ -1350,6 +1362,12 @@ Func End(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
                 Position(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
+                If ImageSearch("SelectionScreen") Then
+                    MyMouseMove($_ImageSearchX, $_ImageSearchY)
+                    SingleClick()
+                    Sleep(1000)
+                    $DisableRelogCount = 1
+                EndIf
             WEnd
             $CurrentAccount = $check
         EndIf
@@ -1434,6 +1452,12 @@ Func End(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
                 Position(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
+                If ImageSearch("SelectionScreen") Then
+                    MyMouseMove($_ImageSearchX, $_ImageSearchY)
+                    SingleClick()
+                    Sleep(1000)
+                    $DisableRelogCount = 1
+                EndIf
             WEnd
             $CurrentAccount = $check
         EndIf
@@ -2087,6 +2111,12 @@ Func Go(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
                     Position(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
+                    If ImageSearch("SelectionScreen") Then
+                        MyMouseMove($_ImageSearchX, $_ImageSearchY)
+                        SingleClick()
+                        Sleep(1000)
+                        $DisableRelogCount = 1
+                    EndIf
                 WEnd
                 $CurrentAccount = $check
             EndIf
