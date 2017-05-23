@@ -191,6 +191,8 @@ While 1
 While 1
     $LoopStarted = 1
     $RestartLoop = 0
+    WaitToInvoke(); If $RestartLoop Then Return 0
+    If $RestartLoop Then ExitLoop 1
     AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
     If CompletedAccount() Then
         End(); If $RestartLoop Then Return 0
@@ -365,8 +367,6 @@ WEnd
 EndFunc
 
 Func StartLoop(); If $RestartLoop Then Return 0
-    WaitToInvoke(); If $RestartLoop Then Return 0
-    If $RestartLoop Then Return 0
     If $LoopStarted Then
         $RestartLoop = 1
         Return 0
@@ -440,16 +440,22 @@ Func GetTimeToInvoke()
 EndFunc
 
 Func WaitToInvoke(); If $RestartLoop Then Return 0
-    Local $Minutes = GetTimeToInvoke()
-    If $Minutes > 1 Then
-        $ETAText = ""
-        Local $check = CheckAccounts()
-        If $check > 0 Then
+    Local $check = CheckAccounts()
+    If $check > 0 Then
+        Local $Minutes = GetTimeToInvoke()
+        If $Minutes > 1 Or $check <> $CurrentAccount Then
+            $ETAText = ""
             Position(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
             Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
-            WaitForScreen("SelectionScreen"); If $RestartLoop Then Return 0
-            If $RestartLoop Then Return 0
+            $WaitingTimer = TimerInit()
+            While Not ( ImageSearch("SelectionScreen") Or ImageSearch("LogInScreen") )
+                Sleep(1000)
+                TimeOut(); If $RestartLoop Then Return 0
+                If $RestartLoop Then Return 0
+                Position(); If $RestartLoop Then Return 0
+                If $RestartLoop Then Return 0
+            WEnd
             Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
             If ImageSearch("SelectionScreen") Then
                 MyMouseMove($_ImageSearchX, $_ImageSearchY)
@@ -457,29 +463,34 @@ Func WaitToInvoke(); If $RestartLoop Then Return 0
                 Sleep(1000)
                 $DisableRelogCount = 1
             EndIf
-            $CurrentAccount = $check
             $WaitingTimer = TimerInit()
             While Not ImageSearch("LogInScreen")
-                Sleep(500)
+                Sleep(1000)
                 TimeOut(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
                 Position(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
             WEnd
-        Else
-            End(); If $RestartLoop Then Return 0
-            If $RestartLoop Then Return 0
-            Exit
+            $CurrentAccount = $check
+            $Minutes = GetTimeToInvoke()
+            If $Minutes <= 0 Then
+                StartLoop(); If $RestartLoop Then Return 0
+                If $RestartLoop Then Return 0
+            EndIf
         EndIf
-    EndIf
-    If $Minutes > 0 Then
-        $ETAText = ""
-        Local $WaitingForDelay = "WaitingForInvokeDelay"
-        If GetAccountValue("InfiniteLoopsStarted") Then $WaitingForDelay = "WaitingForProfessionsDelay"
-        WaitMinutes($Minutes, $WaitingForDelay); If $RestartLoop Then Return 0
+        If $Minutes > 0 Then
+            $ETAText = ""
+            Local $WaitingForDelay = "WaitingForInvokeDelay"
+            If GetAccountValue("InfiniteLoopsStarted") Then $WaitingForDelay = "WaitingForProfessionsDelay"
+            WaitMinutes($Minutes, $WaitingForDelay); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
+            StartLoop(); If $RestartLoop Then Return 0
+            If $RestartLoop Then Return 0
+        EndIf
+    Else
+        End(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
-        StartLoop(); If $RestartLoop Then Return 0
-        If $RestartLoop Then Return 0
+        Exit
     EndIf
 EndFunc
 
@@ -977,6 +988,7 @@ Func WaitMinutes($time, $msg); If $RestartLoop Then Return 0
         End(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
     EndIf
+    SyncValues()
     While $left > 0
         Splash("[ " & Localize($msg, "<MINUTES>", HoursAndMinutes($left)) & " ]", 0)
         If $left > 1 then
@@ -1331,7 +1343,6 @@ Func End(); If $RestartLoop Then Return 0
                 Sleep(1000)
                 $DisableRelogCount = 1
             EndIf
-            $CurrentAccount = $check
             $WaitingTimer = TimerInit()
             While Not ImageSearch("LogInScreen")
                 Sleep(500)
@@ -1340,6 +1351,7 @@ Func End(); If $RestartLoop Then Return 0
                 Position(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
             WEnd
+            $CurrentAccount = $check
         EndIf
         StartLoop(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
@@ -1415,7 +1427,6 @@ Func End(); If $RestartLoop Then Return 0
                 Sleep(1000)
                 $DisableRelogCount = 1
             EndIf
-            $CurrentAccount = $check
             $WaitingTimer = TimerInit()
             While Not ImageSearch("LogInScreen")
                 Sleep(500)
@@ -1424,6 +1435,7 @@ Func End(); If $RestartLoop Then Return 0
                 Position(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
             WEnd
+            $CurrentAccount = $check
         EndIf
         StartLoop(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
@@ -2068,7 +2080,6 @@ Func Go(); If $RestartLoop Then Return 0
                     Sleep(1000)
                     $DisableRelogCount = 1
                 EndIf
-                $CurrentAccount = $check
                 $WaitingTimer = TimerInit()
                 While Not ImageSearch("LogInScreen")
                     Sleep(500)
@@ -2077,6 +2088,7 @@ Func Go(); If $RestartLoop Then Return 0
                     Position(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
                 WEnd
+                $CurrentAccount = $check
             EndIf
         Else
             End(); If $RestartLoop Then Return 0
