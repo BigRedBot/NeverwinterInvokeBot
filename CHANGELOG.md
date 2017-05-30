@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.18
+- Changed the default professions delay seconds in the advanced options from 1 to 0.2
+
 10.17
 - Modified code for logging out during invoke delays
 
