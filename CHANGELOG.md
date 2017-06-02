@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+10.19
+- Will now try to detect incorrect password entered and stop the script
+- Will no longer try to launch the game if the launcher is not detected
+
 10.18
 - Changed the default professions delay seconds in the advanced options from 1 to 0.2
 
