@@ -995,6 +995,8 @@ Func WaitMinutes($time, $msg); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
     EndIf
     SyncValues()
+    FindWindow()
+    If $left > 0 And $WinHandle Then WinSetState($WinHandle, "", @SW_MINIMIZE)
     While $left > 0
         Splash("[ " & Localize($msg, "<MINUTES>", HoursAndMinutes($left)) & " ]", 0)
         If $left > 1 then

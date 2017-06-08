@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.20
+- To reduce processing power, will now minimize the game client when waiting
+
 10.19
 - Will now try to detect incorrect password entered and stop the script
 - Will no longer try to launch the game if the launcher is not detected
