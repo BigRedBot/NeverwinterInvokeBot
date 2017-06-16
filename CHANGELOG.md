@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+10.21
+- The Unattended Launcher will now wait for the system to be idle for 10 minutes before launching the game
+- The Unattended Launcher will now ask to run if the system has not been idle for 10 minutes
+
 10.20
 - To reduce processing power, will now minimize the game client when waiting
 

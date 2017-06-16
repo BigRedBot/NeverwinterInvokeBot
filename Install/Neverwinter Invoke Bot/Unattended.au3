@@ -4,6 +4,7 @@
 #include <Misc.au3>
 #include <MsgBoxConstants.au3>
 #include <TrayConstants.au3>
+#include <Timers.au3>
 #include "_GetUTCMinutes.au3"
 #include "_UnicodeIni.au3"
 #include "Localization.au3"
@@ -86,17 +87,36 @@ Func HoursAndMinutes($n)
     Return Localize("Minutes", "<MINUTES>", $Minutes)
 EndFunc
 
-Func WaitMinutes($time, $msg)
-    Local $t = TimerInit(), $left = $time, $txt = "", $last = ""
-    While $left > 0
-        $txt = $Title & @CRLF & Localize($msg) & @CRLF & HoursAndMinutes($left)
-        If Not ($last == $txt) Then
+Func WaitMinutes($time, $msg, $idle = 0)
+    Local $t = TimerInit(), $left = $time, $txt = "", $last = "", $DoMsgBox = 1, $MsgBoxReturn
+    If $idle Then
+        $left = $time - _Timer_GetIdleTime() / 60000
+        If $left > 0 Then
+            $txt = $Title & @CRLF & Localize($msg) & @CRLF & HoursAndMinutes($time)
             TraySetToolTip($txt)
-            $last = $txt
         EndIf
-        Sleep(1000)
-        If $Ran Then ExitLoop
-        $left = $time - TimerDiff($t) / 60000
+    EndIf
+    While $left > 0
+        If $idle Then
+            If $DoMsgBox And $left * 60 > 15 Then
+                $MsgBoxReturn = MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("RunInvokeBotNow"), 15)
+                If $MsgBoxReturn = $IDYES Then Return
+                If $MsgBoxReturn = $IDNO Then $DoMsgBox = 0
+            Else
+                Sleep(1000)
+            EndIf
+            If $Ran Then ExitLoop
+            $left = $time - _Timer_GetIdleTime() / 60000
+        Else
+            $txt = $Title & @CRLF & Localize($msg) & @CRLF & HoursAndMinutes($left)
+            If Not ($last == $txt) Then
+                TraySetToolTip($txt)
+                $last = $txt
+            EndIf
+            Sleep(1000)
+            If $Ran Then ExitLoop
+            $left = $time - TimerDiff($t) / 60000
+        EndIf
     WEnd
 EndFunc
 
@@ -114,6 +134,13 @@ While 1
         WEnd
         TraySetIcon(@ScriptDir & "\images\blue.ico")
         WaitMinutes($min, "WaitingForServerReset")
+        If $Ran Then ExitLoop
+        TraySetIcon(@ScriptDir & "\images\yellow.ico")
+        WaitMinutes(10, "WaitingForSystemIdle", 1)
+        If $Ran Then ExitLoop
+        TraySetToolTip($Title & @CRLF & Localize("UnattendedRunning"))
+        TraySetIcon(@ScriptDir & "\images\green.ico")
+        If MsgBox($MB_OKCANCEL, $Title, Localize("AboutToStart"), 15) = $IDCANCEL Then ExitLoop
         If $Ran Then ExitLoop
         If Not @Compiled Then
             Local $list = ProcessList(StringRegExpReplace(@AutoItExe, ".*\\", ""))
