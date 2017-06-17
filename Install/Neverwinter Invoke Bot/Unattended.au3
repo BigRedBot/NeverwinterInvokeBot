@@ -99,7 +99,7 @@ Func WaitMinutes($time, $msg, $idle = 0)
     While $left > 0
         If $idle Then
             If $DoMsgBox And $left * 60 > 15 Then
-                $MsgBoxReturn = MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("RunInvokeBotNow"), 15)
+                $MsgBoxReturn = MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("RunInvokeBotNow"), Int($left * 60))
                 If $MsgBoxReturn = $IDYES Then Return
                 If $MsgBoxReturn = $IDNO Then $DoMsgBox = 0
             Else
