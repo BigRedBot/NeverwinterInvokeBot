@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.22
+- Updated version mismatch image
+
 10.21.1
 - Changed timeout for run now pop-up request to remaining idle time required
 
