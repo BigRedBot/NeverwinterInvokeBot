@@ -202,7 +202,7 @@ While 1
         $Hook[1] = $_ImageSearchTop
         $Hook[2] = $_ImageSearchRight
         $Hook[3] = $_ImageSearchBottom
-        If Not ImageSearch("Fishing_Bait") And Not ImageSearch("Fishing_Bait_Lugworm") And Not ImageSearch("Fishing_Bait_Lugworm_Dimmed") And Not ImageSearch("Fishing_Bait_Krill") And Not ImageSearch("Fishing_Bait_Krill_Dimmed") Then ExitLoop 3
+        If Not ImageSearch("Fishing_Bait") And Not ImageSearch("Fishing_Bait_Common") And Not ImageSearch("Fishing_Bait_Common_Dimmed") And Not ImageSearch("Fishing_Bait_Uncommon") And Not ImageSearch("Fishing_Bait_Uncommon_Dimmed") Then ExitLoop 3
         $Bait[0] = $_ImageSearchLeft
         $Bait[1] = $_ImageSearchTop
         $Bait[2] = $_ImageSearchRight
@@ -237,7 +237,7 @@ While 1
             Splash(Localize("Baiting"))
             MySend(GetValue("FishingBaitKey"))
             Sleep(GetValue("FishingDelaySeconds") * 1000)
-            If Not ImageSearch("Fishing_Bait_Lugworm", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) And Not ImageSearch("Fishing_Bait_Lugworm_Dimmed", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) And Not ImageSearch("Fishing_Bait_Krill", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) And Not ImageSearch("Fishing_Bait_Krill_Dimmed", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then ExitLoop 3
+            If Not ImageSearch("Fishing_Bait_Common", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) And Not ImageSearch("Fishing_Bait_Common_Dimmed", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) And Not ImageSearch("Fishing_Bait_Uncommon", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) And Not ImageSearch("Fishing_Bait_Uncommon_Dimmed", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then ExitLoop 3
         EndIf
         If Not $EndTimer Then $EndTimer = TimerInit()
         While 1
@@ -254,8 +254,8 @@ While 1
                 EndIf
                 Sleep(Random(100, 500, 1))
             WEnd
-            If ImageSearch("Fishing_Bait_Lugworm", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then
-                Splash(Localize("BaitingKrill"))
+            If ImageSearch("Fishing_Bait_Common", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then
+                Splash(Localize("BaitingUncommon"))
                 MySend(GetValue("FishingBaitKey"))
                 Sleep(GetValue("FishingDelaySeconds") * 1000)
             EndIf

@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.23
+- Updated fishing bot to work with Tomb of Annihilation
+
 10.22
 - Updated version mismatch image
 
