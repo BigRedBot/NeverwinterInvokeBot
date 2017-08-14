@@ -2,6 +2,10 @@
 
 The latest version has a fishing bot included.
 
+Leadership is the only profession that is currently supported.
+
+For this script to work, the **Interface scale** in the **Options** must be set to **1.00**, in the **Genral** section of the **Interface** tab.
+
 **You can download the installer here:**  
 https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe
 
