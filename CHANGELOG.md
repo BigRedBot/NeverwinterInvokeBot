@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.24
+- Reduced priority of leadership task "Protect Magical Goods Market"
+
 10.23
 - Updated fishing bot to work with Tomb of Annihilation
 
