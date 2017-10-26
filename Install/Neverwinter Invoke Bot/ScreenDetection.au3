@@ -72,7 +72,6 @@ While 1
         CheckImage("BlessedProfessionsElementalPack")
         CheckImage("CofferOfCelestialEnchantments")
         CheckImage("CofferOfCelestialArtifacts")
-        CheckImage("CofferOfCelestialArtifactEquipment")
         CheckImage("ChangeCharacterButton")
         CheckImage("LogInScreen")
         CheckImage("Idle")

@@ -2342,7 +2342,7 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
 EndFunc
 
 Func ChooseOptions()
-    Local $overflowxpdefault = GetValue("DisableOverflowXPRewardCollection"), $openbagsdefault = GetAllAccountsValue("DisableOpeningBags"), $openbagsoneveryloopdefault = GetAllAccountsValue("OpenBagsOnEveryLoop"), $cofferdefault = GetValue("Coffer"), $list = Localize($cofferdefault), $coffers = Array("CofferOfCelestialEnchantments, CofferOfCelestialArtifacts, CofferOfCelestialArtifactEquipment, BlessedProfessionsElementalPack, ElixirOfFate")
+    Local $overflowxpdefault = GetValue("DisableOverflowXPRewardCollection"), $openbagsdefault = GetAllAccountsValue("DisableOpeningBags"), $openbagsoneveryloopdefault = GetAllAccountsValue("OpenBagsOnEveryLoop"), $cofferdefault = GetValue("Coffer"), $list = Localize($cofferdefault), $coffers = Array("CofferOfCelestialArtifacts, CofferOfCelestialEnchantments, BlessedProfessionsElementalPack, ElixirOfFate")
     For $i = 1 To $coffers[0]
         If Not ($coffers[$i] == $cofferdefault) Then $list &= "|" & Localize($coffers[$i])
     Next

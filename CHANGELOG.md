@@ -1,6 +1,11 @@
 RELEASE NOTES
 =============
 
+10.25
+- Removed option for Coffer of Celestial Artifact Equipment
+- Set the default selection from Coffer of Celestial Enchantments to Coffer of Celestial Artifacts
+- Disabled choice to switch language support
+
 10.24
 - Reduced priority of leadership task "Protect Magical Goods Market"
 

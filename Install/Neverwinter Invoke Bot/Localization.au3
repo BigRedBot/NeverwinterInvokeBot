@@ -180,15 +180,19 @@ Func GetLanguage($default = "English", $file = @ScriptDir & "\Localization.ini")
 EndFunc
 
 Func LoadLocalizations($lang = "", $file = "", $iniwrite = 1)
-    Local $l = $lang, $f = $file
+    Local $l = $lang, $f = $file, $LanguageSupport = 0
     If Not IsString($f) Or $f = "" Then $f = @ScriptDir & "\Localization.ini"
     If Not IsString($l) Or $l = "" Then
         Local $s = @AppDataDir & "\Neverwinter Invoke Bot", $o = @AppDataCommonDir & "\Neverwinter Invoke Bot"
         If Not FileExists($s) And FileExists($o) Then DirMove($o, $s)
         $l = _UnicodeIniRead($s & "\Settings.ini", "AllAccounts", "Language", "")
         If @error <> 0 Then Exit
-        If $l = "" Or $lang Then
-            $l = GetLanguage($l, $f)
+        If $l = "" Or $lang Or ( Not $LanguageSupport And $l <> "English" ) Then
+            If $LanguageSupport Then
+                $l = GetLanguage($l, $f)
+            Else
+                $l = "English"
+            EndIf
             If $iniwrite Then
                 DirCreate($s)
                 IniWrite($s & "\Settings.ini", "AllAccounts", "Language", $l)
