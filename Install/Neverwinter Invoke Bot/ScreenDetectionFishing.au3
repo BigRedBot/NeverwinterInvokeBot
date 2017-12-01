@@ -50,10 +50,12 @@ Func End()
     Exit
 EndFunc
 
-Func CheckImage($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $intro = @CRLF & @CRLF, $ext = ".png")
+Func CheckImage($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $intro = @CRLF & @CRLF, $ext = "")
+    Local $i = ImageSearch($image, $left, $top, $right, $bottom), $n = ""
     If Not ImageSearch($image, $left, $top, $right, $bottom) Then Return 0
-    $text &= $intro & $image & $ext & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
-    Return 1
+    If $i > 1 Then $n = "-" & $i
+    $text &= $intro & $image & $n & ".png" & $ext & @CRLF & $_ImageSearchLeft-$OffsetX & ", " & $_ImageSearchTop-$OffsetY & " - " & $_ImageSearchRight-$OffsetX & ", " & $_ImageSearchBottom-$OffsetY
+    Return $i
 EndFunc
 
 HotKeySet("{Esc}", "End")

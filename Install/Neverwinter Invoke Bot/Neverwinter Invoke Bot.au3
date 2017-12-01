@@ -1227,6 +1227,12 @@ While 1
             If $RestartLoop Then Return 0
             Position(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
+            If ImageSearch("IAccept") Then
+                MyMouseMove($_ImageSearchX, $_ImageSearchY)
+                SingleClick()
+                Sleep(1000)
+                If Not ImageSearch("IAccept") Then $WaitingTimer = TimerInit()
+            EndIf
         WEnd
     Else
         Error(Localize("NeverwinterNotFound")); If $RestartLoop Then Return 0
