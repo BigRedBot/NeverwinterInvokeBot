@@ -1066,6 +1066,11 @@ While 1
                     If $RestartLoop Then Return 0
                 ElseIf ImageSearch("Mismatch") And PatchClient() Then; If $RestartLoop Then Return 0
                     ExitLoop
+                ElseIf ImageSearch("IAccept") Then
+                    MyMouseMove($_ImageSearchX, $_ImageSearchY)
+                    SingleClick()
+                    Sleep(1000)
+                    If Not ImageSearch("IAccept") Then $FindLogInScreenWaitingTimer = TimerInit()
                 EndIf
                 If $RestartLoop Then Return 0
                 TimeOut($FindLogInScreenWaitingTimer); If $RestartLoop Then Return 0
