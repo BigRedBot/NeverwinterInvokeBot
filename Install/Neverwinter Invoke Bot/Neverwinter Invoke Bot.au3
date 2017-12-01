@@ -961,7 +961,7 @@ Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $Clien
 EndFunc
 
 Func SetImageSearchVariables($image, $left, $top, $right, $bottom, $tolerance)
-    If $image <> "LogInScreen" And $image <> "InvalidUsernameOrPassword" And $image <> "Mismatch" And $image <> "Idle" And $image <> "OK" Then
+    If $image <> "LogInScreen" And $image <> "InvalidUsernameOrPassword" And $image <> "Mismatch" And $image <> "Idle" And $image <> "OK" And $image <> "LauncherPatching" And $image <> "IAccept" Then
         $LoggingIn = 0
         $LogInTries = 0
         If $DoRelogCount And Not $DisableRelogCount Then
@@ -1045,11 +1045,12 @@ While 1
         Sleep(1000)
         LogIn(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
+        Local $LogInFinishTime = TimerInit()
         Splash("[ " & Localize("WaitingForCharacterSelectionScreen") & " ]")
         Sleep(1000)
         If ImageExists("SelectionScreen") Then
             While Not ImageSearch("SelectionScreen")
-                If ImageSearch("ChangeCharacterButton") Then
+                If TimerDiff($LogInFinishTime) > 10000 And ImageSearch("ChangeCharacterButton") Then
                     Splash()
                     ChangeCharacter(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
