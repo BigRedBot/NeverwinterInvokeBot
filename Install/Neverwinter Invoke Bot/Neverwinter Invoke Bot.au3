@@ -1151,7 +1151,7 @@ While 1
         While 1
             TimeOut(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
-            FindWindow("Neverwinter.exe", "#32770", GetValue("ConnectionProblemWindowTitle"))
+            FindWindow("Neverwinter.exe", "#32770", Localize("ConnectionProblemWindowTitle"))
             If $WinHandle Then
                 ControlClick($WinHandle, "", "[CLASS:Button; INSTANCE:1]")
                 WaitMinutes(Random(20 * 60000, 60 * 60000, 1) / 60000, "WaitingToRetryLogin"); If $RestartLoop Then Return 0
@@ -1195,7 +1195,7 @@ While 1
                 If $RestartLoop Then Return 0
                 ExitLoop 2
             EndIf
-            FindWindow("Neverwinter.exe", "#32770", GetValue("VerifyFilesWindowTitle"))
+            FindWindow("Neverwinter.exe", "#32770", Localize("VerifyFilesWindowTitle"))
             If $WinHandle Then
                 If GetValue("SkipVerifyFiles") Then
                     ControlClick($WinHandle, "", "[CLASS:Button; INSTANCE:2]")

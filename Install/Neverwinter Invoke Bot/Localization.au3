@@ -3,8 +3,6 @@
 
 Func LoadLocalizationDefaults()
     If $Language = "Russian" Then
-        SetDefault("VerifyFilesWindowTitle", "Verify?")
-        SetDefault("ConnectionProblemWindowTitle", "Connection problem")
         SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
         SetDefault("GameMenuKey", "{ESC}")
         SetDefault("CursorModeKey", "{F2}")
@@ -40,8 +38,6 @@ Func LoadLocalizationDefaults()
         SetDefault("ScreenDetectionSplashHeight", 600)
         SetDefault("LogInServerAddress", "208.95.186.167, 208.95.186.168, 208.95.186.96")
     Else
-        SetDefault("VerifyFilesWindowTitle", "Verify?")
-        SetDefault("ConnectionProblemWindowTitle", "Connection problem")
         SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
         SetDefault("GameMenuKey", "{ESC}")
         SetDefault("CursorModeKey", "{ALT}")
