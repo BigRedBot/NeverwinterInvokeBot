@@ -5,7 +5,7 @@ Func LoadLocalizationDefaults()
     If $Language = "Russian" Then
         SetDefault("InvokeKey", "{CTRLDOWN}i{CTRLUP}")
         SetDefault("GameMenuKey", "{ESC}")
-        SetDefault("CursorModeKey", "{F2}")
+        SetDefault("CursorModeKey", "{ALT}")
         SetDefault("FishingCursorModeKey", GetDefaultValue("CursorModeKey"))
         SetDefault("InventoryKey", "i")
         SetDefault("ProfessionsKey", "n")
