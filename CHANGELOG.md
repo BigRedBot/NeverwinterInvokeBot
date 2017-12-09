@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.26
+- Re-enabled Russian support
+
 10.25
 - Removed option for Coffer of Celestial Artifact Equipment
 - Set the default selection from Coffer of Celestial Enchantments to Coffer of Celestial Artifacts

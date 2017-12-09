@@ -1,8 +1,10 @@
 # Neverwinter Invoke and Professions Bot
 
-The latest version has a fishing bot included.
-
 Leadership is the only profession that is currently supported.
+
+Now supports the Russian game client.
+
+The latest version has a fishing bot included.
 
 For this script to work, the **Interface scale** in the **Options** must be set to **1.00**, in the **Genral** section of the **Interface** tab.
 
