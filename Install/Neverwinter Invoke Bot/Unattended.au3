@@ -21,6 +21,9 @@ TrayCreateItem("")
 Local $DoProfessionsItem = TrayCreateItem(Localize("DoProfessions"))
 TrayItemSetOnEvent($DoProfessionsItem, "DoProfessions")
 TrayCreateItem("")
+Local $DoOpenProfessionBagsItem = TrayCreateItem(Localize("DoOpenProfessionBags"))
+TrayItemSetOnEvent($DoOpenProfessionBagsItem, "DoOpenProfessionBags")
+TrayCreateItem("")
 TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitScript")
 TraySetOnEvent($TRAY_EVENT_PRIMARYDOUBLE, "RunNow")
 TraySetState($TRAY_ICONSTATE_SHOW)
@@ -36,6 +39,7 @@ Func RunInvokeBot($n, $noflash = 1)
     $Ran = 1
     TrayItemSetState($RunNowItem, $TRAY_DISABLE)
     TrayItemSetState($DoProfessionsItem, $TRAY_DISABLE)
+    TrayItemSetState($DoOpenProfessionBagsItem, $TRAY_DISABLE)
     TraySetToolTip($Title & @CRLF & Localize("UnattendedRunning"))
     TraySetIcon(@ScriptDir & "\images\green.ico")
     If $noflash Then TraySetState($TRAY_ICONSTATE_STOPFLASH)
@@ -46,6 +50,7 @@ Func RunInvokeBot($n, $noflash = 1)
     EndIf
     TrayItemSetState($RunNowItem, $TRAY_ENABLE)
     TrayItemSetState($DoProfessionsItem, $TRAY_ENABLE)
+    TrayItemSetState($DoOpenProfessionBagsItem, $TRAY_ENABLE)
     TraySetIcon(@ScriptDir & "\images\teal.ico")
     TraySetState($TRAY_ICONSTATE_FLASH)
     $CanRun = 1
@@ -57,6 +62,10 @@ EndFunc
 
 Func DoProfessions()
     RunInvokeBot(3)
+EndFunc
+
+Func DoOpenProfessionBags()
+    RunInvokeBot(7)
 EndFunc
 
 Local $deleted = 1

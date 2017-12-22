@@ -108,6 +108,9 @@ While 1
         CheckImage("Professions_Asset_Footman")
         CheckImage("Professions_Asset_Guard")
         CheckImage("Professions_Asset_Mercenary")
+        CheckImage("Professions_ResonantBag")
+        CheckImage("Professions_ArtifactParaphenalia")
+        CheckImage("Professions_ThaumaturgicBag")
         $time = Round(TimerDiff($timer) / 1000, 2)
     EndIf
     Splash($count & "x " & $time & "s" & @CRLF & $text)

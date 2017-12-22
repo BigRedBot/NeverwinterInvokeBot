@@ -84,6 +84,7 @@ While 1
         CheckImage("InvalidUsernameOrPassword")
         CheckImage("Mismatch")
         CheckImage("OpenAnother")
+        CheckImage("OpenAnotherOK")
         CheckImage("CelestialBagOfRefining")
         CheckImage("InventoryTab")
         CheckImage("VIPInventoryTab")

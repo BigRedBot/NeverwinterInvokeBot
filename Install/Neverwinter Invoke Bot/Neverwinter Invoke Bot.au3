@@ -12,7 +12,7 @@ If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\red.ico")
 AutoItSetOption("TrayIconHide", 0)
 TraySetToolTip($Title)
-Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions, $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $EndTime, $MinutesToEndSaved, $MinutesToEndSavedTimer, $MouseOffset = 5
+Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions, $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $EndTime, $MinutesToEndSaved, $MinutesToEndSavedTimer, $MouseOffset = 5, $OpenProfessionBags, $OpenProfessionBagsMsg
 AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
 #include <StringConstants.au3>
 #include <ColorConstants.au3>
@@ -213,8 +213,8 @@ While 1
     Position(); If $RestartLoop Then Return 0
     If $RestartLoop Then ExitLoop 1
     Local $Start = GetValue("CurrentCharacter"), $CharacterSelectionPositioned = 0
-    For $i = $Start To GetValue("EndAtCharacter")
-        SetAccountValue("CurrentCharacter", $i)
+    For $LoopIndex = $Start To GetValue("EndAtCharacter")
+        SetAccountValue("CurrentCharacter", $LoopIndex)
         DeleteAccountValue("FinishedCharacter")
         If EndNowTime() Then
             SetAllAccountsValue("EndNow", 1)
@@ -273,44 +273,66 @@ While 1
                 Sleep(GetValue("LogInSeconds") * 1000)
                 Splash()
             EndIf
-            If Not GetValue("DisableOverflowXPRewardCollection") And ImageSearch("OverflowXPReward") Then
-                MySend(GetValue("CursorModeKey"))
-                Sleep(500)
-                MyMouseMove($_ImageSearchX, $_ImageSearchY)
-                SingleClick()
-                SaveItemCount("TotalOverflowXPRewards", 1)
-                Sleep(1000)
-                ClearWindows(); If $RestartLoop Then Return 0
-                If $RestartLoop Then ExitLoop 2
-            EndIf
-            If Not GetAccountValue("InfiniteLoopsStarted") Then
-                $WaitingTimer = TimerInit()
-                $CofferTries = 0
-                $FailedInvoke = 1
-                Invoke(); If $RestartLoop Then Return 0
-                If $RestartLoop Then ExitLoop 2
+            If $OpenProfessionBags Then
+                MySend(GetValue("InventoryKey"))
+                Sleep(GetValue("OpenInventoryBagDelay") * 1000)
+                If Not ImageSearch("Inventory") And ImageSearch("InventoryTab") Then
+                    MyMouseMove($_ImageSearchX, $_ImageSearchY)
+                    DoubleClick()
+                    Sleep(GetValue("OpenInventoryBagDelay") * 1000)
+                EndIf
+                Local $bags = Array("Professions_ResonantBag, Professions_ArtifactParaphenalia, Professions_ThaumaturgicBag")
+                For $i = 1 To $bags[0]
+                    OpenInventoryBags($bags[$i], 10000, 0); If $RestartLoop Then Return 0
+                    If $RestartLoop Then ExitLoop 3
+                Next
+                SetAccountValue("FinishedCharacter", 1)
                 SetCharacterInfo("CharacterTime", TimerInit())
                 SetCharacterInfo("CharacterLoop", GetValue("CurrentLoop"))
-                SetAccountValue("FinishedCharacter", 1)
                 If GetValue("CurrentCharacter") >= GetValue("EndAtCharacter") Then
                     SetAccountValue("FinishedLoop", 1)
                     If GetValue("CurrentLoop") >= GetValue("EndAtLoop") Then SetAccountValue("CompletedAccountInvokes", 1)
                 EndIf
-                If $FailedInvoke Then
-                    AddAccountCountValue("FailedInvoke")
-                    AddCharacterCountInfo("FailedInvoke")
-                EndIf
-                If GetValue("OpenBagsOnEveryLoop") Or GetValue("CurrentLoop") = GetValue("StartAtLoop") Then
-                    OpenInventoryBags("CelestialBagOfRefining"); If $RestartLoop Then Return 0
+            Else
+                If Not GetValue("DisableOverflowXPRewardCollection") And ImageSearch("OverflowXPReward") Then
+                    MySend(GetValue("CursorModeKey"))
+                    Sleep(500)
+                    MyMouseMove($_ImageSearchX, $_ImageSearchY)
+                    SingleClick()
+                    SaveItemCount("TotalOverflowXPRewards", 1)
+                    Sleep(1000)
+                    ClearWindows(); If $RestartLoop Then Return 0
                     If $RestartLoop Then ExitLoop 2
                 EndIf
+                If Not GetAccountValue("InfiniteLoopsStarted") Then
+                    $WaitingTimer = TimerInit()
+                    $CofferTries = 0
+                    $FailedInvoke = 1
+                    Invoke(); If $RestartLoop Then Return 0
+                    If $RestartLoop Then ExitLoop 2
+                    SetCharacterInfo("CharacterTime", TimerInit())
+                    SetCharacterInfo("CharacterLoop", GetValue("CurrentLoop"))
+                    SetAccountValue("FinishedCharacter", 1)
+                    If GetValue("CurrentCharacter") >= GetValue("EndAtCharacter") Then
+                        SetAccountValue("FinishedLoop", 1)
+                        If GetValue("CurrentLoop") >= GetValue("EndAtLoop") Then SetAccountValue("CompletedAccountInvokes", 1)
+                    EndIf
+                    If $FailedInvoke Then
+                        AddAccountCountValue("FailedInvoke")
+                        AddCharacterCountInfo("FailedInvoke")
+                    EndIf
+                    If GetValue("OpenBagsOnEveryLoop") Or GetValue("CurrentLoop") = GetValue("StartAtLoop") Then
+                        OpenInventoryBags("CelestialBagOfRefining"); If $RestartLoop Then Return 0
+                        If $RestartLoop Then ExitLoop 2
+                    EndIf
+                EndIf
+                GetVIPAccountReward(); If $RestartLoop Then Return 0
+                If $RestartLoop Then ExitLoop 2
+                GetVIPCharacterReward(); If $RestartLoop Then Return 0
+                If $RestartLoop Then ExitLoop 2
+                RunProfessions(); If $RestartLoop Then Return 0
+                If $RestartLoop Then ExitLoop 2
             EndIf
-            GetVIPAccountReward(); If $RestartLoop Then Return 0
-            If $RestartLoop Then ExitLoop 2
-            GetVIPCharacterReward(); If $RestartLoop Then Return 0
-            If $RestartLoop Then ExitLoop 2
-            RunProfessions(); If $RestartLoop Then Return 0
-            If $RestartLoop Then ExitLoop 2
             Splash()
             If GetAccountValue("InfiniteLoopsStarted") Then
                 SetCharacterInfo("CharacterTime", TimerInit())
@@ -643,16 +665,18 @@ Func GetVIPCharacterReward(); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
 EndFunc
 
-Func OpenInventoryBags($bag); If $RestartLoop Then Return 0
-    If GetValue("DisableOpeningBags") Then Return
-    ClearWindows(); If $RestartLoop Then Return 0
-    If $RestartLoop Then Return 0
-    MySend(GetValue("InventoryKey"))
-    Sleep(GetValue("OpenInventoryBagDelay") * 1000)
-    If Not ImageSearch("Inventory") And ImageSearch("InventoryTab") Then
-        MyMouseMove($_ImageSearchX, $_ImageSearchY)
-        DoubleClick()
+Func OpenInventoryBags($bag, $limit = 10, $open = 1); If $RestartLoop Then Return 0
+    If Not $OpenProfessionBags And GetValue("DisableOpeningBags") Then Return
+    If $open Then
+        ClearWindows(); If $RestartLoop Then Return 0
+        If $RestartLoop Then Return 0
+        MySend(GetValue("InventoryKey"))
         Sleep(GetValue("OpenInventoryBagDelay") * 1000)
+        If Not ImageSearch("Inventory") And ImageSearch("InventoryTab") Then
+            MyMouseMove($_ImageSearchX, $_ImageSearchY)
+            DoubleClick()
+            Sleep(GetValue("OpenInventoryBagDelay") * 1000)
+        EndIf
     EndIf
     MyMouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
     If ImageSearch($bag) Then
@@ -660,12 +684,31 @@ Func OpenInventoryBags($bag); If $RestartLoop Then Return 0
         DoubleClick()
         Sleep(GetValue("OpenInventoryBagDelay") * 1000)
         MyMouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
-        For $i = 1 To 10
-            If Not ImageSearch("OpenAnother") Then ExitLoop
+        If ImageSearch("OpenAnother") Then
             MyMouseMove($_ImageSearchX, $_ImageSearchY)
-            SingleClick()
-            Sleep(GetValue("OpenAnotherInventoryBagDelay") * 1000)
-        Next
+            If Not ImageSearch("OpenAnotherOK") Then Return
+            Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom
+            For $i = 1 To $limit
+                If Not ImageSearch("OpenAnotherOK", $left, $top, $right, $bottom, GetValue("ImageTolerance"), 0) Then
+                    Sleep(GetValue("OpenInventoryBagDelay") * 1000)
+                    If Not ImageSearch("OpenAnother") Then ExitLoop
+                    MyMouseMove($_ImageSearchX, $_ImageSearchY)
+                    If Not ImageSearch("OpenAnotherOK") Then ExitLoop
+                    $left = $_ImageSearchLeft
+                    $top = $_ImageSearchTop
+                    $right = $_ImageSearchRight
+                    $bottom = $_ImageSearchBottom
+                EndIf
+                MouseDown("primary")
+                Sleep(10)
+                MouseUp("primary")
+                Sleep(GetValue("OpenAnotherInventoryBagDelay") * 1000)
+            Next
+            If ImageSearch("OK") Then
+                MyMouseMove($_ImageSearchX, $_ImageSearchY)
+                SingleClick()
+            EndIf
+        EndIf
     EndIf
 EndFunc
 
@@ -858,6 +901,8 @@ Func Splash($s = "", $ontop = 1)
     Local $Message
     If GetAccountValue("InfiniteLoopsStarted") Then
         $Message = Localize("Professions", "<CURRENT>", GetValue("CurrentCharacter"), "<ENDAT>", GetValue("EndAtCharacter")) & @CRLF & $s & @CRLF & $ETAText
+    ElseIf $OpenProfessionBags Then
+        $Message = Localize("OpeningProfessionBags", "<CURRENT>", GetValue("CurrentCharacter"), "<ENDAT>", GetValue("EndAtCharacter")) & @CRLF & $s & @CRLF & $ETAText
     Else
         $Message = Localize("Invoking", "<CURRENT>", GetValue("CurrentCharacter"), "<ENDAT>", GetValue("EndAtCharacter"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & $s & @CRLF & $ETAText
     EndIf
@@ -1092,7 +1137,7 @@ Func GetLogInServerAddressString()
     Local $r = "", $a = Array(GetValue("LogInServerAddress"))
     If Not $a[1] Or Not IsString($a[1]) Or $a[1] = "" Then Return $r
     TCPStartup()
-    For $i = 1 to $a[0]
+    For $i = 1 To $a[0]
         Local $ip = TCPNameToIP($a[$i])
         If $ip And $ip <> "" Then
             $r &= " -server " & $ip
@@ -1109,7 +1154,7 @@ Func CheckServer()
     If @error = 0 Then Return
     Splash("[ " & Localize("WaitingForGameServer") & " ]", 0)
     While 1
-        For $i = 1 to $a[0]
+        For $i = 1 To $a[0]
             Ping($a[$i], 10000)
             If @error = 0 Then Return
         Next
@@ -1404,7 +1449,11 @@ Func End(); If $RestartLoop Then Return 0
                 SetAccountValue("EndAtLoop", GetValue("CurrentLoop"))
             EndIf
         EndIf
-        SendMessage(Localize("CompletedInvoking", "<STARTAT>", GetValue("StartAtCharacter"), "<ENDAT>", GetValue("EndAtCharacter"), "<STARTATLOOP>", GetValue("StartAtLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & @CRLF & Localize("InvokingTook", "<MINUTES>", $EndTime))
+        If $OpenProfessionBags Then
+            SendMessage(Localize("CompletedOpeningProfessionBags", "<STARTAT>", GetValue("StartAtCharacter"), "<ENDAT>", GetValue("EndAtCharacter")) & @CRLF & @CRLF & Localize("OpeningProfessionBagsTook", "<MINUTES>", $EndTime))
+        Else
+            SendMessage(Localize("CompletedInvoking", "<STARTAT>", GetValue("StartAtCharacter"), "<ENDAT>", GetValue("EndAtCharacter"), "<STARTATLOOP>", GetValue("StartAtLoop"), "<ENDATLOOP>", GetValue("EndAtLoop")) & @CRLF & @CRLF & Localize("InvokingTook", "<MINUTES>", $EndTime))
+        EndIf
         If GetValue("InfiniteLoops") And $EnableProfessions Then
             Local $oldc = GetValue("CurrentCharacter")
             For $c = GetValue("StartAtCharacter") To GetValue("EndAtCharacter")
@@ -1483,6 +1532,7 @@ Func Message($s, $n = $MB_OK, $ontop = 0); If $RestartLoop Then Return 0
     EndIf
     Reset()
     $UnattendedMode = 0
+    $OpenProfessionBagsMsg = 0
     Splash(0)
     Local $old = $CurrentAccount
     For $i = 1 To GetValue("TotalAccounts")
@@ -1490,6 +1540,7 @@ Func Message($s, $n = $MB_OK, $ontop = 0); If $RestartLoop Then Return 0
         SendMessage($s, $n, $ontop)
     Next
     $CurrentAccount = $old
+    $OpenProfessionBagsMsg = $OpenProfessionBags
     $LogTime = 0
     Start(); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
@@ -1597,7 +1648,11 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
             $etext &= @CRLF & @CRLF & Localize("GamePatched")
         EndIf
         If Not CompletedAccount() Then
-            $etext &= @CRLF & @CRLF & Localize("Invoking", "<CURRENT>", GetValue("CurrentCharacter"), "<ENDAT>", GetValue("EndAtCharacter"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop"))
+            If $OpenProfessionBags Then
+                $etext &= @CRLF & @CRLF & Localize("OpeningProfessionBags", "<CURRENT>", GetValue("CurrentCharacter"), "<ENDAT>", GetValue("EndAtCharacter"))
+            Else
+                $etext &= @CRLF & @CRLF & Localize("Invoking", "<CURRENT>", GetValue("CurrentCharacter"), "<ENDAT>", GetValue("EndAtCharacter"), "<CURRENTLOOP>", GetValue("CurrentLoop"), "<ENDATLOOP>", GetValue("EndAtLoop"))
+            EndIf
         EndIf
         SetAccountValue("LastMsg", $etext)
         $text &= $etext
@@ -1617,7 +1672,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
             FileWrite($SettingsDir & "\Logs\Log_" & $LogStartDate & ".txt", $LogStart & StringReplace($text, @CRLF & @CRLF, @CRLF) & $LogEnd)
         EndIf
     EndIf
-    If Not $UnattendedMode Then
+    If Not $UnattendedMode And Not $OpenProfessionBagsMsg Then
         If $ontop Then
             MsgBox($n, $Title, $text, "", WinGetHandle(AutoItWinGetTitle()) * WinSetOnTop(AutoItWinGetTitle(), "", 1))
         Else
@@ -1878,13 +1933,15 @@ EndFunc
 
 Func ConfigureAccount()
     If CompletedAccount() Or (MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAccountOptions", "<ACCOUNT>", $CurrentAccount)) = $IDYES) Then Return
-    ChooseAccountOptions()
-    ChooseAccountEnableClaimVIPCharacterRewardOptions()
-    ChooseProfessionsAccountEnableOptions()
-    ChooseProfessionsAccountSetTasksOptions()
-    ChooseProfessionsAccountEnableAssetsOptions()
-    ChooseProfessionsAccountSetAssetsOptions()
-    If Not GetAccountValue("InfiniteLoopsStarted") And GetValue("UnattendedMode") <> 3 Then
+    If Not $OpenProfessionBags Then
+        ChooseAccountOptions()
+        ChooseAccountEnableClaimVIPCharacterRewardOptions()
+        ChooseProfessionsAccountEnableOptions()
+        ChooseProfessionsAccountSetTasksOptions()
+        ChooseProfessionsAccountEnableAssetsOptions()
+        ChooseProfessionsAccountSetAssetsOptions()
+    EndIf
+    If Not $OpenProfessionBags And Not GetAccountValue("InfiniteLoopsStarted") And GetValue("UnattendedMode") <> 3 Then
         While 1
             Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $MaxLoops), GetValue("CurrentLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
             If @error <> 0 Then Exit
@@ -1971,7 +2028,7 @@ Global $MinutesToStartSaved, $MinutesToStartSavedTimer
 Func Begin(); If $RestartLoop Then Return 0
     $SkipAllConfigurations = 0
     If Not $UnattendedMode Then
-        If ( $FirstRun Or $MinutesToStart ) And GetValue("UnattendedMode") <> 2 And GetValue("UnattendedMode") <> 3 Then
+        If Not $OpenProfessionBags And ( $FirstRun Or $MinutesToStart ) And GetValue("UnattendedMode") <> 2 And GetValue("UnattendedMode") <> 3 Then
             While 1
                 If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("GetMinutesUntilServerReset")) = $IDYES Then
                     If $MinutesToStartSavedTimer Then
@@ -2127,12 +2184,19 @@ Func Initialize()
     Local $old = $CurrentAccount
     For $i = 1 To GetValue("TotalAccounts")
         $CurrentAccount = $i
-        SetAccountValue("StartAtLoop", GetValue("DefaultStartAtLoop"))
-        SetAccountValue("EndAtLoop", GetValue("DefaultEndAtLoop"))
+        If $OpenProfessionBags Then
+            SetAccountValue("StartAtLoop", 1)
+            SetAccountValue("EndAtLoop", 1)
+            SetAccountValue("CurrentLoop", 1)
+            SetAccountValue("InfiniteLoops", 0)
+        Else
+            SetAccountValue("StartAtLoop", GetValue("DefaultStartAtLoop"))
+            SetAccountValue("EndAtLoop", GetValue("DefaultEndAtLoop"))
+            SetAccountValue("CurrentLoop", GetValue("StartAtLoop"))
+        EndIf
         SetAccountValue("StartAtCharacter", GetValue("DefaultStartAtCharacter"))
         SetAccountValue("EndAtCharacter", GetValue("DefaultEndAtCharacter"))
         SetAccountValue("CurrentCharacter", GetValue("StartAtCharacter"))
-        SetAccountValue("CurrentLoop", GetValue("StartAtLoop"))
         If Not $UnattendedMode And Not $SkipAllConfigurations Then Load()
         If Not GetValue("EndAtCharacter") Or GetValue("EndAtCharacter") > GetValue("TotalSlots") Then SetAccountValue("EndAtCharacter", GetValue("TotalSlots"))
     Next
@@ -2354,6 +2418,7 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
 EndFunc
 
 Func ChooseOptions()
+    If $OpenProfessionBags Then Return
     Local $overflowxpdefault = GetValue("DisableOverflowXPRewardCollection"), $openbagsdefault = GetAllAccountsValue("DisableOpeningBags"), $openbagsoneveryloopdefault = GetAllAccountsValue("OpenBagsOnEveryLoop"), $cofferdefault = GetValue("Coffer"), $list = Localize($cofferdefault), $coffers = Array("CofferOfCelestialArtifacts, CofferOfCelestialEnchantments, BlessedProfessionsElementalPack, ElixirOfFate")
     For $i = 1 To $coffers[0]
         If Not ($coffers[$i] == $cofferdefault) Then $list &= "|" & Localize($coffers[$i])
@@ -2445,8 +2510,14 @@ EndFunc
 
 Func RunScript(); If $RestartLoop Then Return 0
     If $CmdLine[0] Then
-        SetAllAccountsValue("UnattendedMode", Number($CmdLine[1]))
-        If GetValue("UnattendedMode") = 0 Then $UnattendedModeCheckSettings = 1
+        If Number($CmdLine[1]) = 7 Then
+            If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("OpenProfessionBags")) <> $IDYES Then Exit
+            $OpenProfessionBags = 1
+            $OpenProfessionBagsMsg = 1
+        Else
+            SetAllAccountsValue("UnattendedMode", Number($CmdLine[1]))
+            If GetValue("UnattendedMode") = 0 Then $UnattendedModeCheckSettings = 1
+        EndIf
     EndIf
     Local $old = $CurrentAccount
     For $i = 1 To GetValue("TotalAccounts")
@@ -2458,7 +2529,7 @@ Func RunScript(); If $RestartLoop Then Return 0
     Next
     $CurrentAccount = $old
     If $AllLoginInfoFound And GetValue("UnattendedMode") <> 2 And GetValue("UnattendedMode") <> 3 Then $UnattendedMode = GetValue("UnattendedMode")
-    If Not $UnattendedModeCheckSettings And Not GetValue("DisableDonationPrompts") And ( GetAllAccountsValue("TotalInvoked") - GetAllAccountsValue("DonationPrompts") * 2000 ) >= 2000 Then
+    If Not $OpenProfessionBags And Not $UnattendedModeCheckSettings And Not GetValue("DisableDonationPrompts") And ( GetAllAccountsValue("TotalInvoked") - GetAllAccountsValue("DonationPrompts") * 2000 ) >= 2000 Then
         Statistics_SaveIniAllAccounts("DonationPrompts", Floor(GetAllAccountsValue("TotalInvoked") / 2000))
         CloseClient("DonationPrompt.exe"); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0

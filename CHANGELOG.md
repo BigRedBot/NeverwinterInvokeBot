@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.27
+- Added OpenProfessionBags.exe
+
 10.26
 - Re-enabled Russian support
 
