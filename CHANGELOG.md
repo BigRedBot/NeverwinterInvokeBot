@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.28
+- Synchronized to the Russian server reset time
+
 10.27
 - Added OpenProfessionBags.exe
 

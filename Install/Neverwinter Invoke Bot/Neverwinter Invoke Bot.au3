@@ -2039,7 +2039,7 @@ Func Begin(); If $RestartLoop Then Return 0
                         EndIf
                     EndIf
                     $MinutesToStartSavedTimer = 0
-                    $MinutesToStartSaved = _GetUTCMinutes(10, Random(120, 900, 1) / 60, True, True, False, $Title)
+                    $MinutesToStartSaved = _GetUTCMinutes(GetValue("ServerResetTimeZone"), GetValue("ServerResetTimeHour") * 3600 + Random(2 * 60, 30 * 60, 1), True, True, False, $Title)
                     If $MinutesToStartSaved >= 0 Then
                         $MinutesToStartSavedTimer = TimerInit()
                         $MinutesToStart = Round($MinutesToStartSaved)
@@ -2124,7 +2124,7 @@ Func Go(); If $RestartLoop Then Return 0
     EndIf
     If $UnattendedMode And Not $MinutesToEndSavedTimer Then
         While 1
-            $MinutesToEndSaved = _GetUTCMinutes(10, 0, True, False, True, $Title)
+            $MinutesToEndSaved = _GetUTCMinutes(GetValue("ServerResetTimeZone"), GetValue("ServerResetTimeHour") * 3600, True, False, True, $Title)
             If $MinutesToEndSaved >= 0 Then
                 $MinutesToEndSavedTimer = TimerInit()
                 If EndNowTime() Then $MinutesToEndSaved += 1440

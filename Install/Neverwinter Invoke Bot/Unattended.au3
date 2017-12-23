@@ -7,7 +7,7 @@
 #include <Timers.au3>
 #include "_GetUTCMinutes.au3"
 #include "_UnicodeIni.au3"
-#include "Localization.au3"
+#include "Shared.au3"
 Global $Title = $Name & " " & $Version & ": Unattended Launcher"
 LoadLocalizations()
 If _Singleton($Name & ": Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("UnattendedAlreadyRunning"))
@@ -24,12 +24,12 @@ TrayCreateItem("")
 Local $DoOpenProfessionBagsItem = TrayCreateItem(Localize("DoOpenProfessionBags"))
 TrayItemSetOnEvent($DoOpenProfessionBagsItem, "DoOpenProfessionBags")
 TrayCreateItem("")
-TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitScript")
+TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitUnattendedScript")
 TraySetOnEvent($TRAY_EVENT_PRIMARYDOUBLE, "RunNow")
 TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
 
-Func ExitScript()
+Func ExitUnattendedScript()
     Exit
 EndFunc
 
@@ -135,7 +135,7 @@ While 1
         TraySetIcon(@ScriptDir & "\images\teal.ico")
         Local $min = 0
         While 1
-            $min = _GetUTCMinutes(10, Random(120, 900, 1) / 60, True, False, True, $Title & @CRLF & Localize("GettingTimeUntilServerReset"))
+            $min = _GetUTCMinutes(GetValue("ServerResetTimeZone"), GetValue("ServerResetTimeHour") * 3600 + Random(2 * 60, 30 * 60, 1), True, False, True, $Title & @CRLF & Localize("GettingTimeUntilServerReset"))
             If $Ran Then ExitLoop 2
             If $min >= 0 Then ExitLoop
             WaitMinutes(10, "WaitingToRetryGettingTimeUntilServerReset")

@@ -8,11 +8,17 @@ Local $_GetUTCMinutes_TimeServers = "time.nist.gov, pool.ntp.org, 0.pool.ntp.org
 
 Local $_GetUTCMinutes_TimerDelaySet = TimerInit(), $_GetUTCMinutes_TimeServerArray = StringSplit(StringRegExpReplace(StringRegExpReplace(StringStripWS($_GetUTCMinutes_TimeServers, 8), "^,", ""), ",$", ""), ",")
 
-Func _GetUTCMinutes($Hour = 0, $Minute = 0, $Until = False, $Splash = False, $FlashTrayIcon = False, $title = "")
+Func _GetUTCMinutes($TimeZone = 0, $Seconds = 0, $Until = False, $Splash = False, $FlashTrayIcon = False, $title = "")
+    Local $r = _GetUTCSeconds($TimeZone, $Seconds, $Until, $Splash, $FlashTrayIcon, $title)
+    If $r > 0 Then Return ($r / 60)
+    Return $r
+EndFunc
+
+Func _GetUTCSeconds($TimeZone = 0, $Seconds = 0, $Until = False, $Splash = False, $FlashTrayIcon = False, $title = "")
     If $FlashTrayIcon Then
         TraySetState($TRAY_ICONSTATE_FLASH)
     EndIf
-    Local $r = -1, $data = "", $wait = 5, $t = TimerDiff($_GetUTCMinutes_TimerDelaySet), $txt = Ceiling(5-$t/1000) & "...", $lasttxt = $txt, $win
+    Local $r = -1, $data = "", $wait = 5, $t = TimerDiff($_GetUTCMinutes_TimerDelaySet), $txt = Ceiling($wait - $t / 1000) & "...", $lasttxt = $txt, $win
     If $Splash Then
         $win = SplashTextOn($title, $txt & @CRLF, 200, 100, -1, -1, $DLG_MOVEABLE + $DLG_TEXTVCENTER)
     EndIf
@@ -20,7 +26,7 @@ Func _GetUTCMinutes($Hour = 0, $Minute = 0, $Until = False, $Splash = False, $Fl
         TraySetToolTip($title & @CRLF & $txt)
     EndIf
     While $t < $wait * 1000
-        $txt = Ceiling($wait-$t/1000) & "..."
+        $txt = Ceiling($wait - $t / 1000) & "..."
         If Not ($txt == $lasttxt) Then
             If $Splash Then
                 ControlSetText($win, "", "Static1", $txt & @CRLF)
@@ -38,7 +44,7 @@ Func _GetUTCMinutes($Hour = 0, $Minute = 0, $Until = False, $Splash = False, $Fl
         UDPStartup()
         If @error = 0 Then
             $wait = 10
-            For $i = 1 to $_GetUTCMinutes_TimeServerArray[0]
+            For $i = 1 To $_GetUTCMinutes_TimeServerArray[0]
                 $txt = $_GetUTCMinutes_TimeServerArray[$i]
                 If Not ($txt == $lasttxt) Then
                     If $Splash Then
@@ -70,7 +76,7 @@ Func _GetUTCMinutes($Hour = 0, $Minute = 0, $Until = False, $Splash = False, $Fl
                                 $txt = $_GetUTCMinutes_TimeServerArray[$i]
                                 Local $n = ""
                                 If $t >= 1000 Then
-                                    $n = Ceiling($wait-$t/1000) & "..."
+                                    $n = Ceiling($wait - $t / 1000) & "..."
                                 EndIf
                                 If Not (($txt & $n) == $lasttxt) Then
                                     If $Splash Then
@@ -95,19 +101,10 @@ Func _GetUTCMinutes($Hour = 0, $Minute = 0, $Until = False, $Splash = False, $Fl
                 Sleep(250)
             Next
             If $data <> "" Then
-                Local $h = StringMid($data, 83, 8)
-                $data = Dec(StringTrimRight($h, 1)) * 16 + Dec(StringRight($h, 1))
-                $r = ( ($data/24/60/60) - Floor($data/24/60/60) ) * 24 * 60
-                If $Hour Or $Minute Then
-                    Local $t = $Hour * 60 + $Minute
-                    If $r > $t Then
-                        $t += 24 * 60
-                    EndIf
-                    $r = 24 * 60 - ($t - $r)
-                EndIf
-                If $Until Then
-                    $r = 24 * 60 - $r
-                EndIf
+                $data = StringMid($data, 83, 8)
+                $data = ( Dec(StringTrimRight($data, 1)) * 16 + Dec(StringRight($data, 1)) + $TimeZone * 3600 - $Seconds ) / 86400
+                $r = ( $data - Floor($data) ) * 86400
+                If $Until And $r Then $r = 86400 - $r
             EndIf
         EndIf
         UDPShutdown()
