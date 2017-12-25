@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+10.29
+- Added message.txt
+- Will now show change log after install
+
 10.28
 - Synchronized to the Russian server reset time
 

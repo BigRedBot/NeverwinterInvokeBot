@@ -12,6 +12,8 @@ If Not @Compiled Then Exit MsgBox($MB_ICONWARNING, $Title, "The script must be a
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
 #include <StringConstants.au3>
+#include <FileConstants.au3>
+#include ".\Neverwinter Invoke Bot\_GUIScrollbars_Ex.au3"
 #include ".\Neverwinter Invoke Bot\_UnicodeIni.au3"
 #include ".\Neverwinter Invoke Bot\Localization.au3"
 Local $Language = LoadLocalizations(1, @ScriptDir & "\" & $Name & "\Localization.ini", 0)
@@ -65,7 +67,7 @@ If $InstallLocation <> "" And StringRegExp($InstallLocation, "\\" & $Name & "$")
 Else
     $InstallDir = GetInstallLocation()
 EndIf
-Local $SettingsDir = @AppDataDir & "\Neverwinter Invoke Bot", $OldSettingsDir = @AppDataCommonDir & "\Neverwinter Invoke Bot"
+Local $SettingsDir = @AppDataDir & "\" & $Name, $OldSettingsDir = @AppDataCommonDir & "\" & $Name
 If Not FileExists($SettingsDir) And FileExists($OldSettingsDir) Then DirMove($OldSettingsDir, $SettingsDir)
 If _UnicodeIniRead($SettingsDir & "\Settings.ini", "AllAccounts", "Language", "") <> $Language Then
     DirCreate($SettingsDir)
@@ -83,4 +85,34 @@ ElseIf FileExists(@StartupCommonDir & "\" & $Name & " Unattended Launcher.lnk") 
     Exit MsgBox($MB_ICONWARNING, $Title, Localize("FailedToDeleteFile", "<FILE>", @StartupCommonDir & "\" & $Name & " Unattended Launcher.lnk"))
 EndIf
 MsgBox($MB_OK, $Title, Localize("SuccessfullyInstalled", "<VERSION>", $Version) & @CRLF & @CRLF & $InstallDir)
-If $RunUnattendedOnStartup And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("RunUnattendedNow")) = $IDYES Then ShellExecute($InstallDir & "\Unattended.exe", "", $InstallDir)
+
+Func _setupFileRead($file)
+    Local $fo = FileOpen($file, $FO_READ)
+    If $fo <> -1 Then
+        Local $r = FileRead($fo)
+        FileClose($fo)
+        Return $r
+    EndIf
+    Return ""
+EndFunc
+
+Func _setupMsg($txt)
+    Local $hGUI = GUICreate($Title, 500, -1)
+    GUICtrlCreateLabel($txt, 20, 20, 460, 1000)
+    GUISetState()
+    _GUIScrollbars_Generate($hGUI, 0, 1000)
+    While 1
+        Switch GUIGetMsg()
+            Case $GUI_EVENT_CLOSE
+                ExitLoop
+        EndSwitch
+    WEnd
+    GUIDelete($hGUI)
+EndFunc
+
+MsgBox(0, $Title, _setupFileRead(@ScriptDir & "\" & $Name & "\message.txt"))
+
+_setupMsg(_setupFileRead(@ScriptDir & "\" & $Name & "\CHANGELOG.txt"))
+
+If $RunUnattendedOnStartup And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("RunUnattendedNow")) = $IDYES Then Exit ShellExecute($InstallDir & "\Unattended.exe", "", $InstallDir)
+    
