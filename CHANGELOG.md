@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.30
+- Added Enchanted Coffer to OpenProfessionBags.exe
+
 10.29
 - Added message.txt
 - Will now show change log after install

@@ -281,7 +281,7 @@ While 1
                     DoubleClick()
                     Sleep(GetValue("OpenInventoryBagDelay") * 1000)
                 EndIf
-                Local $bags = Array("Professions_ResonantBag, Professions_ArtifactParaphenalia, Professions_ThaumaturgicBag")
+                Local $bags = Array("Professions_ResonantBag, Professions_ArtifactParaphenalia, Professions_ThaumaturgicBag, Professions_EnchantedCoffer")
                 For $i = 1 To $bags[0]
                     OpenInventoryBags($bags[$i], 10000, 0); If $RestartLoop Then Return 0
                     If $RestartLoop Then ExitLoop 3

@@ -111,6 +111,7 @@ While 1
         CheckImage("Professions_ResonantBag")
         CheckImage("Professions_ArtifactParaphenalia")
         CheckImage("Professions_ThaumaturgicBag")
+        CheckImage("Professions_EnchantedCoffer")
         $time = Round(TimerDiff($timer) / 1000, 2)
     EndIf
     Splash($count & "x " & $time & "s" & @CRLF & $text)
