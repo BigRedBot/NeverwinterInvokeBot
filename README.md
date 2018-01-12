@@ -32,7 +32,7 @@ The unlock code is automatically emailed to your PayPal email address.
 **If you have even five or ten dollars to spare, it would mean an awful lot. Thank you for your support.**
 
 Use this link to send donations of $12 or more:  
-https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&item_name=Neverwinter+Invoke+Bot&hosted_button_id=9CWGXCRGWEJR8
+https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&item_name=Neverwinter%20Invoke%20Bot&hosted_button_id=9CWGXCRGWEJR8
 
 Use this micro payment link to send donations of less than $12:  
-https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&item_name=Neverwinter+Invoke+Bot+-+Micro+Payment&hosted_button_id=S6KS5PESGYSUQ
+https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&item_name=Neverwinter%20Invoke%20Bot%20-%20Micro%20Payment&hosted_button_id=S6KS5PESGYSUQ
