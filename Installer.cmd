@@ -23,7 +23,6 @@ IF "%~4" == "Beta" GOTO Beta
 ) > .\Install\variables.au3
 
 COPY CHANGELOG.md ".\Install\%NAME%\CHANGELOG.txt" /Y
-COPY Message.txt ".\Install\%NAME%\Message.txt" /Y
 
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\%NAME%.au3" /out ".\Install\%NAME%\%NAME%.exe" /icon ".\Install\%NAME%\images\red.ico" /comp 0 /nopack /x86
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Unattended.au3" /out ".\Install\%NAME%\Unattended.exe" /icon ".\Install\%NAME%\images\blue.ico" /comp 0 /nopack /x86
