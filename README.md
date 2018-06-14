@@ -36,7 +36,7 @@ The unlock code is automatically emailed to your PayPal email address.
 https://simple.com/friends/D3B6CY4
 
 And when you use the Simple card for the first time, we will both receive $20 each. How cool is that?  
-(You must be a U.S. citizen that is 18 or older to create a Simple account)
+(You must be a U.S. citizen that is 18 or older to create a Simple account.)
 
 &nbsp;
 
