@@ -8,6 +8,7 @@ The latest version has a fishing bot included.
 
 For this script to work, the **Interface scale** in the **Options** must be set to **1.00**, in the **Genral** section of the **Interface** tab.
 
+&nbsp;  
 **You can download the installer here:**  
 https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe
 
@@ -17,24 +18,23 @@ https://github.com/BigRedBot/NeverwinterInvokeBot/blob/master/CHANGELOG.md
 Please post your questions or requests for this script here:  
 https://github.com/BigRedBot/NeverwinterInvokeBot/issues
 
-
 Some anti-virus software may falsely detect this program as a virus.  
 It is a false positive. Please read here for more information about this:  
 https://github.com/BigRedBot/NeverwinterInvokeBot/issues/41
 
-
-Use this link to purchase the Neverwinter Invoke Bot Professions Unlock Code:  
+&nbsp;  
+**Use this link to purchase the Neverwinter Invoke Bot Professions Unlock Code:**  
 https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UQRNUA698EUTC
 
 The unlock code is automatically emailed to your PayPal email address.
 
-
-Use this referral link to create an account with Simple bank and get $20 absolutely free:  
+&nbsp;  
+**Use this referral link to create an account with Simple bank and get $20 absolutely free:**  
 https://simple.com/friends/D3B6CY4
 
 And when you use the Simple card for the first time, we will both receive $20 each. How cool is that?
 
-
+&nbsp;  
 **If you have even five or ten dollars to spare, it would mean an awful lot. Thank you for your support.**
 
 Use this link to send donations of $12 or more:  
