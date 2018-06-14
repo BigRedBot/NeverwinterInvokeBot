@@ -35,7 +35,8 @@ The unlock code is automatically emailed to your PayPal email address.
 **Use this referral link to create an account with Simple bank and get $20 absolutely free:**  
 https://simple.com/friends/D3B6CY4
 
-And when you use the Simple card for the first time, we will both receive $20 each. How cool is that?
+And when you use the Simple card for the first time, we will both receive $20 each. How cool is that?  
+(You must be a U.S. citizen that is 18 or older to create a Simple account)
 
 &nbsp;
 
