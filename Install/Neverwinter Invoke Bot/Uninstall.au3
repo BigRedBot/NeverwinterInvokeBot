@@ -15,7 +15,7 @@ If _Singleton($Name & " Uninstaller" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($
 
 If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DoYouWantToUninstall", "<VERSION>", $Version)) <> $IDYES Then Exit
 
-Local $deleteshortcuts = StringSplit(@StartupCommonDir & "\" & $Name & " Unattended Launcher.lnk|" & @DesktopCommonDir & "\" & $Name & ".lnk|" & @DesktopCommonDir & "\Neverwinter Fishing Bot.lnk|" & @DesktopCommonDir & "\" & $Name & " Donation.lnk", "|")
+Local $deleteshortcuts = StringSplit(@StartupCommonDir & "\" & $Name & " Unattended Launcher.lnk|" & @DesktopCommonDir & "\" & $Name & ".lnk|" & @DesktopCommonDir & "\Neverwinter Fishing Bot.lnk|" & @DesktopCommonDir & "\" & $Name & " Donation.lnk|" & @DesktopCommonDir & "\Simple Bank Referral.lnk", "|")
 For $i = 1 To $deleteshortcuts[0]
     If FileExists($deleteshortcuts[$i]) And Not FileDelete($deleteshortcuts[$i]) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("FailedToDeleteFile", "<FILE>", $deleteshortcuts[$i]))
 Next

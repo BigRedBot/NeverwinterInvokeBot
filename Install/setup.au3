@@ -76,7 +76,7 @@ EndIf
 If FileExists($InstallDir & "\images") And Not DirRemove($InstallDir & "\images", 1) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCleaningUpExistingInstallation"))
 If Not DirCopy($Name, $InstallDir, 1) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCopyingFilesToProgramsFolder"))
 If Not RegWrite($RegLocation, "DisplayName", "REG_SZ", $Name) Or Not RegWrite($RegLocation, "DisplayVersion", "REG_SZ", $Version) Or Not RegWrite($RegLocation, "Publisher", "REG_SZ", "BigRedBot") Or Not RegWrite($RegLocation, "DisplayIcon", "REG_SZ", $InstallDir & "\" & $Name & ".exe") Or Not RegWrite($RegLocation, "UninstallString", "REG_SZ", '"' & $InstallDir & '\Uninstall.exe"') Or Not RegWrite($RegLocation, "InstallLocation", "REG_SZ", $InstallDir) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingUninstallerRegistry"))
-If Not FileCreateShortcut($InstallDir & "\" & $Name & ".exe", @DesktopCommonDir & "\" & $Name & ".lnk", $InstallDir) Or Not FileCreateShortcut($InstallDir & "\Neverwinter Fishing Bot.exe", @DesktopCommonDir & "\Neverwinter Fishing Bot.lnk", $InstallDir) Or Not FileCreateShortcut($InstallDir & "\Donation.html", @DesktopCommonDir & "\" & $Name & " Donation.lnk", $InstallDir) Or Not FileCreateShortcut($SettingsDir, $InstallDir & "\Settings.lnk", $InstallDir) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingShortcut"))
+If Not FileCreateShortcut($InstallDir & "\" & $Name & ".exe", @DesktopCommonDir & "\" & $Name & ".lnk", $InstallDir) Or Not FileCreateShortcut($InstallDir & "\Neverwinter Fishing Bot.exe", @DesktopCommonDir & "\Neverwinter Fishing Bot.lnk", $InstallDir) Or Not FileCreateShortcut($InstallDir & "\Simple.html", @DesktopCommonDir & "\Simple Bank Referral.lnk", $InstallDir) Or Not FileCreateShortcut($SettingsDir, $InstallDir & "\Settings.lnk", $InstallDir) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingShortcut"))
 Local $RunUnattendedOnStartup
 If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("RunUnattendedOnStartup")) = $IDYES Then
     If Not FileCreateShortcut($InstallDir & "\Unattended.exe", @StartupCommonDir & "\" & $Name & " Unattended Launcher.lnk", $InstallDir) Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("ErrorCreatingShortcut"))
@@ -110,9 +110,11 @@ Func _setupMsg($txt)
     GUIDelete($hGUI)
 EndFunc
 
-MsgBox(0, $Title, _setupFileRead(@ScriptDir & "\" & $Name & "\message.txt"))
-
+;MsgBox(0, $Title, _setupFileRead(@ScriptDir & "\" & $Name & "\Message.txt"))
 _setupMsg(_setupFileRead(@ScriptDir & "\" & $Name & "\CHANGELOG.txt"))
 
-If $RunUnattendedOnStartup And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("RunUnattendedNow")) = $IDYES Then Exit ShellExecute($InstallDir & "\Unattended.exe", "", $InstallDir)
-    
+If $RunUnattendedOnStartup And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("RunUnattendedNow")) = $IDYES Then
+    ShellExecute($InstallDir & "\Simple.html")
+    Exit ShellExecute($InstallDir & "\Unattended.exe", "", $InstallDir)
+EndIf
+ShellExecute($InstallDir & "\Simple.html")
