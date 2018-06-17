@@ -1,7 +1,7 @@
 RELEASE NOTES
 =============
 
-10.30.1
+10.30.2
 - Added a link for the Simple Bank Referral Program (You must be a U.S. citizen that is 18 or older to create a Simple account)
 
 10.30
