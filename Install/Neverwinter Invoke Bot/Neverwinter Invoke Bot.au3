@@ -227,13 +227,14 @@ While 1
             Local $LoopTimer = TimerInit()
             Focus()
             MyMouseMove(GetValue("CharacterSelectionMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("CharacterSelectionMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
-            DoubleRightClick()
+            SingleClick()
             MyMouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
+            ; Disabled Simple Character Selection
             If $CharacterSelectionPositioned And Not GetValue("DisableSimpleCharacterSelection") Then
                 Send("{DOWN}")
             ElseIf GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
                 AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollAwayKeyDelaySeconds") * 1000)
-                For $n = 1 To GetValue("TotalSlots")
+                For $n = 1 To (GetValue("TotalSlots") + 3)
                     Send("{UP}")
                 Next
                 AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollTowardKeyDelaySeconds") * 1000)
@@ -245,7 +246,7 @@ While 1
                 AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
             Else
                 AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollAwayKeyDelaySeconds") * 1000)
-                For $n = 1 To GetValue("TotalSlots")
+                For $n = 1 To (GetValue("TotalSlots") + 3)
                     Send("{DOWN}")
                 Next
                 AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollTowardKeyDelaySeconds") * 1000)
@@ -375,7 +376,8 @@ While 1
                 If GetAccountValue("InfiniteLoopsStarted") Then $LastTook = "LastProfessionsTook"
                 $ETAText = Localize($LastTook, "<SECONDS>", Round($LastTime / 1000, 2)) & @CRLF & Localize("ETAForCurrentLoop", "<MINUTES>", HoursAndMinutes($RemainingSeconds / 60))
             EndIf
-            $CharacterSelectionPositioned = 1
+            ; Disabled Simple Character Selection
+            ;$CharacterSelectionPositioned = 1
         ElseIf GetValue("CurrentCharacter") >= GetValue("EndAtCharacter") Then
             SetAccountValue("FinishedLoop", 1)
         EndIf
