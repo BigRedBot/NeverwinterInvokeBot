@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+10.32
+- Fixed fishing bot
+- Updated version mismatch image
+
 10.31
 - Reverted to the old way of character selection
 
