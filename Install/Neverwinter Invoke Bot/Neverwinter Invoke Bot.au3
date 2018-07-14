@@ -226,36 +226,44 @@ While 1
             Splash()
             Local $LoopTimer = TimerInit()
             Focus()
-            MyMouseMove(GetValue("CharacterSelectionMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("CharacterSelectionMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
-            SingleClick()
-            MyMouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
-            ; Disabled Simple Character Selection
-            If $CharacterSelectionPositioned And Not GetValue("DisableSimpleCharacterSelection") Then
+            If $CharacterSelectionPositioned And Not GetValue("DisableSimpleCharacterSelection") And ImageSearch("SelectedCharacter") Then
+                $_ImageSearchX = Random($_ImageSearchLeft, $_ImageSearchLeft + 295, 1)
+                $_ImageSearchY = Random($_ImageSearchBottom - 54, $_ImageSearchBottom, 1)
+                MyMouseMove($_ImageSearchX, $_ImageSearchY)
+                SingleClick()
+                Sleep(500)
                 Send("{DOWN}")
-            ElseIf GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
-                AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollAwayKeyDelaySeconds") * 1000)
-                For $n = 1 To (GetValue("TotalSlots") + 3)
-                    Send("{UP}")
-                Next
-                AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollTowardKeyDelaySeconds") * 1000)
-                Sleep(1000)
-                For $n = 2 To GetValue("CurrentCharacter")
-                    Send("{DOWN}")
-                    Sleep(50)
-                Next
-                AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
             Else
-                AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollAwayKeyDelaySeconds") * 1000)
-                For $n = 1 To (GetValue("TotalSlots") + 3)
+                MyMouseMove(GetValue("CharacterSelectionMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("CharacterSelectionMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+                SingleClick()
+                MyMouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1))
+                If GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
+                    AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollAwayKeyDelaySeconds") * 1000)
                     Send("{DOWN}")
-                Next
-                AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollTowardKeyDelaySeconds") * 1000)
-                Sleep(1000)
-                For $n = 1 To (GetValue("TotalSlots") - GetValue("CurrentCharacter"))
+                    For $n = 1 To (GetValue("TotalSlots") + 3)
+                        Send("{UP}")
+                    Next
+                    AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollTowardKeyDelaySeconds") * 1000)
+                    Sleep(1000)
+                    For $n = 2 To GetValue("CurrentCharacter")
+                        Send("{DOWN}")
+                        Sleep(50)
+                    Next
+                    AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
+                Else
+                    AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollAwayKeyDelaySeconds") * 1000)
                     Send("{UP}")
-                    Sleep(50)
-                Next
-                AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
+                    For $n = 1 To (GetValue("TotalSlots") + 3)
+                        Send("{DOWN}")
+                    Next
+                    AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollTowardKeyDelaySeconds") * 1000)
+                    Sleep(1000)
+                    For $n = 1 To (GetValue("TotalSlots") - GetValue("CurrentCharacter"))
+                        Send("{UP}")
+                        Sleep(50)
+                    Next
+                    AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
+                EndIf
             EndIf
             Sleep(1000)
             Send("{ENTER}")
@@ -376,8 +384,7 @@ While 1
                 If GetAccountValue("InfiniteLoopsStarted") Then $LastTook = "LastProfessionsTook"
                 $ETAText = Localize($LastTook, "<SECONDS>", Round($LastTime / 1000, 2)) & @CRLF & Localize("ETAForCurrentLoop", "<MINUTES>", HoursAndMinutes($RemainingSeconds / 60))
             EndIf
-            ; Disabled Simple Character Selection
-            ;$CharacterSelectionPositioned = 1
+            $CharacterSelectionPositioned = 1
         ElseIf GetValue("CurrentCharacter") >= GetValue("EndAtCharacter") Then
             SetAccountValue("FinishedLoop", 1)
         EndIf

@@ -65,6 +65,7 @@ While 1
         $timer = TimerInit()
         $count += 1
         CheckImage("SelectionScreen")
+        CheckImage("SelectedCharacter")
         CheckImage("Invoked")
         CheckImage("CongratulationsWindow")
         CheckImage("OverflowXPReward")

@@ -1,12 +1,15 @@
 RELEASE NOTES
 =============
 
+10.33
+- Repaired simple character selection
+
 10.32
 - Fixed fishing bot
 - Updated version mismatch image
 
 10.31
-- Reverted to the old way of character selection
+- ~~Reverted to the old way of character selection~~
 
 10.30.2
 - Added a link for the Simple Bank Referral Program (You must be a U.S. citizen that is 18 or older to create a Simple account)
