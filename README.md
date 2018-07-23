@@ -6,7 +6,8 @@ Now supports the Russian game client.
 
 The latest version has a fishing bot included.
 
-For this script to work, the **Interface scale** in the **Options** must be set to **1.00**, in the **Genral** section of the **Interface** tab.
+For this script to work, the **Interface scale** in the **Options** must be set to **1.00**, in the **General** section of the **Interface** tab.  
+I also recommend a resolution of no greater than 1920x1080.
 
 &nbsp;
 
