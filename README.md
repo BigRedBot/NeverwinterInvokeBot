@@ -8,7 +8,7 @@ The latest version has a fishing bot included.
 
 - For this script to work, the **Interface scale** in the **Options** must be set to **1.00**, in the **General** section of the **Interface** tab.  
 - I also recommend a resolution of no greater than 1920x1080. This script may not work properly with higher resolutions.  
-- For the VIP collection, you need to increase the size of your in game inventory window, so that the script can see the buttons it needs to press. It will not attempt to scroll the inventory for you.
+- For the VIP collection, you need to increase the size of your in game inventory window, so that the script can see the buttons it needs to click on. It will not attempt to scroll the inventory for you.
 
 &nbsp;
 
