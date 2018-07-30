@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.34
+- Fixed Russian client support
+
 10.33
 - Repaired simple character selection
 
