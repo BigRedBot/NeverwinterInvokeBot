@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.35
+- Fixed professions when leadership is close to the bottom of the professions list
+
 10.34
 - Fixed Russian client support
 

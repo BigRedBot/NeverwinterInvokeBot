@@ -57,7 +57,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                 If $ProfessionLevel = -2 Then
                     ProfessionsSleep(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
-                    If Not ImageSearch("Professions_Leadership") Then
+                    If Not FindProfessionImage("Professions_Leadership") Then
                         If $leadership_found Then ExitLoop 2
                         Return
                     EndIf
@@ -90,7 +90,7 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                     $no_optional_assets = StringSplit(GetValue("LeadershipProfessionTasks_NoOptionalAssets"), "|")
                 EndIf
                 If $task > $tasklist[0] Then Return
-                If ImageSearch("Professions_Leadership") Then
+                If FindProfessionImage("Professions_Leadership") Then
                     ProfessionsClickImage(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
                     While 1
@@ -167,6 +167,19 @@ Func RunProfessions(); If $RestartLoop Then Return 0
         WEnd
         WEnd
     WEnd
+EndFunc
+
+Func FindProfessionImage($image = "Professions_Leadership")
+    Local $f = ImageSearch($image)
+    If $f Then Return $f
+    For $i = 1 To 3
+        MyMouseMove(GetValue("ProfessionSelectionMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("ProfessionSelectionMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1))
+        MouseWheel($MOUSE_WHEEL_DOWN, 30)
+        MyMouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
+        $f = ImageSearch($image)
+        If $f Then Return $f
+    Next
+    Return $f
 EndFunc
 
 Func ProfessionsChooseAssets(); If $RestartLoop Then Return 0
