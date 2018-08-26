@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.35.1
+- Added the ability to change the key that is used to pause the script in the advanced configurations
+
 10.35
 - Fixed professions when leadership is close to the bottom of the professions list
 

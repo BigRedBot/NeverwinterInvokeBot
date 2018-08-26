@@ -899,7 +899,7 @@ Global $SplashWindow, $SplashWindowOnTop = 1, $LastSplashText = "", $SplashStart
 
 Func Splash($s = "", $ontop = 1)
     If $s == 0 Then
-        HotKeySet("{F4}")
+        HotKeySet(GetValue("PauseBotKey"))
         FindWindow()
         If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
         If Not GetValue("NoInputBlocking") Then BlockInput(0)
@@ -922,20 +922,20 @@ Func Splash($s = "", $ontop = 1)
             $LastSplashText = $Message
         EndIf
     Else
-        HotKeySet("{F4}", "Pause")
+        HotKeySet(GetValue("PauseBotKey"), "Pause")
         Local $setontop = $DLG_NOTITLE + $DLG_NOTONTOP, $leftlocation = $SplashLeft, $toplocation = $SplashTop
         If $ontop Then
             If GetValue("NoInputBlocking") Then
-                $SplashStartText = Localize("ToStopPressF4") & @CRLF & @CRLF & @CRLF
+                $SplashStartText = Localize("ToStopBotPressKey", "<KEY>", GetValue("PauseBotKey")) & @CRLF & @CRLF & @CRLF
             Else
                 BlockInput(1)
-                $SplashStartText = Localize("ToStopPressCtrlAltDel") & @CRLF & @CRLF
+                $SplashStartText = Localize("ToStopPressCtrlAltDel", "<KEY>", GetValue("PauseBotKey")) & @CRLF & @CRLF
             EndIf
         Else
             If Not GetValue("NoInputBlocking") Then BlockInput(0)
             $setontop = $DLG_MOVEABLE + $DLG_NOTONTOP
             $toplocation = 50
-            $SplashStartText = Localize("ToStopPressF4") & @CRLF & @CRLF & @CRLF
+            $SplashStartText = Localize("ToStopBotPressKey", "<KEY>", GetValue("PauseBotKey")) & @CRLF & @CRLF & @CRLF
         EndIf
         $Message = Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & $SplashStartText & $Message
         $SplashWindow = SplashTextOn("", $Message, GetValue("SplashWidth"), GetValue("SplashHeight"), $leftlocation, $toplocation, $setontop)
@@ -2346,6 +2346,7 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
     $s &= "|" & "CursorModeKey,CursorModeKeyTitle,CursorModeKeyDescription,Text"
     $s &= "|" & "InventoryKey,InventoryKeyTitle,InventoryKeyDescription,Text"
     $s &= "|" & "ProfessionsKey,ProfessionsKeyTitle,ProfessionsKeyDescription,Text"
+    $s &= "|" & "PauseBotKey,PauseBotKeyTitle,PauseBotKeyDescription,Text"
     $s &= "|" & "CheckServerAddress,CheckServerAddressTitle,CheckServerAddressDescription,Text"
     Local $a = StringSplit(StringRegExpReplace($s, "^\|+", ""), "|")
     Local $Total = $a[0]

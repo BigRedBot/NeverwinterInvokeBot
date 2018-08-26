@@ -82,11 +82,11 @@ Local $SplashWindow, $LastSplashText = "", $SplashLeft = @DesktopWidth - GetValu
 Func Splash($s = "")
     If $SplashWindow Then
         If Not ($LastSplashText == $s) Then
-            ControlSetText($SplashWindow, "", "Static1", Localize("ToStopPressF4") & @CRLF & @CRLF & $s)
+            ControlSetText($SplashWindow, "", "Static1", Localize("ToStopBotPressKey", "<KEY>", GetValue("PauseBotKey")) & @CRLF & @CRLF & $s)
             $LastSplashText = $s
         EndIf
     Else
-        $SplashWindow = SplashTextOn($Title, Localize("ToStopPressF4") & @CRLF & @CRLF & $s, GetValue("FishingSplashWidth"), GetValue("FishingSplashHeight"), $SplashLeft, $SplashTop - 50, $DLG_MOVEABLE + $DLG_NOTONTOP)
+        $SplashWindow = SplashTextOn($Title, Localize("ToStopBotPressKey", "<KEY>", GetValue("PauseBotKey")) & @CRLF & @CRLF & $s, GetValue("FishingSplashWidth"), GetValue("FishingSplashHeight"), $SplashLeft, $SplashTop - 50, $DLG_MOVEABLE + $DLG_NOTONTOP)
         $LastSplashText = $s
         WinSetOnTop($SplashWindow, "", 0)
     EndIf
@@ -149,7 +149,7 @@ EndFunc
 Func Fish()
 While 1
 While 1
-    HotKeySet("{F4}")
+    HotKeySet(GetValue("PauseBotKey"))
     If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
     SplashOff()
     $SplashWindow = 0
@@ -173,7 +173,7 @@ While 1
     WEnd
     While 1
     While 1
-        HotKeySet("{F4}", "Fish")
+        HotKeySet(GetValue("PauseBotKey"), "Fish")
         Splash()
         If Not Position() Then ExitLoop 3
         Sleep(GetValue("FishingDelaySeconds") * 1000)
