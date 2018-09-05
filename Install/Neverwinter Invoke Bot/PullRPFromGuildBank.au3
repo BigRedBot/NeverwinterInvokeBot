@@ -112,9 +112,9 @@ Func End()
     Exit
 EndFunc
 
+Local $speed = 2, $found, $reset, $rp = Array("RP_Black_Opal, RP_Flawless_Sapphire, RP_Emerald, RP_Greater_Enchanting_Stone, RP_Moderate_Mark_of_Potency, RP_Black_Pearl, RP_Peridot, RP_Moderate_Enchanting_Stone, RP_Lesser_Mark_of_Potency")
 
 Func Pull()
-    Local $speed = 2, $found, $reset = 1, $rp = Array("RP_Black_Opal, RP_Flawless_Sapphire, RP_Emerald, RP_Greater_Enchanting_Stone, RP_Moderate_Mark_of_Potency, RP_Black_Pearl, RP_Peridot, RP_Moderate_Enchanting_Stone, RP_Lesser_Mark_of_Potency")
     While 1
         HotKeySet("{Esc}")
         If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
@@ -124,6 +124,7 @@ Func Pull()
         Position()
         HotKeySet("{Esc}", "Pull")
         Splash()
+        $reset = 1
         For $n = 1 To 2
             For $i = 1 To $rp[0]
                 If ImageSearch("SortButton") Then

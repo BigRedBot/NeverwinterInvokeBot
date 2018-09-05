@@ -1,7 +1,7 @@
 RELEASE NOTES
 =============
 
-10.36
+10.36.1
 - Added PullRPFromGuildBank.exe
 
 10.35.1
