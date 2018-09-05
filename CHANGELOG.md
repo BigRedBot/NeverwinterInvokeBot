@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.36
+- Added PullRPFromGuildBank.exe
+
 10.35.1
 - Added the ability to change the key that is used to pause the script in the advanced configurations
 

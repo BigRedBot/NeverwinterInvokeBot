@@ -1,6 +1,7 @@
 #include-once
 #include <Misc.au3>
 #include <FileConstants.au3>
+#include <StringConstants.au3>
 #include <MsgBoxConstants.au3>
 #include <AutoItConstants.au3>
 #include <GUIConstants.au3>
