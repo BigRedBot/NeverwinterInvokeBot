@@ -1722,7 +1722,7 @@ Func AdvancedAccountSettings($hWnd = 0)
     Local $a = StringSplit(StringRegExpReplace($s, "^\|+", ""), "|")
     Local $Total = $a[0]
     Local $c[$Total + 1]
-    Local $hGui = GUICreate($Title, 600, 400, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
+    Local $hGUI = GUICreate($Title, 600, 400, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
     GUICtrlCreateLabel(Localize("AdvancedSettings"), 160, 20, 100, -1, $SS_RIGHT)
     For $i = 1 To $Total
@@ -1746,7 +1746,7 @@ Func AdvancedAccountSettings($hWnd = 0)
     Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 40, 60 + $Total * 36, 75, 25)
     Local $ButtonOK = GUICtrlCreateButton("&OK", 268, 60 + $Total * 36, 75, 25, $BS_DEFPUSHBUTTON)
     Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 350, 60 + $Total * 36, 75, 25)
-    GUISetState(@SW_SHOW, $hGui)
+    GUISetState(@SW_SHOW, $hGUI)
     While 1
         Switch GUIGetMsg()
             Case $GUI_EVENT_CLOSE
@@ -1807,7 +1807,7 @@ Func ChooseAccountOptions()
         DeleteIniAccount("OpenBagsOnEveryLoop")
         Return
     EndIf
-    Local $hGui = GUICreate($Title, 320, 150)
+    Local $hGUI = GUICreate($Title, 320, 150)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
     Local $OpenInventoryBagsCheckbox = GUICtrlCreateCheckbox(" " & Localize("OpenInventoryBags"), 25, 45, 270)
     If Not GetAccountValue("DisableOpeningBags") Then GUICtrlSetState($OpenInventoryBagsCheckbox, $GUI_CHECKED)
@@ -1835,7 +1835,7 @@ Func ChooseAccountOptions()
                     GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_DISABLE)
                 EndIf
             Case $ButtonAdvanced
-                AdvancedAccountSettings($hGui)
+                AdvancedAccountSettings($hGUI)
             Case $ButtonOK
                 Local $disabled = 1
                 If GUICtrlRead($OpenInventoryBagsCheckbox) = $GUI_CHECKED Then $disabled = 0
@@ -2350,7 +2350,7 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
     Local $a = StringSplit(StringRegExpReplace($s, "^\|+", ""), "|")
     Local $Total = $a[0]
     Local $c[$Total + 1]
-    Local $hGui = GUICreate($Title, 600, 400, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
+    Local $hGUI = GUICreate($Title, 600, 400, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
     GUICtrlCreateLabel(Localize("AdvancedSettings"), 160, 20, 100, -1, $SS_RIGHT)
     For $i = 1 To $Total
         $a[$i] = StringSplit($a[$i], ",")
@@ -2373,7 +2373,7 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
     Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 40, 60 + $Total * 36, 75, 25)
     Local $ButtonOK = GUICtrlCreateButton("&OK", 268, 60 + $Total * 36, 75, 25, $BS_DEFPUSHBUTTON)
     Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 350, 60 + $Total * 36, 75, 25)
-    GUISetState(@SW_SHOW, $hGui)
+    GUISetState(@SW_SHOW, $hGUI)
     While 1
         Switch GUIGetMsg()
             Case $GUI_EVENT_CLOSE
@@ -2432,7 +2432,7 @@ Func ChooseOptions()
     For $i = 1 To $coffers[0]
         If Not ($coffers[$i] == $cofferdefault) Then $list &= "|" & Localize($coffers[$i])
     Next
-    Local $hGui = GUICreate($Title, 320, 230)
+    Local $hGUI = GUICreate($Title, 320, 230)
     GUICtrlCreateLabel(Localize("ChooseCoffer"), 25, 20, 270)
     Local $hCombo = GUICtrlCreateCombo("", 25, 50, 270)
     GUICtrlSetData(-1, $list, Localize($cofferdefault))
@@ -2463,7 +2463,7 @@ Func ChooseOptions()
                     GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_DISABLE)
                 EndIf
             Case $ButtonAdvanced
-                AdvancedAllAccountsSettings($hGui)
+                AdvancedAllAccountsSettings($hGUI)
             Case $ButtonOK
                 Local $CurrCombo = GUICtrlRead($hCombo), $overflowxpdisabled = 1, $openbagsdisabled = 1, $openbagsoneveryloopenabled = 0
                 If GUICtrlRead($CollectOverflowXPRewardsCheckbox) = $GUI_CHECKED Then $overflowxpdisabled = 0

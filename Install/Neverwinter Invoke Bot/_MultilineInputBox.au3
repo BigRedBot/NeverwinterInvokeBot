@@ -17,7 +17,7 @@ Func _MultilineInputBox($title = "", $prompt = "", $Default = "", $width = 0, $h
     Local $widthAddition = $width-400
     Local $heightAddition = $height-330
     Local $error = 0
-    Local $hGui = GUICreate($title, $width, $height, $left, $top, 0x00C00000+0x00080000,0,$hWnd)
+    Local $hGUI = GUICreate($title, $width, $height, $left, $top, 0x00C00000+0x00080000,0,$hWnd)
     If @error Then
         $error = 3
     Else
@@ -31,12 +31,12 @@ Func _MultilineInputBox($title = "", $prompt = "", $Default = "", $width = 0, $h
         If @error Then $error = 3
         Local $hCancel = GUICtrlCreateButton('&Cancel', 230, 300+$heightAddition, 80, 25)
         If @error Then $error = 3
-        GUISetState(@SW_SHOW, $hGui)
+        GUISetState(@SW_SHOW, $hGUI)
         If @error Then $error = 3
         Local $timer = TimerInit(), $s1, $s2, $msg
         Do
             $msg = GUIGetMsg(1)
-            If $msg[1] = $hGui Then
+            If $msg[1] = $hGUI Then
             Switch $msg[0]
                 Case 0xFFFFFFFD, $hCancel ; 0xFFFFFFFD = $GUI_EVENT_CLOSE
                     $error = 1
@@ -53,7 +53,7 @@ Func _MultilineInputBox($title = "", $prompt = "", $Default = "", $width = 0, $h
             EndIf
         Until $error
         If Not $error Then $text = GUICtrlRead($Edit)
-        GUIDelete($hGui)
+        GUIDelete($hGUI)
         Opt('GUIOnEventMode', $OnEventMode)
     EndIf
     SetError($error)

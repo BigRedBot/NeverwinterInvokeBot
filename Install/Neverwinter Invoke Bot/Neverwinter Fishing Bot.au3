@@ -392,7 +392,7 @@ Func Settings($hWnd = 0)
     Local $a = StringSplit(StringRegExpReplace($s, "^\|+", ""), "|")
     Local $Total = $a[0]
     Local $c[$Total + 1]
-    Local $hGui = GUICreate($Title, 400, 100 + $Total * 36, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
+    Local $hGUI = GUICreate($Title, 400, 100 + $Total * 36, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
     GUICtrlCreateLabel(Localize("Settings"), 20, 20, 100, -1, $SS_RIGHT)
     For $i = 1 To $Total
         $a[$i] = StringSplit($a[$i], ",")
@@ -415,13 +415,13 @@ Func Settings($hWnd = 0)
     Local $ButtonOK = GUICtrlCreateButton("&OK", 128, 64 + $Total * 36, 75, 25, $BS_DEFPUSHBUTTON)
     Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 210, 64 + $Total * 36, 75, 25)
     Local $ButtonAdvanced = GUICtrlCreateButton(Localize("Advanced"), 310, 64 + $Total * 36, 75, 25)
-    GUISetState(@SW_SHOW, $hGui)
+    GUISetState(@SW_SHOW, $hGUI)
     While 1
         Switch GUIGetMsg()
             Case $GUI_EVENT_CLOSE
                 End()
             Case $ButtonAdvanced
-                AdvancedSettings($hGui)
+                AdvancedSettings($hGUI)
             Case $ButtonDefault
                 For $i = 1 To $Total
                     Local $v = ($a[$i])[1], $t = ($a[$i])[4]
@@ -492,7 +492,7 @@ Func AdvancedSettings($hWnd = 0)
     Local $a = StringSplit(StringRegExpReplace($s, "^\|+", ""), "|")
     Local $Total = $a[0]
     Local $c[$Total + 1]
-    Local $hGui = GUICreate($Title, 600, 100 + $Total * 36, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
+    Local $hGUI = GUICreate($Title, 600, 100 + $Total * 36, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
     GUICtrlCreateLabel(Localize("AdvancedSettings"), 160, 20, 100, -1, $SS_RIGHT)
     For $i = 1 To $Total
         $a[$i] = StringSplit($a[$i], ",")
@@ -514,7 +514,7 @@ Func AdvancedSettings($hWnd = 0)
     Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 40, 64 + $Total * 36, 75, 25)
     Local $ButtonOK = GUICtrlCreateButton("&OK", 268, 64 + $Total * 36, 75, 25, $BS_DEFPUSHBUTTON)
     Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 350, 64 + $Total * 36, 75, 25)
-    GUISetState(@SW_SHOW, $hGui)
+    GUISetState(@SW_SHOW, $hGUI)
     While 1
         Switch GUIGetMsg()
             Case $GUI_EVENT_CLOSE

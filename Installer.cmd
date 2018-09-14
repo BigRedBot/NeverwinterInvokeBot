@@ -34,6 +34,8 @@ COPY CHANGELOG.md ".\Install\%NAME%\CHANGELOG.txt" /Y
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Uninstall.au3" /out ".\Install\%NAME%\Uninstall.exe" /icon ".\Install\%NAME%\images\yellow.ico" /comp 0 /nopack /x86
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\OpenProfessionBags.au3" /out ".\Install\%NAME%\OpenProfessionBags.exe" /icon ".\Install\%NAME%\images\teal.ico" /comp 0 /nopack /x86
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\PullRPFromGuildBank.au3" /out ".\Install\%NAME%\PullRPFromGuildBank.exe" /icon ".\Install\%NAME%\images\teal.ico" /comp 0 /nopack /x86
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Auction.au3" /out ".\Install\%NAME%\Auction.exe" /icon ".\Install\%NAME%\images\teal.ico" /comp 0 /nopack /x86
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Mail.au3" /out ".\Install\%NAME%\Mail.exe" /icon ".\Install\%NAME%\images\teal.ico" /comp 0 /nopack /x86
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\DonationPrompt.au3" /out ".\Install\%NAME%\DonationPrompt.exe" /comp 0 /nopack /x86
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in .\Install\setup.au3 /out .\Install\setup.exe /comp 0 /nopack /x86
 

@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+10.37
+- Added Auction.exe
+- Added Mail.exe
+
 10.36.1
 - Added PullRPFromGuildBank.exe
 

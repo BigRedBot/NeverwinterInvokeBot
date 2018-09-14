@@ -871,7 +871,7 @@ Func ChooseProfessionsAccountSetAssetsOptions()
 EndFunc
 
 Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
-    Local $hGui = GUICreate($Title, 350, 440, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
+    Local $hGUI = GUICreate($Title, 350, 440, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
     GUICtrlCreateLabel($msg, 25, 20, 325)
     Local $DefaultWorkers = StringSplit(GetDefaultValue("LeadershipOptionalAssets"), "|"), $TestWorkers = StringSplit($setting & "|" & GetDefaultValue("LeadershipOptionalAssets"), "|")
     Local $Total = $DefaultWorkers[0], $ButtonUp[$Total + 1], $ButtonDown[$Total + 1], $Label[$Total + 1], $Border[$Total + 1], $Image[$Total + 1], $Colors[$Total + 1], $DeleteWorkers = "0", $nMsg
@@ -908,7 +908,7 @@ Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
     Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 40, 400, 75, 25)
     Local $ButtonOK = GUICtrlCreateButton("&OK", 168, 400, 75, 25, $BS_DEFPUSHBUTTON)
     Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 250, 400, 75, 25)
-    GUISetState(@SW_SHOW, $hGui)
+    GUISetState(@SW_SHOW, $hGUI)
     While 1
         $nMsg = GUIGetMsg()
         Switch $nMsg

@@ -13,10 +13,6 @@ TraySetToolTip($Title)
 
 Local $MouseOffset = 5, $KeyDelay = GetValue("KeyDelaySeconds") * 1000
 
-Func Array($x)
-    Return StringSplit(StringRegExpReplace(StringRegExpReplace(StringStripWS($x, $STR_STRIPALL), "^,", ""), ",$", ""), ",")
-EndFunc
-
 Func Position()
     Focus()
     If Not $WinHandle Or Not GetPosition() Then
@@ -112,34 +108,36 @@ Func End()
     Exit
 EndFunc
 
-Local $speed = 2, $found, $reset, $rp = Array("RP_Black_Opal, RP_Flawless_Sapphire, RP_Emerald, RP_Greater_Enchanting_Stone, RP_Moderate_Mark_of_Potency, RP_Black_Pearl, RP_Peridot, RP_Moderate_Enchanting_Stone, RP_Lesser_Mark_of_Potency")
+Local $speed = 2, $found, $reset, $rp = StringSplit("Black_Opal|Flawless_Sapphire|Emerald|Greater_Enchanting_Stone|Moderate_Mark_of_Potency|Black_Pearl|Peridot|Moderate_Enchanting_Stone|Lesser_Mark_of_Potency", "|")
 
 Func Pull()
+    While 1
     While 1
         HotKeySet("{Esc}")
         If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
         SplashOff()
         $SplashWindow = 0
         If MsgBox($MB_OKCANCEL, $Title, Localize("ClickOKToPullRPFromGuildBank")) <> $IDOK Then End()
-        Position()
+        If Not Position() Then ExitLoop
         HotKeySet("{Esc}", "Pull")
         Splash()
         $reset = 1
         For $n = 1 To 2
             For $i = 1 To $rp[0]
                 If ImageSearch("SortButton") Then
-                    Local $left = $_ImageSearchLeft, $right = $_ImageSearchRight, $top = $_ImageSearchTop, $bottom = $_ImageSearchBottom, $NextRPLeft = $ClientLeft, $NextRPTop = $bottom, $NextRPBottom = $ClientBottom
+                    Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom, $NextRPLeft = $ClientLeft, $NextRPTop = $_ImageSearchBottom, $NextRPTopSecond = $_ImageSearchBottom, $NextRPBottom = $ClientBottom
                     If $reset Then
                         $reset = 0
                         MyMouseMove($left - 20 - Random(0, 100, 1), Random($top, $bottom, 1), $speed)
                     EndIf
                     While 1
                         $found = 0
-                        If ImageSearch($rp[$i], $NextRPLeft, $bottom, $right + 10, $NextRPBottom) Or ImageSearch($rp[$i], $ClientLeft, $NextRPTop, $right + 10, $ClientBottom) Then $found = 1
+                        If ImageSearch("Item_" & $rp[$i] & "_Half", $NextRPLeft, $NextRPTop, $right + 10, $NextRPBottom) Or ImageSearch("Item_" & $rp[$i] & "_Half", $ClientLeft, $NextRPTopSecond, $right + 10, $ClientBottom) Then $found = 1
                         If $found Then
                             $NextRPLeft = $_ImageSearchRight
-                            $NextRPTop = $_ImageSearchBottom
+                            $NextRPTop = $_ImageSearchTop
                             $NextRPBottom = $_ImageSearchBottom
+                            $NextRPTopSecond = $_ImageSearchBottom
                             $reset = 1
                             MyMouseMove($_ImageSearchX, $_ImageSearchY, $speed)
                             DoubleClick()
@@ -149,11 +147,12 @@ Func Pull()
                                 MyMouseMove($left - 20 - Random(0, 100, 1), Random($top, $bottom, 1), $speed)
                             EndIf
                             $found = 0
-                            If ImageSearch($rp[$i], $NextRPLeft, $bottom, $right + 10, $NextRPBottom) Or ImageSearch($rp[$i], $ClientLeft, $NextRPTop, $right + 10) Then $found = 1
+                            If ImageSearch("Item_" & $rp[$i] & "_Half", $NextRPLeft, $NextRPTop, $right + 10, $NextRPBottom) Or ImageSearch("Item_" & $rp[$i] & "_Half", $ClientLeft, $NextRPTopSecond, $right + 10) Then $found = 1
                             If $found Then
                                 $NextRPLeft = $_ImageSearchRight
-                                $NextRPTop = $_ImageSearchBottom
+                                $NextRPTop = $_ImageSearchTop
                                 $NextRPBottom = $_ImageSearchBottom
+                                $NextRPTopSecond = $_ImageSearchBottom
                                 $reset = 1
                                 MyMouseMove($_ImageSearchX, $_ImageSearchY, $speed)
                                 DoubleClick()
@@ -171,6 +170,7 @@ Func Pull()
                 EndIf
             Next
         Next
+    WEnd
     WEnd
 EndFunc
 
