@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.38.4
+- Fixed small timing issue with Auction
+
 10.38.3
 - Added missing image for an Auction item
 

@@ -188,6 +188,12 @@ Func Auction()
             SingleClick()
             If $loop == 100 Then ExitLoop
             Sleep(500)
+            $n = 0
+            While ImageSearch("Item_" & $itemArray[$Item_Number] & "_Half", $left, $top, $left + 45, $bottom)
+                If $n == 20 Then ExitLoop
+                $n += 1
+                Sleep(200)
+            WEnd
         WEnd
     WEnd
     WEnd
