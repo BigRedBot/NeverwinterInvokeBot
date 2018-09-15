@@ -100,7 +100,7 @@ Func LoadDefaults()
     SetDefault("LeadershipProfessionTasks_Level_23", Localize("Train_for_the_Protectors_Tourney") & "|" & Localize("Guard_Young_Noble_on_Trip") & "|" & Localize("Capture_Bandit_Leader") & "|" & Localize("Guard_Clerics_of_Ilmater") & "|" & GetDefaultValue("LeadershipProfessionTasks_Workers"))
     SetDefault("LeadershipProfessionTasks_Level_24", Localize("Capture_Bandit_Leader") & "|" & Localize("Escort_a_Wizards_Seneschal") & "|" & Localize("Guard_Clerics_of_Ilmater") & "|" & Localize("Protect_Magical_Goods_Market") & "|" & GetDefaultValue("LeadershipProfessionTasks_Workers"))
     SetDefault("LeadershipProfessionTasks_Level_25", GetDefaultValue("LeadershipProfessionTasks_Level_24"))
-    SetDefault("AuctionItems", "Black_Opal=99|Flawless_Sapphire=99|Emerald=99|Greater_Enchanting_Stone=99|Moderate_Mark_of_Potency=99|Black_Pearl=99|Peridot=99|Moderate_Enchanting_Stone=99|Lesser_Mark_of_Potency=99|Preservation_Ward=99|Coalescent_Ward=1")
+    SetDefault("AuctionItems", "Black_Opal|Flawless_Sapphire|Emerald|Greater_Enchanting_Stone|Moderate_Mark_of_Potency|Black_Pearl|Peridot|Moderate_Enchanting_Stone|Lesser_Mark_of_Potency|Preservation_Ward|Coalescent_Ward")
 EndFunc
 
 Global $CurrentAccount = 1
@@ -113,7 +113,7 @@ For $i = 1 To 100
 Next
 
 SetAllAccountsValue("Language", LoadLocalizations())
-Global $Language = GetValue("Language")
+Global $Language = GetValue("Language"), $ImageDir = "images\" & $Language, $FullImageDir = @ScriptDir & "\" & $ImageDir, $ImagePath = $ImageDir & "\", $FullImagePath = $FullImageDir & "\"
 
 Func SetDefault($name, $value = 0)
     If Not IsDeclared("SETTINGS_Default_" & $name) Then Return Assign("SETTINGS_Default_" & $name, $value, 2)

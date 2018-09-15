@@ -897,7 +897,7 @@ Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
         If $c > 0 Then $color = $Colors[$c]
         GUICtrlSetBkColor($Border[$i], $color)
         $Image[$i] = GUICtrlCreatePic("", 160, 55 * $i + 6, 30, 30)
-        _SetImage($Image[$i], @ScriptDir & "\images\" & $Language & "\Professions_Asset_" & $Workers[$i] & ".png")
+        _SetImage($Image[$i], $FullImagePath & "Professions_Asset_" & $Workers[$i] & ".png")
     Next
     For $i = 1 To $Total
         $ButtonUp[$i] = GUICtrlCreateButton(ChrW(9650), 200, 55 * $i, 20, 20)
@@ -928,7 +928,7 @@ Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
                             Local $color = $COLOR_WHITE, $c = _ArraySearch($DefaultWorkers, $Workers[$i], 1)
                             If $c > 0 Then $color = $Colors[$c]
                             GUICtrlSetBkColor($Border[$i], $color)
-                            _SetImage($Image[$i], @ScriptDir & "\images\" & $Language & "\Professions_Asset_" & $Workers[$i] & ".png")
+                            _SetImage($Image[$i], $FullImagePath & "Professions_Asset_" & $Workers[$i] & ".png")
                         Next
                         GUICtrlSetState($ButtonOK, $GUI_ENABLE)
                         ExitLoop
@@ -948,7 +948,7 @@ Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
                             Local $color = $COLOR_WHITE, $c = _ArraySearch($DefaultWorkers, $Workers[$i], 1)
                             If $c > 0 Then $color = $Colors[$c]
                             GUICtrlSetBkColor($Border[$i], $color)
-                            _SetImage($Image[$i], @ScriptDir & "\images\" & $Language & "\Professions_Asset_" & $Workers[$i] & ".png")
+                            _SetImage($Image[$i], $FullImagePath & "Professions_Asset_" & $Workers[$i] & ".png")
                         Next
                         GUICtrlSetState($ButtonOK, $GUI_ENABLE)
                         ExitLoop
@@ -962,7 +962,7 @@ Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
                     Local $color = $COLOR_WHITE, $c = _ArraySearch($DefaultWorkers, $Workers[$i], 1)
                     If $c > 0 Then $color = $Colors[$c]
                     GUICtrlSetBkColor($Border[$i], $color)
-                    _SetImage($Image[$i], @ScriptDir & "\images\" & $Language & "\Professions_Asset_" & $Workers[$i] & ".png")
+                    _SetImage($Image[$i], $FullImagePath & "Professions_Asset_" & $Workers[$i] & ".png")
                 Next
                 GUICtrlSetState($ButtonOK, $GUI_ENABLE)
             Case $ButtonOK

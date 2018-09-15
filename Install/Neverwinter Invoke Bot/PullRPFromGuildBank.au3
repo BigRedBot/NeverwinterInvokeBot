@@ -93,11 +93,11 @@ Func Splash($s = "")
 EndFunc
 
 Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("ImageTolerance"))
-    If Not FileExists("images\" & $Language & "\" & $image & ".png") Then Return 0
-    If _ImageSearch("images\" & $Language & "\" & $image & ".png", $left, $top, $right, $bottom, $tolerance) Then Return 1
+    If Not FileExists($ImagePath & $image & ".png") Then Return 0
+    If _ImageSearch($ImagePath & $image & ".png", $left, $top, $right, $bottom, $tolerance) Then Return 1
     Local $i = 2
-    While FileExists(@ScriptDir & "\images\" & $Language & "\" & $image & "-" & $i & ".png")
-        If _ImageSearch("images\" & $Language & "\" & $image & "-" & $i & ".png", $left, $top, $right, $bottom, $tolerance) Then Return $i
+    While FileExists($FullImagePath & $image & "-" & $i & ".png")
+        If _ImageSearch($ImagePath & $image & "-" & $i & ".png", $left, $top, $right, $bottom, $tolerance) Then Return $i
         $i += 1
     WEnd
     Return 0

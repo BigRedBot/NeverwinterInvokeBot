@@ -95,14 +95,18 @@ Func Splash($s = "")
 EndFunc
 
 Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $tolerance = GetValue("ImageTolerance"))
-    If Not FileExists("images\" & $Language & "\" & $image & ".png") Then Return 0
-    If _ImageSearch("images\" & $Language & "\" & $image & ".png", $left, $top, $right, $bottom, $tolerance) Then Return 1
+    If Not ImageExists($image) Then Return 0
+    If _ImageSearch($ImagePath & $image & ".png", $left, $top, $right, $bottom, $tolerance) Then Return 1
     Local $i = 2
-    While FileExists(@ScriptDir & "\images\" & $Language & "\" & $image & "-" & $i & ".png")
-        If _ImageSearch("images\" & $Language & "\" & $image & "-" & $i & ".png", $left, $top, $right, $bottom, $tolerance) Then Return $i
+    While ImageExists($image & "-" & $i)
+        If _ImageSearch($ImagePath & $image & "-" & $i & ".png", $left, $top, $right, $bottom, $tolerance) Then Return $i
         $i += 1
     WEnd
     Return 0
+EndFunc
+
+Func ImageExists($image)
+    Return FileExists($FullImagePath & $image & ".png")
 EndFunc
 
 Func End()
@@ -210,20 +214,20 @@ Func SetAuctionOptions($hWnd = 0)
     If $Item_Number Then
         GUICtrlSetState($ButtonSelect, $GUI_HIDE)
         If $itemQuantity[$Item_Number] == "1" Then
-            _SetImage($ImageIcon, @ScriptDir & "\images\" & $Language & "\Item_" & $itemArray[$Item_Number] & ".png")
+            _SetImage($ImageIcon, $FullImagePath & "Item_" & $itemArray[$Item_Number] & ".png")
         Else
-            _SetImage($ImageIcon, @ScriptDir & "\images\" & $Language & "\Item_" & $itemArray[$Item_Number] & "_99.png")
+            _SetImage($ImageIcon, $FullImagePath & "Item_" & $itemArray[$Item_Number] & "_99.png")
         EndIf
         GUICtrlSetData($ImageLabel, Localize($itemArray[$Item_Number]))
         GuiCtrlSetState($ADInput, $GUI_FOCUS)
-        _SetImage($ADIcon, @ScriptDir & "\images\" & $Language & "\AD.png")
+        _SetImage($ADIcon, $FullImagePath & "AD.png")
     Else
         GUICtrlSetState($Label, $GUI_HIDE)
         GUICtrlSetState($ImageIcon, $GUI_HIDE)
         GUICtrlSetState($ImageLabel, $GUI_HIDE)
         GUICtrlSetState($ButtonOK, $GUI_DISABLE)
         GUICtrlSetState($ADInput, $GUI_DISABLE)
-        _SetImage($ADIcon, @ScriptDir & "\images\" & $Language & "\AD_BW.png")
+        _SetImage($ADIcon, $FullImagePath & "AD_BW.png")
         GuiCtrlSetState($ButtonSelect, $GUI_FOCUS)
     EndIf
     GUISetState(@SW_SHOW, $hGUI)
@@ -235,15 +239,15 @@ Func SetAuctionOptions($hWnd = 0)
             Case $ImageIcon
                 If SelectAuctionItem() Then
                     If $itemQuantity[$Item_Number] == "1" Then
-                        _SetImage($ImageIcon, @ScriptDir & "\images\" & $Language & "\Item_" & $itemArray[$Item_Number] & ".png")
+                        _SetImage($ImageIcon, $FullImagePath & "Item_" & $itemArray[$Item_Number] & ".png")
                     Else
-                        _SetImage($ImageIcon, @ScriptDir & "\images\" & $Language & "\Item_" & $itemArray[$Item_Number] & "_99.png")
+                        _SetImage($ImageIcon, $FullImagePath & "Item_" & $itemArray[$Item_Number] & "_99.png")
                     EndIf
                     GUICtrlSetData($ImageLabel, Localize($itemArray[$Item_Number]))
                     $AD_Number = ""
                     GUICtrlSetData($ADInput, $AD_Number)
                     GUICtrlSetState($ADInput, $GUI_ENABLE)
-                    _SetImage($ADIcon, @ScriptDir & "\images\" & $Language & "\AD.png")
+                    _SetImage($ADIcon, $FullImagePath & "AD.png")
                     GUICtrlSetState($ButtonSelect, $GUI_HIDE)
                     GUICtrlSetState($ImageIcon, $GUI_SHOW)
                     GUICtrlSetState($ImageLabel, $GUI_SHOW)
@@ -254,15 +258,15 @@ Func SetAuctionOptions($hWnd = 0)
             Case $ImageLabel
                 If SelectAuctionItem() Then
                     If $itemQuantity[$Item_Number] == "1" Then
-                        _SetImage($ImageIcon, @ScriptDir & "\images\" & $Language & "\Item_" & $itemArray[$Item_Number] & ".png")
+                        _SetImage($ImageIcon, $FullImagePath & "Item_" & $itemArray[$Item_Number] & ".png")
                     Else
-                        _SetImage($ImageIcon, @ScriptDir & "\images\" & $Language & "\Item_" & $itemArray[$Item_Number] & "_99.png")
+                        _SetImage($ImageIcon, $FullImagePath & "Item_" & $itemArray[$Item_Number] & "_99.png")
                     EndIf
                     GUICtrlSetData($ImageLabel, Localize($itemArray[$Item_Number]))
                     $AD_Number = ""
                     GUICtrlSetData($ADInput, $AD_Number)
                     GUICtrlSetState($ADInput, $GUI_ENABLE)
-                    _SetImage($ADIcon, @ScriptDir & "\images\" & $Language & "\AD.png")
+                    _SetImage($ADIcon, $FullImagePath & "AD.png")
                     GUICtrlSetState($ButtonSelect, $GUI_HIDE)
                     GUICtrlSetState($ImageIcon, $GUI_SHOW)
                     GUICtrlSetState($ImageLabel, $GUI_SHOW)
@@ -273,15 +277,15 @@ Func SetAuctionOptions($hWnd = 0)
             Case $ButtonSelect
                 If SelectAuctionItem() Then
                     If $itemQuantity[$Item_Number] == "1" Then
-                        _SetImage($ImageIcon, @ScriptDir & "\images\" & $Language & "\Item_" & $itemArray[$Item_Number] & ".png")
+                        _SetImage($ImageIcon, $FullImagePath & "Item_" & $itemArray[$Item_Number] & ".png")
                     Else
-                        _SetImage($ImageIcon, @ScriptDir & "\images\" & $Language & "\Item_" & $itemArray[$Item_Number] & "_99.png")
+                        _SetImage($ImageIcon, $FullImagePath & "Item_" & $itemArray[$Item_Number] & "_99.png")
                     EndIf
                     GUICtrlSetData($ImageLabel, Localize($itemArray[$Item_Number]))
                     $AD_Number = ""
                     GUICtrlSetData($ADInput, $AD_Number)
                     GUICtrlSetState($ADInput, $GUI_ENABLE)
-                    _SetImage($ADIcon, @ScriptDir & "\images\" & $Language & "\AD.png")
+                    _SetImage($ADIcon, $FullImagePath & "AD.png")
                     GUICtrlSetState($ButtonSelect, $GUI_HIDE)
                     GUICtrlSetState($ImageIcon, $GUI_SHOW)
                     GUICtrlSetState($ImageLabel, $GUI_SHOW)
@@ -325,9 +329,9 @@ Func SelectAuctionItem($hWnd = 0)
     For $i = 1 To $Total
         $Image[$i] = GUICtrlCreatePic("", 50, 60 * $i - 30, 38, 38)
         If $itemQuantity[$i] == "1" Then
-            _SetImage($Image[$i], @ScriptDir & "\images\" & $Language & "\Item_" & $itemArray[$i] & ".png")
+            _SetImage($Image[$i], $FullImagePath & "Item_" & $itemArray[$i] & ".png")
         Else
-            _SetImage($Image[$i], @ScriptDir & "\images\" & $Language & "\Item_" & $itemArray[$i] & "_99.png")
+            _SetImage($Image[$i], $FullImagePath & "Item_" & $itemArray[$i] & "_99.png")
         EndIf
     Next
     For $i = 1 To $Total

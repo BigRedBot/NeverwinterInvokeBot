@@ -998,13 +998,13 @@ Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $Clien
             EndIf
         EndIf
     EndIf
-    If _ImageSearch(@ScriptDir & "\images\" & $Language & "\" & $image & ".png", $left, $top, $right, $bottom, $tolerance) Then
+    If _ImageSearch($FullImagePath & $image & ".png", $left, $top, $right, $bottom, $tolerance) Then
         If $do And Not SetImageSearchVariables($image, $left, $top, $right, $bottom, $tolerance) Then Return 0
         Return 1
     EndIf
     Local $i = 2
     While ImageExists($image & "-" & $i)
-        If _ImageSearch(@ScriptDir & "\images\" & $Language & "\" & $image & "-" & $i & ".png", $left, $top, $right, $bottom, $tolerance) Then
+        If _ImageSearch($FullImagePath & $image & "-" & $i & ".png", $left, $top, $right, $bottom, $tolerance) Then
             If $do And Not SetImageSearchVariables($image, $left, $top, $right, $bottom, $tolerance) Then Return 0
             Return $i
         EndIf
@@ -1037,7 +1037,7 @@ Func SetImageSearchVariables($image, $left, $top, $right, $bottom, $tolerance)
 EndFunc
 
 Func ImageExists($image)
-    Return FileExists(@ScriptDir & "\images\" & $Language & "\" & $image & ".png")
+    Return FileExists($FullImagePath & $image & ".png")
 EndFunc
 
 Func WaitMinutes($time, $msg); If $RestartLoop Then Return 0
