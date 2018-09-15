@@ -1,7 +1,7 @@
 RELEASE NOTES
 =============
 
-10.38.4
+10.38.5
 - Fixed small timing issue with Auction
 
 10.38.3

@@ -190,7 +190,7 @@ Func Auction()
             Sleep(500)
             $n = 0
             While ImageSearch("Item_" & $itemArray[$Item_Number] & "_Half", $left, $top, $left + 45, $bottom)
-                If $n == 20 Then ExitLoop
+                If $n == 50 Then ExitLoop
                 $n += 1
                 Sleep(200)
             WEnd
