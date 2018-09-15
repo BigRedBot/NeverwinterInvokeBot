@@ -113,6 +113,7 @@ EndFunc
 Local $speed = 2, $Item_Number = 0, $AD_Number = "", $left, $top, $right, $bottom, $n, $loop
 Local $itemArray = StringSplit(GetValue("AuctionItems"), "|")
 Local $itemQuantity[$itemArray[0] + 1]
+$itemQuantity[0] = $itemArray[0]
 
 For $i = 1 To $itemArray[0]
     Local $l = StringSplit($itemArray[$i], "=")
