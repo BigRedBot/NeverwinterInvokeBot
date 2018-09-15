@@ -114,7 +114,7 @@ Func End()
     Exit
 EndFunc
 
-Local $speed = 2, $Item_Number = 0, $AD_Number = "", $itemQuantity = 99, $left, $top, $right, $bottom, $n, $loop, $itemArray = StringSplit(GetValue("AuctionItems"), "|")
+Local $speed = 2, $Item_Number = 0, $AD_Number = "", $itemQuantity = 1, $left, $top, $right, $bottom, $n, $loop, $itemArray = StringSplit(GetValue("AuctionItems"), "|")
 
 Func Auction()
     While 1
@@ -128,7 +128,7 @@ Func Auction()
         SetAuctionOptions()
         If Not Position() Then ExitLoop
         HotKeySet("{Esc}", "Auction")
-        Splash()
+        Splash(@CRLF & $itemQuantity & " x " & Localize($itemArray[$Item_Number]) & @CRLF & @CRLF & AddCommas($AD_Number) & " AD")
         While 1
             $loop += 1
             If Not $left Then
@@ -182,6 +182,7 @@ Func Auction()
             MyMouseMove($left + Random(93, 112, 1), $bottom + Random(93, 110, 1), $speed)
             SingleClick()
             Send("{BS}" & $AD_Number)
+            Sleep(500)
             If Not ImageSearch("Auction_Button_Post", $left, $bottom + 110, $right) Then ExitLoop
             MyMouseMove($_ImageSearchX, $_ImageSearchY, $speed)
             SingleClick()
@@ -245,9 +246,12 @@ Func SetAuctionOptions($hWnd = 0)
                     $itemQuantity = 1
                     _SetImage($ImageIcon, $FullImagePath & "Item_" & $itemArray[$Item_Number] & ".png")
                 EndIf
+                $AD_Number = ""
+                GUICtrlSetData($ADInput, $AD_Number)
+                GuiCtrlSetState($ADInput, $GUI_FOCUS)
             Case $ImageIcon
                 If SelectAuctionItem() Then
-                    $itemQuantity = 99
+                    $itemQuantity = 1
                     If Not ImageExists("Item_" & $itemArray[$Item_Number] & "_99") Then
                         $itemQuantity = 1
                         GUICtrlSetState($Checkbox, $GUI_DISABLE)
@@ -278,7 +282,7 @@ Func SetAuctionOptions($hWnd = 0)
                 If $Item_Number Then GuiCtrlSetState($ADInput, $GUI_FOCUS)
             Case $ImageLabel
                 If SelectAuctionItem() Then
-                    $itemQuantity = 99
+                    $itemQuantity = 1
                     If Not ImageExists("Item_" & $itemArray[$Item_Number] & "_99") Then
                         $itemQuantity = 1
                         GUICtrlSetState($Checkbox, $GUI_DISABLE)
@@ -309,7 +313,7 @@ Func SetAuctionOptions($hWnd = 0)
                 If $Item_Number Then GuiCtrlSetState($ADInput, $GUI_FOCUS)
             Case $ButtonSelect
                 If SelectAuctionItem() Then
-                    $itemQuantity = 99
+                    $itemQuantity = 1
                     If Not ImageExists("Item_" & $itemArray[$Item_Number] & "_99") Then
                         $itemQuantity = 1
                         GUICtrlSetState($Checkbox, $GUI_DISABLE)
@@ -351,8 +355,8 @@ Func SetAuctionOptions($hWnd = 0)
             Case $ButtonOK
                 Local $inputValue = GUICtrlRead($ADInput)
                 If StringRegExp($inputValue, "(^[1-9]$)|(^[1-9].*\d$)") And StringRegExp($inputValue, "^(\d+|\d{1,3}(,\d{3})*)(\.\d+)?$") And StringRegExp(StringReplace($inputValue, ",", ""), "^\d+$") Then
-                    If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $itemQuantity & " x " & Localize($itemArray[$Item_Number]) & @CRLF & @CRLF & AddCommas(Number(StringReplace($inputValue, ",", ""))) & " AD", 0, $hGUI) = $IDYES Then
-                        $AD_Number = Number(StringReplace($inputValue, ",", ""))
+                    $AD_Number = Number(StringReplace($inputValue, ",", ""))
+                    If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, $itemQuantity & " x " & Localize($itemArray[$Item_Number]) & @CRLF & @CRLF & AddCommas($AD_Number) & " AD", 0, $hGUI) = $IDYES Then
                         GUIDelete($hGUI)
                         Return $AD_Number
                     EndIf
@@ -373,10 +377,10 @@ Func SelectAuctionItem($hWnd = 0)
     Local $Total = $itemArray[0], $idRadio[$Total + 1], $Image[$Total + 1], $idRadioValue = $Item_Number
     For $i = 1 To $Total
         $Image[$i] = GUICtrlCreatePic("", 50, 60 * $i - 30, 38, 38)
-        If ImageExists("Item_" & $itemArray[$i]) Then
-            _SetImage($Image[$i], $FullImagePath & "Item_" & $itemArray[$i] & ".png")
-        Else
+        If ImageExists("Item_" & $itemArray[$i] & "_99") Then
             _SetImage($Image[$i], $FullImagePath & "Item_" & $itemArray[$i] & "_99.png")
+        Else
+            _SetImage($Image[$i], $FullImagePath & "Item_" & $itemArray[$i] & ".png")
         EndIf
     Next
     For $i = 1 To $Total
@@ -393,14 +397,12 @@ Func SelectAuctionItem($hWnd = 0)
             Case $idRadio[1] To $idRadio[$Total]
                 $idRadioValue = $nMsg + 1 - $idRadio[1]
                 GUICtrlSetState($idRadio[$idRadioValue], $GUI_CHECKED)
-                If $idRadioValue == $Item_Number Then ExitLoop
                 $Item_Number = $idRadioValue
                 GUIDelete($hGUI)
                 Return 1
             Case $Image[1] To $Image[$Total]
                 $idRadioValue = $nMsg + 1 - $Image[1]
                 GUICtrlSetState($idRadio[$idRadioValue], $GUI_CHECKED)
-                If $idRadioValue == $Item_Number Then ExitLoop
                 $Item_Number = $idRadioValue
                 GUIDelete($hGUI)
                 Return 1

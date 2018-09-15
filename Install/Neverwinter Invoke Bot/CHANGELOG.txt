@@ -1,6 +1,11 @@
 RELEASE NOTES
 =============
 
+10.38
+- Fixed small bug with Auction.exe
+- Added single item option as default for all items in Auction.exe
+- Added more items to Auction.exe
+
 10.37
 - Added Auction.exe
 - Added Mail.exe
