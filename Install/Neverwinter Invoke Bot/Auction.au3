@@ -195,7 +195,7 @@ EndFunc
 
 Func SetAuctionOptions($hWnd = 0)
     Local $hGUI = GUICreate($Title, 350, 210, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd), $nMsg
-    Local $Label = GUICtrlCreateLabel(Localize("ClickOKToPostItemToAuctionHouse"), 25, 20, 325)
+    Local $Label = GUICtrlCreateLabel(Localize("ClickOKToPostItemsToAuction"), 25, 20, 325)
     Local $ImageIcon = GUICtrlCreatePic("", 70, 55, 38, 38)
     Local $ImageLabel = GUICtrlCreateLabel("", 120, 66, 200, 20)
     Local $ButtonSelect = GUICtrlCreateButton("&Select", 130, 60, 75, 25)

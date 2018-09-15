@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.38.2
+- Added Auction and Mail to the Unattended Launcher's system tray icon menu
+
 10.38.1
 - Increased speed of Mail.exe
 

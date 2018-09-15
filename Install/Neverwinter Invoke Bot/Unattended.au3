@@ -24,6 +24,10 @@ TrayCreateItem("")
 Local $DoOpenProfessionBagsItem = TrayCreateItem(Localize("DoOpenProfessionBags"))
 TrayItemSetOnEvent($DoOpenProfessionBagsItem, "DoOpenProfessionBags")
 TrayCreateItem("")
+TrayItemSetOnEvent(TrayCreateItem(Localize("PostItemsToAuction")), "Auction")
+TrayCreateItem("")
+TrayItemSetOnEvent(TrayCreateItem(Localize("PullItemsFromMail")), "Mail")
+TrayCreateItem("")
 TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitUnattendedScript")
 TraySetOnEvent($TRAY_EVENT_PRIMARYDOUBLE, "RunNow")
 TraySetState($TRAY_ICONSTATE_SHOW)
@@ -66,6 +70,22 @@ EndFunc
 
 Func DoOpenProfessionBags()
     RunInvokeBot(7)
+EndFunc
+
+Func Auction()
+    If @Compiled Then
+        ShellExecute(@ScriptDir & "\Auction.exe", "", @ScriptDir)
+    Else
+        ShellExecute(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Auction.au3"', @ScriptDir)
+    EndIf
+EndFunc
+
+Func Mail()
+    If @Compiled Then
+        ShellExecute(@ScriptDir & "\Mail.exe", "", @ScriptDir)
+    Else
+        ShellExecute(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Mail.au3"', @ScriptDir)
+    EndIf
 EndFunc
 
 Local $deleted = 1
