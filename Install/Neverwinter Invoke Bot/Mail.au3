@@ -128,13 +128,13 @@ Func Mail()
             $n = 0
             If $left1 Then
                 While Not ImageSearch("Mail_Button_Take_Items", $left1, $top1, $right1, $bottom1)
-                    If $n == 10 Then ExitLoop 2
-                    Sleep(500)
+                    If $n == 25 Then ExitLoop 2
+                    Sleep(200)
                     $n += 1
                 WEnd
             Else
                 While Not ImageSearch("Mail_Button_Take_Items")
-                    If $n == 10 Then ExitLoop 2
+                    If $n == 5 Then ExitLoop 2
                     Sleep(1000)
                     $n += 1
                 WEnd
@@ -149,13 +149,13 @@ Func Mail()
             $n = 0
             If $left2 Then
                 While Not ImageSearch("Mail_Button_Delete", $left2, $top2, $right2, $bottom2)
-                    If $n == 10 Then ExitLoop 2
-                    Sleep(500)
+                    If $n == 25 Then ExitLoop 2
+                    Sleep(200)
                     $n += 1
                 WEnd
             Else
                 While Not ImageSearch("Mail_Button_Delete")
-                    If $n == 10 Then ExitLoop 2
+                    If $n == 5 Then ExitLoop 2
                     Sleep(1000)
                     $n += 1
                 WEnd
@@ -170,13 +170,13 @@ Func Mail()
             $n = 0
             If $left3 Then
                 While Not ImageSearch("OK", $left3, $top3, $right3, $bottom3)
-                    If $n == 10 Then ExitLoop 2
-                    Sleep(500)
+                    If $n == 25 Then ExitLoop 2
+                    Sleep(200)
                     $n += 1
                 WEnd
             Else
                 While Not ImageSearch("OK")
-                    If $n == 10 Then ExitLoop 2
+                    If $n == 5 Then ExitLoop 2
                     Sleep(1000)
                     $n += 1
                 WEnd
