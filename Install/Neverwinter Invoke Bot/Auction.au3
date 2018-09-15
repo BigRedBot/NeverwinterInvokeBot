@@ -111,8 +111,14 @@ Func End()
 EndFunc
 
 Local $speed = 2, $Item_Number = 0, $AD_Number = "", $left, $top, $right, $bottom, $n, $loop
-Local $itemArray = StringSplit("Black_Opal|Flawless_Sapphire|Emerald|Greater_Enchanting_Stone|Moderate_Mark_of_Potency|Black_Pearl|Peridot|Moderate_Enchanting_Stone|Lesser_Mark_of_Potency|Preservation_Ward|Coalescent_Ward", "|")
-Local $itemQuantity = StringSplit("99|99|99|99|99|99|99|99|99|99|1", "|")
+Local $itemArray = StringSplit(GetValue("AuctionItems"), "|")
+Local $itemQuantity[$itemArray[0] + 1]
+
+For $i = 1 To $itemArray[0]
+    Local $l = StringSplit($itemArray[$i], "=")
+    $itemArray[$i] = $l[1]
+    $itemQuantity[$i] = $l[2]
+Next
 
 Func Auction()
     While 1
