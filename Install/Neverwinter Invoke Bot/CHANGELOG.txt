@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.38.6
+- Increased speed of pulling items from mail by a lot
+
 10.38.5
 - Fixed small timing issue with Auction
 

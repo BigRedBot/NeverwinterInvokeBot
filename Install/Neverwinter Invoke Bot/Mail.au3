@@ -108,7 +108,7 @@ Func End()
     Exit
 EndFunc
 
-Local $speed = 2, $n, $left1, $top1, $right1, $bottom1, $left2, $top2, $right2, $bottom2, $left3, $top3, $right3, $bottom3
+Local $speed = 2, $n, $left1, $top1, $right1, $bottom1, $left2, $top2, $right2, $bottom2, $left3, $top3, $right3, $bottom3, $loop
 
 Func Mail()
     While 1
@@ -116,6 +116,7 @@ Func Mail()
         $left1 = 0
         $left2 = 0
         $left3 = 0
+        $loop = 0
         HotKeySet("{Esc}")
         If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
         SplashOff()
@@ -133,19 +134,19 @@ Func Mail()
                     $n += 1
                 WEnd
             Else
+                Sleep(500)
                 While Not ImageSearch("Mail_Button_Take_Items")
-                    If $n == 5 Then ExitLoop 2
-                    Sleep(1000)
+                    If $n == 10 Then ExitLoop 2
+                    Sleep(500)
                     $n += 1
                 WEnd
                 $left1 = $_ImageSearchLeft
                 $top1 = $_ImageSearchTop
                 $right1 = $_ImageSearchRight
                 $bottom1 = $_ImageSearchBottom
+                MyMouseMove($_ImageSearchX, $_ImageSearchY, $speed)
             EndIf
-            MyMouseMove($_ImageSearchX, $_ImageSearchY, $speed)
             SingleClick()
-            Sleep(500)
             $n = 0
             If $left2 Then
                 While Not ImageSearch("Mail_Button_Delete", $left2, $top2, $right2, $bottom2)
@@ -154,9 +155,10 @@ Func Mail()
                     $n += 1
                 WEnd
             Else
+                Sleep(500)
                 While Not ImageSearch("Mail_Button_Delete")
-                    If $n == 5 Then ExitLoop 2
-                    Sleep(1000)
+                    If $n == 10 Then ExitLoop 2
+                    Sleep(500)
                     $n += 1
                 WEnd
                 $left2 = $_ImageSearchLeft
@@ -164,9 +166,9 @@ Func Mail()
                 $right2 = $_ImageSearchRight
                 $bottom2 = $_ImageSearchBottom
             EndIf
-            MyMouseMove($_ImageSearchX, $_ImageSearchY, $speed)
-            SingleClick()
-            Sleep(500)
+            $loop += 1
+            Splash(@CRLF & $loop)
+            Send("{DEL}")
             $n = 0
             If $left3 Then
                 While Not ImageSearch("OK", $left3, $top3, $right3, $bottom3)
@@ -175,9 +177,10 @@ Func Mail()
                     $n += 1
                 WEnd
             Else
+                Sleep(500)
                 While Not ImageSearch("OK")
-                    If $n == 5 Then ExitLoop 2
-                    Sleep(1000)
+                    If $n == 10 Then ExitLoop 2
+                    Sleep(500)
                     $n += 1
                 WEnd
                 $left3 = $_ImageSearchLeft
@@ -185,9 +188,9 @@ Func Mail()
                 $right3 = $_ImageSearchRight
                 $bottom3 = $_ImageSearchBottom
             EndIf
-            MyMouseMove($_ImageSearchX, $_ImageSearchY, $speed)
-            SingleClick()
-            Sleep(500)
+            Send("{ENTER}")
+            Sleep(100)
+            Send("{ENTER}")
         WEnd
     WEnd
     WEnd
