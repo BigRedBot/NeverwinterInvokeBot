@@ -117,7 +117,7 @@ Func Mail()
         If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
         SplashOff()
         $SplashWindow = 0
-        If $loop Then MsgBox($MB_OK + $MB_ICONINFORMATION + $MB_TOPMOST, $Title, $loop)
+        If $loop Then MsgBox($MB_OK + $MB_ICONINFORMATION + $MB_TOPMOST, $Title, "	" & $loop)
         If MsgBox($MB_OKCANCEL + $MB_TOPMOST, $Title, Localize("ClickOKToPullItemsFromMail")) <> $IDOK Then End()
         If Not Position() Then ExitLoop
         HotKeySet("{Esc}", "Mail")
