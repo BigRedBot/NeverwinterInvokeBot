@@ -100,7 +100,7 @@ Func LoadDefaults()
     SetDefault("LeadershipProfessionTasks_Level_23", Localize("Train_for_the_Protectors_Tourney") & "|" & Localize("Guard_Young_Noble_on_Trip") & "|" & Localize("Capture_Bandit_Leader") & "|" & Localize("Guard_Clerics_of_Ilmater") & "|" & GetDefaultValue("LeadershipProfessionTasks_Workers"))
     SetDefault("LeadershipProfessionTasks_Level_24", Localize("Capture_Bandit_Leader") & "|" & Localize("Escort_a_Wizards_Seneschal") & "|" & Localize("Guard_Clerics_of_Ilmater") & "|" & Localize("Protect_Magical_Goods_Market") & "|" & GetDefaultValue("LeadershipProfessionTasks_Workers"))
     SetDefault("LeadershipProfessionTasks_Level_25", GetDefaultValue("LeadershipProfessionTasks_Level_24"))
-    SetDefault("AuctionItems", "Brilliant_Diamond|Black_Opal|Flawless_Sapphire|Emerald|Black_Pearl|Peridot|Ultimate_Enchanting_Stone|Superior_Enchanting_Stone|Greater_Enchanting_Stone|Moderate_Enchanting_Stone|Ultimate_Mark_of_Potency|Superior_Mark_of_Potency|Greater_Mark_of_Potency|Moderate_Mark_of_Potency|Lesser_Mark_of_Potency|Coalescent_Ward|Preservation_Ward")
+    SetDefault("AuctionItems", "Brilliant_Diamond|Black_Opal|Flawless_Sapphire|Emerald|Black_Pearl|Peridot|Ultimate_Enchanting_Stone|Superior_Enchanting_Stone|Greater_Enchanting_Stone|Moderate_Enchanting_Stone|Ultimate_Mark_of_Potency|Superior_Mark_of_Potency|Greater_Mark_of_Potency|Moderate_Mark_of_Potency|Lesser_Mark_of_Potency|Coalescent_Ward|Preservation_Ward|Variety_Fashion_Pack|Howling_Adventure_Pack|Darkened_Night_Stronghold_Pack|Bloodied_Companion_Equipment_Pack|Cursed_Artifact_Equipment_Pack|Full_Moon_Enchantment_Pack")
 EndFunc
 
 Global $CurrentAccount = 1
