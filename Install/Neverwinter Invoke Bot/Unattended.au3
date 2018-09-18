@@ -12,9 +12,6 @@ Global $Title = $Name & " " & $Version & ": Unattended Launcher"
 LoadLocalizations()
 If _Singleton($Name & ": Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnattendedAlreadyRunning"))
 Local $CanRun = 1, $Ran
-AutoItSetOption("TrayAutoPause", 0)
-AutoItSetOption("TrayMenuMode", 3)
-AutoItSetOption("TrayOnEventMode", 1)
 Local $RunNowItem = TrayCreateItem(Localize("RunNow"))
 TrayItemSetOnEvent($RunNowItem, "RunNow")
 TrayCreateItem("")
@@ -28,12 +25,12 @@ TrayItemSetOnEvent(TrayCreateItem(Localize("PostItemsToAuction")), "Auction")
 TrayCreateItem("")
 TrayItemSetOnEvent(TrayCreateItem(Localize("PullItemsFromMail")), "Mail")
 TrayCreateItem("")
-TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitUnattendedScript")
+TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitScript")
 TraySetOnEvent($TRAY_EVENT_PRIMARYDOUBLE, "RunNow")
 TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
 
-Func ExitUnattendedScript()
+Func ExitScript()
     Exit
 EndFunc
 

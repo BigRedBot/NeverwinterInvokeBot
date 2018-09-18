@@ -19,14 +19,6 @@ AutoItSetOption("WinTitleMatchMode", 3)
 AutoItSetOption("TrayAutoPause", 0)
 AutoItSetOption("TrayMenuMode", 3)
 AutoItSetOption("TrayOnEventMode", 1)
-Global $TrayExitItem = TrayCreateItem("&Exit")
-TrayItemSetOnEvent($TrayExitItem, "ExitScript")
-TraySetState($TRAY_ICONSTATE_SHOW)
-AutoItSetOption("TrayIconHide", 1)
-
-Func ExitScript()
-    Exit
-EndFunc
 
 Func LoadDefaults()
     LoadLocalizationDefaults()

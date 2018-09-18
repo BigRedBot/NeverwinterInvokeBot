@@ -6,12 +6,17 @@ Global $Title = $Name
 If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Name, Localize("AuctionAlreadyRunning"))
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\teal.ico")
-TrayItemSetOnEvent($TrayExitItem, "End")
-AutoItSetOption("TrayIconHide", 0)
+TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitScript")
+TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
 #include "_ImageSearch.au3"
 #include "_GUIScrollbars_Ex.au3"
 #Include "_Icons.au3"
+
+Func ExitScript()
+    If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
+    Exit
+EndFunc
 
 Local $MouseOffset = 5, $KeyDelay = GetValue("KeyDelaySeconds") * 1000
 
@@ -24,10 +29,10 @@ Func Position()
     If Not GetValue("GameClientWidth") Or Not GetValue("GameClientHeight") Then Return
     If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight And ( GetValue("GameClientWidth") <> $DeskTopWidth Or GetValue("GameClientHeight") <> $DeskTopHeight ) Then
         MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnMaximize"))
-        End()
+        ExitScript()
     ElseIf $DeskTopWidth < GetValue("GameClientWidth") Or $DeskTopHeight < GetValue("GameClientHeight") Then
         MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ResolutionOrHigher", "<RESOLUTION>", GetValue("GameClientWidth") & "x" & GetValue("GameClientHeight")))
-        End()
+        ExitScript()
     ElseIf $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
         If $DeskTopWidth < GetValue("GameClientWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameClientHeight") + $PaddingHeight Then
             Local $ostyle = DllCall("user32.dll", "long", "GetWindowLong", "hwnd", $WinHandle, "int", -16)
@@ -47,7 +52,7 @@ Func Position()
         EndIf
         If $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
             MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnableToResize"))
-            End()
+            ExitScript()
         EndIf
         MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterResized"))
         Return 0
@@ -70,7 +75,7 @@ Func Position()
         EndIf
         If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
             MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnableToMove"))
-            End()
+            ExitScript()
         EndIf
         MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterMoved"))
         Return 0
@@ -107,11 +112,6 @@ EndFunc
 
 Func ImageExists($image)
     Return FileExists($FullImagePath & $image & ".png")
-EndFunc
-
-Func End()
-    If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
-    Exit
 EndFunc
 
 Local $speed = 2, $Item_Number = 0, $AD_Number = "", $itemQuantity = 1, $left, $top, $right, $bottom, $n, $loop, $itemArray = StringSplit(GetValue("AuctionItems"), "|")
@@ -375,7 +375,7 @@ Func SetAuctionOptions($hWnd = 0)
         EndSwitch
     WEnd
     GUIDelete($hGUI)
-    End()
+    ExitScript()
 EndFunc
 
 Func SelectAuctionItem($hWnd = 0)

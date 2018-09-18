@@ -5,10 +5,15 @@ Global $Title = $Name
 #include "Shared.au3"
 If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ImageCaptureAlreadyRunning"))
 TraySetIcon(@ScriptDir & "\images\purple.ico")
-AutoItSetOption("TrayIconHide", 0)
+TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitScript")
+TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
 #include <ScreenCapture.au3>
 #include <Clipboard.au3>
+
+Func ExitScript()
+    Exit
+EndFunc
 
 Func Position()
     Focus()

@@ -6,10 +6,15 @@ Global $Title = $Name
 If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Name, Localize("MailAlreadyRunning"))
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\teal.ico")
-TrayItemSetOnEvent($TrayExitItem, "End")
-AutoItSetOption("TrayIconHide", 0)
+TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitScript")
+TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
 #include "_ImageSearch.au3"
+
+Func ExitScript()
+    If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
+    Exit
+EndFunc
 
 Local $MouseOffset = 5, $KeyDelay = GetValue("KeyDelaySeconds") * 1000
 
@@ -22,10 +27,10 @@ Func Position()
     If Not GetValue("GameClientWidth") Or Not GetValue("GameClientHeight") Then Return
     If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight And ( GetValue("GameClientWidth") <> $DeskTopWidth Or GetValue("GameClientHeight") <> $DeskTopHeight ) Then
         MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnMaximize"))
-        End()
+        ExitScript()
     ElseIf $DeskTopWidth < GetValue("GameClientWidth") Or $DeskTopHeight < GetValue("GameClientHeight") Then
         MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ResolutionOrHigher", "<RESOLUTION>", GetValue("GameClientWidth") & "x" & GetValue("GameClientHeight")))
-        End()
+        ExitScript()
     ElseIf $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
         If $DeskTopWidth < GetValue("GameClientWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameClientHeight") + $PaddingHeight Then
             Local $ostyle = DllCall("user32.dll", "long", "GetWindowLong", "hwnd", $WinHandle, "int", -16)
@@ -45,7 +50,7 @@ Func Position()
         EndIf
         If $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
             MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnableToResize"))
-            End()
+            ExitScript()
         EndIf
         MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterResized"))
         Return 0
@@ -68,7 +73,7 @@ Func Position()
         EndIf
         If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
             MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnableToMove"))
-            End()
+            ExitScript()
         EndIf
         MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterMoved"))
         Return 0
@@ -103,11 +108,6 @@ Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $Clien
     Return 0
 EndFunc
 
-Func End()
-    If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
-    Exit
-EndFunc
-
 Local $speed = 2, $n, $left1, $top1, $right1, $bottom1, $left2, $top2, $right2, $bottom2, $left3, $top3, $right3, $bottom3, $loop
 
 Func Mail()
@@ -118,7 +118,7 @@ Func Mail()
         SplashOff()
         $SplashWindow = 0
         If $loop Then MsgBox($MB_OK + $MB_ICONINFORMATION + $MB_TOPMOST, $Title, "	" & $loop)
-        If MsgBox($MB_OKCANCEL + $MB_TOPMOST, $Title, Localize("ClickOKToPullItemsFromMail")) <> $IDOK Then End()
+        If MsgBox($MB_OKCANCEL + $MB_TOPMOST, $Title, Localize("ClickOKToPullItemsFromMail")) <> $IDOK Then ExitScript()
         If Not Position() Then ExitLoop
         HotKeySet("{Esc}", "Mail")
         Splash()

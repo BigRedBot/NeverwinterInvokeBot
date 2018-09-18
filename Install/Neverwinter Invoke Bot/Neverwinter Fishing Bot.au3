@@ -6,10 +6,16 @@ Global $Title = $Name
 If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Name, Localize("FishingBotAlreadyRunning"))
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\green.ico")
-TrayItemSetOnEvent($TrayExitItem, "End")
-AutoItSetOption("TrayIconHide", 0)
+TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitScript")
+TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
 #include "_ImageSearch.au3"
+
+Func ExitScript()
+    ReleaseKeys()
+    If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
+    Exit
+EndFunc
 
 Local $Rank[4], $Bait[4], $Catch[4], $Left[4], $Back[4], $Right[4], $Cast[4], $Hook[4], $LeftPressed, $BackPressed, $RightPressed, $MovePressed, $CastPressed, $HookPressed, $Caught, $EndTimer, $EndTime, $FishingTimer, $LastReelingTime = 0, $MouseOffset = 5, $KeyDelay = GetValue("KeyDelaySeconds") * 1000
 
@@ -22,10 +28,10 @@ Func Position()
     If Not GetValue("GameClientWidth") Or Not GetValue("GameClientHeight") Then Return
     If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight And ( GetValue("GameClientWidth") <> $DeskTopWidth Or GetValue("GameClientHeight") <> $DeskTopHeight ) Then
         MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnMaximize"))
-        End()
+        ExitScript()
     ElseIf $DeskTopWidth < GetValue("GameClientWidth") Or $DeskTopHeight < GetValue("GameClientHeight") Then
         MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ResolutionOrHigher", "<RESOLUTION>", GetValue("GameClientWidth") & "x" & GetValue("GameClientHeight")))
-        End()
+        ExitScript()
     ElseIf $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
         If $DeskTopWidth < GetValue("GameClientWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameClientHeight") + $PaddingHeight Then
             Local $ostyle = DllCall("user32.dll", "long", "GetWindowLong", "hwnd", $WinHandle, "int", -16)
@@ -45,7 +51,7 @@ Func Position()
         EndIf
         If $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
             MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnableToResize"))
-            End()
+            ExitScript()
         EndIf
         MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterResized"))
         Return 0
@@ -68,7 +74,7 @@ Func Position()
         EndIf
         If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
             MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnableToMove"))
-            End()
+            ExitScript()
         EndIf
         MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterMoved"))
         Return 0
@@ -140,12 +146,6 @@ Func ReleaseFish()
     Return 1
 EndFunc
 
-Func End()
-    ReleaseKeys()
-    If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
-    Exit
-EndFunc
-
 Func Fish()
 While 1
 While 1
@@ -164,7 +164,7 @@ While 1
         Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
         GUISetState(@SW_HIDE, $InputBoxGUI)
         Local $strNumber = InputBox($Title, Localize("ToStartFishing"), Round($EndTime / 3600000, 5), "", -1, -1, Default, Default, 0, $InputBoxGUI)
-        If @error <> 0 Then End()
+        If @error <> 0 Then ExitScript()
         GUIDelete($InputBoxGUI)
         Local $number = Ceiling(Number($strNumber) * 3600000)
         If $number > 0 And $number < 24 * 3600000 Then
@@ -252,7 +252,7 @@ While 1
         While 1
             ReleaseKeys()
             If Not ReelingKeyReady() Then
-                If $EndTime - TimerDiff($EndTimer) <= 0 Then End()
+                If $EndTime - TimerDiff($EndTimer) <= 0 Then ExitScript()
                 If ImageSearch("Fishing_Bait_Blank", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Or ImageSearch("Fishing_Bait", $Bait[0], $Bait[1], $Bait[2], $Bait[3]) Then ExitLoop 3
                 Splash(Localize("Waiting"))
                 $FishingTimer = TimerInit()
@@ -422,7 +422,7 @@ Func Settings($hWnd = 0)
     While 1
         Switch GUIGetMsg()
             Case $GUI_EVENT_CLOSE
-                End()
+                ExitScript()
             Case $ButtonAdvanced
                 AdvancedSettings($hGUI)
             Case $ButtonDefault
@@ -467,7 +467,7 @@ Func Settings($hWnd = 0)
                 Next
                 ExitLoop
             Case $ButtonCancel
-                End()
+                ExitScript()
         EndSwitch
     WEnd
     GUIDelete($hGUI)

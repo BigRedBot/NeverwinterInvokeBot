@@ -4,6 +4,7 @@ Global $Title = $Name & " v" & $Version
 #include "Shared.au3"
 _Singleton($Name & "Donation Prompt" & "Jp4g9QRntjYP")
 #include "_AddCommaToNumber.au3"
+
 While 1
     Local $text = Localize("InvokedTotalTimes", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalInvoked")))
     If GetAllAccountsValue("TotalCelestialCoffers") Then $text &= @CRLF & @CRLF & Localize("TotalCelestialCoffersCollected", "<COUNT>", _AddCommaToNumber(GetAllAccountsValue("TotalCelestialCoffers")))

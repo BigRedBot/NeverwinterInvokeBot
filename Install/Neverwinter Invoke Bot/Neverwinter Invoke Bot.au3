@@ -10,7 +10,8 @@ If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
 EndIf
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\red.ico")
-AutoItSetOption("TrayIconHide", 0)
+TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitScript")
+TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
 Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions, $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $EndTime, $MinutesToEndSaved, $MinutesToEndSavedTimer, $MouseOffset = 5, $OpenProfessionBags, $OpenProfessionBagsMsg
 AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
@@ -24,6 +25,10 @@ AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
 #include "_GUIScrollbars_Ex.au3"
 #Include "_Icons.au3"
 #include "Professions.au3"
+
+Func ExitScript()
+    Exit
+EndFunc
 
 Func Array($x)
     Return StringSplit(StringRegExpReplace(StringRegExpReplace(StringStripWS($x, $STR_STRIPALL), "^,", ""), ",$", ""), ",")
@@ -2075,8 +2080,11 @@ Func Begin(); If $RestartLoop Then Return 0
             WEnd
         EndIf
         While 1
-            Local $strNumber = InputBox($Title, @CRLF & Localize("ToStartInvoking"), $MinutesToStart, "", GetValue("StartInputBoxWidth"), GetValue("StartInputBoxHeight"))
+            Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
+            GUISetState(@SW_HIDE, $InputBoxGUI)
+            Local $strNumber = InputBox($Title, @CRLF & Localize("ToStartInvoking"), $MinutesToStart, "", GetValue("StartInputBoxWidth"), GetValue("StartInputBoxHeight"), Default, Default, 0, $InputBoxGUI)
             If @error <> 0 Then Exit
+            GUIDelete($InputBoxGUI)
             Local $number = Floor(Number($strNumber))
             If $number >= 0 Then
                 $MinutesToStart = $number

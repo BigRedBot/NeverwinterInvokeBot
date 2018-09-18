@@ -5,9 +5,14 @@ Global $Title = $Name
 If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Name, Localize("ScreenDetectionAlreadyRunning"))
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\black.ico")
-AutoItSetOption("TrayIconHide", 0)
+TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitScript")
+TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
 #include "_ImageSearch.au3"
+
+Func ExitScript()
+    Exit
+EndFunc
 
 Local $text, $timer, $time = 0, $count = 0
 
@@ -46,10 +51,6 @@ Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $Clien
     Return 0
 EndFunc
 
-Func End()
-    Exit
-EndFunc
-
 Func CheckImage($image, $left = $ClientLeft, $top = $ClientTop, $right = $ClientRight, $bottom = $ClientBottom, $intro = @CRLF & @CRLF, $ext = "")
     Local $i = ImageSearch($image, $left, $top, $right, $bottom), $n = ""
     If Not $i Then Return 0
@@ -60,7 +61,7 @@ EndFunc
 
 Local $MaxProfessionLevel = 25
 
-HotKeySet("{Esc}", "End")
+HotKeySet("{Esc}", "ExitScript")
 Splash()
 While 1
     If Position() And $ClientWidth And $ClientHeight Then
