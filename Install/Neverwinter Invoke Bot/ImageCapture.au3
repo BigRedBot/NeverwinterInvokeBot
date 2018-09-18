@@ -12,6 +12,7 @@ TraySetToolTip($Title)
 #include <Clipboard.au3>
 
 Func ExitScript()
+    If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
     Exit
 EndFunc
 
@@ -24,10 +25,10 @@ Func Position()
     If Not GetValue("GameClientWidth") Or Not GetValue("GameClientHeight") Then Return
     If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight And ( GetValue("GameClientWidth") <> $DeskTopWidth Or GetValue("GameClientHeight") <> $DeskTopHeight ) Then
         MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnMaximize"))
-        Exit
+        ExitScript()
     ElseIf $DeskTopWidth < GetValue("GameClientWidth") Or $DeskTopHeight < GetValue("GameClientHeight") Then
         MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ResolutionOrHigher", "<RESOLUTION>", GetValue("GameClientWidth") & "x" & GetValue("GameClientHeight")))
-        Exit
+        ExitScript()
     ElseIf $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
         If $DeskTopWidth < GetValue("GameClientWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameClientHeight") + $PaddingHeight Then
             Local $ostyle = DllCall("user32.dll", "long", "GetWindowLong", "hwnd", $WinHandle, "int", -16)
@@ -47,7 +48,7 @@ Func Position()
         EndIf
         If $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
             MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnableToResize"))
-            Exit
+            ExitScript()
         EndIf
         MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterResized"))
         Capture()
@@ -68,7 +69,10 @@ Func Position()
             MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterNotFound"))
             Capture()
         EndIf
-        If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnableToMove"))
+        If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
+            MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnableToMove"))
+            ExitScript()
+        EndIf
         MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterMoved"))
         Capture()
     EndIf
@@ -77,7 +81,7 @@ EndFunc
 
 Func Capture()
     While 1
-        If MsgBox($MB_OKCANCEL + $MB_TOPMOST, $Title, Localize("ClickOKToCapture")) <> $IDOK Then Exit
+        If MsgBox($MB_OKCANCEL + $MB_TOPMOST, $Title, Localize("ClickOKToCapture")) <> $IDOK Then ExitScript()
         Position()
         Sleep(500)
         Local $err = False, $err_txt
@@ -97,7 +101,10 @@ Func Capture()
         EndIf
         _ClipBoard_Close()
         _WinAPI_DeleteObject($hHBITMAP)
-        If $err Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorOccuredWith", "<ERROR>", $err_txt), 10)
+        If $err Then
+            MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorOccuredWith", "<ERROR>", $err_txt), 10)
+            ExitScript()
+        EndIf
         MsgBox($MB_OK + $MB_TOPMOST, $Title, Localize("NeverwinterCaptured"))
     WEnd
 EndFunc

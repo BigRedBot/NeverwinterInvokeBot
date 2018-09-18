@@ -27,6 +27,8 @@ AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
 #include "Professions.au3"
 
 Func ExitScript()
+    Reset()
+    If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
     Exit
 EndFunc
 
@@ -201,7 +203,7 @@ While 1
     If CompletedAccount() Then
         End(); If $RestartLoop Then Return 0
         If $RestartLoop Then ExitLoop 1
-        Exit
+        ExitScript()
     EndIf
     Position(); If $RestartLoop Then Return 0
     If $RestartLoop Then ExitLoop 1
@@ -395,7 +397,7 @@ While 1
     Next
     End(); If $RestartLoop Then Return 0
     If $RestartLoop Then ExitLoop 1
-    Exit
+    ExitScript()
 Return
 WEnd
 WEnd
@@ -407,7 +409,7 @@ Func StartLoop(); If $RestartLoop Then Return 0
         Return 0
     EndIf
     Loop()
-    Exit
+    ExitScript()
 EndFunc
 
 Func EndNowTime($waiting = 0)
@@ -531,7 +533,7 @@ Func WaitToInvoke(); If $RestartLoop Then Return 0
     Else
         End(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
-        Exit
+        ExitScript()
     EndIf
 EndFunc
 
@@ -1514,7 +1516,7 @@ Func End(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
     EndIf
     $LogTime = 0
-    Exit
+    ExitScript()
 EndFunc
 
 Func Reset()
@@ -1541,7 +1543,7 @@ Func Message($s, $n = $MB_OK, $ontop = 0); If $RestartLoop Then Return 0
     If Not $FirstRun And Not CheckAccounts() Then
         End(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
-        Exit
+        ExitScript()
     EndIf
     Reset()
     $UnattendedMode = 0
@@ -1557,7 +1559,7 @@ Func Message($s, $n = $MB_OK, $ontop = 0); If $RestartLoop Then Return 0
     $LogTime = 0
     Start(); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
-    Exit
+    ExitScript()
 EndFunc
 
 Func SendMessage($s, $n = $MB_OK, $ontop = 0)
@@ -1826,7 +1828,7 @@ Func ChooseAccountOptions()
     While 1
         Switch GUIGetMsg()
             Case $GUI_EVENT_CLOSE
-                Exit
+                ExitScript()
             Case $OpenInventoryBagsCheckbox
                 If GUICtrlRead($OpenInventoryBagsCheckbox) = $GUI_CHECKED And Not GetAllAccountsValue("OpenBagsOnEveryLoop") Then
                     GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_ENABLE)
@@ -1867,7 +1869,7 @@ Func ChooseAccountOptions()
                 GUIDelete()
                 Return
             Case $ButtonCancel
-                Exit
+                ExitScript()
         EndSwitch
     WEnd
 EndFunc
@@ -1898,7 +1900,7 @@ Func ChooseAccountEnableClaimVIPCharacterRewardOptions()
     While 1
         Switch GUIGetMsg()
             Case $GUI_EVENT_CLOSE
-                Exit
+                ExitScript()
             Case $Checkbox[0]
                 GUICtrlSetState($ButtonOK, $GUI_DISABLE)
                 If GUICtrlRead($Checkbox[0]) = $GUI_CHECKED Then
@@ -1939,7 +1941,7 @@ Func ChooseAccountEnableClaimVIPCharacterRewardOptions()
                 GUIDelete($hGUI)
                 Return
             Case $ButtonCancel
-                Exit
+                ExitScript()
         EndSwitch
     WEnd
 EndFunc
@@ -1959,7 +1961,7 @@ Func ConfigureAccount()
             Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
             GUISetState(@SW_HIDE, $InputBoxGUI)
             Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $MaxLoops), GetValue("CurrentLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
-            If @error <> 0 Then Exit
+            If @error <> 0 Then ExitScript()
             GUIDelete($InputBoxGUI)
             Local $number = Floor(Number($strNumber))
             If $number >= 1 Then
@@ -1973,7 +1975,7 @@ Func ConfigureAccount()
             Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
             GUISetState(@SW_HIDE, $InputBoxGUI)
             Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EndingLoop", "<STARTATLOOP>", GetValue("StartAtLoop")), GetValue("EndAtLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
-            If @error <> 0 Then Exit
+            If @error <> 0 Then ExitScript()
             GUIDelete($InputBoxGUI)
             Local $number = Floor(Number($strNumber))
             If $number >= GetValue("StartAtLoop") Then
@@ -1987,7 +1989,7 @@ Func ConfigureAccount()
         Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
         GUISetState(@SW_HIDE, $InputBoxGUI)
         Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartAtEachLoop", "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("StartAtCharacter"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
-        If @error <> 0 Then Exit
+        If @error <> 0 Then ExitScript()
         GUIDelete($InputBoxGUI)
         Local $number = Floor(Number($strNumber))
         If $number >= 1 And $number <= GetValue("TotalSlots") Then
@@ -2000,7 +2002,7 @@ Func ConfigureAccount()
         Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
         GUISetState(@SW_HIDE, $InputBoxGUI)
         Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EndAtEachLoop", "<STARTAT>", GetValue("StartAtCharacter"), "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("EndAtCharacter"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
-        If @error <> 0 Then Exit
+        If @error <> 0 Then ExitScript()
         GUIDelete($InputBoxGUI)
         Local $number = Floor(Number($strNumber))
         If $number >= GetValue("StartAtCharacter") And $number <= GetValue("TotalSlots") Then
@@ -2018,7 +2020,7 @@ Func ConfigureAccount()
         Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
         GUISetState(@SW_HIDE, $InputBoxGUI)
         Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartAtCurrentLoop", "<STARTAT>", GetValue("StartAtCharacter"), "<ENDAT>", GetValue("EndAtCharacter")), GetValue("CurrentCharacter"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
-        If @error <> 0 Then Exit
+        If @error <> 0 Then ExitScript()
         GUIDelete($InputBoxGUI)
         Local $number = Floor(Number($strNumber))
         If $number >= GetValue("StartAtCharacter") And $number <= GetValue("EndAtCharacter") Then
@@ -2083,7 +2085,7 @@ Func Begin(); If $RestartLoop Then Return 0
             Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
             GUISetState(@SW_HIDE, $InputBoxGUI)
             Local $strNumber = InputBox($Title, @CRLF & Localize("ToStartInvoking"), $MinutesToStart, "", GetValue("StartInputBoxWidth"), GetValue("StartInputBoxHeight"), Default, Default, 0, $InputBoxGUI)
-            If @error <> 0 Then Exit
+            If @error <> 0 Then ExitScript()
             GUIDelete($InputBoxGUI)
             Local $number = Floor(Number($strNumber))
             If $number >= 0 Then
@@ -2111,7 +2113,7 @@ Func Begin(); If $RestartLoop Then Return 0
             EndIf
         Next
         $CurrentAccount = $old
-        If Not CheckAccounts() Then Exit
+        If Not CheckAccounts() Then ExitScript()
     EndIf
     $FirstRun = 0
     Go(); If $RestartLoop Then Return 0
@@ -2161,7 +2163,7 @@ Func Go(); If $RestartLoop Then Return 0
                 If EndNowTime() Then $MinutesToEndSaved += 1440
                 ExitLoop
             EndIf
-            If MsgBox($MB_RETRYCANCEL + $MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToGetMinutes"), 300) = $IDCANCEL Then Exit
+            If MsgBox($MB_RETRYCANCEL + $MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToGetMinutes"), 300) = $IDCANCEL Then ExitScript()
         WEnd
     EndIf
     If $StartTimer Then
@@ -2198,7 +2200,7 @@ Func Go(); If $RestartLoop Then Return 0
         Else
             End(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
-            Exit
+            ExitScript()
         EndIf
     Else
         $LogStartDate = @YEAR & "-" & @MON & "-" & @MDAY
@@ -2243,7 +2245,7 @@ Func Load()
             Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
             GUISetState(@SW_HIDE, $InputBoxGUI)
             Local $string = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterUsername"), GetValue("LogInUserName"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
-            If @error <> 0 Then Exit
+            If @error <> 0 Then ExitScript()
             GUIDelete($InputBoxGUI)
             If $string And $string <> "" Then
                 SetAccountValue("LogInUserName", $string)
@@ -2269,7 +2271,7 @@ Func Load()
             Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
             GUISetState(@SW_HIDE, $InputBoxGUI)
             Local $string = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterPassword"), GetValue("LogInPassword"), "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
-            If @error <> 0 Then Exit
+            If @error <> 0 Then ExitScript()
             GUIDelete($InputBoxGUI)
             If $string And $string <> "" Then
                 If GetPrivateIniAccount("LogInPassword") == $string Then
@@ -2286,7 +2288,7 @@ Func Load()
                     Local $InputBoxGUI2 = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
                     GUISetState(@SW_HIDE, $InputBoxGUI2)
                     Local $string2 = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterPasswordAgain"), "", "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI2)
-                    If @error <> 0 Then Exit
+                    If @error <> 0 Then ExitScript()
                     GUIDelete($InputBoxGUI2)
                     If $string == $string2 Then
                         SetAccountValue("LogInPassword", $string)
@@ -2326,7 +2328,7 @@ Func Load()
         Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
         GUISetState(@SW_HIDE, $InputBoxGUI)
         Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("TotalCharacters"), GetValue("TotalSlots"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
-        If @error <> 0 Then Exit
+        If @error <> 0 Then ExitScript()
         GUIDelete($InputBoxGUI)
         Local $number = Floor(Number($strNumber))
         If $number > 0 Then
@@ -2488,7 +2490,7 @@ Func ChooseOptions()
     While 1
         Switch GUIGetMsg()
             Case $GUI_EVENT_CLOSE
-                Exit
+                ExitScript()
             Case $OpenInventoryBagsCheckbox
                 If GUICtrlRead($OpenInventoryBagsCheckbox) = $GUI_CHECKED Then
                     GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_ENABLE)
@@ -2547,7 +2549,7 @@ Func ChooseOptions()
                     EndIf
                 Next
             Case $ButtonCancel
-                Exit
+                ExitScript()
         EndSwitch
     WEnd
 EndFunc
@@ -2555,7 +2557,7 @@ EndFunc
 Func RunScript(); If $RestartLoop Then Return 0
     If $CmdLine[0] Then
         If Number($CmdLine[1]) = 7 Then
-            If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("OpenProfessionBags")) <> $IDYES Then Exit
+            If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("OpenProfessionBags")) <> $IDYES Then ExitScript()
             $OpenProfessionBags = 1
             $OpenProfessionBagsMsg = 1
         Else
@@ -2600,7 +2602,8 @@ Func RunScript(); If $RestartLoop Then Return 0
                     If $tmpinstallfile Then
                         If FileCopy($tmpinstallfile, @ScriptDir & "\Install.exe", $FC_OVERWRITE) Then
                             FileDelete($tmpinstallfile)
-                            Exit ShellExecute(@ScriptDir & "\Install.exe")
+                            ShellExecute(@ScriptDir & "\Install.exe")
+                            ExitScript()
                         EndIf
                         FileDelete($tmpinstallfile)
                     EndIf
@@ -2613,7 +2616,7 @@ Func RunScript(); If $RestartLoop Then Return 0
             MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("CouldNotDownloadCurrentVersionInfo"))
         EndIf
     EndIf
-    If $AllLoginInfoFound And $UnattendedModeCheckSettings Then Exit
+    If $AllLoginInfoFound And $UnattendedModeCheckSettings Then ExitScript()
     CheckProfessionsUnlockCode()
     If Not $UnattendedModeCheckSettings And Not $UnattendedMode And $AllLoginInfoFound And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("SkipAllConfigurations", "<NUMBER>", GetValue("TotalAccounts"))) = $IDYES Then $SkipAllConfigurations = 1
     If Not $UnattendedMode And Not $SkipAllConfigurations Then
@@ -2622,7 +2625,7 @@ Func RunScript(); If $RestartLoop Then Return 0
             Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
             GUISetState(@SW_HIDE, $InputBoxGUI)
             Local $strNumber = InputBox($Title, @CRLF & Localize("TotalAccounts"), GetValue("TotalAccounts"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
-            If @error <> 0 Then Exit
+            If @error <> 0 Then ExitScript()
             GUIDelete($InputBoxGUI)
             Local $number = Floor(Number($strNumber))
             If $number > 0 Then
@@ -2634,10 +2637,10 @@ Func RunScript(); If $RestartLoop Then Return 0
         If GetIniAllAccounts("TotalAccounts") <> GetValue("TotalAccounts") Then SaveIniAllAccounts("TotalAccounts", GetValue("TotalAccounts"))
     EndIf
     Initialize()
-    If $UnattendedModeCheckSettings Then Exit
+    If $UnattendedModeCheckSettings Then ExitScript()
     Start(); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
-    Exit
+    ExitScript()
 EndFunc
 
 RunScript()
