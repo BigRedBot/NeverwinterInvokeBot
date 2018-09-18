@@ -9,27 +9,27 @@
 ; Author(s):       Oscar, Prog@ndy
 ;
 ;===============================================================================
-Func _MultilineInputBox($title = "", $prompt = "", $Default = "", $width = 0, $height = 0, $left = Default, $top = Default, $timeOut = 0, $hWnd = 0)
+Func _MultilineInputBox($title = "", $prompt = "", $Default = "", $width = 0, $height = 0, $left = -1, $top = -1, $timeOut = 0, $hWnd = 0)
     Local $OnEventMode = Opt('GUIOnEventMode', 0)
     Local $text = ""
     If $width < 400 Then $width = 400
     If $height < 330 Then $height = 330
-    Local $widthAddition = $width-400
-    Local $heightAddition = $height-330
+    Local $widthAddition = $width - 400
+    Local $heightAddition = $height - 330
     Local $error = 0
-    Local $hGUI = GUICreate($title, $width, $height, $left, $top, 0x00C00000+0x00080000,0,$hWnd)
+    Local $hGUI = GUICreate($title, $width, $height, $left, $top, 0x00C00000 + 0x00080000, -1, $hWnd)
     If @error Then
         $error = 3
     Else
         GUICtrlCreateLabel($prompt, 5, 5, 390, 90)
         If @error Then $error = 3
-        Local $Edit = GUICtrlCreateEdit($Default, 5, 105, 390+$widthAddition, 190+$heightAddition)
+        Local $Edit = GUICtrlCreateEdit($Default, 5, 105, 390 + $widthAddition, 190 + $heightAddition)
         If @error Then $error = 3
-        Local $hOK = GUICtrlCreateButton('&OK', 70, 300+$heightAddition, 80, 25)
+        Local $hOK = GUICtrlCreateButton('&OK', 70, 300 + $heightAddition, 80, 25)
         If @error Then $error = 3
-        Local $htime = GUICtrlCreateLabel('', 170, 305+$heightAddition, 50, 20)
+        Local $htime = GUICtrlCreateLabel('', 170, 305 + $heightAddition, 50, 20)
         If @error Then $error = 3
-        Local $hCancel = GUICtrlCreateButton('&Cancel', 230, 300+$heightAddition, 80, 25)
+        Local $hCancel = GUICtrlCreateButton('&Cancel', 230, 300 + $heightAddition, 80, 25)
         If @error Then $error = 3
         GUISetState(@SW_SHOW, $hGUI)
         If @error Then $error = 3

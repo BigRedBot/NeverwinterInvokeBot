@@ -2,8 +2,8 @@
 Global $Name = "Neverwinter Invoke Bot: Screen Detection Fishing"
 Global $Title = $Name
 #include "Shared.au3"
-If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Name, Localize("ScreenDetectionAlreadyRunning"))
-If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
+If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Name, Localize("ScreenDetectionAlreadyRunning"))
+If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\black.ico")
 AutoItSetOption("TrayIconHide", 0)
 TraySetToolTip($Title)

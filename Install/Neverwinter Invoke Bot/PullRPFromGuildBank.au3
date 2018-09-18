@@ -3,8 +3,8 @@
 Global $Name = "Neverwinter Invoke Bot: Pull RP from Guild Bank"
 Global $Title = $Name
 #include "Shared.au3"
-If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Name, Localize("PullRPFromGuildBankAlreadyRunning"))
-If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
+If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Name, Localize("PullRPFromGuildBankAlreadyRunning"))
+If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\teal.ico")
 TrayItemSetOnEvent($TrayExitItem, "End")
 AutoItSetOption("TrayIconHide", 0)
@@ -16,15 +16,15 @@ Local $MouseOffset = 5, $KeyDelay = GetValue("KeyDelaySeconds") * 1000
 Func Position()
     Focus()
     If Not $WinHandle Or Not GetPosition() Then
-        MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
+        MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterNotFound"))
         Return 0
     EndIf
     If Not GetValue("GameClientWidth") Or Not GetValue("GameClientHeight") Then Return
     If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight And ( GetValue("GameClientWidth") <> $DeskTopWidth Or GetValue("GameClientHeight") <> $DeskTopHeight ) Then
-        MsgBox($MB_ICONWARNING, $Title, Localize("UnMaximize"))
+        MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnMaximize"))
         End()
     ElseIf $DeskTopWidth < GetValue("GameClientWidth") Or $DeskTopHeight < GetValue("GameClientHeight") Then
-        MsgBox($MB_ICONWARNING, $Title, Localize("ResolutionOrHigher", "<RESOLUTION>", GetValue("GameClientWidth") & "x" & GetValue("GameClientHeight")))
+        MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ResolutionOrHigher", "<RESOLUTION>", GetValue("GameClientWidth") & "x" & GetValue("GameClientHeight")))
         End()
     ElseIf $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
         If $DeskTopWidth < GetValue("GameClientWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameClientHeight") + $PaddingHeight Then
@@ -33,21 +33,21 @@ Func Position()
             DllCall("user32.dll", "long", "SetWindowPos", "hwnd", $WinHandle, "hwnd", $WinHandle, "int", 0, "int", 0, "int", 0, "int", 0, "long", BitOR($SWP_NOMOVE, $SWP_NOSIZE, $SWP_NOZORDER, $SWP_FRAMECHANGED))
             Focus()
             If Not $WinHandle Or Not GetPosition() Then
-                MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
+                MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterNotFound"))
                 Return 0
             EndIf
         EndIf
         WinMove($WinHandle, "", 0, 0, GetValue("GameClientWidth") + $PaddingWidth, GetValue("GameClientHeight") + $PaddingHeight)
         Focus()
         If Not $WinHandle Or Not GetPosition() Then
-            MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
+            MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterNotFound"))
             Return 0
         EndIf
         If $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
-            MsgBox($MB_ICONWARNING, $Title, Localize("UnableToResize"))
+            MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnableToResize"))
             End()
         EndIf
-        MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterResized"))
+        MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterResized"))
         Return 0
     ElseIf $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
         If $DeskTopWidth < GetValue("GameClientWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameClientHeight") + $PaddingHeight Then
@@ -56,21 +56,21 @@ Func Position()
             DllCall("user32.dll", "long", "SetWindowPos", "hwnd", $WinHandle, "hwnd", $WinHandle, "int", 0, "int", 0, "int", 0, "int", 0, "long", BitOR($SWP_NOMOVE, $SWP_NOSIZE, $SWP_NOZORDER, $SWP_FRAMECHANGED))
             Focus()
             If Not $WinHandle Or Not GetPosition() Then
-                MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
+                MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterNotFound"))
                 Return 0
             EndIf
         EndIf
         WinMove($WinHandle, "", 0, 0)
         Focus()
         If Not $WinHandle Or Not GetPosition() Then
-            MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
+            MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterNotFound"))
             Return 0
         EndIf
         If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
-            MsgBox($MB_ICONWARNING, $Title, Localize("UnableToMove"))
+            MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnableToMove"))
             End()
         EndIf
-        MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterMoved"))
+        MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterMoved"))
         Return 0
     EndIf
     WinSetOnTop($WinHandle, "", 1)
@@ -117,7 +117,7 @@ Func Pull()
         If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
         SplashOff()
         $SplashWindow = 0
-        If MsgBox($MB_OKCANCEL, $Title, Localize("ClickOKToPullRPFromGuildBank")) <> $IDOK Then End()
+        If MsgBox($MB_OKCANCEL + $MB_TOPMOST, $Title, Localize("ClickOKToPullRPFromGuildBank")) <> $IDOK Then End()
         If Not Position() Then ExitLoop
         HotKeySet("{Esc}", "Pull")
         Splash()

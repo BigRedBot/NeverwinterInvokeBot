@@ -10,7 +10,7 @@
 #include "Shared.au3"
 Global $Title = $Name & " " & $Version & ": Unattended Launcher"
 LoadLocalizations()
-If _Singleton($Name & ": Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("UnattendedAlreadyRunning"))
+If _Singleton($Name & ": Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnattendedAlreadyRunning"))
 Local $CanRun = 1, $Ran
 AutoItSetOption("TrayAutoPause", 0)
 AutoItSetOption("TrayMenuMode", 3)
@@ -169,7 +169,7 @@ While 1
         If $Ran Then ExitLoop
         TraySetToolTip($Title & @CRLF & Localize("UnattendedRunning"))
         TraySetIcon(@ScriptDir & "\images\green.ico")
-        If MsgBox($MB_OKCANCEL, $Title, Localize("AboutToStart"), 15) = $IDCANCEL Then ExitLoop
+        If MsgBox($MB_OKCANCEL + $MB_TOPMOST, $Title, Localize("AboutToStart"), 15) = $IDCANCEL Then ExitLoop
         If $Ran Then ExitLoop
         If Not @Compiled Then
             Local $list = ProcessList(StringRegExpReplace(@AutoItExe, ".*\\", ""))

@@ -5,10 +5,10 @@ Global $LoadPrivateSettings = 1
 Global $Title = $Name & " v" & $Version
 #include "Shared.au3"
 If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
-    If Not $CmdLine[0] Or Number($CmdLine[1]) <> 0 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("AlreadyRunning"))
+    If Not $CmdLine[0] Or Number($CmdLine[1]) <> 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("AlreadyRunning"))
     Exit
 EndIf
-If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
+If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\red.ico")
 AutoItSetOption("TrayIconHide", 0)
 TraySetToolTip($Title)
@@ -1528,7 +1528,7 @@ Func Pause(); only call from hot key
 EndFunc
 
 Func Error($s); If $RestartLoop Then Return 0
-    Message($s, $MB_ICONWARNING, 1); If $RestartLoop Then Return 0
+    Message($s, $MB_ICONWARNING + $MB_TOPMOST, 1); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
 EndFunc
 
@@ -1722,7 +1722,7 @@ Func AdvancedAccountSettings($hWnd = 0)
     Local $a = StringSplit(StringRegExpReplace($s, "^\|+", ""), "|")
     Local $Total = $a[0]
     Local $c[$Total + 1]
-    Local $hGUI = GUICreate($Title, 600, 400, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
+    Local $hGUI = GUICreate($Title, 600, 400, Default, Default, $WS_CAPTION + $WS_SYSMENU, $WS_EX_TOPMOST, $hWnd)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
     GUICtrlCreateLabel(Localize("AdvancedSettings"), 160, 20, 100, -1, $SS_RIGHT)
     For $i = 1 To $Total
@@ -1807,7 +1807,7 @@ Func ChooseAccountOptions()
         DeleteIniAccount("OpenBagsOnEveryLoop")
         Return
     EndIf
-    Local $hGUI = GUICreate($Title, 320, 150)
+    Local $hGUI = GUICreate($Title, 320, 150, -1, -1, -1, $WS_EX_TOPMOST)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
     Local $OpenInventoryBagsCheckbox = GUICtrlCreateCheckbox(" " & Localize("OpenInventoryBags"), 25, 45, 270)
     If Not GetAccountValue("DisableOpeningBags") Then GUICtrlSetState($OpenInventoryBagsCheckbox, $GUI_CHECKED)
@@ -1871,7 +1871,7 @@ Func ChooseAccountEnableClaimVIPCharacterRewardOptions()
     If $UnattendedMode Or $UnattendedModeCheckSettings Then Return
     Local $Total = GetValue("TotalSlots")
     Local $Checkbox[$Total + 1]
-    Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490)
+    Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490, -1, -1, -1, $WS_EX_TOPMOST)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
     GUICtrlCreateLabel(Localize("ClaimVIPCharacterReward", "<ACCOUNT>", $CurrentAccount), 150, 40, 270)
     $Checkbox[0] = GUICtrlCreateCheckbox(Localize("AllCharacters"), 40, 70, 100)
@@ -1940,7 +1940,7 @@ Func ChooseAccountEnableClaimVIPCharacterRewardOptions()
 EndFunc
 
 Func ConfigureAccount()
-    If CompletedAccount() Or (MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAccountOptions", "<ACCOUNT>", $CurrentAccount)) = $IDYES) Then Return
+    If CompletedAccount() Or (MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("SkipAccountOptions", "<ACCOUNT>", $CurrentAccount)) = $IDYES) Then Return
     If Not $OpenProfessionBags Then
         ChooseAccountOptions()
         ChooseAccountEnableClaimVIPCharacterRewardOptions()
@@ -1951,46 +1951,58 @@ Func ConfigureAccount()
     EndIf
     If Not $OpenProfessionBags And Not GetAccountValue("InfiniteLoopsStarted") And GetValue("UnattendedMode") <> 3 Then
         While 1
-            Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $MaxLoops), GetValue("CurrentLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+            Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
+            GUISetState(@SW_HIDE, $InputBoxGUI)
+            Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartingLoop", "<MAXLOOPS>", $MaxLoops), GetValue("CurrentLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
             If @error <> 0 Then Exit
+            GUIDelete($InputBoxGUI)
             Local $number = Floor(Number($strNumber))
             If $number >= 1 Then
                 SetAccountValue("StartAtLoop", $number)
                 SetAccountValue("CurrentLoop", GetValue("StartAtLoop"))
                 ExitLoop
             EndIf
-            MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
+            MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ValidNumber"))
         WEnd
         While 1
-            Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EndingLoop", "<STARTATLOOP>", GetValue("StartAtLoop")), GetValue("EndAtLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+            Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
+            GUISetState(@SW_HIDE, $InputBoxGUI)
+            Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EndingLoop", "<STARTATLOOP>", GetValue("StartAtLoop")), GetValue("EndAtLoop"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
             If @error <> 0 Then Exit
+            GUIDelete($InputBoxGUI)
             Local $number = Floor(Number($strNumber))
             If $number >= GetValue("StartAtLoop") Then
                 SetAccountValue("EndAtLoop", $number)
                 ExitLoop
             EndIf
-            MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
+            MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ValidNumber"))
         WEnd
     EndIf
     While 1
-        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartAtEachLoop", "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("StartAtCharacter"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+        Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
+        GUISetState(@SW_HIDE, $InputBoxGUI)
+        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartAtEachLoop", "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("StartAtCharacter"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
         If @error <> 0 Then Exit
+        GUIDelete($InputBoxGUI)
         Local $number = Floor(Number($strNumber))
         If $number >= 1 And $number <= GetValue("TotalSlots") Then
             SetAccountValue("StartAtCharacter", $number)
             ExitLoop
         EndIf
-        MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
+        MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ValidNumber"))
     WEnd
     While 1
-        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EndAtEachLoop", "<STARTAT>", GetValue("StartAtCharacter"), "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("EndAtCharacter"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+        Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
+        GUISetState(@SW_HIDE, $InputBoxGUI)
+        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EndAtEachLoop", "<STARTAT>", GetValue("StartAtCharacter"), "<TOTALSLOTS>", GetValue("TotalSlots")), GetValue("EndAtCharacter"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
         If @error <> 0 Then Exit
+        GUIDelete($InputBoxGUI)
         Local $number = Floor(Number($strNumber))
         If $number >= GetValue("StartAtCharacter") And $number <= GetValue("TotalSlots") Then
             SetAccountValue("EndAtCharacter", $number)
             ExitLoop
         EndIf
-        MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
+        MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ValidNumber"))
     WEnd
     If GetValue("CurrentCharacter") < GetValue("StartAtCharacter") Then
         SetAccountValue("CurrentCharacter", GetValue("StartAtCharacter"))
@@ -1998,19 +2010,22 @@ Func ConfigureAccount()
         SetAccountValue("CurrentCharacter", GetValue("EndAtCharacter"))
     EndIf
     While 1
-        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartAtCurrentLoop", "<STARTAT>", GetValue("StartAtCharacter"), "<ENDAT>", GetValue("EndAtCharacter")), GetValue("CurrentCharacter"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+        Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
+        GUISetState(@SW_HIDE, $InputBoxGUI)
+        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("StartAtCurrentLoop", "<STARTAT>", GetValue("StartAtCharacter"), "<ENDAT>", GetValue("EndAtCharacter")), GetValue("CurrentCharacter"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
         If @error <> 0 Then Exit
+        GUIDelete($InputBoxGUI)
         Local $number = Floor(Number($strNumber))
         If $number >= GetValue("StartAtCharacter") And $number <= GetValue("EndAtCharacter") Then
             SetAccountValue("CurrentCharacter", $number)
             ExitLoop
         EndIf
-        MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
+        MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ValidNumber"))
     WEnd
 EndFunc
 
 Func Start(); If $RestartLoop Then Return 0
-    If Not $FirstRun And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAllConfigurations", "<NUMBER>", GetValue("TotalAccounts"))) = $IDYES Then
+    If Not $FirstRun And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("SkipAllConfigurations", "<NUMBER>", GetValue("TotalAccounts"))) = $IDYES Then
         $SkipAllConfigurations = 1
     EndIf
     If Not $UnattendedMode And Not $SkipAllConfigurations Then
@@ -2038,7 +2053,7 @@ Func Begin(); If $RestartLoop Then Return 0
     If Not $UnattendedMode Then
         If Not $OpenProfessionBags And ( $FirstRun Or $MinutesToStart ) And GetValue("UnattendedMode") <> 2 And GetValue("UnattendedMode") <> 3 Then
             While 1
-                If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("GetMinutesUntilServerReset")) = $IDYES Then
+                If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("GetMinutesUntilServerReset")) = $IDYES Then
                     If $MinutesToStartSavedTimer Then
                         Local $m = $MinutesToStartSaved - TimerDiff($MinutesToStartSavedTimer) / 60000
                         If $m >= 0 Then
@@ -2056,7 +2071,7 @@ Func Begin(); If $RestartLoop Then Return 0
                 Else
                     ExitLoop
                 EndIf
-                MsgBox($MB_ICONWARNING, $Title, Localize("FailedToGetMinutes"))
+                MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToGetMinutes"))
             WEnd
         EndIf
         While 1
@@ -2067,7 +2082,7 @@ Func Begin(); If $RestartLoop Then Return 0
                 $MinutesToStart = $number
                 ExitLoop
             EndIf
-            MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
+            MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ValidNumber"))
         WEnd
     EndIf
     If GetValue("UnattendedMode") = 3 Then
@@ -2138,7 +2153,7 @@ Func Go(); If $RestartLoop Then Return 0
                 If EndNowTime() Then $MinutesToEndSaved += 1440
                 ExitLoop
             EndIf
-            If MsgBox($MB_RETRYCANCEL + $MB_ICONWARNING, $Title, Localize("FailedToGetMinutes"), 300) = $IDCANCEL Then Exit
+            If MsgBox($MB_RETRYCANCEL + $MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToGetMinutes"), 300) = $IDCANCEL Then Exit
         WEnd
     EndIf
     If $StartTimer Then
@@ -2217,21 +2232,24 @@ Func Load()
             SetAccountValue("LogInUserName", "")
         EndIf
         While 1
-            Local $string = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterUsername"), GetValue("LogInUserName"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+            Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
+            GUISetState(@SW_HIDE, $InputBoxGUI)
+            Local $string = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterUsername"), GetValue("LogInUserName"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
             If @error <> 0 Then Exit
+            GUIDelete($InputBoxGUI)
             If $string And $string <> "" Then
                 SetAccountValue("LogInUserName", $string)
                 ExitLoop
             EndIf
-            If GetPrivateIniAccount("LogInUserName") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DeleteUsername")) = $IDYES Then
+            If GetPrivateIniAccount("LogInUserName") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("DeleteUsername")) = $IDYES Then
                 SetAccountValue("LogInUserName", "")
                 SavePrivateIniAccount("LogInUserName")
             Else
-                MsgBox($MB_ICONWARNING, $Title, Localize("ValidUsername"))
+                MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ValidUsername"))
             EndIf
         WEnd
         If GetPrivateIniAccount("LogInUserName") <> GetValue("LogInUserName") Then
-            If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SaveUsername")) = $IDYES Then
+            If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("SaveUsername")) = $IDYES Then
                 SavePrivateIniAccount("LogInUserName", GetValue("LogInUserName"))
             Else
                 SavePrivateIniAccount("LogInUserName")
@@ -2240,8 +2258,11 @@ Func Load()
         If Not GetValue("LogInPassword") Then SetAccountValue("LogInPassword", "")
         _Crypt_Startup()
         While 1
-            Local $string = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterPassword"), GetValue("LogInPassword"), "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+            Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
+            GUISetState(@SW_HIDE, $InputBoxGUI)
+            Local $string = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterPassword"), GetValue("LogInPassword"), "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
             If @error <> 0 Then Exit
+            GUIDelete($InputBoxGUI)
             If $string And $string <> "" Then
                 If GetPrivateIniAccount("LogInPassword") == $string Then
                     SetAccountValue("LogInPassword", $string)
@@ -2252,20 +2273,23 @@ Func Load()
                         SetAccountValue("LogInPassword", $string)
                         ExitLoop
                     EndIf
-                    MsgBox($MB_ICONWARNING, $Title, Localize("PasswordIncorrect"))
+                    MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("PasswordIncorrect"))
                 Else
-                    Local $string2 = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterPasswordAgain"), "", "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+                    Local $InputBoxGUI2 = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
+                    GUISetState(@SW_HIDE, $InputBoxGUI2)
+                    Local $string2 = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("EnterPasswordAgain"), "", "*", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI2)
                     If @error <> 0 Then Exit
+                    GUIDelete($InputBoxGUI2)
                     If $string == $string2 Then
                         SetAccountValue("LogInPassword", $string)
-                        If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SavePassword")) = $IDYES Then
+                        If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("SavePassword")) = $IDYES Then
                             SavePrivateIniAccount("LogInPassword", GetValue("LogInPassword"))
                             If GetPrivateIniAccount("PasswordHash") <> "" Then
                                 SavePrivateIniAccount("PasswordHash")
                             EndIf
                         Else
                             SavePrivateIniAccount("LogInPassword")
-                            If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SavePasswordHash")) = $IDYES Then
+                            If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("SavePasswordHash")) = $IDYES Then
                                 SetAccountValue("PasswordHash", Hex(_Crypt_HashData(GetValue("LogInPassword"), $CALG_SHA1)))
                                 SavePrivateIniAccount("PasswordHash", GetValue("PasswordHash"))
                             ElseIf GetPrivateIniAccount("PasswordHash") <> "" Then
@@ -2274,31 +2298,34 @@ Func Load()
                         EndIf
                         ExitLoop
                     EndIf
-                    MsgBox($MB_ICONWARNING, $Title, Localize("PasswordNotMatch"))
+                    MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("PasswordNotMatch"))
                 EndIf
             Else
-                If GetPrivateIniAccount("LogInPassword") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DeletePassword")) = $IDYES Then
+                If GetPrivateIniAccount("LogInPassword") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("DeletePassword")) = $IDYES Then
                     SetAccountValue("LogInPassword", "")
                     SavePrivateIniAccount("LogInPassword")
-                ElseIf GetPrivateIniAccount("PasswordHash") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("DeletePasswordHash")) = $IDYES Then
+                ElseIf GetPrivateIniAccount("PasswordHash") <> "" And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("DeletePasswordHash")) = $IDYES Then
                     DeleteAccountValue("PasswordHash")
                     SavePrivateIniAccount("PasswordHash")
                 Else
-                    MsgBox($MB_ICONWARNING, $Title, Localize("ValidPassword"))
+                    MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ValidPassword"))
                 EndIf
             EndIf
         WEnd
         _Crypt_Shutdown()
     EndIf
     While 1
-        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("TotalCharacters"), GetValue("TotalSlots"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+        Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
+        GUISetState(@SW_HIDE, $InputBoxGUI)
+        Local $strNumber = InputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & Localize("TotalCharacters"), GetValue("TotalSlots"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
         If @error <> 0 Then Exit
+        GUIDelete($InputBoxGUI)
         Local $number = Floor(Number($strNumber))
         If $number > 0 Then
             SetAccountValue("TotalSlots", $number)
             ExitLoop
         EndIf
-        MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
+        MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ValidNumber"))
     WEnd
     If GetIniAccount("TotalSlots") <> GetValue("TotalSlots") Then SaveIniAccount("TotalSlots", GetValue("TotalSlots"))
 EndFunc
@@ -2350,7 +2377,7 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
     Local $a = StringSplit(StringRegExpReplace($s, "^\|+", ""), "|")
     Local $Total = $a[0]
     Local $c[$Total + 1]
-    Local $hGUI = GUICreate($Title, 600, 400, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
+    Local $hGUI = GUICreate($Title, 600, 400, Default, Default, $WS_CAPTION + $WS_SYSMENU, $WS_EX_TOPMOST, $hWnd)
     GUICtrlCreateLabel(Localize("AdvancedSettings"), 160, 20, 100, -1, $SS_RIGHT)
     For $i = 1 To $Total
         $a[$i] = StringSplit($a[$i], ",")
@@ -2432,7 +2459,7 @@ Func ChooseOptions()
     For $i = 1 To $coffers[0]
         If Not ($coffers[$i] == $cofferdefault) Then $list &= "|" & Localize($coffers[$i])
     Next
-    Local $hGUI = GUICreate($Title, 320, 230)
+    Local $hGUI = GUICreate($Title, 320, 230, -1, -1, -1, $WS_EX_TOPMOST)
     GUICtrlCreateLabel(Localize("ChooseCoffer"), 25, 20, 270)
     Local $hCombo = GUICtrlCreateCombo("", 25, 50, 270)
     GUICtrlSetData(-1, $list, Localize($cofferdefault))
@@ -2520,7 +2547,7 @@ EndFunc
 Func RunScript(); If $RestartLoop Then Return 0
     If $CmdLine[0] Then
         If Number($CmdLine[1]) = 7 Then
-            If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("OpenProfessionBags")) <> $IDYES Then Exit
+            If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("OpenProfessionBags")) <> $IDYES Then Exit
             $OpenProfessionBags = 1
             $OpenProfessionBagsMsg = 1
         Else
@@ -2560,7 +2587,7 @@ Func RunScript(); If $RestartLoop Then Return 0
             Local $CurrentVersion = IniRead($tmpverfile, "version", "version", "")
             FileDelete($tmpverfile)
             If $CurrentVersion <> "" Then
-                If $CurrentVersion <> $Version And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("NewerVersionFound", "<VERSION>", $CurrentVersion), 60) = $IDYES Then
+                If $CurrentVersion <> $Version And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("NewerVersionFound", "<VERSION>", $CurrentVersion), 60) = $IDYES Then
                     Local $tmpinstallfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe", $Title, Localize("DownloadingInstaller"))
                     If $tmpinstallfile Then
                         If FileCopy($tmpinstallfile, @ScriptDir & "\Install.exe", $FC_OVERWRITE) Then
@@ -2569,29 +2596,32 @@ Func RunScript(); If $RestartLoop Then Return 0
                         EndIf
                         FileDelete($tmpinstallfile)
                     EndIf
-                    MsgBox($MB_ICONWARNING, $Title, Localize("CouldNotDownloadLatestVersion"))
+                    MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("CouldNotDownloadLatestVersion"))
                 EndIf
             ElseIf Not $UnattendedModeCheckSettings Then
-                MsgBox($MB_ICONWARNING, $Title, Localize("CouldNotReadCurrentVersionInfo"))
+                MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("CouldNotReadCurrentVersionInfo"))
             EndIf
         ElseIf Not $UnattendedModeCheckSettings Then
-            MsgBox($MB_ICONWARNING, $Title, Localize("CouldNotDownloadCurrentVersionInfo"))
+            MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("CouldNotDownloadCurrentVersionInfo"))
         EndIf
     EndIf
     If $AllLoginInfoFound And $UnattendedModeCheckSettings Then Exit
     CheckProfessionsUnlockCode()
-    If Not $UnattendedModeCheckSettings And Not $UnattendedMode And $AllLoginInfoFound And MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize("SkipAllConfigurations", "<NUMBER>", GetValue("TotalAccounts"))) = $IDYES Then $SkipAllConfigurations = 1
+    If Not $UnattendedModeCheckSettings And Not $UnattendedMode And $AllLoginInfoFound And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("SkipAllConfigurations", "<NUMBER>", GetValue("TotalAccounts"))) = $IDYES Then $SkipAllConfigurations = 1
     If Not $UnattendedMode And Not $SkipAllConfigurations Then
         ChooseOptions()
         While 1
-            Local $strNumber = InputBox($Title, @CRLF & Localize("TotalAccounts"), GetValue("TotalAccounts"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"))
+            Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
+            GUISetState(@SW_HIDE, $InputBoxGUI)
+            Local $strNumber = InputBox($Title, @CRLF & Localize("TotalAccounts"), GetValue("TotalAccounts"), "", GetValue("InputBoxWidth"), GetValue("InputBoxHeight"), Default, Default, 0, $InputBoxGUI)
             If @error <> 0 Then Exit
+            GUIDelete($InputBoxGUI)
             Local $number = Floor(Number($strNumber))
             If $number > 0 Then
                 SetAllAccountsValue("TotalAccounts", $number)
                 ExitLoop
             EndIf
-            MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
+            MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ValidNumber"))
         WEnd
         If GetIniAllAccounts("TotalAccounts") <> GetValue("TotalAccounts") Then SaveIniAllAccounts("TotalAccounts", GetValue("TotalAccounts"))
     EndIf

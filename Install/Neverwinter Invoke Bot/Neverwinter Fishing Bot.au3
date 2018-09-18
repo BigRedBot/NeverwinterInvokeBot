@@ -3,8 +3,8 @@
 Global $Name = "Neverwinter Fishing Bot"
 Global $Title = $Name
 #include "Shared.au3"
-If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING, $Name, Localize("FishingBotAlreadyRunning"))
-If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING, $Title, Localize("Use32bit"))
+If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Name, Localize("FishingBotAlreadyRunning"))
+If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\green.ico")
 TrayItemSetOnEvent($TrayExitItem, "End")
 AutoItSetOption("TrayIconHide", 0)
@@ -16,15 +16,15 @@ Local $Rank[4], $Bait[4], $Catch[4], $Left[4], $Back[4], $Right[4], $Cast[4], $H
 Func Position()
     Focus()
     If Not $WinHandle Or Not GetPosition() Then
-        MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
+        MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterNotFound"))
         Return 0
     EndIf
     If Not GetValue("GameClientWidth") Or Not GetValue("GameClientHeight") Then Return
     If $WinLeft = 0 And $WinTop = 0 And $WinWidth = $DeskTopWidth And $WinHeight = $DeskTopHeight And $ClientWidth = $DeskTopWidth And $ClientHeight = $DeskTopHeight And ( GetValue("GameClientWidth") <> $DeskTopWidth Or GetValue("GameClientHeight") <> $DeskTopHeight ) Then
-        MsgBox($MB_ICONWARNING, $Title, Localize("UnMaximize"))
+        MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnMaximize"))
         End()
     ElseIf $DeskTopWidth < GetValue("GameClientWidth") Or $DeskTopHeight < GetValue("GameClientHeight") Then
-        MsgBox($MB_ICONWARNING, $Title, Localize("ResolutionOrHigher", "<RESOLUTION>", GetValue("GameClientWidth") & "x" & GetValue("GameClientHeight")))
+        MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ResolutionOrHigher", "<RESOLUTION>", GetValue("GameClientWidth") & "x" & GetValue("GameClientHeight")))
         End()
     ElseIf $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
         If $DeskTopWidth < GetValue("GameClientWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameClientHeight") + $PaddingHeight Then
@@ -33,21 +33,21 @@ Func Position()
             DllCall("user32.dll", "long", "SetWindowPos", "hwnd", $WinHandle, "hwnd", $WinHandle, "int", 0, "int", 0, "int", 0, "int", 0, "long", BitOR($SWP_NOMOVE, $SWP_NOSIZE, $SWP_NOZORDER, $SWP_FRAMECHANGED))
             Focus()
             If Not $WinHandle Or Not GetPosition() Then
-                MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
+                MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterNotFound"))
                 Return 0
             EndIf
         EndIf
         WinMove($WinHandle, "", 0, 0, GetValue("GameClientWidth") + $PaddingWidth, GetValue("GameClientHeight") + $PaddingHeight)
         Focus()
         If Not $WinHandle Or Not GetPosition() Then
-            MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
+            MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterNotFound"))
             Return 0
         EndIf
         If $ClientWidth <> GetValue("GameClientWidth") Or $ClientHeight <> GetValue("GameClientHeight") Then
-            MsgBox($MB_ICONWARNING, $Title, Localize("UnableToResize"))
+            MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnableToResize"))
             End()
         EndIf
-        MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterResized"))
+        MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterResized"))
         Return 0
     ElseIf $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
         If $DeskTopWidth < GetValue("GameClientWidth") + $PaddingWidth Or $DeskTopHeight < GetValue("GameClientHeight") + $PaddingHeight Then
@@ -56,21 +56,21 @@ Func Position()
             DllCall("user32.dll", "long", "SetWindowPos", "hwnd", $WinHandle, "hwnd", $WinHandle, "int", 0, "int", 0, "int", 0, "int", 0, "long", BitOR($SWP_NOMOVE, $SWP_NOSIZE, $SWP_NOZORDER, $SWP_FRAMECHANGED))
             Focus()
             If Not $WinHandle Or Not GetPosition() Then
-                MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
+                MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterNotFound"))
                 Return 0
             EndIf
         EndIf
         WinMove($WinHandle, "", 0, 0)
         Focus()
         If Not $WinHandle Or Not GetPosition() Then
-            MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterNotFound"))
+            MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterNotFound"))
             Return 0
         EndIf
         If $ClientLeft < 0 Or $ClientTop < 0 Or $ClientRight >= $DeskTopWidth Or $ClientBottom >= $DeskTopHeight Then
-            MsgBox($MB_ICONWARNING, $Title, Localize("UnableToMove"))
+            MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnableToMove"))
             End()
         EndIf
-        MsgBox($MB_ICONWARNING, $Title, Localize("NeverwinterMoved"))
+        MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("NeverwinterMoved"))
         Return 0
     EndIf
     WinSetOnTop($WinHandle, "", 1)
@@ -161,15 +161,18 @@ While 1
         $EndTime = 8 * 3600000
     EndIf
     While 1
-        Local $strNumber = InputBox($Title, Localize("ToStartFishing"), Round($EndTime / 3600000, 5))
+        Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
+        GUISetState(@SW_HIDE, $InputBoxGUI)
+        Local $strNumber = InputBox($Title, Localize("ToStartFishing"), Round($EndTime / 3600000, 5), "", -1, -1, Default, Default, 0, $InputBoxGUI)
         If @error <> 0 Then End()
+        GUIDelete($InputBoxGUI)
         Local $number = Ceiling(Number($strNumber) * 3600000)
         If $number > 0 And $number < 24 * 3600000 Then
             $EndTimer = 0
             $EndTime = $number
             ExitLoop
         EndIf
-        MsgBox($MB_ICONWARNING, $Title, Localize("ValidNumber"))
+        MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ValidNumber"))
     WEnd
     While 1
     While 1
@@ -392,7 +395,7 @@ Func Settings($hWnd = 0)
     Local $a = StringSplit(StringRegExpReplace($s, "^\|+", ""), "|")
     Local $Total = $a[0]
     Local $c[$Total + 1]
-    Local $hGUI = GUICreate($Title, 400, 100 + $Total * 36, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
+    Local $hGUI = GUICreate($Title, 400, 100 + $Total * 36, Default, Default, $WS_CAPTION + $WS_SYSMENU, $WS_EX_TOPMOST, $hWnd)
     GUICtrlCreateLabel(Localize("Settings"), 20, 20, 100, -1, $SS_RIGHT)
     For $i = 1 To $Total
         $a[$i] = StringSplit($a[$i], ",")
@@ -492,7 +495,7 @@ Func AdvancedSettings($hWnd = 0)
     Local $a = StringSplit(StringRegExpReplace($s, "^\|+", ""), "|")
     Local $Total = $a[0]
     Local $c[$Total + 1]
-    Local $hGUI = GUICreate($Title, 600, 100 + $Total * 36, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
+    Local $hGUI = GUICreate($Title, 600, 100 + $Total * 36, Default, Default, $WS_CAPTION + $WS_SYSMENU, $WS_EX_TOPMOST, $hWnd)
     GUICtrlCreateLabel(Localize("AdvancedSettings"), 160, 20, 100, -1, $SS_RIGHT)
     For $i = 1 To $Total
         $a[$i] = StringSplit($a[$i], ",")

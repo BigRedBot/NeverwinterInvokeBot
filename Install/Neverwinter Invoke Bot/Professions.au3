@@ -359,16 +359,20 @@ EndFunc
 Func CheckProfessionsUnlockCodeData($hash, $code, $local1, $local2, $local3, $url)
     If Hex(_Crypt_HashData(StringUpper(StringStripWS(GetValue($code), $STR_STRIPALL)), $CALG_SHA1)) = $hash Then
         Return 1
-    ElseIf Not $UnattendedMode And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2, $Title, Localize($local1)) = $IDYES Then
+    ElseIf Not $UnattendedMode And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2 + $MB_TOPMOST, $Title, Localize($local1)) = $IDYES Then
         While 1
-            Local $input = InputBox($Title, @CRLF & @CRLF & @CRLF & @CRLF & Localize($local2))
+            Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
+            GUISetState(@SW_HIDE, $InputBoxGUI)
+            Local $input = InputBox($Title, @CRLF & @CRLF & @CRLF & @CRLF & Localize($local2), "", "", -1, -1, Default, Default, 0, $InputBoxGUI)
             If @error <> 0 Then
-                If MsgBox($MB_YESNO + $MB_ICONQUESTION, $Title, Localize($local3)) = $IDYES Then
+                GUIDelete($InputBoxGUI)
+                If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize($local3)) = $IDYES Then
                     _Crypt_Shutdown()
                     Exit ShellExecute($url)
                 EndIf
                 Return 0
             EndIf
+            GUIDelete($InputBoxGUI)
             $input = StringUpper(StringStripWS($input, $STR_STRIPALL))
             If Hex(_Crypt_HashData($input, $CALG_SHA1)) = $hash Then
                 SetAllAccountsValue($code, $input)
@@ -384,7 +388,7 @@ Func ChooseProfessionsAccountEnableOptions()
     If Not $EnableProfessions Or $UnattendedMode Or $UnattendedModeCheckSettings Then Return
     Local $Total = GetValue("TotalSlots")
     Local $Checkbox[$Total + 1]
-    Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490)
+    Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490, -1, -1, -1, $WS_EX_TOPMOST)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
     GUICtrlCreateLabel(Localize("EnableProfessions", "<ACCOUNT>", $CurrentAccount), 150, 40, 270)
     $Checkbox[0] = GUICtrlCreateCheckbox(Localize("AllCharacters"), 40, 70, 100)
@@ -496,7 +500,7 @@ Func ChooseProfessionsAccountSetTasksOptions()
     If Not $EnableProfessions Or $UnattendedMode Or $UnattendedModeCheckSettings Then Return
     Local $Total = GetValue("TotalSlots"), $nMsg, $EnabledCharacterFound
     Local $Button[$Total + 1]
-    Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490)
+    Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490, -1, -1, -1, $WS_EX_TOPMOST)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
     GUICtrlCreateLabel(Localize("EditProfessionTasks"), 150, 40, 270)
     Local $default = 1
@@ -548,7 +552,7 @@ Func ChooseProfessionsAccountSetTasksOptions()
                 Exit
             Case $Button[0]
                 Local $results = ChooseProfessionsAccountSetTasksOptionsLevels($hGUI, Localize("EditProfessionTasksForAllCharacters"))
-                If @error = 0 And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2, $Title, Localize("OverwriteProfessionTasksForAllOtherCharacters", "<ACCOUNT>", $CurrentAccount), 0, $hGUI) = $IDYES Then
+                If @error = 0 And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2 + $MB_TOPMOST, $Title, Localize("OverwriteProfessionTasksForAllOtherCharacters", "<ACCOUNT>", $CurrentAccount), 0, $hGUI) = $IDYES Then
                     GUICtrlSetState($ButtonOK, $GUI_DISABLE)
                     For $i = 0 To $Total
                         GUICtrlSetData($Button[0], Localize("Working"))
@@ -638,7 +642,7 @@ Func ChooseProfessionsAccountSetTasksOptionsLevels($hWnd = 0, $label = 0, $chara
     Local $Total = $MaxProfessionLevel + 1, $nMsg
     Local $Button[$Total + 1]
     Local $results[$Total + 1]
-    Local $hGUI = GUICreate($Title, 360, 440, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
+    Local $hGUI = GUICreate($Title, 360, 440, -1, -1, $WS_CAPTION + $WS_SYSMENU, $WS_EX_TOPMOST, $hWnd)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
     GUICtrlCreateLabel($label, 100, 40, 270)
     For $l = 0 To $Total
@@ -670,7 +674,7 @@ Func ChooseProfessionsAccountSetTasksOptionsLevels($hWnd = 0, $label = 0, $chara
                         If $l = $Total Then $level = "Unknown"
                         Local $txt = Localize("EditProfessionLevelTasksForAllCharacters", "<LEVEL>", Localize($level))
                         If $character Then $txt = Localize("EditProfessionLevelTasksForCharacter", "<LEVEL>", Localize($level), "<NUMBER>", $character)
-                        Local $input = _MultilineInputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & @CRLF & $txt, StringReplace($results[$l], "|", @CRLF), 0, 0, Default, Default, 0, $hGUI)
+                        Local $input = _MultilineInputBox($Title, Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount) & @CRLF & @CRLF & @CRLF & $txt, StringReplace($results[$l], "|", @CRLF), 0, 0, -1, -1, 0, $hGUI)
                         If @error = 0 Then
                             GUICtrlSetState($ButtonOK, $GUI_DISABLE)
                             $input = StringStripWS(StringRegExpReplace(StringRegExpReplace(StringRegExpReplace($input, "(\s*\v)+", @CRLF), "\A\s*\v|\v\s*\Z", ""), "\s*" & @CRLF & "\s*", "|"), $STR_STRIPLEADING + $STR_STRIPTRAILING)
@@ -701,7 +705,7 @@ Func ChooseProfessionsAccountEnableAssetsOptions()
     If Not $EnableProfessions Or $UnattendedMode Or $UnattendedModeCheckSettings Then Return
     Local $Total = GetValue("TotalSlots"), $EnabledCharacterFound
     Local $Checkbox[$Total + 1]
-    Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490)
+    Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490, -1, -1, -1, $WS_EX_TOPMOST)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
     GUICtrlCreateLabel(Localize("EnableOptionalAssets", "<ACCOUNT>", $CurrentAccount), 150, 40, 270)
     $Checkbox[0] = GUICtrlCreateCheckbox(Localize("AllCharacters"), 40, 70, 100)
@@ -782,7 +786,7 @@ Func ChooseProfessionsAccountSetAssetsOptions()
     If Not $EnableProfessions Or $UnattendedMode Or $UnattendedModeCheckSettings Then Return
     Local $Total = GetValue("TotalSlots"), $nMsg, $EnabledCharacterFound
     Local $Button[$Total + 1]
-    Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490)
+    Local $hGUI = GUICreate($Title, _Max(60 + (Ceiling($Total / 10) * 100), 360), 490, -1, -1, -1, $WS_EX_TOPMOST)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
     GUICtrlCreateLabel(Localize("EditOptionalAssets", "<ACCOUNT>", $CurrentAccount), 150, 40, 270)
     If GetAccountValue("LeadershipOptionalAssets") == GetDefaultValue("LeadershipOptionalAssets") Then
@@ -818,7 +822,7 @@ Func ChooseProfessionsAccountSetAssetsOptions()
                 Exit
             Case $Button[0]
                 Local $input = SetProfessionsAccountAssets(Localize("EditOptionalAssetsForAllCharacters"), GetAccountValue("LeadershipOptionalAssets"), $hGUI)
-                If @error = 0 And ( Not ( GetAccountValue("LeadershipOptionalAssets") == GetDefaultValue("LeadershipOptionalAssets") ) Or MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2, $Title, Localize("OverwriteOptionalAssetsForAllOtherCharacters", "<ACCOUNT>", $CurrentAccount), 0, $hGUI) = $IDYES ) Then
+                If @error = 0 And ( Not ( GetAccountValue("LeadershipOptionalAssets") == GetDefaultValue("LeadershipOptionalAssets") ) Or MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2 + $MB_TOPMOST, $Title, Localize("OverwriteOptionalAssetsForAllOtherCharacters", "<ACCOUNT>", $CurrentAccount), 0, $hGUI) = $IDYES ) Then
                     GUICtrlSetState($ButtonOK, $GUI_DISABLE)
                     If $input == GetDefaultValue("LeadershipOptionalAssets") Then
                         DeleteAccountValue("LeadershipOptionalAssets")
@@ -871,7 +875,7 @@ Func ChooseProfessionsAccountSetAssetsOptions()
 EndFunc
 
 Func SetProfessionsAccountAssets($msg, $setting, $hWnd = 0)
-    Local $hGUI = GUICreate($Title, 350, 440, Default, Default, 0x00C00000 + 0x00080000, 0, $hWnd)
+    Local $hGUI = GUICreate($Title, 350, 440, -1, -1, $WS_CAPTION + $WS_SYSMENU, $WS_EX_TOPMOST, $hWnd)
     GUICtrlCreateLabel($msg, 25, 20, 325)
     Local $DefaultWorkers = StringSplit(GetDefaultValue("LeadershipOptionalAssets"), "|"), $TestWorkers = StringSplit($setting & "|" & GetDefaultValue("LeadershipOptionalAssets"), "|")
     Local $Total = $DefaultWorkers[0], $ButtonUp[$Total + 1], $ButtonDown[$Total + 1], $Label[$Total + 1], $Border[$Total + 1], $Image[$Total + 1], $Colors[$Total + 1], $DeleteWorkers = "0", $nMsg
