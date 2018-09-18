@@ -1,7 +1,7 @@
 RELEASE NOTES
 =============
 
-10.38.7
+10.38.8
 - Added items from the Glorious Resurgence Lockbox to Auction
 
 10.38.6
