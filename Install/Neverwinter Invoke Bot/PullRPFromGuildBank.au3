@@ -132,7 +132,7 @@ Func Pull()
                     EndIf
                     While 1
                         $found = 0
-                        If ImageSearch("Item_" & $rp[$i] & "_Half", $NextRPLeft, $NextRPTop, $right + 10, $NextRPBottom) Or ImageSearch("Item_" & $rp[$i] & "_Half", $ClientLeft, $NextRPTopSecond, $right + 10, $ClientBottom) Then $found = 1
+                        If ImageSearch("Item_Half_" & $rp[$i], $NextRPLeft, $NextRPTop, $right + 10, $NextRPBottom) Or ImageSearch("Item_Half_" & $rp[$i], $ClientLeft, $NextRPTopSecond, $right + 10, $ClientBottom) Then $found = 1
                         If $found Then
                             $NextRPLeft = $_ImageSearchRight
                             $NextRPTop = $_ImageSearchTop
@@ -147,7 +147,7 @@ Func Pull()
                                 MyMouseMove($left - 20 - Random(0, 100, 1), Random($top, $bottom, 1), $speed)
                             EndIf
                             $found = 0
-                            If ImageSearch("Item_" & $rp[$i] & "_Half", $NextRPLeft, $NextRPTop, $right + 10, $NextRPBottom) Or ImageSearch("Item_" & $rp[$i] & "_Half", $ClientLeft, $NextRPTopSecond, $right + 10) Then $found = 1
+                            If ImageSearch("Item_Half_" & $rp[$i], $NextRPLeft, $NextRPTop, $right + 10, $NextRPBottom) Or ImageSearch("Item_Half_" & $rp[$i], $ClientLeft, $NextRPTopSecond, $right + 10) Then $found = 1
                             If $found Then
                                 $NextRPLeft = $_ImageSearchRight
                                 $NextRPTop = $_ImageSearchTop
