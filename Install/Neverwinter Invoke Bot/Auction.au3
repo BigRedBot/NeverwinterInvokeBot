@@ -114,7 +114,7 @@ Func ImageExists($image)
     Return FileExists($FullImagePath & $image & ".png")
 EndFunc
 
-Local $speed = 2, $Item_Number = 0, $AD_Number = "", $itemQuantity = 1, $left, $top, $right, $bottom, $n, $loop, $itemArray = StringSplit(GetValue("AuctionItems"), "|")
+Local $Item_Number = 0, $AD_Number = "", $itemQuantity = 1, $left, $top, $right, $bottom, $n, $loop, $itemArray = StringSplit(GetValue("AuctionItems"), "|")
 
 Func Auction()
     While 1
@@ -138,10 +138,10 @@ Func Auction()
                 $right = $_ImageSearchRight
                 $bottom = $_ImageSearchBottom
             EndIf
-            MyMouseMove(Random($left, $right, 1), Random($top, $bottom, 1), $speed)
+            MyMouseMove(Random($left, $right, 1), Random($top, $bottom, 1))
             SingleClick()
             Sleep(500)
-            MyMouseMove($OffsetX + Random(490, 508, 1), $OffsetY + Random(251, 530, 1), $speed)
+            MyMouseMove($OffsetX + Random(490, 508, 1), $OffsetY + Random(251, 530, 1))
             $n = 0
             While 1
                 If Not ImageSearch("Auction_Button_Select", $OffsetX + 357, $OffsetY + 601, $OffsetX + 504, $OffsetY + 624) Then ExitLoop 2
@@ -159,7 +159,7 @@ Func Auction()
                 MouseWheel($MOUSE_WHEEL_DOWN, 7)
                 Sleep(100)
             WEnd
-            MyMouseMove($_ImageSearchX, $_ImageSearchY, $speed)
+            MyMouseMove($_ImageSearchX, $_ImageSearchY)
             DoubleClick()
             If ImageSearch("OpenAnotherOK") Then
                 If $itemQuantity == 1 Then
@@ -167,7 +167,7 @@ Func Auction()
                 Else
                     Send("99")
                 EndIf
-                MyMouseMove($_ImageSearchX, $_ImageSearchY, $speed)
+                MyMouseMove($_ImageSearchX, $_ImageSearchY)
                 SingleClick()
             EndIf
             Sleep(500)
@@ -176,15 +176,15 @@ Func Auction()
             Else
                 If Not ImageSearch("Item_Half_" & $itemArray[$Item_Number], $left, $top, $left + 45, $bottom) Then ExitLoop
             EndIf
-            MyMouseMove($left + Random(93, 112, 1), $bottom + Random(36, 53, 1), $speed)
+            MyMouseMove($left + Random(93, 112, 1), $bottom + Random(36, 53, 1))
             SingleClick()
             Send("{BS}")
-            MyMouseMove($left + Random(93, 112, 1), $bottom + Random(93, 110, 1), $speed)
+            MyMouseMove($left + Random(93, 112, 1), $bottom + Random(93, 110, 1))
             SingleClick()
             Send("{BS}" & $AD_Number)
             Sleep(500)
             If Not ImageSearch("Auction_Button_Post", $left, $bottom + 110, $right) Then ExitLoop
-            MyMouseMove($_ImageSearchX, $_ImageSearchY, $speed)
+            MyMouseMove($_ImageSearchX, $_ImageSearchY)
             SingleClick()
             If $loop == 100 Then ExitLoop
             Sleep(500)

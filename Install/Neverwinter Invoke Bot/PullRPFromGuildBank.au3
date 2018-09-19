@@ -108,7 +108,7 @@ Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $Clien
     Return 0
 EndFunc
 
-Local $speed = 2, $found, $reset, $rp = StringSplit("Black_Opal|Flawless_Sapphire|Emerald|Greater_Enchanting_Stone|Moderate_Mark_of_Potency|Black_Pearl|Peridot|Moderate_Enchanting_Stone|Lesser_Mark_of_Potency", "|")
+Local $found, $reset, $rp = StringSplit("Black_Opal|Flawless_Sapphire|Emerald|Greater_Enchanting_Stone|Moderate_Mark_of_Potency|Black_Pearl|Peridot|Moderate_Enchanting_Stone|Lesser_Mark_of_Potency", "|")
 
 Func Pull()
     While 1
@@ -128,7 +128,7 @@ Func Pull()
                     Local $left = $_ImageSearchLeft, $top = $_ImageSearchTop, $right = $_ImageSearchRight, $bottom = $_ImageSearchBottom, $NextRPLeft = $ClientLeft, $NextRPTop = $_ImageSearchBottom, $NextRPTopSecond = $_ImageSearchBottom, $NextRPBottom = $ClientBottom
                     If $reset Then
                         $reset = 0
-                        MyMouseMove($left - 20 - Random(0, 100, 1), Random($top, $bottom, 1), $speed)
+                        MyMouseMove($left - 20 - Random(0, 100, 1), Random($top, $bottom, 1))
                     EndIf
                     While 1
                         $found = 0
@@ -139,12 +139,12 @@ Func Pull()
                             $NextRPBottom = $_ImageSearchBottom
                             $NextRPTopSecond = $_ImageSearchBottom
                             $reset = 1
-                            MyMouseMove($_ImageSearchX, $_ImageSearchY, $speed)
+                            MyMouseMove($_ImageSearchX, $_ImageSearchY)
                             DoubleClick()
                         Else
                             If $reset Then
                                 $reset = 0
-                                MyMouseMove($left - 20 - Random(0, 100, 1), Random($top, $bottom, 1), $speed)
+                                MyMouseMove($left - 20 - Random(0, 100, 1), Random($top, $bottom, 1))
                             EndIf
                             $found = 0
                             If ImageSearch("Item_Half_" & $rp[$i], $NextRPLeft, $NextRPTop, $right + 10, $NextRPBottom) Or ImageSearch("Item_Half_" & $rp[$i], $ClientLeft, $NextRPTopSecond, $right + 10) Then $found = 1
@@ -154,7 +154,7 @@ Func Pull()
                                 $NextRPBottom = $_ImageSearchBottom
                                 $NextRPTopSecond = $_ImageSearchBottom
                                 $reset = 1
-                                MyMouseMove($_ImageSearchX, $_ImageSearchY, $speed)
+                                MyMouseMove($_ImageSearchX, $_ImageSearchY)
                                 DoubleClick()
                             Else
                                 ExitLoop
@@ -163,7 +163,7 @@ Func Pull()
                         While ImageSearch("OpenAnotherOK")
                             Send("99")
                             $reset = 1
-                            MyMouseMove($_ImageSearchX, $_ImageSearchY, $speed)
+                            MyMouseMove($_ImageSearchX, $_ImageSearchY)
                             SingleClick()
                         WEnd
                     WEnd

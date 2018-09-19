@@ -108,7 +108,7 @@ Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $Clien
     Return 0
 EndFunc
 
-Local $speed = 2, $n, $left1, $top1, $right1, $bottom1, $left2, $top2, $right2, $bottom2, $left3, $top3, $right3, $bottom3, $loop
+Local $n, $left1, $top1, $right1, $bottom1, $left2, $top2, $right2, $bottom2, $left3, $top3, $right3, $bottom3, $loop
 
 Func Mail()
     While 1
@@ -145,7 +145,7 @@ Func Mail()
                 $top1 = $_ImageSearchTop
                 $right1 = $_ImageSearchRight
                 $bottom1 = $_ImageSearchBottom
-                MyMouseMove($_ImageSearchX, $_ImageSearchY, $speed)
+                MyMouseMove($_ImageSearchX, $_ImageSearchY)
             EndIf
             SingleClick()
             $n = 0
