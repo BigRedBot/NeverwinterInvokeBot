@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.38.9
+- Increased mouse speed
+
 10.38.8
 - Added items from the Glorious Resurgence Lockbox to Auction
 

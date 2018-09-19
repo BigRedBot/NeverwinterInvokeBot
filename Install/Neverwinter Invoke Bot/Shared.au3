@@ -292,7 +292,7 @@ Func Statistics_DeleteIniAccount($name, $account = $CurrentAccount)
     Return _UnicodeIniDelete($SettingsDir & "\Statistics.ini", "Account" & $account, $name)
 EndFunc
 
-Func MyMouseMove($x, $y, $speed = 2, $retry = 10)
+Func MyMouseMove($x, $y, $speed = 3, $retry = 10)
     For $i = 1 To $retry
         MouseMove($x, $y, $speed)
         Local $a = MouseGetPos()
