@@ -61,6 +61,7 @@ Func LoadDefaults()
     SetDefault("ProfessionSelectionMenuY", 384)
     SetDefault("LogFilesToKeep", 30)
     SetDefault("PauseBotKey", "{F4}")
+    SetDefault("MouseSpeed", 2)
     SetDefault("CheckServerAddress", "patchserver.crypticstudios.com, us1.proxy.crypticstudios.com, eu1.proxy.crypticstudios.com, us2.proxy.crypticstudios.com, eu2.proxy.crypticstudios.com")
     SetDefault("LeadershipOptionalAssets", "Hero|Adventurer|ManatArms|Mercenary|Guard|Footman")
     SetDefault("LeadershipProfessionTasks_Workers", Localize("Train_a_Footman") & "|" & Localize("Train_a_Guard") & "|" & Localize("Hire_a_Mercenary") & "|" & Localize("Emergency_Hire"))
@@ -292,7 +293,7 @@ Func Statistics_DeleteIniAccount($name, $account = $CurrentAccount)
     Return _UnicodeIniDelete($SettingsDir & "\Statistics.ini", "Account" & $account, $name)
 EndFunc
 
-Func MyMouseMove($x, $y, $speed = 3, $retry = 10)
+Func MyMouseMove($x, $y, $speed = GetValue("MouseSpeed"), $retry = 10)
     For $i = 1 To $retry
         MouseMove($x, $y, $speed)
         Local $a = MouseGetPos()
