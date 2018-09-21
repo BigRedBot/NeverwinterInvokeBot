@@ -130,7 +130,7 @@ Func Mail()
             $n = 0
             If $left1 Then
                 While Not ImageSearch("Mail_Button_Take_Items", $left1, $top1, $right1, $bottom1)
-                    If $n == 25 Then ExitLoop 2
+                    If $n == 15 Then ExitLoop 2
                     Sleep(200)
                     $n += 1
                 WEnd
