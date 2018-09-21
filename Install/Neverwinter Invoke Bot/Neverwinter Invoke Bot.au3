@@ -100,7 +100,7 @@ While 1
         While 1
             TimeOut($PositionWaitingTimer); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
-            MyMouseMove($DeskTopWidth - 1, 0, 10)
+            MyMouseMove($DeskTopWidth - 1, 0, GetValue("LoginMouseSpeed"))
             SingleClick()
             Sleep(10000)
             Focus()
@@ -235,14 +235,14 @@ While 1
             If $CharacterSelectionPositioned And Not GetValue("DisableSimpleCharacterSelection") And ImageSearch("SelectedCharacter") Then
                 $_ImageSearchX = Random($_ImageSearchLeft, $_ImageSearchLeft + 295, 1)
                 $_ImageSearchY = Random($_ImageSearchBottom - 54, $_ImageSearchBottom, 1)
-                MyMouseMove($_ImageSearchX, $_ImageSearchY, 10)
+                MyMouseMove($_ImageSearchX, $_ImageSearchY, GetValue("LoginMouseSpeed"))
                 SingleClick()
                 Sleep(500)
                 Send("{DOWN}")
             Else
-                MyMouseMove(GetValue("CharacterSelectionMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("CharacterSelectionMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1), 10)
+                MyMouseMove(GetValue("CharacterSelectionMenuX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("CharacterSelectionMenuY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1), GetValue("LoginMouseSpeed"))
                 SingleClick()
-                MyMouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1), 10)
+                MyMouseMove($ClientWidthCenter + Random(-$MouseOffset, $MouseOffset, 1), $ClientHeightCenter + Random(-$MouseOffset, $MouseOffset, 1), GetValue("LoginMouseSpeed"))
                 If GetValue("CurrentCharacter") <= Ceiling(GetValue("TotalSlots") / 2) Then
                     AutoItSetOption("SendKeyDownDelay", GetValue("CharacterSelectionScrollAwayKeyDelaySeconds") * 1000)
                     Send("{DOWN}")
@@ -275,7 +275,7 @@ While 1
             Send("{ENTER}")
             Sleep(1000)
             If GetValue("SafeLoginX") Then
-                MyMouseMove(GetValue("SafeLoginX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SafeLoginY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1), 10)
+                MyMouseMove(GetValue("SafeLoginX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("SafeLoginY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1), GetValue("LoginMouseSpeed"))
                 DoubleClick()
             EndIf
             Splash("[ " & Localize("WaitingForInGameScreen") & " ]")
@@ -495,7 +495,7 @@ Func WaitToInvoke(); If $RestartLoop Then Return 0
             WEnd
             Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
             If ImageSearch("SelectionScreen") Then
-                MyMouseMove($_ImageSearchX, $_ImageSearchY, 10)
+                MyMouseMove($_ImageSearchX, $_ImageSearchY, GetValue("LoginMouseSpeed"))
                 SingleClick()
                 Sleep(1000)
                 $DisableRelogCount = 1
@@ -508,7 +508,7 @@ Func WaitToInvoke(); If $RestartLoop Then Return 0
                 Position(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
                 If ImageSearch("SelectionScreen") Then
-                    MyMouseMove($_ImageSearchX, $_ImageSearchY, 10)
+                    MyMouseMove($_ImageSearchX, $_ImageSearchY, GetValue("LoginMouseSpeed"))
                     SingleClick()
                     Sleep(1000)
                     $DisableRelogCount = 1
@@ -1082,7 +1082,7 @@ Func FindLogInScreen(); If $RestartLoop Then Return 0
         SetAccountValue("FinishedCharacter", 1)
         $FailedInvoke = 0
         Splash()
-        MyMouseMove($_ImageSearchX, $_ImageSearchY, 10)
+        MyMouseMove($_ImageSearchX, $_ImageSearchY, GetValue("LoginMouseSpeed"))
         DoubleClick()
         Sleep(1000)
     EndIf
@@ -1128,7 +1128,7 @@ While 1
                 ElseIf ImageSearch("Mismatch") And PatchClient() Then; If $RestartLoop Then Return 0
                     ExitLoop
                 ElseIf ImageSearch("IAccept") Then
-                    MyMouseMove($_ImageSearchX, $_ImageSearchY, 10)
+                    MyMouseMove($_ImageSearchX, $_ImageSearchY, GetValue("LoginMouseSpeed"))
                     SingleClick()
                     Sleep(1000)
                     If Not ImageSearch("IAccept") Then $FindLogInScreenWaitingTimer = TimerInit()
@@ -1294,7 +1294,7 @@ While 1
             Position(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
             If ImageSearch("IAccept") Then
-                MyMouseMove($_ImageSearchX, $_ImageSearchY, 10)
+                MyMouseMove($_ImageSearchX, $_ImageSearchY, GetValue("LoginMouseSpeed"))
                 SingleClick()
                 Sleep(1000)
                 If Not ImageSearch("IAccept") Then $WaitingTimer = TimerInit()
@@ -1326,7 +1326,7 @@ Func LogIn(); If $RestartLoop Then Return 0
         Position(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         Splash()
-        MyMouseMove(GetValue("UsernameInputX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("UsernameInputY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1), 10)
+        MyMouseMove(GetValue("UsernameInputX") + $OffsetX + Random(-$MouseOffset, $MouseOffset, 1), GetValue("UsernameInputY") + $OffsetY + Random(-$MouseOffset, $MouseOffset, 1), GetValue("LoginMouseSpeed"))
         DoubleClick()
         AutoItSetOption("SendKeyDownDelay", 5)
         Send("{END}{BS 254}")
@@ -1397,7 +1397,7 @@ Func End(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
             Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
             If ImageSearch("SelectionScreen") Then
-                MyMouseMove($_ImageSearchX, $_ImageSearchY, 10)
+                MyMouseMove($_ImageSearchX, $_ImageSearchY, GetValue("LoginMouseSpeed"))
                 SingleClick()
                 Sleep(1000)
                 $DisableRelogCount = 1
@@ -1410,7 +1410,7 @@ Func End(); If $RestartLoop Then Return 0
                 Position(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
                 If ImageSearch("SelectionScreen") Then
-                    MyMouseMove($_ImageSearchX, $_ImageSearchY, 10)
+                    MyMouseMove($_ImageSearchX, $_ImageSearchY, GetValue("LoginMouseSpeed"))
                     SingleClick()
                     Sleep(1000)
                     $DisableRelogCount = 1
@@ -1427,7 +1427,7 @@ Func End(); If $RestartLoop Then Return 0
         Position(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         If ImageSearch("SelectionScreen") Then
-            MyMouseMove($_ImageSearchX, $_ImageSearchY, 10)
+            MyMouseMove($_ImageSearchX, $_ImageSearchY, GetValue("LoginMouseSpeed"))
             SingleClick()
             Sleep(1000)
             $DisableRelogCount = 1
@@ -1491,7 +1491,7 @@ Func End(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
             Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
             If ImageSearch("SelectionScreen") Then
-                MyMouseMove($_ImageSearchX, $_ImageSearchY, 10)
+                MyMouseMove($_ImageSearchX, $_ImageSearchY, GetValue("LoginMouseSpeed"))
                 SingleClick()
                 Sleep(1000)
                 $DisableRelogCount = 1
@@ -1504,7 +1504,7 @@ Func End(); If $RestartLoop Then Return 0
                 Position(); If $RestartLoop Then Return 0
                 If $RestartLoop Then Return 0
                 If ImageSearch("SelectionScreen") Then
-                    MyMouseMove($_ImageSearchX, $_ImageSearchY, 10)
+                    MyMouseMove($_ImageSearchX, $_ImageSearchY, GetValue("LoginMouseSpeed"))
                     SingleClick()
                     Sleep(1000)
                     $DisableRelogCount = 1
@@ -2176,7 +2176,7 @@ Func Go(); If $RestartLoop Then Return 0
             If $check <> $CurrentAccount Then
                 Splash("[ " & Localize("WaitingForLogInScreen") & " ]")
                 If ImageSearch("SelectionScreen") Then
-                    MyMouseMove($_ImageSearchX, $_ImageSearchY, 10)
+                    MyMouseMove($_ImageSearchX, $_ImageSearchY, GetValue("LoginMouseSpeed"))
                     SingleClick()
                     Sleep(1000)
                     $DisableRelogCount = 1
@@ -2189,7 +2189,7 @@ Func Go(); If $RestartLoop Then Return 0
                     Position(); If $RestartLoop Then Return 0
                     If $RestartLoop Then Return 0
                     If ImageSearch("SelectionScreen") Then
-                        MyMouseMove($_ImageSearchX, $_ImageSearchY, 10)
+                        MyMouseMove($_ImageSearchX, $_ImageSearchY, GetValue("LoginMouseSpeed"))
                         SingleClick()
                         Sleep(1000)
                         $DisableRelogCount = 1
@@ -2372,6 +2372,7 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
     $s &= "|" & "LogInDelaySeconds,LogInDelaySecondsTitle,LogInDelaySecondsDescription,Number"
     $s &= "|" & "KeyDelaySeconds,KeyDelaySecondsTitle,KeyDelaySecondsDescription,Number"
     $s &= "|" & "MouseSpeed,MouseSpeedTitle,MouseSpeedDescription,Number"
+    $s &= "|" & "LoginMouseSpeed,LoginMouseSpeedTitle,LoginMouseSpeedDescription,Number"
     $s &= "|" & "CharacterSelectionScrollAwayKeyDelaySeconds,CharacterSelectionScrollAwayKeyDelaySecondsTitle,CharacterSelectionScrollAwayKeyDelaySecondsDescription,Number"
     $s &= "|" & "CharacterSelectionScrollTowardKeyDelaySeconds,CharacterSelectionScrollTowardKeyDelaySecondsTitle,CharacterSelectionScrollTowardKeyDelaySecondsDescription,Number"
     $s &= "|" & "TimeOutMinutes,TimeOutMinutesTitle,TimeOutMinutesDescription,Number"
