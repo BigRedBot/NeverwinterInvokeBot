@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.38.11
+- Fixed fishing bot
+
 10.38.10
 - Fixed bug with character selection mouse speed
 
