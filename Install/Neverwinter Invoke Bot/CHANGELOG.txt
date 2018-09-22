@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.39
+- Mail will now work with items other than those from the auction house
+
 10.38.11
 - Fixed fishing bot
 

@@ -108,7 +108,7 @@ Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $Clien
     Return 0
 EndFunc
 
-Local $n, $left1, $top1, $right1, $bottom1, $left2, $top2, $right2, $bottom2, $left3, $top3, $right3, $bottom3, $loop
+Local $n, $mouseX, $mouseY, $left1, $top1, $right1, $bottom1, $left2, $top2, $right2, $bottom2, $left3, $top3, $right3, $bottom3, $loop
 
 Func Mail()
     While 1
@@ -145,9 +145,17 @@ Func Mail()
                 $top1 = $_ImageSearchTop
                 $right1 = $_ImageSearchRight
                 $bottom1 = $_ImageSearchBottom
-                MyMouseMove($_ImageSearchX, $_ImageSearchY)
+                $mouseX = $_ImageSearchX
+                $mouseY = $_ImageSearchY
             EndIf
+            MyMouseMove($mouseX, $mouseY)
             SingleClick()
+            $n = 0
+            While ImageSearch("Mail_Button_Take_Items", $left1, $top1, $right1, $bottom1)
+                If $n == 25 Then ExitLoop 2
+                Sleep(200)
+                $n += 1
+            WEnd
             $n = 0
             If $left2 Then
                 While Not ImageSearch("Mail_Button_Delete", $left2, $top2, $right2, $bottom2)
