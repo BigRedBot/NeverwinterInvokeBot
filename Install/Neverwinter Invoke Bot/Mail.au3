@@ -108,7 +108,7 @@ Func ImageSearch($image, $left = $ClientLeft, $top = $ClientTop, $right = $Clien
     Return 0
 EndFunc
 
-Local $n, $mouseX, $mouseY, $left1, $top1, $right1, $bottom1, $left2, $top2, $right2, $bottom2, $left3, $top3, $right3, $bottom3, $loop
+Local $n, $delay, $TakeAndDelete, $mouseX, $mouseY, $leftTake, $topTake, $rightTake, $bottomTake, $leftDelete, $topDelete, $rightDelete, $bottomDelete, $leftOK, $topOK, $rightOK, $bottomOK, $loop
 
 Func Mail()
     While 1
@@ -122,84 +122,143 @@ Func Mail()
         If Not Position() Then ExitLoop
         HotKeySet("{Esc}", "Mail")
         Splash()
-        $left1 = 0
-        $left2 = 0
-        $left3 = 0
+        $leftTake = 0
+        $leftDelete = 0
+        $leftOK = 0
         $loop = 0
+        $delay = 750
+        $TakeAndDelete = 0
         While 1
             $n = 0
-            If $left1 Then
-                While Not ImageSearch("Mail_Button_Take_Items", $left1, $top1, $right1, $bottom1)
+            If $leftTake Then
+                While Not ImageSearch("Mail_Button_Take_Items", $leftTake, $topTake, $rightTake, $bottomTake)
                     If $n == 15 Then ExitLoop 2
                     Sleep(200)
                     $n += 1
                 WEnd
+                If ImageSearch("Mail_Button_Delete", $leftDelete, $topDelete, $rightDelete, $bottomDelete) Then
+                    $TakeAndDelete = 1
+                Else
+                    $TakeAndDelete = 0
+                EndIf
             Else
                 Sleep(500)
                 While Not ImageSearch("Mail_Button_Take_Items")
-                    If $n == 10 Then ExitLoop 2
+                    If $n == 6 Then ExitLoop 2
                     Sleep(500)
                     $n += 1
                 WEnd
-                $left1 = $_ImageSearchLeft
-                $top1 = $_ImageSearchTop
-                $right1 = $_ImageSearchRight
-                $bottom1 = $_ImageSearchBottom
+                $leftTake = $_ImageSearchLeft
+                $topTake = $_ImageSearchTop
+                $rightTake = $_ImageSearchRight
+                $bottomTake = $_ImageSearchBottom
                 $mouseX = $_ImageSearchX
                 $mouseY = $_ImageSearchY
+                If ImageSearch("Mail_Button_Delete") Then
+                    $leftDelete = $_ImageSearchLeft
+                    $topDelete = $_ImageSearchTop
+                    $rightDelete = $_ImageSearchRight
+                    $bottomDelete = $_ImageSearchBottom
+                    $TakeAndDelete = 1
+                EndIf
             EndIf
             MyMouseMove($mouseX, $mouseY)
             SingleClick()
-            $n = 0
-            While ImageSearch("Mail_Button_Take_Items", $left1, $top1, $right1, $bottom1)
-                If $n == 25 Then ExitLoop 2
-                Sleep(200)
-                $n += 1
+            While 1
+            While 1
+                $n = 0
+                While ImageSearch("Mail_Button_Take_Items", $leftTake, $topTake, $rightTake, $bottomTake)
+                    If $n == 15 Then ExitLoop 4
+                    Sleep(200)
+                    $n += 1
+                WEnd
+                $n = 0
+                If $leftDelete Then
+                    While Not ImageSearch("Mail_Button_Delete", $leftDelete, $topDelete, $rightDelete, $bottomDelete)
+                        If $n == 15 Then ExitLoop 4
+                        Sleep(200)
+                        $n += 1
+                    WEnd
+                    If Not $Loop Then
+                        Sleep(2000)
+                        $n = 0
+                        While ImageSearch("Mail_Button_Take_Items")
+                            If $n == 6 Then ExitLoop 4
+                            Sleep(500)
+                            $n += 1
+                        WEnd
+                    ElseIf $TakeAndDelete Then
+                        Sleep($delay)
+                    EndIf
+                Else
+                    While Not ImageSearch("Mail_Button_Delete")
+                        If $n == 6 Then ExitLoop 4
+                        Sleep(500)
+                        $n += 1
+                    WEnd
+                    $leftDelete = $_ImageSearchLeft
+                    $topDelete = $_ImageSearchTop
+                    $rightDelete = $_ImageSearchRight
+                    $bottomDelete = $_ImageSearchBottom
+                    Sleep(2000)
+                    $n = 0
+                    While ImageSearch("Mail_Button_Take_Items")
+                        If $n == 6 Then ExitLoop 4
+                        Sleep(500)
+                        $n += 1
+                    WEnd
+                EndIf
+                Send("{DEL}")
+                $n = 0
+                If $leftOK Then
+                    While Not ImageSearch("OK", $leftOK, $topOK, $rightOK, $bottomOK)
+                        If $n == 15 Then
+                            If ImageSearch("OK") Then
+                                HotKeySet("{Esc}")
+                                Send("{ESC}")
+                                HotKeySet("{Esc}", "Mail")
+                                $n = 0
+                                While ImageSearch("OK")
+                                    If $n == 6 Then ExitLoop 5
+                                    Sleep(500)
+                                    $n += 1
+                                WEnd
+                                $n = 0
+                                While ImageSearch("Mail_Button_Take_Items")
+                                    If $n == 6 Then ExitLoop 5
+                                    Sleep(500)
+                                    $n += 1
+                                WEnd
+                                $delay += 250
+                                ExitLoop 2
+                            EndIf
+                            ExitLoop 4
+                        EndIf
+                        Sleep(200)
+                        $n += 1
+                    WEnd
+                Else
+                    Sleep(500)
+                    While Not ImageSearch("OK")
+                        If $n == 6 Then
+                            If Not ImageSearch("OK") Then ExitLoop 4
+                        EndIf
+                        Sleep(500)
+                        $n += 1
+                    WEnd
+                    $leftOK = $_ImageSearchLeft
+                    $topOK = $_ImageSearchTop
+                    $rightOK = $_ImageSearchRight
+                    $bottomOK = $_ImageSearchBottom
+                EndIf
+                $loop += 1
+                Splash(@CRLF & $loop)
+                Send("{ENTER}")
+                Sleep(100)
+                Send("{ENTER}")
+                ExitLoop 2
             WEnd
-            $n = 0
-            If $left2 Then
-                While Not ImageSearch("Mail_Button_Delete", $left2, $top2, $right2, $bottom2)
-                    If $n == 25 Then ExitLoop 2
-                    Sleep(200)
-                    $n += 1
-                WEnd
-            Else
-                Sleep(500)
-                While Not ImageSearch("Mail_Button_Delete")
-                    If $n == 10 Then ExitLoop 2
-                    Sleep(500)
-                    $n += 1
-                WEnd
-                $left2 = $_ImageSearchLeft
-                $top2 = $_ImageSearchTop
-                $right2 = $_ImageSearchRight
-                $bottom2 = $_ImageSearchBottom
-            EndIf
-            $loop += 1
-            Splash(@CRLF & $loop)
-            Send("{DEL}")
-            $n = 0
-            If $left3 Then
-                While Not ImageSearch("OK", $left3, $top3, $right3, $bottom3)
-                    If $n == 25 Then ExitLoop 2
-                    Sleep(200)
-                    $n += 1
-                WEnd
-            Else
-                Sleep(500)
-                While Not ImageSearch("OK")
-                    If $n == 10 Then ExitLoop 2
-                    Sleep(500)
-                    $n += 1
-                WEnd
-                $left3 = $_ImageSearchLeft
-                $top3 = $_ImageSearchTop
-                $right3 = $_ImageSearchRight
-                $bottom3 = $_ImageSearchBottom
-            EndIf
-            Send("{ENTER}")
-            Sleep(100)
-            Send("{ENTER}")
+            WEnd
         WEnd
     WEnd
     WEnd

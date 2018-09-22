@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.39.1
+- Fixed bug with Mail
+
 10.39
 - Mail will now work with items other than those from the auction house
 
