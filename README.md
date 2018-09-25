@@ -1,4 +1,4 @@
-# Neverwinter Invoke and Professions Bot
+# Neverwinter Invoke Bot
 
 Mod 15 will completely break profession support.
 
