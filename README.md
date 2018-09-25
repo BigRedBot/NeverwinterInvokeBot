@@ -1,5 +1,15 @@
 # Neverwinter Invoke and Professions Bot
 
+Mod 15 will completely break profession support.
+
+I currently have no plans to continue support for professions. Please understand that no refunds will be given for those who have purchased the unlock keys.
+
+For those who unlocked profession support without paying for the unlock code, I am sure you probably don't have the money to spare, so, I have no hard feelings about it. :)
+
+Thank you all who have supported this project, it has helped me more than you will ever know.
+
+&nbsp;
+
 Leadership is the only profession that is currently supported.
 
 Now supports the Russian game client.

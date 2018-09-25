@@ -126,7 +126,7 @@ Func Mail()
         $leftDelete = 0
         $leftOK = 0
         $loop = 0
-        $delay = 750
+        $delay = 1000
         $TakeAndDelete = 0
         While 1
             $n = 0
@@ -180,7 +180,7 @@ Func Mail()
                         $n += 1
                     WEnd
                     If Not $Loop Then
-                        Sleep(2000)
+                        If $TakeAndDelete Then Sleep(2000)
                         $n = 0
                         While ImageSearch("Mail_Button_Take_Items")
                             If $n == 6 Then ExitLoop 4
@@ -200,7 +200,7 @@ Func Mail()
                     $topDelete = $_ImageSearchTop
                     $rightDelete = $_ImageSearchRight
                     $bottomDelete = $_ImageSearchBottom
-                    Sleep(2000)
+                    If $TakeAndDelete Then Sleep(2000)
                     $n = 0
                     While ImageSearch("Mail_Button_Take_Items")
                         If $n == 6 Then ExitLoop 4

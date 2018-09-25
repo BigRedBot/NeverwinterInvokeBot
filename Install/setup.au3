@@ -110,7 +110,7 @@ Func _setupMsg($txt)
     GUIDelete($hGUI)
 EndFunc
 
-;MsgBox($MB_OK + $MB_TOPMOST, $Title, _setupFileRead(@ScriptDir & "\" & $Name & "\Message.txt"))
+If FileExists(@ScriptDir & "\" & $Name & "\Message.txt") Then MsgBox($MB_OK + $MB_ICONINFORMATION + $MB_TOPMOST, $Title, _setupFileRead(@ScriptDir & "\" & $Name & "\Message.txt"))
 _setupMsg(_setupFileRead(@ScriptDir & "\" & $Name & "\CHANGELOG.txt"))
 
 If $RunUnattendedOnStartup And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("RunUnattendedNow")) = $IDYES Then

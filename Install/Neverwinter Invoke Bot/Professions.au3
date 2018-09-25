@@ -349,6 +349,7 @@ Func ProfessionsSleep($sleeptime = GetValue("ProfessionsDelay") * 1000); If $Res
 EndFunc
 
 Func CheckProfessionsUnlockCode()
+    $EnableProfessions = 1
     If $EnableProfessions Or $UnattendedModeCheckSettings Then Return
     _Crypt_Startup()
     If Not $EnableProfessions Then $EnableProfessions = CheckProfessionsUnlockCodeData("225BA7083CE6B485BE95CBDAF18CF6D025C4D7F3", "ProfessionsUnlockCode", "UnlockProfessions", "EnterProfessionsUnlockCode", "BuyProfessionsUnlockCode", "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UQRNUA698EUTC")
