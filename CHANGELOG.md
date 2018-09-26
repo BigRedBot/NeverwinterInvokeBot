@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.40.1
+- Fixed bug with taking profession rewards
+
 10.40
 - Unlocked profession support for everyone ( will be broken soon enough anyway )
 

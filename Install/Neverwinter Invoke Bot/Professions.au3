@@ -3,7 +3,7 @@ Local $MaxProfessionLevel = 25
 
 Func RunProfessions(); If $RestartLoop Then Return 0
     If Not $EnableProfessions Or Not GetValue("EnableProfessions") Then Return
-    Local $ProfessionLevel = -2, $ProfessionLoops = 0, $ProfessionTakeRewardsFailed = 0, $OverviewX, $OverviewY, $task = 1, $make_workers = 0, $lasttask = 0, $tasklist, $require_ingredients, $no_optional_assets, $leadership_found
+    Local $n, $ProfessionLevel = -2, $ProfessionLoops = 0, $ProfessionTakeRewardsFailed = 0, $OverviewX, $OverviewY, $task = 1, $make_workers = 0, $lasttask = 0, $tasklist, $require_ingredients, $no_optional_assets, $leadership_found
     While 1
         If $ProfessionLoops >= 10 Then Return
         ClearWindows(); If $RestartLoop Then Return 0
@@ -31,22 +31,46 @@ Func RunProfessions(); If $RestartLoop Then Return 0
                         ProfessionsClickImage(); If $RestartLoop Then Return 0
                         If $RestartLoop Then Return 0
                         MyMouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
-                        If ImageSearch("Professions_TakeRewards") Then
-                            $lasttask = 0
-                            $task = 1
-                            $ProfessionLevel = -2
-                            ProfessionsClickImage(); If $RestartLoop Then Return 0
-                            If $RestartLoop Then Return 0
-                            If ImageSearch("Professions_TakeRewards") Then
+                        $n = 0
+                        While Not ImageSearch("Professions_TakeRewards")
+                            If $n = 6 Then
                                 $ProfessionLoops -= 1
                                 $ProfessionTakeRewardsFailed += 1
-                                ExitLoop 3
+                                ExitLoop 4
                             EndIf
-                        Else
+                            Sleep(500)
+                            $n += 1
+                        WEnd
+                        $lasttask = 0
+                        $task = 1
+                        $ProfessionLevel = -2
+                        While 1
+                            For $l = 1 To 5
+                                MyMouseMove($_ImageSearchX, $_ImageSearchY)
+                                If ImageSearch("Professions_TakeRewards", $_ImageSearchLeft, $_ImageSearchTop, $_ImageSearchRight, $_ImageSearchBottom) Then
+                                    SingleClick()
+                                    ProfessionsSleep(); If $RestartLoop Then Return 0
+                                    If $RestartLoop Then Return 0
+                                    If Not ImageSearch("Professions_TakeRewards") Then ExitLoop 2
+                                Else
+                                    ProfessionsSleep(); If $RestartLoop Then Return 0
+                                    If $RestartLoop Then Return 0
+                                    $n = 0
+                                    While Not ImageSearch("Professions_TakeRewards")
+                                        If $n = 6 Then
+                                            $ProfessionLoops -= 1
+                                            $ProfessionTakeRewardsFailed += 1
+                                            ExitLoop 6
+                                        EndIf
+                                        Sleep(500)
+                                        $n += 1
+                                    WEnd
+                                EndIf
+                            Next
                             $ProfessionLoops -= 1
                             $ProfessionTakeRewardsFailed += 1
-                            ExitLoop 3
-                        EndIf
+                            ExitLoop 4
+                        WEnd
                         MyMouseMove($ClientWidthCenter + Random(-50, 50, 1), $ClientBottom)
                     WEnd
                 EndIf
