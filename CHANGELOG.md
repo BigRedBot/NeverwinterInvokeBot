@@ -1,7 +1,7 @@
 RELEASE NOTES
 =============
 
-10.41
+10.41.1
 - Added Russian support for Auction and Mail
 
 10.40.1

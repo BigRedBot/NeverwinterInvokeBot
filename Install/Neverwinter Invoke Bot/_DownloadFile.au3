@@ -22,7 +22,7 @@ Func _DownloadFile($DownloadURL, $Name, $DownloadTitle = "Downloading", $Downloa
         Local $percent = GUICtrlCreateLabel("0%", 10, 59, 400, 20, $SS_CENTER)
         Local $progressbar = GUICtrlCreateProgress(10, 35, 400, 20, $PBS_SMOOTH)
         GUICtrlSetData($message, $DownloadMsg)
-        GUISetState()
+        GUISetState(@SW_SHOW, $hGUI)
         Local $last = 0
         Do
             If GUIGetMsg() = $GUI_EVENT_CLOSE Then
@@ -33,6 +33,12 @@ Func _DownloadFile($DownloadURL, $Name, $DownloadTitle = "Downloading", $Downloa
             Else
                 Sleep(100)
                 Local $Data = InetGetInfo($Download)
+                If @error Then
+                    InetClose($Download)
+                    FileDelete($DownloadFilePath)
+                    GUIDelete($hGUI)
+                    Return 0
+                EndIf
                 If $Data[$INET_DOWNLOADREAD] <> $last Then
                     $last = $Data[$INET_DOWNLOADREAD]
                     Local $i = Floor(($Data[$INET_DOWNLOADREAD] / $DownloadSize) * 100)
