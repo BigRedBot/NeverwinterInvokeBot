@@ -2594,20 +2594,13 @@ Func RunScript(); If $RestartLoop Then Return 0
         EndIf
     EndIf
     If Not $UnattendedMode And @Compiled Then
-        Local $tmpverfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/version.ini", $Title, Localize("RetrievingVersion"))
-        If $tmpverfile Then
-            Local $CurrentVersion = IniRead($tmpverfile, "version", "version", "")
-            FileDelete($tmpverfile)
+        If _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/version.ini", "version.ini", $Title, Localize("RetrievingVersion")) Then
+            Local $CurrentVersion = IniRead(@ScriptDir & "\version.ini", "version", "version", "")
             If $CurrentVersion <> "" Then
                 If $CurrentVersion <> $Version And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("NewerVersionFound", "<VERSION>", $CurrentVersion), 60) = $IDYES Then
-                    Local $tmpinstallfile = _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe", $Title, Localize("DownloadingInstaller"))
-                    If $tmpinstallfile Then
-                        If FileCopy($tmpinstallfile, @ScriptDir & "\Install.exe", $FC_OVERWRITE) Then
-                            FileDelete($tmpinstallfile)
-                            ShellExecute(@ScriptDir & "\Install.exe")
-                            ExitScript()
-                        EndIf
-                        FileDelete($tmpinstallfile)
+                    If _DownloadFile("https://github.com/BigRedBot/NeverwinterInvokeBot/raw/master/NeverwinterInvokeBot.exe", "Install.exe", $Title, Localize("DownloadingInstaller")) Then
+                        ShellExecute(@ScriptDir & "\Install.exe")
+                        ExitScript()
                     EndIf
                     MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("CouldNotDownloadLatestVersion"))
                 EndIf

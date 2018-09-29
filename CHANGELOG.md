@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.41
+- Added Russian support for Auction and Mail
+
 10.40.1
 - Fixed bug with taking profession rewards
 
