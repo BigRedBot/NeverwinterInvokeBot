@@ -1,5 +1,9 @@
-﻿
-#include-once
+﻿#include-once
+#include <GUIConstants.au3>
+#include <GUIConstantsEx.au3>
+#include <ButtonConstants.au3>
+#include <WinAPIFiles.au3>
+#include "_UnicodeIni.au3"
 
 Func LoadLocalizationDefaults()
     If $Language = "Russian" Then
@@ -78,11 +82,6 @@ Func LoadLocalizationDefaults()
         SetDefault("ServerResetTimeHour", 2)
     EndIf
 EndFunc
-
-#include <GUIConstants.au3>
-#include <GUIConstantsEx.au3>
-#include <ButtonConstants.au3>
-#include <WinAPIFiles.au3>
 
 Func GetLanguage($default = "English", $file = @ScriptDir & "\Localization.ini")
     Local $d = $default

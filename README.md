@@ -10,11 +10,7 @@ Thank you all who have supported this project, it has helped me more than you wi
 
 &nbsp;
 
-Leadership is the only profession that is currently supported.
-
 Now supports the Russian game client.
-
-The latest version has a fishing bot included.
 
 - For this script to work, the **Interface scale** in the **Options** must be set to **1.00**, in the **General** section of the **Interface** tab.  
 - I also recommend a resolution of no greater than 1920x1080. This script may not work properly with higher resolutions.  
@@ -34,6 +30,13 @@ https://github.com/BigRedBot/NeverwinterInvokeBot/issues
 Some anti-virus software may falsely detect this program as a virus.  
 It is a false positive. Please read here for more information about this:  
 https://github.com/BigRedBot/NeverwinterInvokeBot/issues/41
+
+&nbsp;
+
+**Use this link to purchase the Neverwinter Invoke Bot Utility Unlock Code:**  
+https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=R3PNJD7RT56BY
+
+The unlock code is automatically emailed to your PayPal email address.
 
 &nbsp;
 

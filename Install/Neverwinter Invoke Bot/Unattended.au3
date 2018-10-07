@@ -1,6 +1,6 @@
 #NoTrayIcon
 #RequireAdmin
-#include "..\variables.au3"
+#include "variables.au3"
 #include <Misc.au3>
 #include <MsgBoxConstants.au3>
 #include <TrayConstants.au3>
@@ -10,22 +10,34 @@
 #include "Shared.au3"
 Global $Title = $Name & " " & $Version & ": Unattended Launcher"
 LoadLocalizations()
-If _Singleton($Name & ": Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnattendedAlreadyRunning"))
-Local $CanRun = 1, $Ran
+If _Singleton("Neverwinter Invoke Bot: Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnattendedAlreadyRunning"))
+Local $CanRun = 1, $Ran, $Disabled
 Local $RunNowItem = TrayCreateItem(Localize("RunNow"))
 TrayItemSetOnEvent($RunNowItem, "RunNow")
 TrayCreateItem("")
-Local $DoProfessionsItem = TrayCreateItem(Localize("DoProfessions"))
-TrayItemSetOnEvent($DoProfessionsItem, "DoProfessions")
+Local $DoProfessionsItem
+If Not $RemoveProfessions Then
+    $DoProfessionsItem = TrayCreateItem(Localize("DoProfessions"))
+    TrayItemSetOnEvent($DoProfessionsItem, "DoProfessions")
+    TrayCreateItem("")
+EndIf
+TrayItemSetState(TrayCreateItem(" "), $TRAY_DISABLE)
 TrayCreateItem("")
 Local $DoOpenProfessionBagsItem = TrayCreateItem(Localize("DoOpenProfessionBags"))
 TrayItemSetOnEvent($DoOpenProfessionBagsItem, "DoOpenProfessionBags")
+TrayCreateItem("")
+TrayItemSetOnEvent(TrayCreateItem(Localize("RunFishingBot")), "Fish")
 TrayCreateItem("")
 TrayItemSetOnEvent(TrayCreateItem(Localize("PostItemsToAuction")), "Auction")
 TrayCreateItem("")
 TrayItemSetOnEvent(TrayCreateItem(Localize("PullItemsFromMail")), "Mail")
 TrayCreateItem("")
-TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitScript")
+TrayItemSetState(TrayCreateItem(" "), $TRAY_DISABLE)
+TrayCreateItem("")
+Local $DisableItem = TrayCreateItem(Localize("Disable"))
+TrayItemSetOnEvent($DisableItem, "Disable")
+TrayCreateItem("")
+TrayItemSetOnEvent(TrayCreateItem(Localize("Exit")), "ExitScript")
 TraySetOnEvent($TRAY_EVENT_PRIMARYDOUBLE, "RunNow")
 TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
@@ -34,23 +46,41 @@ Func ExitScript()
     Exit
 EndFunc
 
+Func Disable()
+    If $Disabled Then
+        $Disabled = 0
+        DeleteAllAccountsValue("UnattendedDisabled")
+        DeleteIniAllAccounts("UnattendedDisabled")
+        TrayItemSetText($DisableItem, Localize("Disable"))
+    Else
+        $Disabled = 1
+        $Ran = 1
+        SetAllAccountsValue("UnattendedDisabled", 1)
+        SaveIniAllAccounts("UnattendedDisabled", 1)
+        TrayItemSetText($DisableItem, Localize("Enable"))
+        TraySetToolTip($Title)
+        TraySetIcon(@ScriptDir & "\images\black.ico")
+        TraySetState($TRAY_ICONSTATE_STOPFLASH)
+    EndIf
+EndFunc
+
 Func RunInvokeBot($n, $noflash = 1)
     If Not $CanRun Then Return
     $CanRun = 0
     $Ran = 1
     TrayItemSetState($RunNowItem, $TRAY_DISABLE)
-    TrayItemSetState($DoProfessionsItem, $TRAY_DISABLE)
+    If Not $RemoveProfessions Then TrayItemSetState($DoProfessionsItem, $TRAY_DISABLE)
     TrayItemSetState($DoOpenProfessionBagsItem, $TRAY_DISABLE)
     TraySetToolTip($Title & @CRLF & Localize("UnattendedRunning"))
     TraySetIcon(@ScriptDir & "\images\green.ico")
     If $noflash Then TraySetState($TRAY_ICONSTATE_STOPFLASH)
     If @Compiled Then
-        ShellExecuteWait(@ScriptDir & "\Neverwinter Invoke Bot.exe", $n, @ScriptDir)
+        ShellExecuteWait(@ScriptDir & "\Invoke.exe", $n, @ScriptDir)
     Else
-        ShellExecuteWait(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Neverwinter Invoke Bot.au3" ' & $n, @ScriptDir)
+        ShellExecuteWait(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Invoke.au3" ' & $n, @ScriptDir)
     EndIf
     TrayItemSetState($RunNowItem, $TRAY_ENABLE)
-    TrayItemSetState($DoProfessionsItem, $TRAY_ENABLE)
+    If Not $RemoveProfessions Then TrayItemSetState($DoProfessionsItem, $TRAY_ENABLE)
     TrayItemSetState($DoOpenProfessionBagsItem, $TRAY_ENABLE)
     TraySetIcon(@ScriptDir & "\images\teal.ico")
     TraySetState($TRAY_ICONSTATE_FLASH)
@@ -69,6 +99,14 @@ Func DoOpenProfessionBags()
     RunInvokeBot(7)
 EndFunc
 
+Func Fish()
+    If @Compiled Then
+        ShellExecute(@ScriptDir & "\Fish.exe", "", @ScriptDir)
+    Else
+        ShellExecute(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Fish.au3"', @ScriptDir)
+    EndIf
+EndFunc
+
 Func Auction()
     If @Compiled Then
         ShellExecute(@ScriptDir & "\Auction.exe", "", @ScriptDir)
@@ -84,12 +122,6 @@ Func Mail()
         ShellExecute(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Mail.au3"', @ScriptDir)
     EndIf
 EndFunc
-
-Local $deleted = 1
-If FileExists(@ScriptDir & "\Install.exe") Then $deleted = FileDelete(@ScriptDir & "\Install.exe")
-TraySetState($TRAY_ICONSTATE_FLASH)
-RunInvokeBot(0, 0)
-If $deleted And FileExists(@ScriptDir & "\Install.exe") Then Exit
 
 Func HoursAndMinutes($n)
     Local $All = Ceiling($n)
@@ -146,8 +178,22 @@ Func WaitMinutes($time, $msg, $idle = 0)
     WEnd
 EndFunc
 
-While 1
+Func Unattended()
     While 1
+    While 1
+        If $Disabled Then
+            TrayItemSetText($DisableItem, Localize("Enable"))
+            TraySetToolTip($Title)
+            TraySetIcon(@ScriptDir & "\images\black.ico")
+            TraySetState($TRAY_ICONSTATE_STOPFLASH)
+            While $Disabled
+                Sleep(1000)
+            WEnd
+        EndIf
+        While Not $CanRun
+            Sleep(1000)
+            If $Disabled Then ExitLoop 2
+        WEnd
         $Ran = 0
         TraySetIcon(@ScriptDir & "\images\teal.ico")
         Local $min = 0
@@ -176,8 +222,19 @@ While 1
                 Next
             EndIf
         EndIf
-        ProcessClose("Neverwinter Invoke Bot.exe")
-        ProcessClose("Neverwinter Fishing Bot.exe")
+        ProcessClose("Invoke.exe")
+        ProcessClose("Fish.exe")
         RunInvokeBot(1)
     WEnd
-WEnd
+    WEnd
+EndFunc
+
+If GetAllAccountsValue("UnattendedDisabled") Then $Disabled = 1
+If $Disabled Then TrayItemSetText($DisableItem, Localize("Enable"))
+Local $deleted = 1
+If FileExists(@ScriptDir & "\Install.exe") Then $deleted = FileDelete(@ScriptDir & "\Install.exe")
+TraySetState($TRAY_ICONSTATE_FLASH)
+RunInvokeBot(0, 0)
+If $deleted And FileExists(@ScriptDir & "\Install.exe") Then Exit
+
+Unattended()

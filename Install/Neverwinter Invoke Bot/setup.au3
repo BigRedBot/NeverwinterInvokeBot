@@ -12,10 +12,10 @@ If Not @Compiled Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, "The sc
 #include <StaticConstants.au3>
 #include <WindowsConstants.au3>
 #include <StringConstants.au3>
+#include <File.au3>
 #include <FileConstants.au3>
-#include ".\Neverwinter Invoke Bot\_GUIScrollbars_Ex.au3"
-#include ".\Neverwinter Invoke Bot\_UnicodeIni.au3"
-#include ".\Neverwinter Invoke Bot\Localization.au3"
+#include "_GUIScrollbars_Ex.au3"
+#include "Localization.au3"
 Local $Language = LoadLocalizations(1, @ScriptDir & "\" & $Name & "\Localization.ini", 0)
 
 Local $InstallDir = @ProgramFilesDir & "\" & $Name, $RegLocation = "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Uninstall\" & $Name, $InstallLocation = StringRegExpReplace(RegRead($RegLocation, "InstallLocation"), "\\+$", "")
@@ -58,10 +58,12 @@ Func GetInstallLocation($dir = $InstallDir)
     WEnd
 EndFunc
 
-If _Singleton($Name & " Installer" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("InstallerAlreadyRunning"))
-If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("CloseBeforeInstall"))
-If _Singleton($Name & ": Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("CloseUnattendedBeforeInstall"))
+If _Singleton("Neverwinter Invoke Bot Installer" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("InstallerAlreadyRunning"))
+If _Singleton("Neverwinter Invoke Bot" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("CloseBeforeInstall"))
+If _Singleton("Neverwinter Invoke Bot: Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("CloseUnattendedBeforeInstall"))
 If _Singleton("Neverwinter Fishing Bot" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("CloseFishingBeforeInstall"))
+If _Singleton("Neverwinter Invoke Bot: Auction" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("CloseAuctionBeforeInstall"))
+If _Singleton("Neverwinter Invoke Bot: Mail" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("CloseMailBeforeInstall"))
 If $InstallLocation <> "" And StringRegExp($InstallLocation, "\\" & $Name & "$") And FileExists($InstallLocation) Then
     $InstallDir = $InstallLocation
 Else
@@ -73,16 +75,25 @@ If _UnicodeIniRead($SettingsDir & "\Settings.ini", "AllAccounts", "Language", ""
     DirCreate($SettingsDir)
     _UnicodeIniWrite($SettingsDir & "\Settings.ini", "AllAccounts", "Language", $Language)
 EndIf
-If FileExists($InstallDir & "\images") And Not DirRemove($InstallDir & "\images", 1) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCleaningUpExistingInstallation"))
+If FileExists($InstallDir) Then
+    If FileExists($InstallDir & "\images") And Not DirRemove($InstallDir & "\images", 1) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCleaningUpExistingInstallation"))
+    Local $delete = _FileListToArray($InstallDir, "*", $FLTA_FILES)
+    If @error <> 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCleaningUpExistingInstallation"))
+    For $i = 1 To $delete[0]
+        If $delete[$i] <> "Install.exe" And Not FileDelete($InstallDir & "\" & $delete[$i]) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToDeleteFile", "<FILE>", $InstallDir & "\" & $delete[$i]))
+    Next
+EndIf
+If FileExists(@DesktopCommonDir & "\Neverwinter Fishing Bot.lnk") And Not FileDelete(@DesktopCommonDir & "\Neverwinter Fishing Bot.lnk") Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToDeleteFile", "<FILE>", @DesktopCommonDir & "\Neverwinter Fishing Bot.lnk"))
+If FileExists(@StartupCommonDir & "\Neverwinter Invoke Bot Unattended Launcher.lnk") And Not FileDelete(@StartupCommonDir & "\Neverwinter Invoke Bot Unattended Launcher.lnk") Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToDeleteFile", "<FILE>", @StartupCommonDir & "\Neverwinter Invoke Bot Unattended Launcher.lnk"))
 If Not DirCopy($Name, $InstallDir, 1) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCopyingFilesToProgramsFolder"))
-If Not RegWrite($RegLocation, "DisplayName", "REG_SZ", $Name) Or Not RegWrite($RegLocation, "DisplayVersion", "REG_SZ", $Version) Or Not RegWrite($RegLocation, "Publisher", "REG_SZ", "BigRedBot") Or Not RegWrite($RegLocation, "DisplayIcon", "REG_SZ", $InstallDir & "\" & $Name & ".exe") Or Not RegWrite($RegLocation, "UninstallString", "REG_SZ", '"' & $InstallDir & '\Uninstall.exe"') Or Not RegWrite($RegLocation, "InstallLocation", "REG_SZ", $InstallDir) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCreatingUninstallerRegistry"))
-If Not FileCreateShortcut($InstallDir & "\" & $Name & ".exe", @DesktopCommonDir & "\" & $Name & ".lnk", $InstallDir) Or Not FileCreateShortcut($InstallDir & "\Neverwinter Fishing Bot.exe", @DesktopCommonDir & "\Neverwinter Fishing Bot.lnk", $InstallDir) Or Not FileCreateShortcut($InstallDir & "\Simple.html", @DesktopCommonDir & "\Simple Bank Referral.lnk", $InstallDir) Or Not FileCreateShortcut($SettingsDir, $InstallDir & "\Settings.lnk", $InstallDir) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCreatingShortcut"))
+If Not RegWrite($RegLocation, "DisplayName", "REG_SZ", $Name) Or Not RegWrite($RegLocation, "DisplayVersion", "REG_SZ", $Version) Or Not RegWrite($RegLocation, "Publisher", "REG_SZ", "BigRedBot") Or Not RegWrite($RegLocation, "DisplayIcon", "REG_SZ", $InstallDir & "\Invoke.exe") Or Not RegWrite($RegLocation, "UninstallString", "REG_SZ", '"' & $InstallDir & '\Uninstall.exe"') Or Not RegWrite($RegLocation, "InstallLocation", "REG_SZ", $InstallDir) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCreatingUninstallerRegistry"))
+If Not FileCreateShortcut($InstallDir & "\Unattended.exe", @DesktopCommonDir & "\" & $Name & ".lnk", $InstallDir) Or Not FileCreateShortcut($InstallDir & "\Simple.html", @DesktopCommonDir & "\Simple Bank Referral.lnk", $InstallDir) Or Not FileCreateShortcut($SettingsDir, $InstallDir & "\Settings.lnk", $InstallDir) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCreatingShortcut"))
 Local $RunUnattendedOnStartup
 If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("RunUnattendedOnStartup")) = $IDYES Then
-    If Not FileCreateShortcut($InstallDir & "\Unattended.exe", @StartupCommonDir & "\" & $Name & " Unattended Launcher.lnk", $InstallDir) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCreatingShortcut"))
+    If Not FileCreateShortcut($InstallDir & "\Unattended.exe", @StartupCommonDir & "\" & $Name & ".lnk", $InstallDir) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCreatingShortcut"))
     $RunUnattendedOnStartup = 1
-ElseIf FileExists(@StartupCommonDir & "\" & $Name & " Unattended Launcher.lnk") And Not FileDelete(@StartupCommonDir & "\" & $Name & " Unattended Launcher.lnk") Then
-    Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToDeleteFile", "<FILE>", @StartupCommonDir & "\" & $Name & " Unattended Launcher.lnk"))
+ElseIf FileExists(@StartupCommonDir & "\" & $Name & ".lnk") And Not FileDelete(@StartupCommonDir & "\" & $Name & ".lnk") Then
+    Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToDeleteFile", "<FILE>", @StartupCommonDir & "\" & $Name & ".lnk"))
 EndIf
 MsgBox($MB_OK + $MB_TOPMOST, $Title, Localize("SuccessfullyInstalled", "<VERSION>", $Version) & @CRLF & @CRLF & $InstallDir)
 

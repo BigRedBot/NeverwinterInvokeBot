@@ -1,12 +1,12 @@
 #NoTrayIcon
 #RequireAdmin
-Global $Name = "Neverwinter Invoke Bot: Auction"
+Global $Name = "Neverwinter Auction Bot"
 Global $Title = $Name
 #include "Shared.au3"
-If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Name, Localize("AuctionAlreadyRunning"))
+If _Singleton("Neverwinter Invoke Bot: Auction" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Name, Localize("AuctionAlreadyRunning"))
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\teal.ico")
-TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitScript")
+TrayItemSetOnEvent(TrayCreateItem(Localize("Exit")), "ExitScript")
 TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
 #include "_ImageSearch.au3"
@@ -434,4 +434,5 @@ Func SingleClick()
     MouseUp("primary")
 EndFunc
 
+CheckUtilityUnlockCode()
 Auction()

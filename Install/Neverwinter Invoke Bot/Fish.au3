@@ -3,10 +3,10 @@
 Global $Name = "Neverwinter Fishing Bot"
 Global $Title = $Name
 #include "Shared.au3"
-If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Name, Localize("FishingBotAlreadyRunning"))
+If _Singleton("Neverwinter Fishing Bot" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Name, Localize("FishingBotAlreadyRunning"))
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\green.ico")
-TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitScript")
+TrayItemSetOnEvent(TrayCreateItem(Localize("Exit")), "ExitScript")
 TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
 #include "_ImageSearch.au3"
@@ -560,5 +560,6 @@ Func SingleClick()
     MouseUp("primary")
 EndFunc
 
+CheckUtilityUnlockCode()
 Settings()
 Fish()

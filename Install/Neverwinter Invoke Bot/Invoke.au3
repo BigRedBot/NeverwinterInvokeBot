@@ -1,23 +1,22 @@
 #NoTrayIcon
 #RequireAdmin
 Global $LoadPrivateSettings = 1
-#include "..\variables.au3"
+#include "variables.au3"
 Global $Title = $Name & " v" & $Version
 #include "Shared.au3"
-If _Singleton($Name & "Jp4g9QRntjYP", 1) = 0 Then
+If _Singleton("Neverwinter Invoke Bot" & "Jp4g9QRntjYP", 1) = 0 Then
     If Not $CmdLine[0] Or Number($CmdLine[1]) <> 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("AlreadyRunning"))
     Exit
 EndIf
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\red.ico")
-TrayItemSetOnEvent(TrayCreateItem("&Exit"), "ExitScript")
+TrayItemSetOnEvent(TrayCreateItem(Localize("Exit")), "ExitScript")
 TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
 Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions, $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $EndTime, $MinutesToEndSaved, $MinutesToEndSavedTimer, $MouseOffset = 5, $OpenProfessionBags, $OpenProfessionBagsMsg
 AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
 #include <ColorConstants.au3>
 #include <Math.au3>
-#include <Crypt.au3>
 #include "_DownloadFile.au3"
 #include "_GetUTCMinutes.au3"
 #include "_ImageSearch.au3"
@@ -2362,8 +2361,8 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
     $s &= "|" & "NoInputBlocking,InputBlockingTitle,InputBlockingDescription,ReverseBoolean"
     $s &= "|" & "SkipVerifyFiles,SkipVerifyFilesTitle,SkipVerifyFilesDescription,Boolean"
     $s &= "|" & "DisableDonationPrompts,DisableDonationPromptsTitle,DisableDonationPromptsDescription,Boolean"
-    $s &= "|" & "ProfessionsDelay,ProfessionsDelayTitle,ProfessionsDelayDescription,Number"
-    $s &= "|" & "OptionalAssetsDelay,OptionalAssetsDelayTitle,OptionalAssetsDelayDescription,Number"
+    If Not $RemoveProfessions Then $s &= "|" & "ProfessionsDelay,ProfessionsDelayTitle,ProfessionsDelayDescription,Number"
+    If Not $RemoveProfessions Then $s &= "|" & "OptionalAssetsDelay,OptionalAssetsDelayTitle,OptionalAssetsDelayDescription,Number"
     $s &= "|" & "ClaimCofferDelay,ClaimCofferDelayTitle,ClaimCofferDelayDescription,Number"
     $s &= "|" & "ClaimVIPCharacterRewardDelay,ClaimVIPCharacterRewardDelayTitle,ClaimVIPCharacterRewardDelayDescription,Number"
     $s &= "|" & "ClaimVIPAccountRewardDelay,ClaimVIPAccountRewardDelayTitle,ClaimVIPAccountRewardDelayDescription,Number"
@@ -2383,7 +2382,7 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
     $s &= "|" & "GameMenuKey,GameMenuKeyTitle,GameMenuKeyDescription,Text"
     $s &= "|" & "CursorModeKey,CursorModeKeyTitle,CursorModeKeyDescription,Text"
     $s &= "|" & "InventoryKey,InventoryKeyTitle,InventoryKeyDescription,Text"
-    $s &= "|" & "ProfessionsKey,ProfessionsKeyTitle,ProfessionsKeyDescription,Text"
+    If Not $RemoveProfessions Then $s &= "|" & "ProfessionsKey,ProfessionsKeyTitle,ProfessionsKeyDescription,Text"
     $s &= "|" & "PauseBotKey,PauseBotKeyTitle,PauseBotKeyDescription,Text"
     $s &= "|" & "CheckServerAddress,CheckServerAddressTitle,CheckServerAddressDescription,Text"
     Local $a = StringSplit(StringRegExpReplace($s, "^\|+", ""), "|")
@@ -2579,18 +2578,18 @@ Func RunScript(); If $RestartLoop Then Return 0
     If $AllLoginInfoFound And GetValue("UnattendedMode") <> 2 And GetValue("UnattendedMode") <> 3 Then $UnattendedMode = GetValue("UnattendedMode")
     If Not $OpenProfessionBags And Not $UnattendedModeCheckSettings And Not GetValue("DisableDonationPrompts") And ( GetAllAccountsValue("TotalInvoked") - GetAllAccountsValue("DonationPrompts") * 2000 ) >= 2000 Then
         Statistics_SaveIniAllAccounts("DonationPrompts", Floor(GetAllAccountsValue("TotalInvoked") / 2000))
-        CloseClient("DonationPrompt.exe"); If $RestartLoop Then Return 0
+        CloseClient("Donation.exe"); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         If $UnattendedMode Then
             If @Compiled Then
-                ShellExecute(@ScriptDir & "\DonationPrompt.exe", "", @ScriptDir)
+                ShellExecute(@ScriptDir & "\Donation.exe", "", @ScriptDir)
             Else
-                ShellExecute(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\DonationPrompt.au3"', @ScriptDir)
+                ShellExecute(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Donation.au3"', @ScriptDir)
             EndIf
         ElseIf @Compiled Then
-            ShellExecuteWait(@ScriptDir & "\DonationPrompt.exe", "", @ScriptDir)
+            ShellExecuteWait(@ScriptDir & "\Donation.exe", "", @ScriptDir)
         Else
-            ShellExecuteWait(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\DonationPrompt.au3"', @ScriptDir)
+            ShellExecuteWait(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Donation.au3"', @ScriptDir)
         EndIf
     EndIf
     If Not $UnattendedMode And @Compiled Then

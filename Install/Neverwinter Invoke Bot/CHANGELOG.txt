@@ -1,6 +1,11 @@
 RELEASE NOTES
 =============
 
+10.42
+- Added the ability to disable the launcher in its task tray menu, to disable it from automatically running the bot
+- Replaced invoke bot desktop shortcut with the launcher shortcut
+- Removed fishing bot shortcut from the desktop and added it to the launcher's task tray menu
+
 10.41.1
 - Added Russian support for Auction and Mail
 

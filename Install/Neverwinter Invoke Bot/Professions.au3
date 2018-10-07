@@ -373,25 +373,25 @@ Func ProfessionsSleep($sleeptime = GetValue("ProfessionsDelay") * 1000); If $Res
 EndFunc
 
 Func CheckProfessionsUnlockCode()
+    If $RemoveProfessions Then Return
     $EnableProfessions = 1
     If $EnableProfessions Or $UnattendedModeCheckSettings Then Return
     _Crypt_Startup()
-    If Not $EnableProfessions Then $EnableProfessions = CheckProfessionsUnlockCodeData("225BA7083CE6B485BE95CBDAF18CF6D025C4D7F3", "ProfessionsUnlockCode", "UnlockProfessions", "EnterProfessionsUnlockCode", "BuyProfessionsUnlockCode", "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UQRNUA698EUTC")
-    ;If $EnableProfessions And Not $EnableOptionalAssets Then $EnableOptionalAssets = CheckProfessionsUnlockCodeData("07016EDD9A3CB06164336D062698BFF2566696CF", "OptionalAssetsUnlockCode", "UnlockOptionalAssets", "EnterOptionalAssetsUnlockCode", "BuyOptionalAssetsUnlockCode", "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LWTPB6AEB4V86")
+    If Not $EnableProfessions Then $EnableProfessions = CheckProfessionsUnlockCodeData("225BA7083CE6B485BE95CBDAF18CF6D025C4D7F3", $Title, "ProfessionsUnlockCode", "UnlockProfessions", "EnterProfessionsUnlockCode", "BuyProfessionsUnlockCode", "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UQRNUA698EUTC")
+    ;If $EnableProfessions And Not $EnableOptionalAssets Then $EnableOptionalAssets = CheckProfessionsUnlockCodeData("07016EDD9A3CB06164336D062698BFF2566696CF", $Title, "OptionalAssetsUnlockCode", "UnlockOptionalAssets", "EnterOptionalAssetsUnlockCode", "BuyOptionalAssetsUnlockCode", "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LWTPB6AEB4V86")
     _Crypt_Shutdown()
 EndFunc
 
-Func CheckProfessionsUnlockCodeData($hash, $code, $local1, $local2, $local3, $url)
-    If Hex(_Crypt_HashData(StringUpper(StringStripWS(GetValue($code), $STR_STRIPALL)), $CALG_SHA1)) = $hash Then
-        Return 1
-    ElseIf Not $UnattendedMode And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2 + $MB_TOPMOST, $Title, Localize($local1)) = $IDYES Then
+Func CheckProfessionsUnlockCodeData($hash, $title, $code, $local1, $local2, $local3, $url)
+    If Hex(_Crypt_HashData(StringUpper(StringStripWS(GetValue($code), $STR_STRIPALL)), $CALG_SHA1)) = $hash Then Return 1
+    If Not $UnattendedMode And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2 + $MB_TOPMOST, $title, Localize($local1)) = $IDYES Then
         While 1
             Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
             GUISetState(@SW_HIDE, $InputBoxGUI)
-            Local $input = InputBox($Title, @CRLF & @CRLF & @CRLF & @CRLF & Localize($local2), "", "", -1, -1, Default, Default, 0, $InputBoxGUI)
+            Local $input = InputBox($title, @CRLF & @CRLF & @CRLF & @CRLF & Localize($local2), "", "", -1, -1, Default, Default, 0, $InputBoxGUI)
             If @error <> 0 Then
                 GUIDelete($InputBoxGUI)
-                If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize($local3)) = $IDYES Then
+                If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $title, Localize($local3)) = $IDYES Then
                     _Crypt_Shutdown()
                     Exit ShellExecute($url)
                 EndIf

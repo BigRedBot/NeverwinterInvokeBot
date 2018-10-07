@@ -1,10 +1,19 @@
 @ECHO OFF
-IF "%~1" == "" EXIT
-IF "%~2" == "" EXIT
-IF "%~3" == "" EXIT
+IF "%~1" == "" GOTO BadStart
+IF "%~2" == "" GOTO BadStart
+IF "%~3" == "" GOTO BadStart
+GOTO Start
+:BadStart
+ECHO.
+ECHO This must be started with another script!
+ECHO.
+PAUSE
+EXIT
+:Start
 SET VERSION=%~1
 SET NAME=%~2
 SET INSTALLER=%~3
+ECHO.
 ECHO Compiling: %NAME% v%VERSION%
 
 IF "%~4" == "Beta" GOTO Beta
@@ -20,24 +29,24 @@ IF "%~4" == "Beta" GOTO Beta
     ECHO #include-once
     ECHO Global $Name = "%NAME%"
     ECHO Global $Version = "%VERSION%"
-) > .\Install\variables.au3
+) > ".\Install\%NAME%\variables.au3"
 
 COPY CHANGELOG.md ".\Install\%NAME%\CHANGELOG.txt" /Y
 
-"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\%NAME%.au3" /out ".\Install\%NAME%\%NAME%.exe" /icon ".\Install\%NAME%\images\red.ico" /comp 2 /nopack /x86 /gui
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Invoke.au3" /out ".\Install\%NAME%\Invoke.exe" /icon ".\Install\%NAME%\images\red.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Unattended.au3" /out ".\Install\%NAME%\Unattended.exe" /icon ".\Install\%NAME%\images\blue.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\ScreenDetection.au3" /out ".\Install\%NAME%\ScreenDetection.exe" /icon ".\Install\%NAME%\images\black.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\ScreenDetectionProfessions.au3" /out ".\Install\%NAME%\ScreenDetectionProfessions.exe" /icon ".\Install\%NAME%\images\black.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\ScreenDetectionFishing.au3" /out ".\Install\%NAME%\ScreenDetectionFishing.exe" /icon ".\Install\%NAME%\images\black.ico" /comp 2 /nopack /x86 /gui
-"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Neverwinter Fishing Bot.au3" /out ".\Install\%NAME%\Neverwinter Fishing Bot.exe" /icon ".\Install\%NAME%\images\green.ico" /comp 2 /nopack /x86 /gui
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Fish.au3" /out ".\Install\%NAME%\Fish.exe" /icon ".\Install\%NAME%\images\green.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\ImageCapture.au3" /out ".\Install\%NAME%\ImageCapture.exe" /icon ".\Install\%NAME%\images\purple.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Uninstall.au3" /out ".\Install\%NAME%\Uninstall.exe" /icon ".\Install\%NAME%\images\yellow.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\OpenProfessionBags.au3" /out ".\Install\%NAME%\OpenProfessionBags.exe" /icon ".\Install\%NAME%\images\teal.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\PullRPFromGuildBank.au3" /out ".\Install\%NAME%\PullRPFromGuildBank.exe" /icon ".\Install\%NAME%\images\teal.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Auction.au3" /out ".\Install\%NAME%\Auction.exe" /icon ".\Install\%NAME%\images\teal.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Mail.au3" /out ".\Install\%NAME%\Mail.exe" /icon ".\Install\%NAME%\images\teal.ico" /comp 2 /nopack /x86 /gui
-"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\DonationPrompt.au3" /out ".\Install\%NAME%\DonationPrompt.exe" /comp 2 /nopack /x86 /gui
-"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in .\Install\setup.au3 /out .\Install\setup.exe /comp 2 /nopack /x86 /gui
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Donation.au3" /out ".\Install\%NAME%\Donation.exe" /comp 2 /nopack /x86 /gui
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\setup.au3" /out ".\Install\setup.exe" /comp 2 /nopack /x86 /gui
 
 DEL %INSTALLER%.exe
 "%ProgramFiles%\7-Zip\7z.exe" a Installer.7z .\Install\* -r -x!Thumbs.db -x!ehthumbs.db -x!Desktop.ini -x!*.au3 -x!*.kxf
@@ -56,5 +65,5 @@ PAUSE
 
 DEL Installer.7z
 DEL config.txt
-DEL .\Install\*.exe
+DEL ".\Install\*.exe"
 DEL ".\Install\%NAME%\*.exe"

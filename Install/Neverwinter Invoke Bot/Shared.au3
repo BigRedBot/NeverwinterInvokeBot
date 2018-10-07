@@ -13,7 +13,7 @@
 #include <WinAPI.au3>
 #include <File.au3>
 #include <Array.au3>
-#include "_UnicodeIni.au3"
+#include <Crypt.au3>
 #include "Localization.au3"
 AutoItSetOption("WinTitleMatchMode", 3)
 AutoItSetOption("TrayAutoPause", 0)
@@ -109,6 +109,47 @@ Next
 
 SetAllAccountsValue("Language", LoadLocalizations())
 Global $Language = GetValue("Language"), $ImageDir = "images\" & $Language, $FullImageDir = @ScriptDir & "\" & $ImageDir, $ImagePath = $ImageDir & "\", $FullImagePath = $FullImageDir & "\"
+
+Global $RemoveProfessions = 0
+
+Local $UtilityCodeHash = "A3B3249F2784364B7BE3550FD0E02A140C6267F0"
+
+Func CheckUtilityUnlockCode()
+    Return
+    If Hex(_Crypt_HashData(StringUpper(StringStripWS(GetPrivateIniAllAccounts("UtilityUnlockCode"), $STR_STRIPALL)), $CALG_SHA1)) = $UtilityCodeHash Then Return
+    _Singleton("Neverwinter Invoke Bot: Utility Code Prompt" & "Jp4g9QRntjYP")
+    _Crypt_Startup()
+    CheckUnlockCodeData($UtilityCodeHash, "Neverwinter Invoke Bot: Utilities", "UtilityUnlockCode", "UnlockUtility", "EnterUtilityUnlockCode", "BuyUtilityUnlockCode", "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=R3PNJD7RT56BY")
+    _Crypt_Shutdown()
+    If Hex(_Crypt_HashData(StringUpper(StringStripWS(GetPrivateIniAllAccounts("UtilityUnlockCode"), $STR_STRIPALL)), $CALG_SHA1)) = $UtilityCodeHash Then Return
+    Exit
+EndFunc
+
+Func CheckUnlockCodeData($hash, $title, $code, $local1, $local2, $local3, $url)
+    If Hex(_Crypt_HashData(StringUpper(StringStripWS(GetPrivateIniAllAccounts($code), $STR_STRIPALL)), $CALG_SHA1)) = $hash Then Return 1
+    If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2 + $MB_TOPMOST, $title, Localize($local1)) = $IDYES Then
+        While 1
+            Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
+            GUISetState(@SW_HIDE, $InputBoxGUI)
+            Local $input = InputBox($title, @CRLF & @CRLF & @CRLF & @CRLF & Localize($local2), "", "", -1, -1, Default, Default, 0, $InputBoxGUI)
+            If @error <> 0 Then
+                GUIDelete($InputBoxGUI)
+                If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $title, Localize($local3)) = $IDYES Then
+                    _Crypt_Shutdown()
+                    Exit ShellExecute($url)
+                EndIf
+                Return 0
+            EndIf
+            GUIDelete($InputBoxGUI)
+            $input = StringUpper(StringStripWS($input, $STR_STRIPALL))
+            If Hex(_Crypt_HashData($input, $CALG_SHA1)) = $hash Then
+                SavePrivateIniAllAccounts($code, $input)
+                Return 1
+            EndIf
+        WEnd
+    EndIf
+    Return 0
+EndFunc
 
 Func SetDefault($name, $value = 0)
     If Not IsDeclared("SETTINGS_Default_" & $name) Then Return Assign("SETTINGS_Default_" & $name, $value, 2)

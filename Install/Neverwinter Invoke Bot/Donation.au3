@@ -1,8 +1,8 @@
 #NoTrayIcon
-#include "..\variables.au3"
+#include "variables.au3"
 Global $Title = $Name & " v" & $Version
 #include "Shared.au3"
-_Singleton($Name & "Donation Prompt" & "Jp4g9QRntjYP")
+_Singleton("Neverwinter Invoke Bot: Donation Prompt" & "Jp4g9QRntjYP")
 #include "_AddCommaToNumber.au3"
 
 While 1
