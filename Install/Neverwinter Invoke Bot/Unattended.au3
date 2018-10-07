@@ -21,12 +21,14 @@ If Not $RemoveProfessions Then
     TrayItemSetOnEvent($DoProfessionsItem, "DoProfessions")
     TrayCreateItem("")
 EndIf
-TrayItemSetState(TrayCreateItem(" "), $TRAY_DISABLE)
-TrayCreateItem("")
 Local $DoOpenProfessionBagsItem = TrayCreateItem(Localize("DoOpenProfessionBags"))
 TrayItemSetOnEvent($DoOpenProfessionBagsItem, "DoOpenProfessionBags")
 TrayCreateItem("")
+TrayItemSetState(TrayCreateItem(" "), $TRAY_DISABLE)
+TrayCreateItem("")
 TrayItemSetOnEvent(TrayCreateItem(Localize("RunFishingBot")), "Fish")
+TrayCreateItem("")
+TrayItemSetOnEvent(TrayCreateItem(Localize("PullRPFromGuildBank")), "PullRPFromGuildBank")
 TrayCreateItem("")
 TrayItemSetOnEvent(TrayCreateItem(Localize("PostItemsToAuction")), "Auction")
 TrayCreateItem("")
@@ -104,6 +106,14 @@ Func Fish()
         ShellExecute(@ScriptDir & "\Fish.exe", "", @ScriptDir)
     Else
         ShellExecute(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Fish.au3"', @ScriptDir)
+    EndIf
+EndFunc
+
+Func PullRPFromGuildBank()
+    If @Compiled Then
+        ShellExecute(@ScriptDir & "\PullRPFromGuildBank.exe", "", @ScriptDir)
+    Else
+        ShellExecute(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\PullRPFromGuildBank.au3"', @ScriptDir)
     EndIf
 EndFunc
 
