@@ -7,7 +7,6 @@ If _Singleton("Neverwinter Invoke Bot: Mail" & "Jp4g9QRntjYP", 1) = 0 Then Exit 
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\teal.ico")
 TrayItemSetOnEvent(TrayCreateItem(Localize("Exit")), "ExitScript")
-TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
 #include "_ImageSearch.au3"
 
@@ -276,5 +275,5 @@ Func SingleClick()
     MouseUp("primary")
 EndFunc
 
-CheckUtilityUnlockCode()
+If Not CheckUtilityUnlockCode() Then Exit
 Mail()

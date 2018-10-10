@@ -41,7 +41,6 @@ TrayItemSetOnEvent($DisableItem, "Disable")
 TrayCreateItem("")
 TrayItemSetOnEvent(TrayCreateItem(Localize("Exit")), "ExitScript")
 TraySetOnEvent($TRAY_EVENT_PRIMARYDOUBLE, "RunNow")
-TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
 
 Func ExitScript()
@@ -247,4 +246,5 @@ TraySetState($TRAY_ICONSTATE_FLASH)
 RunInvokeBot(0, 0)
 If $deleted And FileExists(@ScriptDir & "\Install.exe") Then Exit
 
+CheckUtilityUnlockCode(15)
 Unattended()

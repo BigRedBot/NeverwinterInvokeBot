@@ -7,7 +7,6 @@ If _Singleton("Neverwinter Invoke Bot: Pull RP from Guild Bank" & "Jp4g9QRntjYP"
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\teal.ico")
 TrayItemSetOnEvent(TrayCreateItem(Localize("Exit")), "ExitScript")
-TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
 #include "_ImageSearch.au3"
 
@@ -186,5 +185,5 @@ Func SingleClick()
     MouseUp("primary")
 EndFunc
 
-CheckUtilityUnlockCode()
+If Not CheckUtilityUnlockCode() Then Exit
 Pull()

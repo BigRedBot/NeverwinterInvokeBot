@@ -46,6 +46,7 @@ COPY CHANGELOG.md ".\Install\%NAME%\CHANGELOG.txt" /Y
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Auction.au3" /out ".\Install\%NAME%\Auction.exe" /icon ".\Install\%NAME%\images\teal.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Mail.au3" /out ".\Install\%NAME%\Mail.exe" /icon ".\Install\%NAME%\images\teal.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Donation.au3" /out ".\Install\%NAME%\Donation.exe" /comp 2 /nopack /x86 /gui
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Unlock.au3" /out ".\Install\%NAME%\Unlock.exe" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\setup.au3" /out ".\Install\setup.exe" /comp 2 /nopack /x86 /gui
 
 DEL %INSTALLER%.exe

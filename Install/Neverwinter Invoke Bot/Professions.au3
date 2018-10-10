@@ -372,19 +372,19 @@ Func ProfessionsSleep($sleeptime = GetValue("ProfessionsDelay") * 1000); If $Res
     If $RestartLoop Then Return 0
 EndFunc
 
-Func CheckProfessionsUnlockCode()
+Func CheckProfessionsUnlockCode($timeout = 0)
     If $RemoveProfessions Then Return
     $EnableProfessions = 1
     If $EnableProfessions Or $UnattendedModeCheckSettings Then Return
     _Crypt_Startup()
-    If Not $EnableProfessions Then $EnableProfessions = CheckProfessionsUnlockCodeData("225BA7083CE6B485BE95CBDAF18CF6D025C4D7F3", $Title, "ProfessionsUnlockCode", "UnlockProfessions", "EnterProfessionsUnlockCode", "BuyProfessionsUnlockCode", "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UQRNUA698EUTC")
+    If Not $EnableProfessions Then $EnableProfessions = CheckProfessionsUnlockCodeData("225BA7083CE6B485BE95CBDAF18CF6D025C4D7F3", $Title, "ProfessionsUnlockCode", "UnlockProfessions", "EnterProfessionsUnlockCode", "BuyProfessionsUnlockCode", "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=UQRNUA698EUTC", $timeout)
     ;If $EnableProfessions And Not $EnableOptionalAssets Then $EnableOptionalAssets = CheckProfessionsUnlockCodeData("07016EDD9A3CB06164336D062698BFF2566696CF", $Title, "OptionalAssetsUnlockCode", "UnlockOptionalAssets", "EnterOptionalAssetsUnlockCode", "BuyOptionalAssetsUnlockCode", "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=LWTPB6AEB4V86")
     _Crypt_Shutdown()
 EndFunc
 
-Func CheckProfessionsUnlockCodeData($hash, $title, $code, $local1, $local2, $local3, $url)
+Func CheckProfessionsUnlockCodeData($hash, $title, $code, $local1, $local2, $local3, $url, $timeout = 0)
     If Hex(_Crypt_HashData(StringUpper(StringStripWS(GetValue($code), $STR_STRIPALL)), $CALG_SHA1)) = $hash Then Return 1
-    If Not $UnattendedMode And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2 + $MB_TOPMOST, $title, Localize($local1)) = $IDYES Then
+    If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2 + $MB_TOPMOST, $title, Localize($local1), $timeout) = $IDYES Then
         While 1
             Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
             GUISetState(@SW_HIDE, $InputBoxGUI)

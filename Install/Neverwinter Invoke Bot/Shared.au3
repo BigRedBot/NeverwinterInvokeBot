@@ -114,20 +114,29 @@ Global $RemoveProfessions = 0
 
 Local $UtilityCodeHash = "A3B3249F2784364B7BE3550FD0E02A140C6267F0"
 
-Func CheckUtilityUnlockCode()
-    Return
-    If Hex(_Crypt_HashData(StringUpper(StringStripWS(GetPrivateIniAllAccounts("UtilityUnlockCode"), $STR_STRIPALL)), $CALG_SHA1)) = $UtilityCodeHash Then Return
-    _Singleton("Neverwinter Invoke Bot: Utility Code Prompt" & "Jp4g9QRntjYP")
-    _Crypt_Startup()
-    CheckUnlockCodeData($UtilityCodeHash, "Neverwinter Invoke Bot: Utilities", "UtilityUnlockCode", "UnlockUtility", "EnterUtilityUnlockCode", "BuyUtilityUnlockCode", "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=R3PNJD7RT56BY")
-    _Crypt_Shutdown()
-    If Hex(_Crypt_HashData(StringUpper(StringStripWS(GetPrivateIniAllAccounts("UtilityUnlockCode"), $STR_STRIPALL)), $CALG_SHA1)) = $UtilityCodeHash Then Return
-    Exit
+Func CheckUtilityUnlockCode($timeout = 0)
+    Return 1
+    If Hex(_Crypt_HashData(StringUpper(StringStripWS(GetPrivateIniAllAccounts("UtilityUnlockCode"), $STR_STRIPALL)), $CALG_SHA1)) = $UtilityCodeHash Then Return 1
+    TraySetState($TRAY_ICONSTATE_HIDE)
+    If @Compiled Then
+        ShellExecuteWait(@ScriptDir & "\Unlock.exe", $timeout, @ScriptDir)
+    Else
+        ShellExecuteWait(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\Unlock.au3" ' & $timeout, @ScriptDir)
+    EndIf
+    TraySetState($TRAY_ICONSTATE_SHOW)
+    If Hex(_Crypt_HashData(StringUpper(StringStripWS(GetPrivateIniAllAccounts("UtilityUnlockCode"), $STR_STRIPALL)), $CALG_SHA1)) = $UtilityCodeHash Then Return 1
+    Return 0
 EndFunc
 
-Func CheckUnlockCodeData($hash, $title, $code, $local1, $local2, $local3, $url)
+Func RunCheckUtilityUnlockCode($timeout = 0)
+    _Crypt_Startup()
+    CheckUnlockCodeData($UtilityCodeHash, "Neverwinter Invoke Bot: Utilities", "UtilityUnlockCode", "UnlockUtility", "EnterUtilityUnlockCode", "BuyUtilityUnlockCode", "https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=R3PNJD7RT56BY", $timeout)
+    _Crypt_Shutdown()
+EndFunc
+
+Func CheckUnlockCodeData($hash, $title, $code, $local1, $local2, $local3, $url, $timeout = 0)
     If Hex(_Crypt_HashData(StringUpper(StringStripWS(GetPrivateIniAllAccounts($code), $STR_STRIPALL)), $CALG_SHA1)) = $hash Then Return 1
-    If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2 + $MB_TOPMOST, $title, Localize($local1)) = $IDYES Then
+    If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_DEFBUTTON2 + $MB_TOPMOST, $title, Localize($local1), $timeout) = $IDYES Then
         While 1
             Local $InputBoxGUI = GUICreate("", 0, 0, 0, 0, -1, $WS_EX_TOPMOST)
             GUISetState(@SW_HIDE, $InputBoxGUI)

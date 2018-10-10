@@ -6,7 +6,6 @@ Global $Title = $Name
 If _Singleton("Neverwinter Client Image Capture" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ImageCaptureAlreadyRunning"))
 TraySetIcon(@ScriptDir & "\images\purple.ico")
 TrayItemSetOnEvent(TrayCreateItem(Localize("Exit")), "ExitScript")
-TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
 #include <ScreenCapture.au3>
 #include <Clipboard.au3>

@@ -11,7 +11,6 @@ EndIf
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\red.ico")
 TrayItemSetOnEvent(TrayCreateItem(Localize("Exit")), "ExitScript")
-TraySetState($TRAY_ICONSTATE_SHOW)
 TraySetToolTip($Title)
 Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $UnattendedMode, $UnattendedModeCheckSettings, $EnableProfessions, $MinutesToStart = 0, $ReLogged = 0, $LogInTries = 0, $DoRelogCount = 0, $TimeOutRetries = 0, $DisableRelogCount = 1, $DisableRestartCount = 1, $GamePatched = 0, $CofferTries = 0, $LoopStarted = 0, $RestartLoop = 0, $Restarted = 0, $LogDate = 0, $LogTime = 0, $LogStartDate = 0, $LogStartTime = 0, $LogSessionStart = 1, $LoopDelayMinutes[7] = [6, 0, 15, 30, 45, 60, 90], $MaxLoops = $LoopDelayMinutes[0], $FailedInvoke, $StartTimer, $WaitingTimer, $LoggingIn, $EndTime, $MinutesToEndSaved, $MinutesToEndSavedTimer, $MouseOffset = 5, $OpenProfessionBags, $OpenProfessionBagsMsg
 AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
@@ -2611,7 +2610,10 @@ Func RunScript(); If $RestartLoop Then Return 0
         EndIf
     EndIf
     If $AllLoginInfoFound And $UnattendedModeCheckSettings Then ExitScript()
-    CheckProfessionsUnlockCode()
+    Local $timeout = 0
+    If GetValue("UnattendedMode") = 1 Then $timeout = 15
+    CheckUtilityUnlockCode($timeout)
+    CheckProfessionsUnlockCode($timeout)
     If Not $UnattendedModeCheckSettings And Not $UnattendedMode And $AllLoginInfoFound And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("SkipAllConfigurations", "<NUMBER>", GetValue("TotalAccounts"))) = $IDYES Then $SkipAllConfigurations = 1
     If Not $UnattendedMode And Not $SkipAllConfigurations Then
         ChooseOptions()
