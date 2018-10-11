@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.42.2
+- Auction will now clear the current selection for you
+
 10.42.1
 - Added "Pull RP from Guild Bank" to the launcher's task tray menu
 

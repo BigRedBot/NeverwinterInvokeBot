@@ -59,9 +59,11 @@ Func Disable()
         SetAllAccountsValue("UnattendedDisabled", 1)
         SaveIniAllAccounts("UnattendedDisabled", 1)
         TrayItemSetText($DisableItem, Localize("Enable"))
-        TraySetToolTip($Title)
-        TraySetIcon(@ScriptDir & "\images\black.ico")
-        TraySetState($TRAY_ICONSTATE_STOPFLASH)
+        If $CanRun Then
+            TraySetToolTip($Title)
+            TraySetIcon(@ScriptDir & "\images\black.ico")
+            TraySetState($TRAY_ICONSTATE_STOPFLASH)
+        EndIf
     EndIf
 EndFunc
 
@@ -83,8 +85,14 @@ Func RunInvokeBot($n, $noflash = 1)
     TrayItemSetState($RunNowItem, $TRAY_ENABLE)
     If Not $RemoveProfessions Then TrayItemSetState($DoProfessionsItem, $TRAY_ENABLE)
     TrayItemSetState($DoOpenProfessionBagsItem, $TRAY_ENABLE)
-    TraySetIcon(@ScriptDir & "\images\teal.ico")
-    TraySetState($TRAY_ICONSTATE_FLASH)
+    If $Disabled Then
+        TraySetToolTip($Title)
+        TraySetIcon(@ScriptDir & "\images\black.ico")
+        TraySetState($TRAY_ICONSTATE_STOPFLASH)
+    Else
+        TraySetIcon(@ScriptDir & "\images\teal.ico")
+        TraySetState($TRAY_ICONSTATE_FLASH)
+    EndIf
     $CanRun = 1
 EndFunc
 
@@ -192,9 +200,11 @@ Func Unattended()
     While 1
         If $Disabled Then
             TrayItemSetText($DisableItem, Localize("Enable"))
-            TraySetToolTip($Title)
-            TraySetIcon(@ScriptDir & "\images\black.ico")
-            TraySetState($TRAY_ICONSTATE_STOPFLASH)
+            If $CanRun Then
+                TraySetToolTip($Title)
+                TraySetIcon(@ScriptDir & "\images\black.ico")
+                TraySetState($TRAY_ICONSTATE_STOPFLASH)
+            EndIf
             While $Disabled
                 Sleep(1000)
             WEnd
