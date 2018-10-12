@@ -1,9 +1,9 @@
 #NoTrayIcon
 #RequireAdmin
-Global $Name = "Neverwinter Invoke Bot: Pull RP from Guild Bank"
+Global $Name = "Neverwinter Guild Bank RP Bot"
 Global $Title = $Name
 #include "Shared.au3"
-If _Singleton("Neverwinter Invoke Bot: Pull RP from Guild Bank" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Name, Localize("PullRPFromGuildBankAlreadyRunning"))
+If _Singleton("Neverwinter Invoke Bot: Pull RP from Guild Bank" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Name, Localize("GuildBankRPAlreadyRunning"))
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\teal.ico")
 TrayItemSetOnEvent(TrayCreateItem(Localize("Exit")), "ExitScript")
@@ -116,7 +116,7 @@ Func Pull()
         If $WinHandle Then WinSetOnTop($WinHandle, "", 0)
         SplashOff()
         $SplashWindow = 0
-        If MsgBox($MB_OKCANCEL + $MB_TOPMOST, $Title, Localize("ClickOKToPullRPFromGuildBank")) <> $IDOK Then ExitScript()
+        If MsgBox($MB_OKCANCEL + $MB_TOPMOST, $Title, Localize("ClickOKToPullGuildBankRP")) <> $IDOK Then ExitScript()
         If Not Position() Then ExitLoop
         HotKeySet("{Esc}", "Pull")
         Splash()

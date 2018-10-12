@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+10.42.3
+- Renamed utilities on untended launcher's menu options
+- Added message about future plans
+
 10.42.2
 - Auction will now clear the current selection for you
 

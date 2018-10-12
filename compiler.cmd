@@ -42,7 +42,7 @@ COPY CHANGELOG.md ".\Install\%NAME%\CHANGELOG.txt" /Y
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\ImageCapture.au3" /out ".\Install\%NAME%\ImageCapture.exe" /icon ".\Install\%NAME%\images\purple.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Uninstall.au3" /out ".\Install\%NAME%\Uninstall.exe" /icon ".\Install\%NAME%\images\yellow.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\OpenProfessionBags.au3" /out ".\Install\%NAME%\OpenProfessionBags.exe" /icon ".\Install\%NAME%\images\teal.ico" /comp 2 /nopack /x86 /gui
-"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\PullRPFromGuildBank.au3" /out ".\Install\%NAME%\PullRPFromGuildBank.exe" /icon ".\Install\%NAME%\images\teal.ico" /comp 2 /nopack /x86 /gui
+"%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\GuildBankRP.au3" /out ".\Install\%NAME%\GuildBankRP.exe" /icon ".\Install\%NAME%\images\teal.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Auction.au3" /out ".\Install\%NAME%\Auction.exe" /icon ".\Install\%NAME%\images\teal.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Mail.au3" /out ".\Install\%NAME%\Mail.exe" /icon ".\Install\%NAME%\images\teal.ico" /comp 2 /nopack /x86 /gui
 "%ProgramFiles(x86)%\AutoIt3\Aut2Exe\Aut2exe.exe" /in ".\Install\%NAME%\Donation.au3" /out ".\Install\%NAME%\Donation.exe" /comp 2 /nopack /x86 /gui

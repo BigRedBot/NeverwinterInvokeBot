@@ -28,7 +28,7 @@ TrayItemSetState(TrayCreateItem(" "), $TRAY_DISABLE)
 TrayCreateItem("")
 TrayItemSetOnEvent(TrayCreateItem(Localize("RunFishingBot")), "Fish")
 TrayCreateItem("")
-TrayItemSetOnEvent(TrayCreateItem(Localize("PullRPFromGuildBank")), "PullRPFromGuildBank")
+TrayItemSetOnEvent(TrayCreateItem(Localize("PullGuildBankRP")), "GuildBankRP")
 TrayCreateItem("")
 TrayItemSetOnEvent(TrayCreateItem(Localize("PostItemsToAuction")), "Auction")
 TrayCreateItem("")
@@ -116,11 +116,11 @@ Func Fish()
     EndIf
 EndFunc
 
-Func PullRPFromGuildBank()
+Func GuildBankRP()
     If @Compiled Then
-        ShellExecute(@ScriptDir & "\PullRPFromGuildBank.exe", "", @ScriptDir)
+        ShellExecute(@ScriptDir & "\GuildBankRP.exe", "", @ScriptDir)
     Else
-        ShellExecute(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\PullRPFromGuildBank.au3"', @ScriptDir)
+        ShellExecute(@AutoItExe, '/AutoIt3ExecuteScript "' & @ScriptDir & '\GuildBankRP.au3"', @ScriptDir)
     EndIf
 EndFunc
 
