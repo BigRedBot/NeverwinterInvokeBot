@@ -1,8 +1,8 @@
 RELEASE NOTES
 =============
 
-10.42.3
-- Renamed utilities on untended launcher's menu options
+10.42.4
+- Renamed utilities on unattended launcher's menu options
 - Added message about future plans
 
 10.42.2
