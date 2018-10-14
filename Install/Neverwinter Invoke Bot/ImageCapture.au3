@@ -1,7 +1,6 @@
 #NoTrayIcon
 #RequireAdmin
-Global $Name = "Neverwinter Client Image Capture"
-Global $Title = $Name
+Global $Title = "Neverwinter Client Image Capture"
 #include "Shared.au3"
 If _Singleton("Neverwinter Client Image Capture" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ImageCaptureAlreadyRunning"))
 TraySetIcon(@ScriptDir & "\images\purple.ico")

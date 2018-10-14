@@ -14,6 +14,7 @@
 #include <File.au3>
 #include <Array.au3>
 #include <Crypt.au3>
+#include "variables.au3"
 #include "Localization.au3"
 AutoItSetOption("WinTitleMatchMode", 3)
 AutoItSetOption("TrayAutoPause", 0)
@@ -100,7 +101,7 @@ EndFunc
 
 Global $CurrentAccount = 1
 If Not IsDeclared("LoadPrivateSettings") Then Assign("LoadPrivateSettings", 0, 2)
-Global $SettingsDir = @AppDataDir & "\Neverwinter Invoke Bot"
+Global $SettingsDir = @AppDataDir & "\" & $Name, $LogsDir = $SettingsDir & "\Logs"
 
 Global $DeletedString = "DELETED_"
 For $i = 1 To 100
@@ -396,12 +397,12 @@ Func LoadSettings($file)
 EndFunc
 
 Func PruneLogs()
-    If Not FileExists($SettingsDir & "\Logs") Then Return
-    Local $FileList = _FileListToArray($SettingsDir & "\Logs", "Log_????-??-??.txt", $FLTA_FILES)
+    If Not FileExists($LogsDir) Then Return
+    Local $FileList = _FileListToArray($LogsDir, "Log_????-??-??.txt", $FLTA_FILES)
     If @error = 0 And $FileList[0] > GetValue("LogFilesToKeep") Then
         _ArraySort($FileList)
         For $i = 1 To $FileList[0] - GetValue("LogFilesToKeep")
-            FileDelete($SettingsDir & "\Logs" & "\" & $FileList[$i])
+            FileDelete($LogsDir & "\" & $FileList[$i])
         Next
     EndIf
 EndFunc

@@ -1,7 +1,6 @@
 #NoTrayIcon
-#include "variables.au3"
-Global $Title = $Name & " v" & $Version
 #include "Shared.au3"
+Global $Title = $Name & " v" & $Version
 _Singleton("Neverwinter Invoke Bot: Donation Prompt" & "Jp4g9QRntjYP")
 #include "_AddCommaToNumber.au3"
 
@@ -16,7 +15,7 @@ While 1
     Local $msg = MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, $text & @CRLF & @CRLF & @CRLF & Localize("DonateNow"), 900)
     If $msg = $IDYES Then Exit ShellExecute(@ScriptDir & "\Donation.html")
     If $msg <> $IDTIMEOUT Then Exit
-    While _Singleton($Name & "Jp4g9QRntjYP", 1) = 0
+    While _Singleton("Neverwinter Invoke Bot" & "Jp4g9QRntjYP", 1) = 0
         Sleep(1000)
     WEnd
 Wend

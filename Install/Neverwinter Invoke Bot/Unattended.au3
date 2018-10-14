@@ -1,6 +1,5 @@
 #NoTrayIcon
 #RequireAdmin
-#include "variables.au3"
 #include <Misc.au3>
 #include <MsgBoxConstants.au3>
 #include <TrayConstants.au3>
@@ -39,6 +38,8 @@ TrayCreateItem("")
 Local $DisableItem = TrayCreateItem(Localize("Disable"))
 TrayItemSetOnEvent($DisableItem, "Disable")
 TrayCreateItem("")
+TrayItemSetOnEvent(TrayCreateItem(Localize("Logs")), "Logs")
+TrayCreateItem("")
 TrayItemSetOnEvent(TrayCreateItem(Localize("Exit")), "ExitScript")
 TraySetOnEvent($TRAY_EVENT_PRIMARYDOUBLE, "RunNow")
 TraySetToolTip($Title)
@@ -64,6 +65,14 @@ Func Disable()
             TraySetIcon(@ScriptDir & "\images\black.ico")
             TraySetState($TRAY_ICONSTATE_STOPFLASH)
         EndIf
+    EndIf
+EndFunc
+
+Func Logs()
+    If WinExists("Logs") Then
+        WinActivate("Logs")
+    Else
+        Run("explorer.exe " & $LogsDir)
     EndIf
 EndFunc
 

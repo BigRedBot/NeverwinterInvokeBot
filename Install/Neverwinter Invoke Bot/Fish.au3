@@ -1,9 +1,8 @@
 #NoTrayIcon
 #RequireAdmin
-Global $Name = "Neverwinter Fishing Bot"
-Global $Title = $Name
+Global $Title = "Neverwinter Fishing Bot"
 #include "Shared.au3"
-If _Singleton("Neverwinter Fishing Bot" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Name, Localize("FishingBotAlreadyRunning"))
+If _Singleton("Neverwinter Fishing Bot" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FishingBotAlreadyRunning"))
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\green.ico")
 TrayItemSetOnEvent(TrayCreateItem(Localize("Exit")), "ExitScript")
@@ -377,7 +376,7 @@ Func Settings($hWnd = 0)
     For $i = 1 To $Total
         $a[$i] = StringSplit($a[$i], ",")
         GUICtrlCreateLabel(Localize(($a[$i])[2]), 0, 23 + $i * 36, 200, -1, $SS_RIGHT)
-        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
+        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $LogsDir))
         Local $v = ($a[$i])[1], $gv = GetAllAccountsValue($v), $t = ($a[$i])[4]
         If $t = "Boolean" Or $t = "ReverseBoolean" Then
             $c[$i] = GUICtrlCreateCheckbox(" ", 210, 20 + $i * 36)
@@ -389,7 +388,7 @@ Func Settings($hWnd = 0)
         Else
             $c[$i] = GUICtrlCreateInput($gv, 210, 20 + $i * 36, 155)
         EndIf
-        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
+        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $LogsDir))
     Next
     Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 20, 64 + $Total * 36, 75, 25)
     Local $ButtonOK = GUICtrlCreateButton("&OK", 128, 64 + $Total * 36, 75, 25, $BS_DEFPUSHBUTTON)
@@ -477,7 +476,7 @@ Func AdvancedSettings($hWnd = 0)
     For $i = 1 To $Total
         $a[$i] = StringSplit($a[$i], ",")
         GUICtrlCreateLabel(Localize(($a[$i])[2]), 0, 23 + $i * 36, 340, -1, $SS_RIGHT)
-        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
+        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $LogsDir))
         Local $v = ($a[$i])[1], $gv = GetAllAccountsValue($v), $t = ($a[$i])[4]
         If $t = "Boolean" Or $t = "ReverseBoolean" Then
             $c[$i] = GUICtrlCreateCheckbox(" ", 350, 20 + $i * 36)
@@ -489,7 +488,7 @@ Func AdvancedSettings($hWnd = 0)
         Else
             $c[$i] = GUICtrlCreateInput($gv, 350, 20 + $i * 36, 155)
         EndIf
-        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
+        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $LogsDir))
     Next
     Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 40, 64 + $Total * 36, 75, 25)
     Local $ButtonOK = GUICtrlCreateButton("&OK", 268, 64 + $Total * 36, 75, 25, $BS_DEFPUSHBUTTON)

@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.42.5
+- Added option to open the Logs folder in the unattended launcher's menu options
+
 10.42.4
 - Renamed utilities on unattended launcher's menu options
 - Added message about future plans

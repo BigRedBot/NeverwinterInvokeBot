@@ -1,9 +1,8 @@
 #NoTrayIcon
 #RequireAdmin
 Global $LoadPrivateSettings = 1
-#include "variables.au3"
-Global $Title = $Name & " v" & $Version
 #include "Shared.au3"
+Global $Title = $Name & " v" & $Version
 If _Singleton("Neverwinter Invoke Bot" & "Jp4g9QRntjYP", 1) = 0 Then
     If Not $CmdLine[0] Or Number($CmdLine[1]) <> 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("AlreadyRunning"))
     Exit
@@ -1670,7 +1669,7 @@ Func SendMessage($s, $n = $MB_OK, $ontop = 0)
         SetAccountValue("LastMsg", $etext)
         $text &= $etext
         If $StartTimer Then
-            If Not FileExists($SettingsDir & "\Logs") Then DirCreate($SettingsDir & "\Logs")
+            If Not FileExists($LogsDir) Then DirCreate($LogsDir)
             Local $LogStart = "", $LogEnd = @CRLF
             If $LogSessionStart Then
                 $LogStart = @CRLF & Localize("SessionStart") & @CRLF & $LogStartDate & " " & $LogStartTime & @CRLF & @CRLF
@@ -1733,7 +1732,7 @@ Func AdvancedAccountSettings($hWnd = 0)
     For $i = 1 To $Total
         $a[$i] = StringSplit($a[$i], ",")
         GUICtrlCreateLabel(Localize(($a[$i])[2]), 0, 23 + $i * 36, 340, -1, $SS_RIGHT)
-        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
+        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $LogsDir))
         Local $v = ($a[$i])[1], $gv = GetAccountValue($v), $t = ($a[$i])[4]
         If $t = "Boolean" Or $t = "ReverseBoolean" Then
             $c[$i] = GUICtrlCreateCheckbox(" ", 350, 20 + $i * 36)
@@ -1745,7 +1744,7 @@ Func AdvancedAccountSettings($hWnd = 0)
         Else
             $c[$i] = GUICtrlCreateInput($gv, 350, 20 + $i * 36, 155)
         EndIf
-        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
+        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $LogsDir))
     Next
     _GUIScrollbars_Generate($hGUI, 1, 100 + $Total * 36)
     Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 40, 60 + $Total * 36, 75, 25)
@@ -2392,7 +2391,7 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
     For $i = 1 To $Total
         $a[$i] = StringSplit($a[$i], ",")
         GUICtrlCreateLabel(Localize(($a[$i])[2]), 0, 23 + $i * 36, 340, -1, $SS_RIGHT)
-        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
+        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $LogsDir))
         Local $v = ($a[$i])[1], $gv = GetAllAccountsValue($v), $t = ($a[$i])[4]
         If $t = "Boolean" Or $t = "ReverseBoolean" Then
             $c[$i] = GUICtrlCreateCheckbox(" ", 350, 20 + $i * 36)
@@ -2404,7 +2403,7 @@ Func AdvancedAllAccountsSettings($hWnd = 0)
         Else
             $c[$i] = GUICtrlCreateInput($gv, 350, 20 + $i * 36, 155)
         EndIf
-        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $SettingsDir & "\Logs"))
+        GUICtrlSetTip(-1, Localize(($a[$i])[3], "<DIRECTORY>", $LogsDir))
     Next
     _GUIScrollbars_Generate($hGUI, 1, 100 + $Total * 36)
     Local $ButtonDefault = GUICtrlCreateButton(Localize("Default"), 40, 60 + $Total * 36, 75, 25)

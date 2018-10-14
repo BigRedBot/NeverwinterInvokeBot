@@ -1,8 +1,7 @@
 #NoTrayIcon
-Global $Name = "Neverwinter Invoke Bot: Screen Detection Fishing"
-Global $Title = $Name
+Global $Title = "Neverwinter Invoke Bot: Screen Detection Fishing"
 #include "Shared.au3"
-If _Singleton("Neverwinter Invoke Bot: Screen Detection Fishing" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Name, Localize("ScreenDetectionAlreadyRunning"))
+If _Singleton("Neverwinter Invoke Bot: Screen Detection Fishing" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ScreenDetectionAlreadyRunning"))
 If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
 TraySetIcon(@ScriptDir & "\images\black.ico")
 TrayItemSetOnEvent(TrayCreateItem(Localize("Exit")), "ExitScript")
