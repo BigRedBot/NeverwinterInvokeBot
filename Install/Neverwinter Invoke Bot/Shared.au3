@@ -111,7 +111,7 @@ Next
 SetAllAccountsValue("Language", LoadLocalizations())
 Global $Language = GetValue("Language"), $ImageDir = "images\" & $Language, $FullImageDir = @ScriptDir & "\" & $ImageDir, $ImagePath = $ImageDir & "\", $FullImagePath = $FullImageDir & "\"
 
-Global $RemoveProfessions = 0
+Global $RemoveProfessions = 1
 
 Local $UtilityCodeHash = "A3B3249F2784364B7BE3550FD0E02A140C6267F0"
 

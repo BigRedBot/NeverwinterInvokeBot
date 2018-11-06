@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+10.42.6
+- Removed profession support
+
 10.42.5
 - Added option to open the Logs folder in the unattended launcher's menu options
 
