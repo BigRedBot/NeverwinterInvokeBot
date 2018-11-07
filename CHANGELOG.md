@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+11.0
+- Fixed login issue
+- Added unlock code for utilities
+
 10.42.6
 - Removed profession support
 

@@ -1262,9 +1262,13 @@ While 1
             EndIf
             Sleep(1000)
             Focus("Neverwinter.exe", "#32770")
-            If Not GetPosition() Then ExitLoop 2
+            If Not GetPosition() Then
+                Focus()
+                If GetPosition() Then ExitLoop
+                ExitLoop 2
+            EndIf
         WEnd
-        Splash("[ " & Localize("PatchingGame") & " ]", 0)
+        If ImageSearch("LauncherPatching") Then Splash("[ " & Localize("PatchingGame") & " ]", 0)
         Focus()
         Local $set = 1
         While Not $WinHandle
