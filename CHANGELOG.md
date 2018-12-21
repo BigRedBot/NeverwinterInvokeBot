@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+11.1
+- Updated Fishing Bot to work with Winter Festival Fishing.
+
 11.0
 - Fixed login issue
 - Added unlock code for utilities

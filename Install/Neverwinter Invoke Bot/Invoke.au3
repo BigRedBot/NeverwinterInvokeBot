@@ -295,7 +295,7 @@ While 1
                 EndIf
                 Local $bags = Array("Professions_ResonantBag, Professions_ArtifactParaphenalia, Professions_ThaumaturgicBag, Professions_EnchantedCoffer")
                 For $i = 1 To $bags[0]
-                    OpenInventoryBags($bags[$i], 10000, 0); If $RestartLoop Then Return 0
+                    OpenInventoryBags($bags[$i], 0, 10000); If $RestartLoop Then Return 0
                     If $RestartLoop Then ExitLoop 3
                 Next
                 SetAccountValue("FinishedCharacter", 1)
@@ -629,7 +629,7 @@ While 1
         SetAccountValue("TriedVIPAccountReward", 1)
     EndIf
     If $tried Then
-        OpenInventoryBags("VIPAccountRewards"); If $RestartLoop Then Return 0
+        OpenInventoryBags("VIPAccountRewards", 2); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
     EndIf
 Return
@@ -673,12 +673,12 @@ Func GetVIPCharacterReward(); If $RestartLoop Then Return 0
             SetCharacterValue("CollectedVIPCharacterReward", 1)
         EndIf
     EndIf
-    OpenInventoryBags("VIPCharacterRewards"); If $RestartLoop Then Return 0
+    OpenInventoryBags("VIPCharacterRewards", 2); If $RestartLoop Then Return 0
     If $RestartLoop Then Return 0
 EndFunc
 
-Func OpenInventoryBags($bag, $limit = 10, $open = 1); If $RestartLoop Then Return 0
-    If Not $OpenProfessionBags And GetValue("DisableOpeningBags") Then Return
+Func OpenInventoryBags($bag, $open = 1, $limit = 10); If $RestartLoop Then Return 0
+    If Not $OpenProfessionBags And $open <> 2 And GetValue("DisableOpeningBags") Then Return
     If $open Then
         ClearWindows(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
