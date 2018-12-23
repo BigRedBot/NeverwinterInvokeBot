@@ -13,7 +13,7 @@ Thank you all who have supported this project, it has helped me more than you wi
 Now supports the Russian game client.
 
 - For this script to work, the **Interface scale** in the **Options** must be set to **1.00**, in the **General** section of the **Interface** tab.  
-- I also recommend a screen resolution of no greater than 1920x1080. This script may not work properly with higher resolutions.  
+- I also recommend a screen resolution of no greater than **1920x1080**. This script may not work properly with higher resolutions.  
 - For the VIP collection, you need to increase the size of your in game inventory window, so that the script can see the buttons it needs to click on. It will not attempt to scroll the inventory window for you.
 
 &nbsp;
