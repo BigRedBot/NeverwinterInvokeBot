@@ -43,18 +43,12 @@ So that I can continue to fund my efforts, I have added an unlock code for the e
 
 **Fishing Bot**: Will fish for you.
 
+&nbsp;
+
 **Use this link to purchase the Neverwinter Invoke Bot Utility Unlock Code:**  
 https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=R3PNJD7RT56BY
 
 The unlock code is automatically emailed to your PayPal email address.
-
-&nbsp;
-
-**Use this referral link to create an account with Simple bank and get $20 absolutely free:**  
-https://simple.com/friends/D3B6CY4
-
-And when you use the Simple card for the first time, we will both receive $20 each. How cool is that?  
-(You must be a U.S. citizen that is 18 or older to create a Simple account.)
 
 &nbsp;
 
