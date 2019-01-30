@@ -33,6 +33,16 @@ https://github.com/BigRedBot/NeverwinterInvokeBot/issues/41
 
 &nbsp;
 
+So that I can continue to fund my efforts, I have added an unlock code for the extra utilities that I have added: **Mail Bot**, **Auction Bot**, **Guild Bank RP Bot**, and the **Fishing Bot**
+
+**Mail Bot**: Opens mail for you by removing the item and then deleting the mail.
+
+**Auction Bot**: Has a predefined list of items that can be posted to the auction house for you.
+
+**Guild Bank RP Bot**: Removes refining stones from your Guild Bank tab that you have permissions to.
+
+**Fishing Bot**: Will fish for you.
+
 **Use this link to purchase the Neverwinter Invoke Bot Utility Unlock Code:**  
 https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=R3PNJD7RT56BY
 

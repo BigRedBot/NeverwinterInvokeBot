@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+11.1.1
+- Added a description of the Utilities in the README file
+- Removed advertisement for Simple Bank (The referral program stopped)
+
 11.1
 - Updated Fishing Bot to work with Winter Festival Fishing.
 
