@@ -4,13 +4,9 @@ Mod 15 will completely break profession support.
 
 I currently have no plans to continue support for professions. Please understand that no refunds will be given for those who have purchased the unlock keys.
 
-For those who unlocked profession support without paying for the unlock code, I am sure you probably don't have the money to spare, so, I have no hard feelings about it. :)
-
-Thank you all who have supported this project, it has helped me more than you will ever know.
+This script currently supports the Russian game client.
 
 &nbsp;
-
-Now supports the Russian game client.
 
 - For this script to work, the **Interface scale** in the **Options** must be set to **1.00**, in the **General** section of the **Interface** tab.  
 - I also recommend a screen resolution of no greater than **1920x1080**. This script may not work properly with higher resolutions.  
