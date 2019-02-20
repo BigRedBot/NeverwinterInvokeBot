@@ -1813,15 +1813,18 @@ Func ChooseAccountOptions()
         DeleteIniAccount("DisableOpeningBags")
         DeleteAccountValue("OpenBagsOnEveryLoop")
         DeleteIniAccount("OpenBagsOnEveryLoop")
-        Return
+    ElseIf GetAllAccountsValue("OpenBagsOnEveryLoop") Then
+        DeleteAccountValue("OpenBagsOnEveryLoop")
+        DeleteIniAccount("OpenBagsOnEveryLoop")
     EndIf
     Local $hGUI = GUICreate($Title, 320, 150, -1, -1, -1, $WS_EX_TOPMOST)
     GUICtrlCreateLabel(Localize("AccountNumber", "<ACCOUNT>", $CurrentAccount), 25, 20, 150)
     Local $OpenInventoryBagsCheckbox = GUICtrlCreateCheckbox(" " & Localize("OpenInventoryBags"), 25, 45, 270)
-    If Not GetAccountValue("DisableOpeningBags") Then GUICtrlSetState($OpenInventoryBagsCheckbox, $GUI_CHECKED)
+    If GetAllAccountsValue("DisableOpeningBags") Then GUICtrlSetState($OpenInventoryBagsCheckbox, $GUI_DISABLE)
+    If Not GetAccountValue("DisableOpeningBags") And Not GetAllAccountsValue("DisableOpeningBags") Then GUICtrlSetState($OpenInventoryBagsCheckbox, $GUI_CHECKED)
     Local $OpenInventoryBagsOnEveryLoopCheckbox = GUICtrlCreateCheckbox(" " & Localize("OpenInventoryBagsOnEveryLoop"), 25, 75, 270)
-    If GetAccountValue("DisableOpeningBags") Or GetAllAccountsValue("OpenBagsOnEveryLoop") Then GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_DISABLE)
-    If (Not GetAccountValue("DisableOpeningBags") And GetAccountValue("OpenBagsOnEveryLoop")) Or GetAllAccountsValue("OpenBagsOnEveryLoop") Then GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_CHECKED)
+    If GetAccountValue("DisableOpeningBags") Or GetAllAccountsValue("DisableOpeningBags") Or GetAllAccountsValue("OpenBagsOnEveryLoop") Then GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_DISABLE)
+    If Not GetAccountValue("DisableOpeningBags") And Not GetAllAccountsValue("DisableOpeningBags") And (GetAccountValue("OpenBagsOnEveryLoop") Or GetAllAccountsValue("OpenBagsOnEveryLoop")) Then GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_CHECKED)
     Local $ButtonAdvanced = GUICtrlCreateButton(Localize("Advanced"), 25, 110, 75, 25)
     Local $ButtonOK = GUICtrlCreateButton("&OK", 127, 110, 75, 25, $BS_DEFPUSHBUTTON)
     Local $ButtonCancel = GUICtrlCreateButton("&Cancel", 214, 110, 75, 25)
@@ -1831,40 +1834,43 @@ Func ChooseAccountOptions()
             Case $GUI_EVENT_CLOSE
                 ExitScript()
             Case $OpenInventoryBagsCheckbox
-                If GUICtrlRead($OpenInventoryBagsCheckbox) = $GUI_CHECKED And Not GetAllAccountsValue("OpenBagsOnEveryLoop") Then
-                    GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_ENABLE)
-                    If GetAccountValue("OpenBagsOnEveryLoop") Then GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_CHECKED)
-                Else
+                If GUICtrlRead($OpenInventoryBagsCheckbox) = $GUI_CHECKED Then
                     If GetAllAccountsValue("OpenBagsOnEveryLoop") Then
                         GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_CHECKED)
                     Else
-                        GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_UNCHECKED)
+                        GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_ENABLE)
                     EndIf
+                Else
+                    GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_UNCHECKED)
                     GUICtrlSetState($OpenInventoryBagsOnEveryLoopCheckbox, $GUI_DISABLE)
                 EndIf
             Case $ButtonAdvanced
                 AdvancedAccountSettings($hGUI)
             Case $ButtonOK
-                Local $disabled = 1
-                If GUICtrlRead($OpenInventoryBagsCheckbox) = $GUI_CHECKED Then $disabled = 0
-                If GetAccountValue("DisableOpeningBags") <> $disabled Then
-                    If $disabled == GetDefaultValue("DisableOpeningBags") Then
-                        DeleteAccountValue("DisableOpeningBags")
-                        DeleteIniAccount("DisableOpeningBags")
-                    Else
-                        SetAccountValue("DisableOpeningBags", $disabled)
-                        SaveIniAccount("DisableOpeningBags", GetAccountValue("DisableOpeningBags"))
+                If Not GetAllAccountsValue("DisableOpeningBags") Then
+                    Local $disabled = 1
+                    If GUICtrlRead($OpenInventoryBagsCheckbox) = $GUI_CHECKED Then $disabled = 0
+                    If GetAccountValue("DisableOpeningBags") <> $disabled Then
+                        If $disabled == GetDefaultValue("DisableOpeningBags") Then
+                            DeleteAccountValue("DisableOpeningBags")
+                            DeleteIniAccount("DisableOpeningBags")
+                        Else
+                            SetAccountValue("DisableOpeningBags", $disabled)
+                            SaveIniAccount("DisableOpeningBags", GetAccountValue("DisableOpeningBags"))
+                        EndIf
                     EndIf
-                EndIf
-                Local $enabled = 0
-                If GUICtrlRead($OpenInventoryBagsOnEveryLoopCheckbox) = $GUI_CHECKED And Not GetAllAccountsValue("OpenBagsOnEveryLoop") Then $enabled = 1
-                If GetAccountValue("OpenBagsOnEveryLoop") <> $enabled Then
-                    If $enabled == GetDefaultValue("OpenBagsOnEveryLoop") Then
-                        DeleteAccountValue("OpenBagsOnEveryLoop")
-                        DeleteIniAccount("OpenBagsOnEveryLoop")
-                    Else
-                        SetAccountValue("OpenBagsOnEveryLoop", $enabled)
-                        SaveIniAccount("OpenBagsOnEveryLoop", GetAccountValue("OpenBagsOnEveryLoop"))
+                    If Not GetAllAccountsValue("OpenBagsOnEveryLoop") Then
+                        Local $enabled = 0
+                        If GUICtrlRead($OpenInventoryBagsOnEveryLoopCheckbox) = $GUI_CHECKED And Not GetAllAccountsValue("OpenBagsOnEveryLoop") Then $enabled = 1
+                        If GetAccountValue("OpenBagsOnEveryLoop") <> $enabled Then
+                            If $enabled == GetDefaultValue("OpenBagsOnEveryLoop") Then
+                                DeleteAccountValue("OpenBagsOnEveryLoop")
+                                DeleteIniAccount("OpenBagsOnEveryLoop")
+                            Else
+                                SetAccountValue("OpenBagsOnEveryLoop", $enabled)
+                                SaveIniAccount("OpenBagsOnEveryLoop", GetAccountValue("OpenBagsOnEveryLoop"))
+                            EndIf
+                        EndIf
                     EndIf
                 EndIf
                 GUIDelete()

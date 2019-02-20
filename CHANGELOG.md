@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+11.2
+- Fixed small bug with the advanced account options button being hidden if opening bags for all accounts option is disabled
+
 11.1.1
 - Added a description of the Utilities in the README file
 - Removed advertisement for Simple Bank (The referral program stopped)
