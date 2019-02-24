@@ -15,6 +15,7 @@ Global $AllLoginInfoFound = 1, $FirstRun = 1, $SkipAllConfigurations, $Unattende
 AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
 #include <ColorConstants.au3>
 #include <Math.au3>
+#include "_ScheduleWakeUp.au3"
 #include "_DownloadFile.au3"
 #include "_GetUTCMinutes.au3"
 #include "_ImageSearch.au3"
@@ -22,6 +23,7 @@ AutoItSetOption("SendKeyDownDelay", GetValue("KeyDelaySeconds") * 1000)
 #include "_GUIScrollbars_Ex.au3"
 #Include "_Icons.au3"
 #include "Professions.au3"
+OnAutoItExitRegister("_ScheduleWakeUp_Delete_ExitScript")
 
 Func ExitScript()
     Reset()
@@ -1046,14 +1048,15 @@ EndFunc
 
 Func WaitMinutes($time, $msg); If $RestartLoop Then Return 0
     Local $t = TimerInit(), $left = $time, $lastmin = 0, $leftover
-    If EndNowTime($left) Then
+    If EndNowTime($time) Then
         SetAllAccountsValue("EndNow", 1)
         End(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
     EndIf
+    If $time >= 10 Then _ScheduleWakeUp($time * 60, 5 * 60)
     SyncValues()
     FindWindow()
-    If $left > 0 And $WinHandle Then WinSetState($WinHandle, "", @SW_MINIMIZE)
+    If $time > 0 And $WinHandle Then WinSetState($WinHandle, "", @SW_MINIMIZE)
     While $left > 0
         Splash("[ " & Localize($msg, "<MINUTES>", HoursAndMinutes($left)) & " ]", 0)
         If $left > 1 then
@@ -2136,13 +2139,14 @@ Func Go(); If $RestartLoop Then Return 0
     $DisableRestartCount = 1
     If $MinutesToStart Then
         Local $t = TimerInit(), $time = $MinutesToStart, $left = $time, $lastmin = 0, $leftover
-        Position(); If $RestartLoop Then Return 0
-        If $RestartLoop Then Return 0
-        If EndNowTime($left) Then
+        If EndNowTime($time) Then
             SetAllAccountsValue("EndNow", 1)
             End(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
         EndIf
+        If $time >= 10 Then _ScheduleWakeUp($time * 60, 5 * 60)
+        Position(); If $RestartLoop Then Return 0
+        If $RestartLoop Then Return 0
         While $left > 0
             $MinutesToStart = Ceiling($left)
             Splash("[ " & Localize("WaitingToStart", "<MINUTES>", HoursAndMinutes($left)) & " ]", 0)

@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+11.3
+- To reduce energy use: Will now add a windows scheduled task to wake the computer from sleep if the script will wait for 10 minutes or more (for this to work, the windows setting to require a password on wakeup must be disabled)
+
 11.2
 - Fixed small bug with the advanced account options button being hidden if opening bags for all accounts option is disabled
 

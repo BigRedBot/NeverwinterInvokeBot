@@ -4,12 +4,15 @@
 #include <MsgBoxConstants.au3>
 #include <TrayConstants.au3>
 #include <Timers.au3>
+#include "_ScheduleWakeUp.au3"
 #include "_GetUTCMinutes.au3"
 #include "_UnicodeIni.au3"
 #include "Shared.au3"
 Global $Title = $Name & " " & $Version & ": Unattended Launcher"
 LoadLocalizations()
 If _Singleton("Neverwinter Invoke Bot: Unattended Launcher" & "Jp4g9QRntjYP", 1) = 0 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("UnattendedAlreadyRunning"))
+If @AutoItX64 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("Use32bit"))
+OnAutoItExitRegister("_ScheduleWakeUp_Delete_ExitScript")
 Local $CanRun = 1, $Ran, $Disabled
 Local $RunNowItem = TrayCreateItem(Localize("RunNow"))
 TrayItemSetOnEvent($RunNowItem, "RunNow")
@@ -179,6 +182,8 @@ Func WaitMinutes($time, $msg, $idle = 0)
             $txt = $Title & @CRLF & Localize($msg) & @CRLF & HoursAndMinutes($time)
             TraySetToolTip($txt)
         EndIf
+    ElseIf $time >= 10 Then
+        _ScheduleWakeUp(($time - 5) * 60)
     EndIf
     While $left > 0
         If $idle Then
@@ -236,7 +241,7 @@ Func Unattended()
         WaitMinutes($min, "WaitingForServerReset")
         If $Ran Then ExitLoop
         TraySetIcon(@ScriptDir & "\images\yellow.ico")
-        WaitMinutes(10, "WaitingForSystemIdle", 1)
+        WaitMinutes(5, "WaitingForSystemIdle", 1)
         If $Ran Then ExitLoop
         TraySetToolTip($Title & @CRLF & Localize("UnattendedRunning"))
         TraySetIcon(@ScriptDir & "\images\green.ico")
