@@ -31,6 +31,8 @@ If ( RegRead($RegLocation, "DisplayName") <> "" Or RegRead($RegLocation, "Displa
 
 If FileExists(@AppDataDir & "\" & $Name) And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("KeepSettingsFiles")) <> $IDYES Then DirRemove(@AppDataDir & "\" & $Name, 1)
 
+If Not RunWait('schtasks /query /tn "Neverwinter Invoke Bot Start Up"', "", @SW_HIDE) And RunWait('schtasks /delete /tn "Neverwinter Invoke Bot Start Up" /f', "", @SW_HIDE) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToDeleteStartUpTask"))
+
 _SelfDelete(5, 1, 1)
 If @error = 1 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, "Self Delete", "The script must be a compiled exe to work correctly!")
 If @error = 2 Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, "Self Delete", "Unable to create temporary deletion script file!")

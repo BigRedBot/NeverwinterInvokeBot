@@ -182,8 +182,8 @@ Func WaitMinutes($time, $msg, $idle = 0)
             $txt = $Title & @CRLF & Localize($msg) & @CRLF & HoursAndMinutes($time)
             TraySetToolTip($txt)
         EndIf
-    ElseIf $time >= 10 Then
-        _ScheduleWakeUp(($time - 5) * 60)
+    ElseIf $time >= 5 Then
+        _ScheduleWakeUp(($time - 2) * 60)
     EndIf
     While $left > 0
         If $idle Then

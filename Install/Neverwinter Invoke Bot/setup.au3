@@ -83,8 +83,11 @@ If FileExists($InstallDir) Then
         If $delete[$i] <> "Install.exe" And Not FileDelete($InstallDir & "\" & $delete[$i]) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToDeleteFile", "<FILE>", $InstallDir & "\" & $delete[$i]))
     Next
 EndIf
-If FileExists(@DesktopCommonDir & "\Neverwinter Fishing Bot.lnk") And Not FileDelete(@DesktopCommonDir & "\Neverwinter Fishing Bot.lnk") Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToDeleteFile", "<FILE>", @DesktopCommonDir & "\Neverwinter Fishing Bot.lnk"))
-If FileExists(@StartupCommonDir & "\Neverwinter Invoke Bot Unattended Launcher.lnk") And Not FileDelete(@StartupCommonDir & "\Neverwinter Invoke Bot Unattended Launcher.lnk") Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToDeleteFile", "<FILE>", @StartupCommonDir & "\Neverwinter Invoke Bot Unattended Launcher.lnk"))
+Local $XMLFile = $InstallDir & "\ScheduledStartUp.xml"
+Local $deleteshortcuts = StringSplit(@DesktopCommonDir & "\Neverwinter Fishing Bot.lnk" & "|" & @StartupCommonDir & "\Neverwinter Invoke Bot Unattended Launcher.lnk" & "|" & @StartupCommonDir & "\" & $Name & ".lnk" & "|" & $XMLFile, "|")
+For $i = 1 To $deleteshortcuts[0]
+    If FileExists($deleteshortcuts[$i]) And Not FileDelete($deleteshortcuts[$i]) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToDeleteFile", "<FILE>", $deleteshortcuts[$i]))
+Next
 If Not DirCopy($Name, $InstallDir, 1) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCopyingFilesToProgramsFolder"))
 If Not RegWrite($RegLocation, "DisplayName", "REG_SZ", $Name) Or Not RegWrite($RegLocation, "DisplayVersion", "REG_SZ", $Version) Or Not RegWrite($RegLocation, "Publisher", "REG_SZ", "BigRedBot") Or Not RegWrite($RegLocation, "DisplayIcon", "REG_SZ", $InstallDir & "\Unattended.exe") Or Not RegWrite($RegLocation, "UninstallString", "REG_SZ", '"' & $InstallDir & '\Uninstall.exe"') Or Not RegWrite($RegLocation, "InstallLocation", "REG_SZ", $InstallDir) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCreatingUninstallerRegistry"))
 If Not FileCreateShortcut($InstallDir & "\Unattended.exe", @DesktopCommonDir & "\" & $Name & ".lnk", $InstallDir) Or Not FileCreateShortcut($SettingsDir, $InstallDir & "\Settings.lnk", $InstallDir) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCreatingShortcut"))
@@ -92,10 +95,61 @@ If Not FileCreateShortcut($InstallDir & "\Unattended.exe", @DesktopCommonDir & "
 FileDelete(@DesktopCommonDir & "\Simple Bank Referral.lnk")
 Local $RunUnattendedOnStartup
 If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("RunUnattendedOnStartup")) = $IDYES Then
-    If Not FileCreateShortcut($InstallDir & "\Unattended.exe", @StartupCommonDir & "\" & $Name & ".lnk", $InstallDir) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCreatingShortcut"))
+    If Not RunWait('schtasks /query /tn "Neverwinter Invoke Bot Start Up"', "", @SW_HIDE) And RunWait('schtasks /delete /tn "Neverwinter Invoke Bot Start Up" /f', "", @SW_HIDE) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToDeleteStartUpTask"))
+    Local $XMLText = _
+    '<?xml version="1.0" encoding="UTF-16"?>' & @CRLF & _
+    '<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">' & @CRLF & _
+    '<RegistrationInfo>' & @CRLF & _
+    '  <Author>SYSTEM</Author>' & @CRLF & _
+    '  <URI>\Neverwinter Invoke Bot Start Up</URI>' & @CRLF & _
+    '</RegistrationInfo>' & @CRLF & _
+    '<Triggers>' & @CRLF & _
+    '  <LogonTrigger>' & @CRLF & _
+    '    <Enabled>true</Enabled>' & @CRLF & _
+    '  </LogonTrigger>' & @CRLF & _
+    '</Triggers>' & @CRLF & _
+    '<Principals>' & @CRLF & _
+    '  <Principal id="Author">' & @CRLF & _
+    '    <LogonType>InteractiveToken</LogonType>' & @CRLF & _
+    '    <RunLevel>HighestAvailable</RunLevel>' & @CRLF & _
+    '  </Principal>' & @CRLF & _
+    '</Principals>' & @CRLF & _
+    '<Settings>' & @CRLF & _
+    '  <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>' & @CRLF & _
+    '  <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>' & @CRLF & _
+    '  <StopIfGoingOnBatteries>true</StopIfGoingOnBatteries>' & @CRLF & _
+    '  <AllowHardTerminate>true</AllowHardTerminate>' & @CRLF & _
+    '  <StartWhenAvailable>false</StartWhenAvailable>' & @CRLF & _
+    '  <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>' & @CRLF & _
+    '  <IdleSettings>' & @CRLF & _
+    '    <StopOnIdleEnd>true</StopOnIdleEnd>' & @CRLF & _
+    '    <RestartOnIdle>false</RestartOnIdle>' & @CRLF & _
+    '  </IdleSettings>' & @CRLF & _
+    '  <AllowStartOnDemand>true</AllowStartOnDemand>' & @CRLF & _
+    '  <Enabled>true</Enabled>' & @CRLF & _
+    '  <Hidden>false</Hidden>' & @CRLF & _
+    '  <RunOnlyIfIdle>false</RunOnlyIfIdle>' & @CRLF & _
+    '  <WakeToRun>false</WakeToRun>' & @CRLF & _
+    '  <ExecutionTimeLimit>PT72H</ExecutionTimeLimit>' & @CRLF & _
+    '  <Priority>7</Priority>' & @CRLF & _
+    '</Settings>' & @CRLF & _
+    '<Actions Context="Author">' & @CRLF & _
+    '  <Exec>' & @CRLF & _
+    '      <Command>cmd.exe</Command>' & @CRLF & _
+    '      <Arguments>/c start /b "" "' & $InstallDir & "\Unattended.exe" & '"</Arguments>' & @CRLF & _
+    '  </Exec>' & @CRLF & _
+    '</Actions>' & @CRLF & _
+    '</Task>'
+    If Not FileWrite($XMLFile, $XMLText) Then Return Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToCreateStartUpTask"))
+    If RunWait('schtasks /create /xml "' & $XMLFile & '" /tn "Neverwinter Invoke Bot Start Up"', "", @SW_HIDE) Then
+        FileDelete($XMLFile)
+        Return Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToCreateStartUpTask"))
+    Else
+        FileDelete($XMLFile)
+    EndIf
     $RunUnattendedOnStartup = 1
-ElseIf FileExists(@StartupCommonDir & "\" & $Name & ".lnk") And Not FileDelete(@StartupCommonDir & "\" & $Name & ".lnk") Then
-    Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToDeleteFile", "<FILE>", @StartupCommonDir & "\" & $Name & ".lnk"))
+ElseIf Not RunWait('schtasks /query /tn "Neverwinter Invoke Bot Start Up"', "", @SW_HIDE) And RunWait('schtasks /delete /tn "Neverwinter Invoke Bot Start Up" /f', "", @SW_HIDE) Then
+    Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToDeleteStartUpTask"))
 EndIf
 MsgBox($MB_OK + $MB_TOPMOST, $Title, Localize("SuccessfullyInstalled", "<VERSION>", $Version) & @CRLF & @CRLF & $InstallDir)
 
