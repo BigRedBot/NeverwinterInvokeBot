@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+11.5
+- Set computer to wake up 5 minutes instead of 2 minutes before unattended launcher runs
+
 11.4.1
 - Now using task scheduler to start unattended launcher on startup
 

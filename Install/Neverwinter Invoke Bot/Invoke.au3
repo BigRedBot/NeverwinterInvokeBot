@@ -1053,7 +1053,7 @@ Func WaitMinutes($time, $msg); If $RestartLoop Then Return 0
         End(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
     EndIf
-    If $time >= 5 Then _ScheduleWakeUp($time * 60, 2 * 60)
+    If $time >= 6 Then _ScheduleWakeUp($time * 60, 5 * 60)
     SyncValues()
     FindWindow()
     If $time > 0 And $WinHandle Then WinSetState($WinHandle, "", @SW_MINIMIZE)
@@ -2144,7 +2144,7 @@ Func Go(); If $RestartLoop Then Return 0
             End(); If $RestartLoop Then Return 0
             If $RestartLoop Then Return 0
         EndIf
-        If $time >= 5 Then _ScheduleWakeUp($time * 60, 2 * 60)
+        If $time >= 6 Then _ScheduleWakeUp($time * 60, 5 * 60)
         Position(); If $RestartLoop Then Return 0
         If $RestartLoop Then Return 0
         While $left > 0
