@@ -1,7 +1,7 @@
 RELEASE NOTES
 =============
 
-11.4
+11.4.1
 - Now using task scheduler to start unattended launcher on startup
 
 11.3

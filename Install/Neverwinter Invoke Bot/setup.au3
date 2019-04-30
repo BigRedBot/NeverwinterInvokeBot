@@ -134,7 +134,7 @@ If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("RunUnatt
     '<Actions Context="Author">' & @CRLF & _
     '  <Exec>' & @CRLF & _
     '      <Command>cmd.exe</Command>' & @CRLF & _
-    '      <Arguments>/c start /b "" "' & $InstallDir & "\Unattended.exe" & '"</Arguments>' & @CRLF & _
+    '      <Arguments>/c start "" "' & $InstallDir & "\Unattended.exe" & '"</Arguments>' & @CRLF & _
     '  </Exec>' & @CRLF & _
     '</Actions>' & @CRLF & _
     '</Task>'
