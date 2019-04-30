@@ -84,15 +84,13 @@ If FileExists($InstallDir) Then
     Next
 EndIf
 Local $XMLFile = $InstallDir & "\ScheduledStartUp.xml"
-Local $deleteshortcuts = StringSplit(@DesktopCommonDir & "\Neverwinter Fishing Bot.lnk" & "|" & @StartupCommonDir & "\Neverwinter Invoke Bot Unattended Launcher.lnk" & "|" & @StartupCommonDir & "\" & $Name & ".lnk" & "|" & $XMLFile, "|")
+Local $deleteshortcuts = StringSplit(@DesktopCommonDir & "\Neverwinter Fishing Bot.lnk" & "|" & @StartupCommonDir & "\Neverwinter Invoke Bot Unattended Launcher.lnk" & "|" & @StartupCommonDir & "\" & $Name & ".lnk" & "|" & @DesktopCommonDir & "\Simple Bank Referral.lnk" & "|" & $XMLFile, "|")
 For $i = 1 To $deleteshortcuts[0]
     If FileExists($deleteshortcuts[$i]) And Not FileDelete($deleteshortcuts[$i]) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToDeleteFile", "<FILE>", $deleteshortcuts[$i]))
 Next
 If Not DirCopy($Name, $InstallDir, 1) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCopyingFilesToProgramsFolder"))
 If Not RegWrite($RegLocation, "DisplayName", "REG_SZ", $Name) Or Not RegWrite($RegLocation, "DisplayVersion", "REG_SZ", $Version) Or Not RegWrite($RegLocation, "Publisher", "REG_SZ", "BigRedBot") Or Not RegWrite($RegLocation, "DisplayIcon", "REG_SZ", $InstallDir & "\Unattended.exe") Or Not RegWrite($RegLocation, "UninstallString", "REG_SZ", '"' & $InstallDir & '\Uninstall.exe"') Or Not RegWrite($RegLocation, "InstallLocation", "REG_SZ", $InstallDir) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCreatingUninstallerRegistry"))
 If Not FileCreateShortcut($InstallDir & "\Unattended.exe", @DesktopCommonDir & "\" & $Name & ".lnk", $InstallDir) Or Not FileCreateShortcut($SettingsDir, $InstallDir & "\Settings.lnk", $InstallDir) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCreatingShortcut"))
-;If Not FileCreateShortcut($InstallDir & "\Simple.html", @DesktopCommonDir & "\Simple Bank Referral.lnk", $InstallDir) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("ErrorCreatingShortcut"))
-FileDelete(@DesktopCommonDir & "\Simple Bank Referral.lnk")
 Local $RunUnattendedOnStartup
 If MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("RunUnattendedOnStartup")) = $IDYES Then
     If Not RunWait('schtasks /query /tn "Neverwinter Invoke Bot Start Up"', "", @SW_HIDE) And RunWait('schtasks /delete /tn "Neverwinter Invoke Bot Start Up" /f', "", @SW_HIDE) Then Exit MsgBox($MB_ICONWARNING + $MB_TOPMOST, $Title, Localize("FailedToDeleteStartUpTask"))
@@ -181,7 +179,5 @@ If FileExists(@ScriptDir & "\" & $Name & "\Message.txt") Then MsgBox($MB_OK + $M
 _setupMsg(_setupFileRead(@ScriptDir & "\" & $Name & "\CHANGELOG.txt"))
 
 If $RunUnattendedOnStartup And MsgBox($MB_YESNO + $MB_ICONQUESTION + $MB_TOPMOST, $Title, Localize("RunUnattendedNow")) = $IDYES Then
-    ;ShellExecute($InstallDir & "\Simple.html")
     Exit ShellExecute($InstallDir & "\Unattended.exe", "", $InstallDir)
 EndIf
-;ShellExecute($InstallDir & "\Simple.html")
