@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+11.6
+- Fixed image for English version
+
 11.5
 - Set computer to wake up 5 minutes instead of 2 minutes before unattended launcher runs
 
