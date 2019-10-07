@@ -4,7 +4,7 @@
 
 Global $_GetUTCMinutes_LastTimeServer
 
-Local $_GetUTCMinutes_TimeServers = "time.nist.gov, pool.ntp.org, 0.pool.ntp.org, 1.pool.ntp.org, 2.pool.ntp.org, 3.pool.ntp.org"
+Local $_GetUTCMinutes_TimeServers = "time.google.com, pool.ntp.org, time.nist.gov, 0.pool.ntp.org, 1.pool.ntp.org, 2.pool.ntp.org, 3.pool.ntp.org"
 
 Local $_GetUTCMinutes_TimerDelaySet = TimerInit(), $_GetUTCMinutes_TimeServerArray = StringSplit(StringRegExpReplace(StringRegExpReplace(StringStripWS($_GetUTCMinutes_TimeServers, 8), "^,", ""), ",$", ""), ",")
 

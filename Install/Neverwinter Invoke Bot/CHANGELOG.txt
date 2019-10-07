@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+11.7.1
+- Added time.google.com to list of ntp servers
+
 11.7
 - Auction bot will now work with stacks larger than 99
 
