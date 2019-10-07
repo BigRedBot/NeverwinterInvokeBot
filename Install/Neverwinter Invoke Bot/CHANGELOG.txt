@@ -1,6 +1,10 @@
 RELEASE NOTES
 =============
 
+11.7.2
+- Set pool.ntp.org as first ntp server
+- Set time.windows.com as last ntp server
+
 11.7.1
 - Added time.google.com to list of ntp servers
 
