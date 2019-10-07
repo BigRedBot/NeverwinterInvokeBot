@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+11.7
+- Auction bot will now work with stacks larger than 99
+
 11.6
 - Fixed image for English version
 

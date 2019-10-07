@@ -183,9 +183,9 @@ Func Auction()
             EndIf
             If $OKFound Then
                 If $itemQuantity == 1 Then
-                    Send("{BS 2}1")
+                    Send("{BS 5}1")
                 Else
-                    Send("99")
+                    Send("{BS 5}99")
                 EndIf
                 MyMouseMove($_ImageSearchX, $_ImageSearchY)
                 SingleClick()
