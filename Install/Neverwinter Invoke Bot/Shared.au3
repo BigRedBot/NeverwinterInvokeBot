@@ -116,6 +116,7 @@ Global $RemoveProfessions = 1
 Local $UtilityCodeHash = "A3B3249F2784364B7BE3550FD0E02A140C6267F0"
 
 Func CheckUtilityUnlockCode($timeout = 0)
+    Return 1
     If Hex(_Crypt_HashData(StringUpper(StringStripWS(GetPrivateIniAllAccounts("UtilityUnlockCode"), $STR_STRIPALL)), $CALG_SHA1)) = $UtilityCodeHash Then Return 1
     TraySetState($TRAY_ICONSTATE_HIDE)
     If @Compiled Then

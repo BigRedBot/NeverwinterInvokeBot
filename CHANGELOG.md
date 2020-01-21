@@ -1,6 +1,9 @@
 RELEASE NOTES
 =============
 
+11.8
+- Removed unlock code requirement
+
 11.7.2
 - Set pool.ntp.org as first ntp server
 - Set time.windows.com as last ntp server
